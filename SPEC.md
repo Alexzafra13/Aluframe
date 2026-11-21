@@ -152,7 +152,7 @@ CRUD de clientes y artículos, importación de clientes desde CSV, precios con h
 Versiones, líneas de ventana y libres, dibujo SVG, cálculo en vivo (la página lo pide al servidor mientras se escribe), presupuesto imprimible en A4.
 - Aceptación: crear un presupuesto de 3 ventanas distintas con una línea libre, ver el dibujo, imprimirlo o guardarlo como PDF desde el navegador y que el total coincida con el cálculo del dominio.
 
-**Punto de validación con el taller:** probar H1–H3 con 5 ventanas reales y comparar con lo que haría el dueño a mano. No se sigue hasta que cuadre.
+**Punto de validación con el taller:** probar H1–H3 con 5 ventanas reales y comparar con lo que haría el dueño a mano. No se sigue hasta que cuadre. *(2026-11-21: aplazado por decisión del propietario hasta tener los datos; se sigue con H4 y la validación se hará en cuanto lleguen. Ver `docs/CAMBIOS.md`.)*
 
 ### H4. Trabajos y orden de taller
 Aceptar presupuesto, congelar cálculo, orden de taller en pantalla y en hoja imprimible A4, estados del trabajo.

@@ -2,9 +2,9 @@
 
 Abre Claude Code en la raíz del repositorio. No hace falta ejecutar `/init`. Trabaja con una sesión por hito y usa `/clear` entre hitos.
 
-## Siguiente sesión (H2), en modo plan
+## Siguiente sesión (H4), en modo plan
 ```
-Lee CLAUDE.md, docs/PROGRESS.md (apartado «Cómo retomar»), docs/CONTEXTO.md, docs/OPEN_QUESTIONS.md, el apartado H2 de SPEC.md, docs/DATOS.md (7.3 y 7.4) y docs/PANTALLAS.md (5 y 10). Ejecuta just check. Después, sin escribir código, propón el plan de H2: tablas que añadirás a esquema.sql, casos de uso, pantallas, pruebas y cómo comprobarás los criterios de aceptación. Señala huecos o contradicciones y espera mi aprobación.
+Lee CLAUDE.md y docs/PROGRESS.md (apartado «Cómo retomar»), y después docs/CONTEXTO.md, docs/OPEN_QUESTIONS.md, el apartado H4 de SPEC.md, docs/DATOS.md (3.6, 4 y 7.7), docs/PANTALLAS.md (8 y 13), docs/design.md y design/03-hoja-taller.png. Trabaja sobre la rama que indica PROGRESS.md (H2 y H3 aún no están en main). Comprueba que todo está en verde. Después, sin escribir código, propón el plan de H4: tablas que añadirás a esquema.sql, casos de uso, pantallas (con el estilo iOS ya acordado), pruebas y cómo comprobarás los criterios de aceptación. Señala huecos o contradicciones y espera mi aprobación.
 ```
 
 ## Empezar un hito

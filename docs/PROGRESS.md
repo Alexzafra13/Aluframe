@@ -1,11 +1,14 @@
 # Progreso
 
-Estado: **H3 terminado** (2026-11-21) en la rama `claude/sesion-h2-inicial-0eu0lb` (con H2), pendiente de llevar a `main`. Siguiente: **punto de validación con el taller** (5 ventanas reales, SPEC H3) y después **H4, trabajos y orden de taller**.
+Estado: **H3 terminado** (2026-11-21). H2 y H3 están en la rama `claude/sesion-h2-inicial-0eu0lb` y **aún no en `main`** (falta el permiso del propietario). Siguiente: **H4, trabajos y orden de taller**.
+
+**Validación con el taller aplazada (decisión del propietario, 2026-11-21).** SPEC pide probar H1–H3 con 5 ventanas reales antes de seguir, pero aún no hay datos para hacerlo (ver «Datos que faltan»). Se sigue con H4, que no depende de ellos, y la validación se hará en cuanto lleguen; si descubre fallos, se corrigen antes de cerrar el hito en curso.
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`; para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
-2. Comprueba que todo está en verde: `just instalar-hooks`, `just check`, `just e2e`.
-3. Propón el plan de H4 y **espera la aprobación** del propietario antes de escribir código.
+2. Parte de la rama de trabajo: si H2 y H3 siguen sin estar en `main`, trabaja sobre `claude/sesion-h2-inicial-0eu0lb` (o crea la rama nueva a partir de ella), nunca desde `main`.
+3. Comprueba que todo está en verde: `just instalar-hooks`, `just check`, `just e2e`. En la nube `just` no está instalado: `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, `cargo test --workspace --locked`, y para los E2E `cargo build --release --locked -p servidor` y luego, en `e2e/`, `npm ci` y `ALUMFRAME_BIN=../target/release/alumframe npx playwright test --trace off`.
+4. Propón el plan de H4 y **espera la aprobación** del propietario antes de escribir código.
 
 **Reglas que no están en SPEC y conviene no olvidar**
 - **Sin migraciones** hasta el primer despliegue real: se amplía `crates/servidor/src/bd/esquema.sql` (ADR-0011). Si cambia, borra `datos-dev/`.
@@ -15,8 +18,13 @@ Estado: **H3 terminado** (2026-11-21) en la rama `claude/sesion-h2-inicial-0eu0l
 - El cálculo vive en `crates/dominio`; el servidor solo guarda, sirve y llama. Las pantallas nuevas llevan prueba de integración y, los flujos principales, E2E.
 - **Publicar una versión:** subir `version` en `Cargo.toml` y llevarlo a `main`; GitHub Actions prueba, compila y publica (`docs/MAINTENANCE.md`, apartado 3). Desde las sesiones en la nube no se pueden subir etiquetas.
 - Se trabaja en una rama y se lleva a `main` al cerrar cada hito, con permiso del propietario.
+- **Estilo iOS** (petición del propietario): hojas con `<dialog>` y `recursos/js/hojas.js`, control segmentado, avisos efímeros (`aviso-efimero`), pie fijo oscuro; todo en `docs/design.md`. Las pantallas nuevas siguen ese patrón y respetan «reducir movimiento».
+- **Datos de prueba:** la serie y la tarifa ficticias de `fixtures/demo/` (E2E con `ALUMFRAME_DATOS_DEMO=si`); una serie demo nunca da precio final, así que lo que exige «completo» se prueba con `crates/servidor/tests/datos/serie-prueba-completa.yaml`.
+- **Precio:** nada se inventa. Margen, cobro de perfiles y mano de obra los elige el propietario en Ajustes > Empresa y precios (aún sin decidir); mientras tanto los presupuestos salen «Provisional». IVA 21 % por defecto, importes sin IVA y el IVA sumado al final (confirmado).
 
-**Datos que aún faltan del taller:** descuentos del cristal, una tarifa real, pletinas de falleba, recorte de extremos y confirmar la sierra de 2 mm (lista completa en `docs/OPEN_QUESTIONS.md`).
+**Datos que aún faltan del taller** (lista completa en `docs/OPEN_QUESTIONS.md`):
+- Para validar H1–H3 con 5 ventanas reales: descuentos del cristal de cada serie, la referencia de Aluval de cada código de las series (`MARCO_LATERAL`…), una tarifa real de Aluval, 5 ventanas con su hoja de corte y precio cobrado, y elegir margen y mano de obra.
+- Otros: pletinas de falleba, recorte de extremos, confirmar la sierra de 2 mm, posición de las bisagras y logotipo.
 
 | Hito | Estado |
 |---|---|
