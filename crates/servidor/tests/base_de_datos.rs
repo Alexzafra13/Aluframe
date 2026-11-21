@@ -52,6 +52,7 @@ async fn restablecer_la_contrasena_permite_entrar_con_la_nueva() {
         usuario_id: propietario.id,
         clave: CONTRASENA.into(),
         ip: "127.0.0.1".into(),
+        duracion: servidor::aplicacion::sesion::DuracionDeSesion::Normal,
     };
     let resultado = entrar(&contexto.estado, con_vieja).await.unwrap();
     assert!(matches!(resultado, ResultadoDeEntrada::Incorrecta));
@@ -59,6 +60,7 @@ async fn restablecer_la_contrasena_permite_entrar_con_la_nueva() {
         usuario_id: propietario.id,
         clave: "nueva-clave-larga".into(),
         ip: "127.0.0.1".into(),
+        duracion: servidor::aplicacion::sesion::DuracionDeSesion::Normal,
     };
     let resultado = entrar(&contexto.estado, con_nueva).await.unwrap();
     assert!(matches!(resultado, ResultadoDeEntrada::Correcta { .. }));

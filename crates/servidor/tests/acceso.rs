@@ -4,7 +4,7 @@ mod comun;
 
 use axum::http::StatusCode;
 use axum::http::header::SET_COOKIE;
-use comun::{CONTRASENA, Contexto, PIN, destino, get, post, texto};
+use comun::{CONTRASENA, Contexto, PIN, destino, get, post, texto, token_de_la_cookie};
 use servidor::aplicacion::entrar::{ResultadoDeEntrada, SolicitudDeEntrada, entrar};
 use servidor::aplicacion::sesion::identificar;
 use time::Duration;
@@ -14,6 +14,7 @@ fn solicitud(usuario_id: i64, clave: &str) -> SolicitudDeEntrada {
         usuario_id,
         clave: clave.into(),
         ip: "192.168.1.20".into(),
+        duracion: servidor::aplicacion::sesion::DuracionDeSesion::Normal,
     }
 }
 
@@ -163,4 +164,75 @@ async fn salir_cierra_la_sesion() {
             .unwrap()
             .is_none()
     );
+}
+
+#[tokio::test]
+async fn el_propietario_puede_mantener_la_sesion_hasta_cerrar_el_navegador() {
+    let contexto = Contexto::nuevo().await;
+    let (_, propietario) = contexto.con_propietario().await;
+    let formulario = format!(
+        "usuario_id={}&clave={CONTRASENA}&mantener_sesion=si",
+        propietario.id
+    );
+    let respuesta = contexto.pedir(post("/entrar", None, &formulario)).await;
+    let cookie = respuesta
+        .headers()
+        .get(SET_COOKIE)
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert!(!cookie.contains("Max-Age"), "{cookie}");
+    let token = token_de_la_cookie(cookie);
+    contexto.reloj.avanzar(Duration::hours(10));
+    assert!(
+        identificar(&contexto.estado, &token)
+            .await
+            .unwrap()
+            .is_some()
+    );
+    contexto.reloj.avanzar(Duration::days(5));
+    assert!(
+        identificar(&contexto.estado, &token)
+            .await
+            .unwrap()
+            .is_some()
+    );
+    contexto.reloj.avanzar(Duration::days(30));
+    assert!(
+        identificar(&contexto.estado, &token)
+            .await
+            .unwrap()
+            .is_none()
+    );
+}
+
+#[tokio::test]
+async fn por_defecto_la_sesion_caduca_y_la_cookie_tiene_duracion() {
+    let contexto = Contexto::nuevo().await;
+    let (_, propietario) = contexto.con_propietario().await;
+    let formulario = format!("usuario_id={}&clave={CONTRASENA}", propietario.id);
+    let respuesta = contexto.pedir(post("/entrar", None, &formulario)).await;
+    let cookie = respuesta
+        .headers()
+        .get(SET_COOKIE)
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert!(cookie.contains("Max-Age=43200"), "{cookie}");
+}
+
+#[tokio::test]
+async fn el_operario_no_puede_mantener_la_sesion_abierta() {
+    let contexto = Contexto::nuevo().await;
+    let (_, propietario) = contexto.con_propietario().await;
+    let operario = contexto.con_operario(&propietario).await;
+    let formulario = format!("usuario_id={operario}&clave={PIN}&mantener_sesion=si");
+    let respuesta = contexto.pedir(post("/entrar", None, &formulario)).await;
+    let cookie = respuesta
+        .headers()
+        .get(SET_COOKIE)
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert!(cookie.contains("Max-Age"), "{cookie}");
 }

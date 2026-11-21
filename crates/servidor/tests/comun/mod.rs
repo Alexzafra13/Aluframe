@@ -56,6 +56,7 @@ impl Contexto {
             usuario_id: 1,
             clave: CONTRASENA.into(),
             ip: "127.0.0.1".into(),
+            duracion: servidor::aplicacion::sesion::DuracionDeSesion::Normal,
         };
         match servidor::aplicacion::entrar::entrar(&self.estado, solicitud)
             .await
@@ -107,4 +108,9 @@ pub fn destino(respuesta: &Response<Body>) -> Option<&str> {
         .headers()
         .get(header::LOCATION)
         .and_then(|valor| valor.to_str().ok())
+}
+
+pub fn token_de_la_cookie(cookie: &str) -> String {
+    let primer_par = cookie.split(';').next().unwrap();
+    primer_par.split_once('=').unwrap().1.to_owned()
 }

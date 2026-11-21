@@ -25,6 +25,7 @@ test("el propietario da de alta un operario con PIN", async ({ page }) => {
   await page.goto("/entrar");
   await page.getByRole("link", { name: PROPIETARIO.nombre }).click();
   await page.getByLabel("Contraseña").fill(PROPIETARIO.contrasena);
+  await expect(page.getByLabel("Mantener la sesión abierta hasta cerrar el navegador")).not.toBeChecked();
   await page.getByRole("button", { name: "Entrar" }).click();
   await page.getByRole("link", { name: "Ajustes" }).click();
   await page.getByLabel("Nombre").fill(OPERARIO.nombre);

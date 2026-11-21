@@ -14,6 +14,7 @@ async fn token_de_operario(contexto: &Contexto) -> String {
         usuario_id: operario,
         clave: PIN.into(),
         ip: "10.0.0.5".into(),
+        duracion: servidor::aplicacion::sesion::DuracionDeSesion::Normal,
     };
     match entrar(&contexto.estado, solicitud).await.unwrap() {
         ResultadoDeEntrada::Correcta { token, .. } => token,
