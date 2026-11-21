@@ -97,8 +97,8 @@ Reglas:
 
 ## 9. Stock
 - El stock actual es la **suma de movimientos** (entrada, salida, ajuste), nunca un número editable.
-- Inventario inicial por artículo y color: barras enteras y **retales existentes** (cada uno con su longitud), para que el taller los registre al instalar el programa (decisión del propietario, 2026-11-21).
-- **Los retales se usan antes que las barras nuevas:** el plan de corte propone qué retal coger (perfil, color y longitud) y, al terminar la orden, el retal sale del stock y el sobrante útil (mayor que el retal mínimo) entra como retal nuevo.
+- Inventario inicial por artículo y color: barras enteras y **retales existentes** (cada uno con su longitud). Es **opcional**: el programa funciona sin inventario y los retales se pueden registrar cuando se quiera, al instalar o más tarde (decisión del propietario, 2026-11-21).
+- **Los retales se usan antes que las barras nuevas:** el plan de corte propone qué retal coger (perfil, color y longitud) y, al terminar la orden, el retal sale del stock y el sobrante entra como retal nuevo. **Retal mínimo: 0** (se guarda cualquier sobrante por si encaja en algo; decisión del propietario). Un retal que se tira se da de baja con un ajuste.
 - Entradas de material con una pantalla de pocos toques. Salidas automáticas al terminar la orden de taller.
 - Stock mínimo por artículo, aviso y lista de compra sugerida a partir de trabajos pendientes.
 

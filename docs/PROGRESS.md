@@ -16,7 +16,7 @@ Estado: **H2 terminado** (2026-11-21) en la rama `claude/sesion-h2-inicial-0eu0l
 - **Publicar una versión:** subir `version` en `Cargo.toml` y llevarlo a `main`; GitHub Actions prueba, compila y publica (`docs/MAINTENANCE.md`, apartado 3). Desde las sesiones en la nube no se pueden subir etiquetas.
 - Se trabaja en una rama y se lleva a `main` al cerrar cada hito, con permiso del propietario.
 
-**Datos que aún faltan del taller:** descuentos del cristal, una tarifa real, pletinas de falleba, recorte de extremos y retal mínimo, y confirmar la sierra de 2 mm (lista completa en `docs/OPEN_QUESTIONS.md`).
+**Datos que aún faltan del taller:** descuentos del cristal, una tarifa real, pletinas de falleba, recorte de extremos y confirmar la sierra de 2 mm (lista completa en `docs/OPEN_QUESTIONS.md`).
 
 | Hito | Estado |
 |---|---|

@@ -7,7 +7,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] `ancho` y `alto`: ¿hueco de obra o medida de la ventana? (las fórmulas dadas sugieren medida de ventana; confirmarlo)
 - [ ] ¿Marco superior, lateral e inferior salen del mismo perfil o de perfiles distintos?
 - [ ] ¿Se optimizan los cortes por ventana o por trabajo? ¿Qué se hace con los retales?
-- [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos y retal mínimo aprovechable, sin dato (se usan 0). Se cambian en Ajustes > Taller.
+- [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos sin dato (se usa 0); retal mínimo 0 por decisión del propietario. Se cambian en Ajustes > Taller.
 - [ ] Aluprom 21 de 4 hojas: confirmar ruedas (8) y tornillos (9 + 16), que son supuestos. Otras tipologías (fija, puertas).
 - [x] **Fixture de la abatible y bisagras:** el propietario confirma (2026-11-21) 2 bisagras por hoja hasta 140 cm de alto de la ventana, incluido, y 3 por encima. El fixture incluye ahora «BISAGRA: 4» para 120 × 140.
 - [ ] V-94 abatible: cantidad de inversores y su ángulo de corte, cálculo de las pletinas de falleba, tipos de escuadra (exterior e interior de hoja) y si los marcos superior, lateral e inferior son el mismo perfil.
@@ -67,7 +67,7 @@ Comparado con programas como Productor (Gaia), Cortizo Software, GesFácil, Klae
 - [ ] ¿Se quiere medir el tiempo por paso o por ventana? De momento no.
 - [ ] Cremona: ¿el lado se mira desde dentro o desde fuera? ¿Cambia alguna pieza (por ejemplo, qué hoja lleva el inversor) según el lado?
 - [x] Barras de longitud distinta de 640 cm (2026-11-21): si alguna serie o marca las vende de otra longitud, se configura en esa serie cuando aparezca. Los retales existentes se registran en el stock al instalar el programa (con su longitud, perfil y color) y el plan de corte los propone antes de abrir barras nuevas (`SPEC.md`, apartado 9 y H5).
-- [ ] Retal mínimo aprovechable: hace falta el dato para saber qué sobrante se guarda como retal (hoy 0, Ajustes > Taller).
+- [x] Retal mínimo aprovechable: **0**, se guarda cualquier sobrante por si encaja en algo (propietario, 2026-11-21). Registrar retales al instalar es opcional.
 - [ ] Retales: ¿se marcan físicamente (etiqueta, rotulador) para identificarlos al cogerlos, o basta con perfil, color y longitud?
 
 ## Bisagras y dibujo de la abatible
