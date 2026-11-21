@@ -1,6 +1,22 @@
 # Progreso
 
-Estado: **H1 terminado** (2026-11-21). Siguiente: **H2, catálogo, clientes e importación de tarifas**.
+Estado: **H1 terminado** (2026-11-21), publicado como v0.2.0. Siguiente: **H2, catálogo, clientes e importación de tarifas**.
+
+## Cómo retomar en una sesión nueva
+1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`; para H2, además `SPEC.md` (H2), `docs/DATOS.md` (7.3 y 7.4) y `docs/PANTALLAS.md` (5 y 10).
+2. Comprueba que todo está en verde: `just instalar-hooks`, `just check`, `just e2e`.
+3. Propón el plan de H2 y **espera la aprobación** del propietario antes de escribir código.
+
+**Reglas que no están en SPEC y conviene no olvidar**
+- **Sin migraciones** hasta el primer despliegue real: se amplía `crates/servidor/src/bd/esquema.sql` (ADR-0011). Si cambia, borra `datos-dev/`.
+- Toda dependencia nueva: ADR corto y versión con **más de 14 días** (`just antiguedad`; bajar con `cargo update -p nombre@version --precise anterior`).
+- Commits pequeños con Conventional Commits; comentarios solo para el porqué; archivos ≤ 300 líneas y funciones ≤ 40 (clippy y `just lint-size` lo vigilan).
+- Diseño: tokens y reglas de movimiento en `docs/design.md`. Nada de efectos decorativos; animar solo `transform` y `opacity`.
+- El cálculo vive en `crates/dominio`; el servidor solo guarda, sirve y llama. Las pantallas nuevas llevan prueba de integración y, los flujos principales, E2E.
+- **Publicar una versión:** subir `version` en `Cargo.toml` y llevarlo a `main`; GitHub Actions prueba, compila y publica (`docs/MAINTENANCE.md`, apartado 3). Desde las sesiones en la nube no se pueden subir etiquetas.
+- Se trabaja en una rama y se lleva a `main` al cerrar cada hito, con permiso del propietario.
+
+**Datos que aún faltan del taller:** descuentos del cristal, una tarifa real, pletinas de falleba, recorte de extremos y retal mínimo, y confirmar la sierra de 2 mm (lista completa en `docs/OPEN_QUESTIONS.md`).
 
 | Hito | Estado |
 |---|---|
@@ -23,7 +39,7 @@ Estado: **H1 terminado** (2026-11-21). Siguiente: **H2, catálogo, clientes e im
 - Workspace `crates/dominio` y `crates/servidor`, Rust 1.97.0 fijado, lints que prohíben `unwrap`, `expect`, `panic` y `unsafe`.
 - `just check` (formato, clippy `-D warnings`, pruebas, archivos de hasta 300 líneas), hook `.githooks/pre-push`, `cargo deny` y CI en GitHub Actions (Linux, E2E y Windows). Publicación por etiqueta `v*` con ejecutable Linux estático y `.exe` de Windows.
 - Servidor Axum en el **puerto 9090**: `/health`, configuración `alumframe.toml` y variables `ALUMFRAME_*`, modos servidor y local, órdenes `migrar` y `restablecer-contrasena`.
-- SQLite con WAL, `synchronous=FULL`, un escritor y cuatro lectores; migraciones 0001 (usuario, sesion, bloqueo_ip, auditoria y version_esquema) y 0002 (sesión hasta cerrar el navegador), copia previa a cada migración y negativa a arrancar con una base más nueva.
+- SQLite con WAL, `synchronous=FULL`, un escritor y cuatro lectores; (luego sustituidas por el esquema único, ADR-0011) migraciones 0001 (usuario, sesion, bloqueo_ip, auditoria y version_esquema) y 0002 (sesión hasta cerrar el navegador), copia previa a cada migración y negativa a arrancar con una base más nueva.
 - Acceso: asistente de primer arranque, propietario con contraseña (argon2id) y operario con PIN de 6 cifras en teclado táctil, sesiones con cookie `HttpOnly` (2 h de inactividad y 12 h máximo, o hasta cerrar el navegador si el propietario lo marca al entrar), CSRF por origen y token, bloqueo progresivo por usuario y por IP (1, 5 y 15 min), permisos en la capa de aplicación (404 para lo ajeno) y auditoría de solo añadir.
 - Interfaz: menú de 8 entradas, Inicio vacío con el tablero, Mi día del operario, Ajustes > Usuarios (alta, cambio de PIN y desactivar). IBM Plex y HTMX incluidos.
 - Despliegue: servicio systemd e instalador (`despliegue/linux`), acceso directo de Edge en modo aplicación para Windows (`despliegue/windows`).
@@ -53,3 +69,9 @@ Estado: **H1 terminado** (2026-11-21). Siguiente: **H2, catálogo, clientes e im
 - El **coste y el precio** de la ventana se calculan en H2/H3, cuando existan tarifas y se confirme si el margen va sobre coste o sobre venta.
 - Grosor de sierra, recorte de extremos y retal mínimo: se usan 0 hasta que el taller los dé (`OPEN_QUESTIONS.md`).
 - Validar una serie (pasarla de borrador a validada) con ventanas reales: acción explícita que llegará con el punto de validación tras H3.
+
+### Después de H1 (2026-11-21)
+- **Esquema único sin migraciones** hasta el primer despliegue (ADR-0011, decisión del propietario).
+- **Movimiento al estilo iOS** sin cambiar colores ni estructura: transiciones entre pantallas, indicador del menú que se desliza, respuesta al pulsar, barra superior translúcida y PIN con puntos y entrada automática (`docs/design.md`).
+- **Ajustes > Taller:** grosor de sierra (2 mm provisional, dado por el propietario), recorte de extremos y retal mínimo, guardados en la tabla `configuracion` y usados por «Probar una ventana».
+- La serie V-94 usa barras de 6,40 m (confirmado).

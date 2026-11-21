@@ -7,14 +7,16 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] `ancho` y `alto`: ¿hueco de obra o medida de la ventana? (las fórmulas dadas sugieren medida de ventana; confirmarlo)
 - [ ] ¿Marco superior, lateral e inferior salen del mismo perfil o de perfiles distintos?
 - [ ] ¿Se optimizan los cortes por ventana o por trabajo? ¿Qué se hace con los retales?
-- [ ] Grosor de sierra, recorte de extremos y retal mínimo aprovechable.
+- [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos y retal mínimo aprovechable, sin dato (se usan 0). Se cambian en Ajustes > Taller.
 - [ ] Aluprom 21 de 4 hojas: confirmar ruedas (8) y tornillos (9 + 16), que son supuestos. Otras tipologías (fija, puertas).
 - [x] **Fixture de la abatible y bisagras:** el propietario confirma (2026-11-21) 2 bisagras por hoja hasta 140 cm de alto de la ventana, incluido, y 3 por encima. El fixture incluye ahora «BISAGRA: 4» para 120 × 140.
-- [ ] V-94 abatible: cantidad de inversores y su ángulo de corte, cálculo de las pletinas de falleba, tipos de escuadra (exterior e interior de hoja), longitud de barra y si los marcos superior, lateral e inferior son el mismo perfil.
+- [ ] V-94 abatible: cantidad de inversores y su ángulo de corte, cálculo de las pletinas de falleba, tipos de escuadra (exterior e interior de hoja) y si los marcos superior, lateral e inferior son el mismo perfil.
 - [ ] Redondeo: ¿a 0,1 cm hacia abajo es lo correcto? Validarlo con ventanas reales.
 - [ ] Optimizador con cortes a 45°: de momento cada pieza cuenta por su lado más largo (conservador). Revisarlo con el taller.
 - [x] Cómo se modifica un trabajo ya aceptado: lo hace el propietario con "Modificar medidas" (`docs/PANTALLAS.md`, apartado 8). El operario no.
 - [ ] Al modificar medidas con pasos ya hechos: ¿se reinician siempre o decide el propietario (propuesto: decide él)?
+
+- [x] Longitud de barra de la V-94: 6,40 m (confirmado 2026-11-21).
 
 ## Precios y documentos
 - [ ] Proveedores (Aluval y Sopena de momento) y formato de sus tarifas. El usuario reunirá precios por barra y tarifas.

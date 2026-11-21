@@ -2,10 +2,9 @@
 
 Abre Claude Code en la raíz del repositorio. No hace falta ejecutar `/init`. Trabaja con una sesión por hito y usa `/clear` entre hitos.
 
-## Primera sesión (H0), en modo plan
-Activa el modo plan (Mayús+Tab o `/plan`) y pega:
+## Siguiente sesión (H2), en modo plan
 ```
-Lee CLAUDE.md, SPEC.md, docs/CONTEXTO.md, docs/BACKEND.md, docs/DATOS.md, docs/PANTALLAS.md y docs/adr/ (docs/FORMATO_SERIES.md a partir de H1). Después, sin escribir código, propón el plan detallado del hito H0 según el apartado H0 de SPEC.md: orden de tareas, archivos que crearás, dependencias que añadirás (con su justificación según CLAUDE.md) y cómo comprobarás cada criterio de aceptación. Señala contradicciones o huecos que encuentres. Espera mi aprobación.
+Lee CLAUDE.md, docs/PROGRESS.md (apartado «Cómo retomar»), docs/CONTEXTO.md, docs/OPEN_QUESTIONS.md, el apartado H2 de SPEC.md, docs/DATOS.md (7.3 y 7.4) y docs/PANTALLAS.md (5 y 10). Ejecuta just check. Después, sin escribir código, propón el plan de H2: tablas que añadirás a esquema.sql, casos de uso, pantallas, pruebas y cómo comprobarás los criterios de aceptación. Señala huecos o contradicciones y espera mi aprobación.
 ```
 
 ## Empezar un hito
