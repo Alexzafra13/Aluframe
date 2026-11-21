@@ -42,7 +42,6 @@ test("el operario entra con el teclado de PIN y solo ve su día", async ({ page 
   for (const cifra of OPERARIO.pin) {
     await page.locator(`.teclado button[data-cifra="${cifra}"]`).click();
   }
-  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL(/\/mi-dia$/);
   await expect(page.getByText("No tienes ventanas asignadas")).toBeVisible();
   await expect(page.getByRole("link", { name: "Facturas" })).toHaveCount(0);
@@ -55,7 +54,10 @@ test("el operario entra con el teclado de PIN y solo ve su día", async ({ page 
 test("un PIN incorrecto no deja entrar", async ({ page }) => {
   await page.goto("/entrar");
   await page.getByRole("link", { name: OPERARIO.nombre }).click();
-  await page.getByLabel("PIN").fill("000000");
-  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page.locator(".puntos-pin span.lleno")).toHaveCount(0);
+  for (const cifra of "000000") {
+    await page.locator(`.teclado button[data-cifra="${cifra}"]`).click();
+  }
   await expect(page.getByRole("alert")).toHaveText("El PIN o la contraseña no son correctos.");
+  await expect(page.locator(".puntos-pin")).toHaveClass(/agitar/);
 });
