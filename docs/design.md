@@ -51,7 +51,6 @@ Objetivo: que la interfaz se sienta fluida y responda al tacto, sin adornos ni e
 | Resultados que cambian con HTMX | Se atenúan mientras se calculan y el nuevo resultado aparece con un fundido |
 | PIN del operario | Teclado redondo de 76 px como el del iPhone, puntos que se rellenan, entrada automática al sexto dígito y sacudida si el PIN es incorrecto; no abre el teclado del sistema en la tablet |
 | Lista de usuarios | Inicial en un círculo y flecha «›», como las listas de iOS |
-
 | Hojas (paneles) | Formularios cortos y confirmaciones salen en una **hoja** con `<dialog>` nativo: sube desde abajo en tablet y entra desde la derecha en ordenador (320 ms, `--curva-suave`) sobre un velo que se oscurece; se cierra con Esc, con «Cancelar» o tocando el velo, y baja con la misma curva. El foco entra en la hoja y vuelve al botón que la abrió (lo hace el navegador). Sin JavaScript propio salvo abrir y cerrar |
 | Control segmentado | Como el de iOS (Cotas, Piezas, Cristal): una «píldora» blanca se desliza bajo la opción elegida |
 | Avisos efímeros | Las confirmaciones («Línea guardada») bajan desde la barra superior como en iOS, se quedan 4 s y se van; los errores se quedan hasta que se corrigen. Lectores de pantalla: `role="status"` |
