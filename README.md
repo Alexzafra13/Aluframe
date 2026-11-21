@@ -2,14 +2,24 @@
 
 Programa de gestión para un taller de carpintería de aluminio y cerrajería: presupuestos con dibujo, orden de taller con medidas de corte, trabajos asignados a operarios, stock y facturación.
 
-Estado: **fase de especificación completa (versión 1, borrador)**. Aún no hay código: se construye con Claude Code, hito a hito (H0 a H7).
+Estado: **H0 (cimientos) terminado**; siguiente, H1 (motor de cálculo). Se construye con Claude Code, hito a hito (H0 a H7). Ver `docs/PROGR## Cómo funciona
+- **Servidor del taller (Linux):** un único ejecutable `alumframe` y su base de datos SQLite `alumframe.db`, como servicio systemd en el **puerto 9090**.
+- **PC de la oficina (Windows) y tablet:** entran con el navegador en `http://IP-DEL-SERVIDOR:9090`. En Windows se crea un acceso directo que lo abre como una aplicación.
+- **`alumframe.exe` en modo local:** para probarlo en un solo PC o como plan de emergencia.
 
-## Cómo empezar con Claude Code
-1. **Instala en tu PC:** Git, Rust (con `rustup`), `just`, Node (solo para las pruebas E2E) y Claude Code, con una suscripción que lo incluya.
-2. **Crea el repositorio** (privado: contiene fórmulas y datos del negocio): descomprime este paquete en una carpeta, entra en ella y ejecuta `git init` y un primer `git commit`.
-3. **Abre Claude Code en esa carpeta.** No hace falta `/init`. Activa el modo plan.
-4. **Pega el primer mensaje** de `docs/PROMPT_INICIAL.md` (sección "Primera sesión (H0)"). Claude propondrá el plan de H0 y esperará tu aprobación.
-5. Trabaja **una sesión por hito** y limpia el contexto (`/clear`) entre hitos. Los demás mensajes (empezar, cerrar y retomar un hito) están en el mismo archivo.
+## Desarrollo
+```
+just instalar-hooks   # una vez por clon
+just dev              # arranca en http://localhost:9090 con datos en datos-dev/
+just check            # formato, clippy, pruebas y tamaño de archivos
+just e2e              # pruebas con navegador contra el ejecutable
+```
+La primera vez aparece el asistente para crear la cuenta del propietario. Instalación y mantenimiento: `docs/MAINTENANCE.md`.
+
+## Cómo seguir con Claude Code
+Trabaja **una sesión por hito**. Los mensajes para empezar, cerrar y retomar un hito están en `docs/PROMPT_INICIAL.md`.
+
+archivo.
 
 ## Qué leer y en qué orden
 1. `docs/CONTEXTO.md`: decisiones tomadas, datos reales y lo que falta.

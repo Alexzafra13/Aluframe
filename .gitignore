@@ -20,3 +20,4 @@ Thumbs.db
 # Claude Code (personal)
 .claude/settings.local.json
 CLAUDE.local.md
+/datos-dev/

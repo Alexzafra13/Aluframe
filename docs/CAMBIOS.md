@@ -38,5 +38,7 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - Puerto por defecto: **9090**.
 - Base de datos: **SQLite** (se confirma ADR-0002; PostgreSQL descartado).
 - Primer usuario: **asistente de primer arranque** (solo aparece si no hay usuarios) y comando `alumframe restablecer-contrasena` para recuperar el acceso.
-- Plantillas: **Askama** (ADR-0003).
+- Plantillas: **Askama** (ADR-0004; el número 0003 queda reservado para el PDF).
 - Ya no hace falta el ADR del envoltorio de servicio de Windows.
+- H0 construido: ver `docs/PROGRESS.md`. Nuevos ADR-0004 a 0008, `docs/design.md` y `docs/MAINTENANCE.md` (secciones de compilación, publicación, instalación y dependencias).
+- `docs/DATOS.md`: tabla `bloqueo_ip` (ip, intentos_fallidos, bloqueado_hasta) para el bloqueo por IP; `sesion.id` guarda la huella SHA-256 del token.
