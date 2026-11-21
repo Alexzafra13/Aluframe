@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use thiserror::Error;
 
+use crate::aplicacion::series_incluidas::{CargaDeSerie, cargar_series_incluidas};
 use crate::bd::{BaseDeDatos, ErrorEsquema, preparar_esquema};
 use crate::config::{Configuracion, ErrorConfiguracion, NOMBRE_ARCHIVO_CONFIGURACION};
 use crate::errores::ErrorApp;
@@ -59,9 +60,29 @@ pub async fn preparar_estado(config: &Configuracion) -> Result<EstadoApp, ErrorA
         preparar_esquema(&mut conexion, &formatear_utc(reloj.ahora()))?;
     }
     let bd = BaseDeDatos::abrir(&config.ruta_base_de_datos())?;
-    Ok(EstadoApp::nuevo(bd, reloj)
+    let estado = EstadoApp::nuevo(bd, reloj)
         .await?
-        .con_datos_demo(config.permitir_datos_demo))
+        .con_datos_demo(config.permitir_datos_demo);
+    anotar_series_incluidas(&cargar_series_incluidas(&estado).await?);
+    Ok(estado)
+}
+
+fn anotar_series_incluidas(cargas: &[CargaDeSerie]) {
+    for (es_error, texto) in cargas.iter().filter_map(CargaDeSerie::describir) {
+        if es_error {
+            anotar_error(&texto);
+        } else {
+            anotar_informacion(&texto);
+        }
+    }
+}
+
+fn anotar_error(texto: &str) {
+    tracing::error!("{texto}");
+}
+
+fn anotar_informacion(texto: &str) {
+    tracing::info!("{texto}");
 }
 
 pub async fn servir_http(config: &Configuracion, estado: EstadoApp) -> std::io::Result<()> {

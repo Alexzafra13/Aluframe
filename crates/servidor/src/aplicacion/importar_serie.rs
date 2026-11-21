@@ -38,7 +38,7 @@ pub fn texto_de_estado(estado: EstadoSerie) -> &'static str {
     }
 }
 
-fn analizar(texto: &str, permitir_demo: bool) -> (Option<Serie>, Informe) {
+pub(super) fn analizar(texto: &str, permitir_demo: bool) -> (Option<Serie>, Informe) {
     let mut informe = Informe::default();
     if texto.len() > TAMANO_MAXIMO {
         informe.error("", "El archivo es demasiado grande (máximo 256 KB).");
@@ -123,7 +123,7 @@ pub async fn importar_serie(
                 serie: &serie,
                 texto: &texto,
                 avisos,
-                autor,
+                autor: Some(autor),
                 ahora: &ahora,
             };
             guardar(tx, &importacion)
@@ -131,15 +131,18 @@ pub async fn importar_serie(
         .await
 }
 
-struct Importacion<'a> {
-    serie: &'a Serie,
-    texto: &'a str,
-    avisos: i64,
-    autor: i64,
-    ahora: &'a str,
+pub(super) struct Importacion<'a> {
+    pub serie: &'a Serie,
+    pub texto: &'a str,
+    pub avisos: i64,
+    pub autor: Option<i64>,
+    pub ahora: &'a str,
 }
 
-fn guardar(tx: &Connection, importacion: &Importacion) -> Result<(String, i64), ErrorApp> {
+pub(super) fn guardar(
+    tx: &Connection,
+    importacion: &Importacion,
+) -> Result<(String, i64), ErrorApp> {
     let Importacion {
         serie,
         texto,
@@ -167,8 +170,12 @@ fn guardar(tx: &Connection, importacion: &Importacion) -> Result<(String, i64), 
     series::insertar_referencias(tx, version_id, &serie.referencias)?;
     let apunte = Apunte {
         cuando_en: ahora,
-        usuario_id: Some(autor),
-        accion: "importar_serie",
+        usuario_id: autor,
+        accion: if autor.is_some() {
+            "importar_serie"
+        } else {
+            "cargar_serie_incluida"
+        },
         entidad: "serie_version",
         entidad_id: Some(version_id),
     };

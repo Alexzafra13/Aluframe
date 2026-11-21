@@ -24,7 +24,8 @@ pub struct NuevaVersion<'a> {
     pub origen_yaml: &'a str,
     pub sha256: &'a str,
     pub avisos: i64,
-    pub importada_por: i64,
+    /// Vacío cuando la carga el propio programa (series incluidas, ADR-0014).
+    pub importada_por: Option<i64>,
     pub creada_en: &'a str,
 }
 
@@ -60,6 +61,16 @@ pub fn buscar_ultima(con: &Connection, codigo: &str) -> Result<Option<VersionGua
             leer_version,
         )
         .optional()?)
+}
+
+/// Si esa serie ya tuvo alguna vez exactamente este archivo (por su SHA-256), vigente o no.
+pub fn existe_version(con: &Connection, codigo: &str, sha256: &str) -> Result<bool, ErrorApp> {
+    Ok(con.query_row(
+        "SELECT EXISTS (SELECT 1 FROM serie_version v JOIN serie s ON s.id = v.serie_id \
+         WHERE s.codigo = ?1 AND v.sha256 = ?2)",
+        params![codigo, sha256],
+        |f| f.get(0),
+    )?)
 }
 
 /// Una versión concreta: las líneas de presupuesto guardan la versión con la que se calcularon.

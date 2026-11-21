@@ -18,6 +18,7 @@ pub mod primer_arranque;
 pub mod restablecer_contrasena;
 pub mod resumen_de_linea;
 pub mod series;
+pub mod series_incluidas;
 pub mod sesion;
 pub mod taller;
 pub mod tarifas;

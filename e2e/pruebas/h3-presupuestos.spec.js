@@ -31,7 +31,9 @@ test("prepara la serie y la tarifa ficticias y las reglas de precio", async ({ p
   await expect(page.getByRole("status")).toHaveText("Ajustes guardados.");
 });
 
+// Las series reales vienen incluidas en el programa (ADR-0014): se elige la ficticia a propósito.
 async function ventana(page, ancho, alto, boton) {
+  await page.getByLabel("Serie y tipología").selectOption({ label: "DEMO_FICTICIA · DEMO corredera 2 hojas (ficticia)" });
   await page.getByLabel("Ancho (cm)").fill(ancho);
   await page.getByLabel("Alto (cm)").fill(alto);
   await expect(page.locator("#dibujo svg.dibujo-ventana")).toBeVisible();

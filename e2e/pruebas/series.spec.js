@@ -1,20 +1,12 @@
-const path = require("node:path");
 const { test, expect } = require("@playwright/test");
 const { entrarComoPropietario } = require("./comun");
 
-const SERIE = path.join(__dirname, "..", "..", "data", "series", "aluprom-21.yaml");
-
-test("el propietario importa una serie real y prueba una ventana", async ({ page }) => {
+// Las series reales vienen incluidas en el programa y se cargan al arrancar (ADR-0014).
+test("las series reales vienen incluidas y se prueba una ventana sin importar nada", async ({ page }) => {
   await entrarComoPropietario(page);
   await page.getByRole("link", { name: "Catálogo" }).click();
   await page.getByRole("link", { name: "Series", exact: true }).click();
-  await page.getByRole("link", { name: "Importar serie" }).click();
-  await page.locator("#archivo").setInputFiles(SERIE);
-  await expect(page.locator("#texto")).toHaveValue(/ALUPROM_21/);
-  await page.getByRole("button", { name: "Revisar" }).click();
-  await expect(page.getByText("Se guardará como")).toContainText("versión 1");
-  await page.getByRole("button", { name: "Confirmar e importar" }).click();
-  await expect(page.getByRole("status")).toHaveText("Serie ALUPROM_21 importada como versión 1.");
+  await expect(page.getByRole("row", { name: /SOPENA_V94/ })).toBeVisible();
 
   await page.getByRole("row", { name: /ALUPROM_21/ }).getByRole("link", { name: "Probar una ventana" }).click();
   await page.getByLabel("Ancho (cm)").fill("150");
