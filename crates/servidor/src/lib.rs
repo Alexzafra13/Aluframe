@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 
 pub mod aplicacion;
+pub mod arranque;
 pub mod autenticacion;
 pub mod bd;
 pub mod config;
