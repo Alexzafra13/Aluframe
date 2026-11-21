@@ -20,9 +20,14 @@ const MIGRACIONES: &[Migracion] = &[
         nombre: "sesion_hasta_cerrar_navegador",
         sql: include_str!("migraciones/0002_sesion_hasta_cerrar_navegador.sql"),
     },
+    Migracion {
+        version: 3,
+        nombre: "series",
+        sql: include_str!("migraciones/0003_series.sql"),
+    },
 ];
 
-pub const ULTIMA_VERSION: i64 = 2;
+pub const ULTIMA_VERSION: i64 = 3;
 
 #[derive(Debug, Error)]
 pub enum ErrorMigracion {
