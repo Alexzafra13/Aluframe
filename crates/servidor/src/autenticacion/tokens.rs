@@ -13,7 +13,11 @@ pub fn generar_token() -> Result<String, ErrorApp> {
 
 /// En la base solo se guarda la huella del token: quien lea la base no puede suplantar sesiones.
 pub fn huella_de_token(token: &str) -> String {
-    a_hexadecimal(&Sha256::digest(token.as_bytes()))
+    calcular_sha256(token)
+}
+
+pub fn calcular_sha256(texto: &str) -> String {
+    a_hexadecimal(&Sha256::digest(texto.as_bytes()))
 }
 
 pub fn tokens_iguales(a: &str, b: &str) -> bool {
