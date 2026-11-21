@@ -74,4 +74,4 @@ Comparado con programas como Productor (Gaia), Cortizo Software, GesFácil, Klae
 ## Bisagras y dibujo de la abatible
 - [x] Bisagras: 2 por hoja hasta 140 cm de alto de la ventana (140 incluido) y 3 por encima (confirmado 2026-11-21).
 - [ ] ¿Las bisagras van dentro del kit de 2 hojas o se piden aparte?
-- [ ] Posición de las bisagras en el dibujo (hoy repartidas a ojo): ¿a qué distancia de los extremos van?
+- [ ] Posición de las bisagras en el dibujo (desde H3, al 15 % y al 85 % del alto de la hoja, y en medio si hay tres): ¿a qué distancia de los extremos van?

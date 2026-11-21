@@ -40,7 +40,9 @@ El diseño tiene 10 entradas. Propongo **8 para el MVP** y se decide al construi
 | Presupuestos | `/presupuestos` | H3 | Lista con filtros por estado (borrador, enviado, aceptado, rechazado, caducado) |
 | Presupuesto | `/presupuestos/{id}` | H3 | Cabecera, líneas, totales y acciones (apartado 6) |
 | Línea de ventana | `/presupuestos/{id}/lineas/{n}` | H3 | Editor con dibujo y cálculo en vivo (apartado 7) |
-| Línea libre | `/presupuestos/{id}/lineas/libre/{n}` | H3 | Descripción, cantidad, precio unitario e IVA |
+| Línea libre | hoja en `/presupuestos/{id}` | H3 | Descripción, cantidad, precio unitario, descuento e IVA |
+| Nueva línea de ventana | `/presupuestos/{id}/lineas/nueva` | H3 | El mismo editor, vacío |
+| Ajustes de empresa y precio | `/ajustes/presupuestos` | H3 | Datos de la empresa, margen, cobro de perfiles, mano de obra, IVA, validez y condiciones |
 | Presupuesto imprimible | `/presupuestos/{id}/imprimir` | H3 | A4 con dibujos y condiciones; sin costes ni márgenes |
 | Trabajos | `/trabajos` | H4 | El mismo tablero del Inicio con vista de lista y filtro por operario |
 | Trabajo | `/trabajos/{id}` | H4 | Pestañas Resumen, Orden de taller, Material y Entrega (apartado 8) |

@@ -145,9 +145,13 @@ Las tipologías, piezas, vidrios, accesorios y opciones no tienen tablas propias
 ### 7.6 Presupuestos
 | Tabla | Campos |
 |---|---|
-| `presupuesto` | id, serie_numeracion, anio, numero, cliente_id, direccion_montaje_id, estado (`borrador`/`enviado`/`aceptado`/`rechazado`/`caducado`), enviado_en (para "sin respuesta hace n días"), validez_hasta, condiciones, creado_por, creado_en, version; único (serie_numeracion, anio, numero) |
-| `version_presupuesto` | id, presupuesto_id, numero_version, motivo, vigente, base_cent, iva_cent, total_cent, creada_en |
-| `linea_presupuesto` | id, version_id, orden, tipo (`ventana`/`libre`), descripcion, cantidad_mil, serie_version_id, tipologia_id, ancho_dmm, alto_dmm, acabado_id, vidrio_articulo_id, opciones_json, resultado_json, incompleta, revisar_limites (medida fuera de límites), coste_cent, margen_bp, descuento_bp, tipo_iva_bp, precio_cent, precio_unitario_pu (líneas libres) |
+| `presupuesto` | id, anio, numero (`P-AAAA-NNNN`), cliente_id, direccion_montaje_id, estado (`borrador`/`enviado`/`aceptado`/`rechazado`/`caducado`), validez_hasta, condiciones, descuento_bp, enviado_en, aceptado_en, copia_json y copia_sha256 (solo al aceptar; un trigger impide modificar lo aceptado), creado_por, creado_en, version; único (anio, numero) |
+| `version_presupuesto` | id, presupuesto_id, numero_version, motivo, vigente (una por presupuesto), base_cent, iva_cent, total_cent, completo, creada_en |
+| `linea_presupuesto` | id, version_id, orden, tipo (`ventana`/`libre`), descripcion, cantidad_mil, serie_version_id, tipologia, ancho_dmm, alto_dmm, acabado_id, vidrio_articulo_id, opciones_json, resultado_json (piezas, vidrios, accesorios, barras, costes y dibujo), faltan_json, incompleta, revisar_limites, tarifas_json, coste_cent, mano_de_obra_cent, descuento_bp, tipo_iva_bp, precio_unitario_pu (libres), precio_cent |
+| `presupuesto_tarifa` | presupuesto_id, tarifa_id: tarifas usadas por un presupuesto aceptado (no se pueden deshacer) |
+| `secuencia_documentos` | serie (`P`, `T`, `F`, `R`, `A`), anio, ultimo |
+
+Ajustes de empresa y precio en `configuracion`: `empresa.*`, `precio.margen_modo`, `precio.margen`, `precio.perfiles`, `precio.merma`, `precio.mano_de_obra`, `iva.general`, `iva.reducido`, `presupuesto.validez_dias`, `presupuesto.condiciones`.
 
 ### 7.7 Trabajos y orden de taller
 | Tabla | Campos |

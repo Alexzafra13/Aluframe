@@ -1,11 +1,11 @@
 # Progreso
 
-Estado: **H2 terminado** (2026-11-21) en la rama `claude/sesion-h2-inicial-0eu0lb`, pendiente de llevar a `main`. Siguiente: **H3, presupuestos**.
+Estado: **H3 terminado** (2026-11-21) en la rama `claude/sesion-h2-inicial-0eu0lb` (con H2), pendiente de llevar a `main`. Siguiente: **punto de validación con el taller** (5 ventanas reales, SPEC H3) y después **H4, trabajos y orden de taller**.
 
 ## Cómo retomar en una sesión nueva
-1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`; para H3, además `SPEC.md` (H3 y apartado 7), `docs/DATOS.md` (7.6), `docs/PANTALLAS.md` (6 y 7), `docs/BACKEND.md` (5.4) y ADR-0012.
+1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`; para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
 2. Comprueba que todo está en verde: `just instalar-hooks`, `just check`, `just e2e`.
-3. Propón el plan de H3 y **espera la aprobación** del propietario antes de escribir código.
+3. Propón el plan de H4 y **espera la aprobación** del propietario antes de escribir código.
 
 **Reglas que no están en SPEC y conviene no olvidar**
 - **Sin migraciones** hasta el primer despliegue real: se amplía `crates/servidor/src/bd/esquema.sql` (ADR-0011). Si cambia, borra `datos-dev/`.
@@ -23,7 +23,7 @@ Estado: **H2 terminado** (2026-11-21) en la rama `claude/sesion-h2-inicial-0eu0l
 | H0 Cimientos | **hecho** (2026-11-21) |
 | H1 Motor de dominio | **hecho** (2026-11-21) |
 | H2 Catálogo, clientes e importación | **hecho** (2026-11-21) |
-| H3 Presupuestos | pendiente |
+| H3 Presupuestos | **hecho** (2026-11-21) |
 | H4 Trabajos y orden de taller | pendiente |
 | H5 Stock | pendiente |
 | H6 Facturación | pendiente |
@@ -93,4 +93,20 @@ Estado: **H2 terminado** (2026-11-21) en la rama `claude/sesion-h2-inicial-0eu0l
 - `kit_componente` (H5) y recargo de color por proveedor (decisión 4 de DATOS).
 - Al llegar los presupuestos (H3): bloquear deshacer una tarifa usada y anonimizar en lugar de borrar clientes con documentos.
 - `cargo deny` no está instalado en las sesiones en la nube; se ejecuta en CI.
+
+### H3. Presupuestos (2026-11-21)
+**Hecho**
+- **Dibujo SVG** en el dominio: corredera de 2 y 4 hojas, abatible con bisagras y cremona, fija; piezas numeradas como en la hoja de taller, cotas y capas (Cotas, Piezas, Cristal). Mismo dibujo en pantalla, en las miniaturas y en la hoja impresa.
+- **Precio** en el dominio: perfiles por barras enteras del plan de corte o por metros con merma (se calculan los dos), cristal por m², accesorios por unidad, metro o caja, descuento de compra, recargo de color, margen sobre coste o sobre venta, mano de obra, cantidad y descuento; totales con descuento general, base y cuota por tipo de IVA en un único sitio.
+- **Presupuestos:** numeración `P-AAAA-NNNN`, versiones, estados (borrador, enviado, aceptado, rechazado), líneas de ventana y libres, dirección de montaje, validez, condiciones y descuento. «Recalcular precios» si la tarifa cambió. **Aceptar** exige todo completo y congela una copia con su SHA-256; la tarifa usada ya no se puede deshacer y el cliente con presupuestos no se puede borrar.
+- **Pantallas al estilo iOS** (petición del propietario): editor de línea como `design/01-presupuesto.png` con cálculo en vivo, control segmentado con píldora deslizante, hojas (`<dialog>`) que entran y salen, avisos efímeros, tarjetas de línea con miniatura y pie fijo oscuro con el desglose y el total; los avisos de confirmación de todo el programa pasan a ser efímeros. **Ajustes > Empresa y precios.** Hoja **A4 imprimible** (o PDF desde el navegador) sin costes.
+- **Criterio de aceptación:** presupuesto de 3 ventanas distintas y una línea libre, con dibujo, imprimible, y total igual al del dominio (`tests/presupuestos.rs::tres_ventanas_y_una_linea_libre_suman_el_total_del_dominio` y E2E `h3-presupuestos`): **cumplido** con datos ficticios.
+- Pruebas: 248 entre unitarias e integración y 15 E2E, en verde; cobertura del dominio 95,8 % de líneas.
+
+**Decisiones:** ADR-0003 (PDF desde el navegador hasta H6), ADR-0013 (`serde_json`). Margen, cobro de perfiles y mano de obra se eligen en Ajustes; sin elegir, no hay precio final. IVA 21 % y 10 % por defecto (cuándo aplica el reducido, con el gestor). La mano de obra se suma después del margen (provisional). Una serie de demostración nunca da precio final: la aceptación se prueba con una copia «validada» que solo existe en `crates/servidor/tests/datos/`.
+
+**Pendiente**
+- **Punto de validación** (SPEC H3): 5 ventanas reales comparadas con el cálculo a mano. Hacen falta los descuentos del cristal, las referencias de proveedor de las series y una tarifa real; hoy las series reales salen incompletas, como debe ser.
+- El trabajo que nace al aceptar llega en H4. Anonimizar clientes con documentos, en H6.
+- Posición real de las bisagras en el dibujo y logotipo en la hoja impresa.
 

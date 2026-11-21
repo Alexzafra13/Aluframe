@@ -3,7 +3,7 @@
 Este archivo permite retomar el trabajo en una conversación nueva sin perder lo decidido.
 
 ## Estado
-H0, H1 y H2 terminados: acceso, series importables, cálculo de ventanas con plan de corte, clientes y catálogo con tarifas versionadas. Siguiente: H3 (presupuestos). El punto de partida de una sesión nueva está en `docs/PROGRESS.md`, apartado «Cómo retomar».
+H0 a H3 terminados: acceso, series, cálculo y plan de corte, clientes, catálogo con tarifas versionadas y presupuestos con dibujo, precio e impresión. Siguiente: validar con 5 ventanas reales y después H4 (trabajos y orden de taller). El punto de partida de una sesión nueva está en `docs/PROGRESS.md`, apartado «Cómo retomar».
 
 ## Qué es
 AlumFrame: programa de gestión para el taller de cerrajería y ventanas de aluminio del padre de Alejandro (web developer en Zafra, Extremadura). Presupuestar ventanas con precio y dibujo, orden de taller con medidas de corte y cristal, stock con avisos y facturación. Se construirá con Claude Code a partir de `CLAUDE.md` y `SPEC.md`.
