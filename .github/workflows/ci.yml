@@ -20,9 +20,11 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@v2
         with:
-          tool: just,cargo-deny
+          tool: just,cargo-deny,cargo-llvm-cov
+      - run: rustup component add llvm-tools-preview
       - run: just check
       - run: cargo deny check
+      - run: just cobertura
 
   e2e:
     name: E2E con Playwright
