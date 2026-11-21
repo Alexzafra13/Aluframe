@@ -1,0 +1,22 @@
+{% extends "marco.html" %}
+{% block titulo %}Taller{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Ajustes</p>
+  <h1>Taller</h1>
+</header>
+{% include "pestanas_ajustes.html" %}
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+<form class="tarjeta" method="post" action="/ajustes/taller">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <h2>Corte de barras</h2>
+  <p class="texto-apagado">Se usan para repartir las piezas en las barras.{% if provisional %} Son valores provisionales hasta que los guardes.{% endif %}</p>
+  <div class="formulario-en-linea">
+    <label>Grosor de sierra (mm) <input name="grosor_sierra_mm" value="{{ grosor_sierra_mm }}" inputmode="decimal" required></label>
+    <label>Recorte de extremos (mm) <input name="recorte_extremos_mm" value="{{ recorte_extremos_mm }}" inputmode="decimal" required></label>
+    <label>Retal mínimo aprovechable (cm) <input name="retal_minimo_cm" value="{{ retal_minimo_cm }}" inputmode="decimal" required></label>
+  </div>
+  <button class="boton primario" type="submit">Guardar</button>
+</form>
+{% endblock %}

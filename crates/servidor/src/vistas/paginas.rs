@@ -75,6 +75,7 @@ pub struct PaginaUsuarios {
     pub usuario: UsuarioEnPantalla,
     pub menu: &'static [GrupoMenu],
     pub seccion: &'static str,
+    pub pestana: &'static str,
     pub usuarios: Vec<OpcionUsuario>,
     pub aviso: Option<String>,
     pub confirmacion: Option<String>,
@@ -107,4 +108,19 @@ pub struct PaginaError {
     pub titulo: &'static str,
     pub mensaje: String,
     pub codigo: Option<String>,
+}
+
+#[derive(Template)]
+#[template(path = "ajustes_taller.html")]
+pub struct PaginaTaller {
+    pub usuario: UsuarioEnPantalla,
+    pub menu: &'static [GrupoMenu],
+    pub seccion: &'static str,
+    pub pestana: &'static str,
+    pub grosor_sierra_mm: String,
+    pub recorte_extremos_mm: String,
+    pub retal_minimo_cm: String,
+    pub provisional: bool,
+    pub aviso: Option<String>,
+    pub confirmacion: Option<String>,
 }

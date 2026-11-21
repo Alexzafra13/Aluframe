@@ -1,8 +1,9 @@
 use dominio::acceso::Accion;
-use dominio::corte::{ParametrosDeCorte, PlanDeCorte, optimizar_cortes};
+use dominio::corte::{PlanDeCorte, optimizar_cortes};
 use dominio::series::{Dato, ResultadoVentana, Serie, calcular_ventana, importar_serie};
-use dominio::unidades::{Decimal, Longitud};
+use dominio::unidades::Decimal;
 
+use super::taller::AjustesDeTaller;
 use super::{Actor, autorizar};
 use crate::bd::consultas::series::{self, VersionGuardada};
 use crate::errores::ErrorApp;
@@ -92,9 +93,8 @@ pub fn leer_medida(texto: &str, nombre: &str) -> Result<Decimal, ErrorApp> {
 
 pub fn probar_ventana(
     serie: &Serie,
-    tipologia: &str,
-    ancho: Decimal,
-    alto: Decimal,
+    (tipologia, ancho, alto): (&str, Decimal, Decimal),
+    taller: &AjustesDeTaller,
 ) -> Result<PruebaDeVentana, ErrorApp> {
     let resultado = calcular_ventana(serie, tipologia, ancho, alto)
         .map_err(|error| ErrorApp::Validacion(error.to_string()))?;
@@ -108,16 +108,8 @@ pub fn probar_ventana(
             avisos_de_corte,
         });
     };
-    avisos_de_corte.push(
-        "Grosor de sierra, recorte de extremos y retal mínimo sin confirmar: se toman como 0."
-            .into(),
-    );
-    let parametros = ParametrosDeCorte {
-        longitud_barra,
-        grosor_sierra: Longitud::CERO,
-        recorte_extremos: Longitud::CERO,
-        retal_minimo: Longitud::CERO,
-    };
+    avisos_de_corte.push(describir_ajustes(taller));
+    let parametros = taller.parametros_de_corte(longitud_barra);
     let mut cortes = Vec::new();
     for (perfil, piezas) in resultado.piezas_a_cortar() {
         match optimizar_cortes(&piezas, &parametros) {
@@ -130,4 +122,18 @@ pub fn probar_ventana(
         cortes,
         avisos_de_corte,
     })
+}
+
+fn describir_ajustes(taller: &AjustesDeTaller) -> String {
+    let texto = format!(
+        "Sierra {} mm, recorte de extremos {} mm y retal mínimo {} cm (Ajustes > Taller).",
+        taller.grosor_sierra.formatear_mm(),
+        taller.recorte_extremos.formatear_mm(),
+        taller.retal_minimo.formatear_cm()
+    );
+    if taller.confirmados {
+        texto
+    } else {
+        format!("{texto} Son valores provisionales: confírmalos allí.")
+    }
 }

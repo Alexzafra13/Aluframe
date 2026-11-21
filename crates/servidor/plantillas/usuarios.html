@@ -5,6 +5,7 @@
   <p class="antetitulo">Ajustes</p>
   <h1>Usuarios</h1>
 </header>
+{% include "pestanas_ajustes.html" %}
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 {% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
 <section class="tarjeta">

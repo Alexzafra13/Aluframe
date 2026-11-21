@@ -101,6 +101,7 @@ async fn pagina_de_usuarios(
         usuario: actor.into(),
         menu: MENU,
         seccion: "ajustes",
+        pestana: "usuarios",
         usuarios: usuarios.into_iter().map(OpcionUsuario::from).collect(),
         aviso,
         confirmacion,

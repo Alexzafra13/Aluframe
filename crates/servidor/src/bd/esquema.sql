@@ -93,3 +93,10 @@ CREATE TRIGGER serie_version_no_se_borra BEFORE DELETE ON serie_version
 BEGIN
     SELECT RAISE(ABORT, 'Una versión de serie no se borra');
 END;
+
+CREATE TABLE configuracion (
+    clave TEXT PRIMARY KEY,
+    valor TEXT NOT NULL,
+    actualizado_en TEXT NOT NULL,
+    usuario_id INTEGER REFERENCES usuario (id) ON DELETE RESTRICT
+) STRICT;

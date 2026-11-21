@@ -8,6 +8,7 @@ use serde::Deserialize;
 use crate::aplicacion::Actor;
 use crate::aplicacion::importar_serie::{importar_serie, previsualizar_serie};
 use crate::aplicacion::series::{cargar_serie, leer_medida, listar_series, probar_ventana};
+use crate::aplicacion::taller::{AjustesDeTaller, leer_ajustes_de_taller};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
@@ -126,7 +127,8 @@ pub async fn mostrar_prueba(
         medidas.ancho.unwrap_or_default(),
         medidas.alto.unwrap_or_default(),
     );
-    let (prueba, aviso) = calcular_prueba(serie, &elegida, &ancho, &alto)?;
+    let taller = leer_ajustes_de_taller(&estado).await?;
+    let (prueba, aviso) = calcular_prueba(serie, &elegida, (&ancho, &alto), &taller)?;
     let pagina = PaginaProbarVentana {
         usuario: (&actor).into(),
         menu: MENU,
@@ -152,15 +154,15 @@ type PruebaOAviso = (Option<VistaPrueba>, Option<String>);
 fn calcular_prueba(
     serie: &Serie,
     tipologia: &str,
-    ancho: &str,
-    alto: &str,
+    (ancho, alto): (&str, &str),
+    taller: &AjustesDeTaller,
 ) -> Result<PruebaOAviso, ErrorApp> {
     if ancho.is_empty() || alto.is_empty() {
         return Ok((None, None));
     }
     let calculo = leer_medida(ancho, "ancho")
         .and_then(|a| leer_medida(alto, "alto").map(|h| (a, h)))
-        .and_then(|(a, h)| probar_ventana(serie, tipologia, a, h));
+        .and_then(|(a, h)| probar_ventana(serie, (tipologia, a, h), taller));
     match calculo {
         Ok(prueba) => Ok((Some(VistaPrueba::from(&prueba)), None)),
         Err(ErrorApp::Validacion(mensaje)) => Ok((None, Some(mensaje))),

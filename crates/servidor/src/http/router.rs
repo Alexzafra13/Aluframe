@@ -9,7 +9,7 @@ use super::middleware::{
 };
 use super::recursos::servir_recurso;
 use super::rutas::paginas::{SECCIONES_PENDIENTES, mostrar_pendiente};
-use super::rutas::{acceso, ajustes, paginas, primer_arranque, salud, series};
+use super::rutas::{acceso, ajustes, paginas, primer_arranque, salud, series, taller};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 
@@ -62,6 +62,10 @@ fn rutas_de_ajustes() -> Router<EstadoApp> {
             post(ajustes::desactivacion),
         )
         .route("/ajustes/usuarios/{id}/activar", post(ajustes::activacion))
+        .route(
+            "/ajustes/taller",
+            get(taller::mostrar_taller).post(taller::guardar_taller),
+        )
 }
 
 fn rutas_de_catalogo() -> Router<EstadoApp> {

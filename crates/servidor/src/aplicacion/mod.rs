@@ -6,6 +6,7 @@ pub mod primer_arranque;
 pub mod restablecer_contrasena;
 pub mod series;
 pub mod sesion;
+pub mod taller;
 pub mod usuarios;
 
 pub use actor::{Actor, autorizar};

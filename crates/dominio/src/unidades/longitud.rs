@@ -67,6 +67,12 @@ impl Longitud {
         self.0.checked_sub(otra.0).map(Longitud)
     }
 
+    pub fn formatear_mm(self) -> String {
+        self.a_decimal(Unidad::Mm)
+            .map(|d| d.to_string().replace('.', ","))
+            .unwrap_or_default()
+    }
+
     /// Formato de pantalla en cm con coma decimal: 1459 décimas de mm se muestran «145,9».
     pub fn formatear_cm(self) -> String {
         let texto = self
@@ -110,5 +116,6 @@ mod tests {
         assert_eq!(cm("145.9").formatear_cm(), "145,9");
         assert_eq!(cm("120").formatear_cm(), "120");
         assert_eq!(Longitud::desde_decimas_de_mm(5_757).formatear_cm(), "57,57");
+        assert_eq!(Longitud::desde_decimas_de_mm(25).formatear_mm(), "2,5");
     }
 }
