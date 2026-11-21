@@ -86,7 +86,7 @@ Se da de alta un **cliente** con una dirección de montaje. Se crea el **presupu
 10. Facturas de proveedores y archivos adjuntos: ¿entran en el MVP o quedan reservadas?
 
 ## 7. Tablas y campos (para Claude Code)
-Las migraciones empiezan en la 0001 con usuarios, sesiones, auditoría y versión del esquema (H0). El resto llega con cada hito (clientes y catálogo en H2, series en H1, presupuestos en H3, trabajos en H4, stock en H5, facturas en H6).
+Hasta el primer despliegue real hay un único esquema, `crates/servidor/src/bd/esquema.sql`, que crece con cada hito (ADR-0011): usuarios, sesiones, auditoría y esquema (H0), series (H1), clientes y catálogo (H2), presupuestos (H3), trabajos (H4), stock (H5) y facturas (H6).
 
 ### 7.1 Convenciones
 | Convención | Regla |
@@ -113,7 +113,7 @@ Las migraciones empiezan en la 0001 con usuarios, sesiones, auditoría y versió
 | `secuencia_documentos` | serie, anio, ultimo; PK (serie, anio) |
 | `auditoria` | id, cuando_en, usuario_id, accion, entidad, entidad_id, detalle_json (solo añadir) |
 | `copia_seguridad` | id, cuando_en, resultado, ruta, tamano_bytes |
-| `version_esquema` | version (PK), nombre, aplicada_en |
+| `esquema` | huella (SHA-256 de `esquema.sql`, PK), creado_en (ADR-0011) |
 
 ### 7.3 Clientes
 | Tabla | Campos |

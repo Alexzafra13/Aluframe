@@ -7,6 +7,7 @@ Objetivo: que cualquier persona, o una sesión nueva de Claude sin contexto, pue
 - Node 22 solo para los E2E (`e2e/`); el ejecutable no lo necesita.
 - `just check` (formato, clippy, pruebas y tamaño de archivos) · `just build` · `just dev` (modo local en `datos-dev/`).
 - Activa el hook previo al push una vez por clon: `just instalar-hooks`.
+- Si `just dev` dice que la base es «de otra versión de desarrollo», el esquema ha cambiado: borra `datos-dev/` (ADR-0011).
 
 ## 2. Pruebas
 - `just test`: unitarias e integración (SQLite en memoria).
@@ -22,7 +23,7 @@ Objetivo: que cualquier persona, o una sesión nueva de Claude sin contexto, pue
 ## 4. Instalar y actualizar en el taller
 **Servidor Linux:** descomprime el `.tar.gz`, entra en la carpeta y ejecuta `sudo ./instalar.sh`. Instala en `/opt/alumframe`, configura en `/etc/alumframe/alumframe.toml`, guarda los datos en `/var/lib/alumframe` y deja el servicio `alumframe` activo al arrancar. Comprueba `http://IP:9090/health`.
 - Actualizar: lo mismo con la versión nueva; la anterior queda en `/opt/alumframe/alumframe.anterior`.
-- Volver atrás: ver `despliegue/linux/LEEME.txt`. Si la base ya se migró a un esquema nuevo, el programa antiguo no arranca; restaura la copia `antes-de-migrar-*.db` de `/var/lib/alumframe/copias/`.
+- Volver atrás: ver `despliegue/linux/LEEME.txt`. (Hasta el primer despliegue real no hay migraciones: ADR-0011.)
 - Registros: `journalctl -u alumframe`.
 
 **PC de la oficina (Windows):** ejecuta `crear-acceso-directo.ps1` del `.zip` e indica la IP del servidor. `alumframe.exe` es el modo local (probar o emergencia).

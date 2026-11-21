@@ -14,6 +14,7 @@ Estado: **H1 terminado** (2026-11-21). Siguiente: **H2, catálogo, clientes e im
 | H7 Copias y despliegue | pendiente |
 
 ## ADR pendientes
+- Antes del primer despliegue real: congelar el esquema como migración 0001 (ADR-0011).
 - Antes de H3: ADR-0003, PDF automático en el servidor.
 
 ## Registro de decisiones y cambios

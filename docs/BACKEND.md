@@ -114,6 +114,7 @@ Tabla `secuencia_documentos(serie, anio, ultimo)`. Al emitir se hace, en **la mi
 - Cadena: presupuesto → trabajo → orden de taller → albarán → factura; rectificativa referencia a la original. Exigencias legales (numeración, inalterabilidad, conservación) frente a decisiones técnicas: las primeras se confirman con el gestor.
 
 ## 8. Migraciones y copias de seguridad
+- **Hasta el primer despliegue real:** un único esquema que se amplía directamente (ADR-0011). **Después:** migraciones como se describe a continuación.
 - **Migraciones:** archivos SQL numerados e incrustados; se aplican en una transacción; tabla `version_esquema`. Antes de migrar se hace una copia automática. Si la base de datos es más nueva que el programa, **no arranca**.
 - **Pruebas de migración:** instalación desde cero y desde bases de datos de versiones anteriores guardadas en `tests/bases_de_datos/`; después `integrity_check` y `foreign_key_check`.
 - **Copias:** cada noche `VACUUM INTO` a un archivo temporal, `integrity_check` sobre la copia y traslado al destino. Retención: 7 diarias, 4 semanales y 12 mensuales. Copia externa (USB o carpeta de red) más una fuera del taller. El estado de la última copia se guarda y se muestra en la interfaz. La restauración está documentada y probada en CI.

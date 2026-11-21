@@ -58,7 +58,7 @@ Prefiere lo simple y estable. Una herramienta compleja solo se justifica si resu
 
 ## Stack (ver ADR-0001 y ADR-0002; cambiarlo exige un ADR nuevo)
 - **Rust estable**, versión fijada en `rust-toolchain.toml`. Workspace de Cargo.
-- Servidor: Tokio + Axum. **rusqlite** con SQLite incluido (tablas `STRICT`, claves foráneas activas, modo WAL, `busy_timeout`), usado desde tareas bloqueantes con una conexión de escritura y un grupo pequeño de lectura. Migraciones numeradas. Además `serde`, `thiserror`, `tracing`, `argon2` y `time` (`time` no incluye zonas horarias: la conversión a Europe/Madrid se decide en un ADR durante H0).
+- Servidor: Tokio + Axum. **rusqlite** con SQLite incluido (tablas `STRICT`, claves foráneas activas, modo WAL, `busy_timeout`), usado desde tareas bloqueantes con una conexión de escritura y un grupo pequeño de lectura. Esquema único hasta el primer despliegue (ADR-0011). Además `serde`, `thiserror`, `tracing`, `argon2` y `time` (`time` no incluye zonas horarias: la conversión a Europe/Madrid se decide en un ADR durante H0).
 - Interfaz: **HTML generado en el servidor** con plantillas comprobadas al compilar (Askama o Maud; decide en un ADR) y **HTMX** incluido en el repositorio, sin npm. JavaScript mínimo, sin empaquetador. **CSS propio con variables**, sin Tailwind ni frameworks CSS.
 - Dibujo de la ventana: función de Rust que devuelve SVG, usada en pantalla y en la hoja impresa.
 - Impresión: hojas HTML con hoja de estilos de impresión A4 (`@page`, saltos de página). PDF automático en el servidor (correo, archivo): spike y ADR-0003; aíslalo tras un puerto, porque su API puede cambiar.
@@ -78,7 +78,7 @@ Prefiere lo simple y estable. Una herramienta compleja solo se justifica si resu
 - **Longitudes:** `Longitud(i64)` en décimas de milímetro. Las series y la interfaz usan **cm** (un decimal de cm = 1 mm); por dentro todo va en décimas de mm. Las divisiones redondean de forma explícita y la regla es configurable por serie (por ahora, a 0,1 cm hacia abajo; provisional hasta validarlo con ventanas reales). Nunca `f64` para medidas ni dinero.
 - Las fórmulas de las series se evalúan con un **evaluador propio de gramática mínima** (números, `ancho`, `alto`, parámetros, `+ - * /`, paréntesis, `minimo`, `maximo`, `redondear`, `techo`, `suelo` y `si(condición, entonces, si_no)` con las comparaciones `>`, `>=`, `<`, `<=`, `==` solo dentro de `si`, para cantidades o longitudes que dependen de la medida; primer caso real: las bisagras de la abatible).
 - Valida cada entrada al deserializarla, con tipos fuertes.
-- Migraciones: nunca edites una ya aplicada.
+- Base de datos: **hasta el primer despliegue real** hay un único esquema (`crates/servidor/src/bd/esquema.sql`) que se amplía directamente, sin migraciones (ADR-0011, decisión del propietario). Desde el primer despliegue, migraciones numeradas que nunca se editan.
 - Los **documentos emitidos son inmutables** (presupuesto aceptado, orden de taller, factura): copia los datos al emitir; no los releas del catálogo.
 - Identificadores enteros autoincrementales. Fechas en UTC, mostradas en Europe/Madrid.
 - Un concepto por archivo: hasta 200 líneas (máximo 300) y funciones de hasta 40 líneas. El detalle de módulos y algoritmos está en `docs/BACKEND.md`.
