@@ -92,6 +92,8 @@ Las fórmulas usan solo lo que permite el evaluador (`docs/BACKEND.md`, apartado
 - números con punto decimal, `+ - * /` y paréntesis;
 - `minimo`, `maximo`, `redondear`, `techo`, `suelo`;
 - `si(condición, entonces, si_no)`, y solo dentro de `si` las comparaciones `>`, `>=`, `<`, `<=`, `==`.
+- `minimo` y `maximo` admiten 2 o más argumentos; `redondear`, `techo` y `suelo` tienen 1 y redondean a un número entero de la unidad de la serie (al más cercano, hacia arriba y hacia abajo).
+- Un campo con un nombre que no está en este documento es un error (evita erratas como `acesorios`).
 
 No se admiten texto, variables nuevas ni funciones propias. Una fórmula con un nombre desconocido es un **error de importación**, no se interpreta. Las opciones de línea (apartado 8) **no** se pueden usar dentro de las fórmulas en el MVP: cambian el dibujo y los textos, no las cuentas. Si una opción tiene que cambiar una cantidad o una medida, se amplía el evaluador con una decisión explícita.
 

@@ -1,11 +1,11 @@
 # Progreso
 
-Estado: **H0 terminado** (2026-11-21). Siguiente: **H1, motor de dominio**.
+Estado: **H1 terminado** (2026-11-21). Siguiente: **H2, catálogo, clientes e importación de tarifas**.
 
 | Hito | Estado |
 |---|---|
 | H0 Cimientos | **hecho** (2026-11-21) |
-| H1 Motor de dominio | pendiente |
+| H1 Motor de dominio | **hecho** (2026-11-21) |
 | H2 Catálogo, clientes e importación | pendiente |
 | H3 Presupuestos | pendiente |
 | H4 Trabajos y orden de taller | pendiente |
@@ -14,7 +14,6 @@ Estado: **H0 terminado** (2026-11-21). Siguiente: **H1, motor de dominio**.
 | H7 Copias y despliegue | pendiente |
 
 ## ADR pendientes
-- Antes de H1: dónde viven las series en ejecución (propuesta: base de datos, versionadas).
 - Antes de H3: ADR-0003, PDF automático en el servidor.
 
 ## Registro de decisiones y cambios
@@ -35,3 +34,21 @@ Estado: **H0 terminado** (2026-11-21). Siguiente: **H1, motor de dominio**.
 - La cobertura del 90 % del dominio se exigirá en CI desde H1.
 - Pendiente de confirmar: menú de 8 entradas.
 - Los `fixtures/demo` ya venían en el paquete; se usarán en los E2E desde H3.
+
+### H1. Motor de dominio (2026-11-21)
+**Hecho**
+- Unidades exactas: `Decimal` de punto fijo (4 decimales, sin `f64`), `Longitud` en décimas de mm, `Dinero` en céntimos y redondeo abajo, arriba o cercano.
+- Evaluador de fórmulas propio: `+ - * /`, paréntesis, `minimo`, `maximo`, `redondear`, `techo`, `suelo` y `si(...)` con comparaciones; límites de 200 caracteres y 16 niveles; errores en español; pruebas de propiedades.
+- Series como datos: lectura con `yaml-rust2` a un árbol neutro y validación completa en el dominio (apartado 11 de FORMATO_SERIES.md), con todos los errores a la vez y avisos por cada `CONFIRMAR`.
+- Cálculo de una ventana: piezas numeradas, vidrio, accesorios desglosados y sumados, límites y lista de pendientes; la línea sale **incompleta** mientras falte cualquier dato.
+- Optimizador Best Fit Decreasing con grosor de sierra, recorte y retal; pruebas de propiedades y comparación con la solución óptima en casos pequeños.
+- **Tests dorados:** las 3 ventanas de `fixtures/real/` coinciden con el cálculo (criterio de aceptación).
+- Servidor: migración 0003 (series versionadas), Catálogo > Series, importación en 3 pasos con vista previa y pantalla **«Probar una ventana»** con el plan de corte.
+- Pruebas: 132 entre unitarias e integración y 5 E2E; cobertura del dominio 95,7 %, exigida en CI (mínimo 90 %).
+
+**Decisiones:** ADR-0009 (series como YAML versionado en la base de datos) y ADR-0010 (`yaml-rust2`). Bisagras de la abatible confirmadas por el propietario. **Revisión de ADR-0001 tras H1:** el motor salió sin atascos; se mantiene Rust.
+
+**Pendiente**
+- El **coste y el precio** de la ventana se calculan en H2/H3, cuando existan tarifas y se confirme si el margen va sobre coste o sobre venta.
+- Grosor de sierra, recorte de extremos y retal mínimo: se usan 0 hasta que el taller los dé (`OPEN_QUESTIONS.md`).
+- Validar una serie (pasarla de borrador a validada) con ventanas reales: acción explícita que llegará con el punto de validación tras H3.

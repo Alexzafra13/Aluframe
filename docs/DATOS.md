@@ -135,15 +135,11 @@ Las migraciones empiezan en la 0001 con usuarios, sesiones, auditoría y versió
 ### 7.5 Series de perfiles (las recetas)
 | Tabla | Campos |
 |---|---|
-| `serie` | id, codigo (`ALUPROM_21`), fabricante, nombre, proveedor_id |
-| `serie_version` | id, serie_id, numero, estado (`borrador`/`validada`/`demo`), unidades (`cm`/`mm`), redondeo_precision_dmm, redondeo_sentido (`abajo`/`arriba`/`cercano`), longitud_barra_dmm, parametros_json, origen_yaml, sha256, creada_en; único (serie_id, numero) |
-| `serie_referencia` | serie_version_id, codigo (`MARCO_LATERAL`, `BISAGRA`, `CRISTAL_4MM`), referencia_texto (`CONFIRMAR` si falta), proveedor_id, articulo_id (NULL si falta o no está en la tarifa vigente); PK (serie_version_id, codigo). Enlaza la serie con la tarifa: ver `docs/FORMATO_SERIES.md`, apartado 5 |
-| `tipologia` | id, serie_version_id, codigo, nombre, estado, dibujo_json (tipo, hojas, bisagras, cremona…), ancho_min_dmm, ancho_max_dmm, alto_min_dmm, alto_max_dmm (NULL si no hay límites) |
-| `pieza_serie` | id, tipologia_id, orden, perfil_codigo, cantidad_formula, longitud_formula, corte_grados (NULL si `CONFIRMAR`) |
-| `vidrio_serie` | tipologia_id (PK), estado (`ok`/`CONFIRMAR`), tipo_codigo (código de `serie_referencia`) |
-| `vidrio_pieza_serie` | id, tipologia_id, orden, cantidad_formula, ancho_formula, alto_formula |
-| `accesorio_serie` | id, tipologia_id, codigo (de `serie_referencia`), cantidad_formula (NULL si `CONFIRMAR`), unidad_cantidad (`unidad`/`metro`), aplica_a (`marco`/`hojas`/`ventana`) |
-| `opcion_linea` | id, tipologia_id, codigo (`lado_cremona`), nombre, valores_json (`["izquierda","derecha"]`), por_defecto |
+| `serie` | id, codigo (`ALUPROM_21`), fabricante, creada_en |
+| `serie_version` | id, serie_id, numero, estado (`borrador`/`validada`/`demo`), origen_yaml (texto original), sha256, avisos, importada_por, creada_en; único (serie_id, numero); no se modifica ni se borra (ADR-0009) |
+| `serie_referencia` | serie_version_id, codigo (`MARCO_LATERAL`, `BISAGRA`), referencia_texto (`CONFIRMAR` si falta), proveedor_texto; PK (serie_version_id, codigo). En H2 se añade el enlace con el artículo de la tarifa |
+
+Las tipologías, piezas, vidrios, accesorios y opciones no tienen tablas propias: se leen del YAML de la versión (ADR-0009).
 
 ### 7.6 Presupuestos
 | Tabla | Campos |

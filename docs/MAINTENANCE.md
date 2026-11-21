@@ -33,7 +33,9 @@ Hoy: antes de cada migración se guarda una copia con `VACUUM INTO` en `copias/`
 ## 6. Operaciones frecuentes
 - Dar de alta operarios, cambiar su PIN o desactivarlos: Ajustes > Usuarios.
 - Contraseña del propietario olvidada (en el servidor): `sudo -u alumframe ALUMFRAME_CONFIG=/etc/alumframe/alumframe.toml /opt/alumframe/alumframe restablecer-contrasena "Nombre"`.
-- Tarifas, series e IVA: llegan en H1 y H2.
+- **Añadir o corregir una serie:** edita su YAML (formato en `docs/FORMATO_SERIES.md`) e impórtalo en Catálogo > Series > Importar serie. La vista previa muestra errores y avisos; cada importación crea una versión nueva y las anteriores se conservan.
+- Antes de tocar una serie real, comprueba sus ventanas con «Probar una ventana» y que `just test` sigue en verde: los tests dorados comparan `data/series/` con `fixtures/real/`.
+- Tarifas e IVA: llegan en H2.
 
 ## 7. Actualizar el toolchain y las dependencias
 Cada 6 meses o ante un aviso de seguridad:
