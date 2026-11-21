@@ -6,6 +6,7 @@ pub mod catalogo;
 pub mod clientes;
 pub mod corte;
 pub mod csv;
+pub mod dibujo;
 pub mod formula;
 pub mod informe;
 pub mod nif;
