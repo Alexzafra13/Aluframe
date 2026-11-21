@@ -52,4 +52,4 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - Documentación preparada para retomar en una sesión nueva: `docs/PROGRESS.md` («Cómo retomar») y `docs/PROMPT_INICIAL.md` (mensaje para H2).
 - **H2 (plan aprobado):** importación de tarifas y clientes solo desde CSV (Excel, guardado como CSV), todo o nada, versiones completas de tarifa y deshacer la última de cada proveedor (ADR-0012). `proveedor` gana `descuento_habitual_bp` (DATOS 3.3 lo nombraba y la tabla no lo tenía). `kit_componente` pasa a H5 y `acabado_recargo_proveedor` espera a la decisión 4 de DATOS.
 - **H2 terminado:** clientes (búsqueda, direcciones, RGPD, importación CSV con deshacer), catálogo (proveedores, acabados, artículos), tarifas versionadas (importación con vista previa, edición, ajuste, histórico y deshacer). `DATOS.md` 7.3 y 7.4 recogen las columnas añadidas (`busqueda`, `importacion_id`, tabla `importacion`). Rutas de edición del catálogo en `PANTALLAS.md`.
-
+- El propietario confirma que las barras de Aluval vienen en 640 cm; coincide con `data/series/aluprom-21.yaml` y no cambia nada del código.

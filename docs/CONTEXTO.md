@@ -51,6 +51,8 @@ Todo se maneja en cm (un decimal de cm = 1 mm). Redondeo provisional: a 0,1 cm h
 - Marco: `ancho` y `alto` sin descuento. Hoja: alto `alto − 4,1` y ancho `(ancho − 4,85) / 2`, 4 piezas de cada. Inversor: `alto − 10,3`. Cortes a 45°.
 - Accesorios: 4 escuadras para el marco y 4 por hoja, 1 cremona, 1 kit de 2 hojas, bisagras (2 por hoja hasta 140 cm de alto incluido, 3 por encima). Barras de 640 cm. Pendientes: pletinas de falleba, tipos de escuadra, cantidad de inversores y cristal.
 
+**Proveedores:** las barras de Aluval vienen en 640 cm (confirmado por el propietario, 2026-11-21); las de la V-94 (Sopena), también en 6,40 m.
+
 **Taller:** grosor de sierra 2 mm (provisional, por comprobar).
 
 - Ver `data/series/aluprom-21.yaml`, `data/series/sopena-v94.yaml` y los tres fixtures de `fixtures/real/` (`validado: false`: derivados de las fórmulas, no de hojas de corte reales).
