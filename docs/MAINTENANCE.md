@@ -21,10 +21,18 @@ Objetivo: que cualquier persona, o una sesión nueva de Claude sin contexto, pue
 4. También se puede lanzar a mano en Actions > «Publicar versión» > *Run workflow*.
 
 ## 4. Instalar y actualizar en el taller
-**Servidor Linux:** descomprime el `.tar.gz`, entra en la carpeta y ejecuta `sudo ./instalar.sh`. Instala en `/opt/alumframe`, configura en `/etc/alumframe/alumframe.toml`, guarda los datos en `/var/lib/alumframe` y deja el servicio `alumframe` activo al arrancar. Comprueba `http://IP:9090/health`.
+**Servidor Linux:** descarga y descomprime el `.tar.gz`, entra en la carpeta y ejecuta `sudo ./instalar.sh`:
+```
+curl -LO https://github.com/Alexzafra13/Aluframe/releases/download/vX.Y.Z/alumframe-vX.Y.Z-linux-x86_64.tar.gz
+tar xzf alumframe-vX.Y.Z-linux-x86_64.tar.gz && cd alumframe-vX.Y.Z-linux-x86_64 && sudo ./instalar.sh
+```
+Si el repositorio vuelve a ser privado, `curl` baja un archivo de 9 bytes («Not Found»): usa `gh release download vX.Y.Z -R Alexzafra13/Aluframe -p '*linux*'` tras `gh auth login`.
+ Instala en `/opt/alumframe`, configura en `/etc/alumframe/alumframe.toml`, guarda los datos en `/var/lib/alumframe` y deja el servicio `alumframe` activo al arrancar. Comprueba `http://IP:9090/health`.
 - Actualizar: lo mismo con la versión nueva; la anterior queda en `/opt/alumframe/alumframe.anterior`.
 - Volver atrás: ver `despliegue/linux/LEEME.txt`. (Hasta el primer despliegue real no hay migraciones: ADR-0011.)
 - Registros: `journalctl -u alumframe`.
+- **Series:** las de `data/series/` vienen dentro del ejecutable y se cargan solas al arrancar (ADR-0014); no hay que importarlas.
+- **Acceso desde fuera del taller:** con **Tailscale**, sin abrir puertos en el router. En el servidor, `curl -fsSL https://tailscale.com/install.sh | sh`, `sudo tailscale up` y `sudo systemctl enable --now tailscaled`; en el móvil o portátil, la app Tailscale con la misma cuenta, y se abre `http://IP-TAILSCALE:9090` (`tailscale ip -4`). Con `ufw`: `sudo ufw allow in on tailscale0 to any port 9090 proto tcp` y `sudo ufw allow from 192.168.1.0/24 to any port 9090 proto tcp`. No se publica con un proxy inverso: el bloqueo por IP vería todas las peticiones con la IP del proxy.
 
 **PC de la oficina (Windows):** ejecuta `crear-acceso-directo.ps1` del `.zip` e indica la IP del servidor. `alumframe.exe` es el modo local (probar o emergencia).
 
@@ -35,7 +43,7 @@ Hoy: antes de cada migración se guarda una copia con `VACUUM INTO` en `copias/`
 - Dar de alta operarios, cambiar su PIN o desactivarlos: Ajustes > Usuarios.
 - Grosor de sierra, recorte de extremos y retal mínimo: Ajustes > Taller.
 - Contraseña del propietario olvidada (en el servidor): `sudo -u alumframe ALUMFRAME_CONFIG=/etc/alumframe/alumframe.toml /opt/alumframe/alumframe restablecer-contrasena "Nombre"`.
-- **Añadir o corregir una serie:** edita su YAML (formato en `docs/FORMATO_SERIES.md`) e impórtalo en Catálogo > Series > Importar serie. La vista previa muestra errores y avisos; cada importación crea una versión nueva y las anteriores se conservan.
+- **Añadir o corregir una serie:** edita o añade su YAML en `data/series/` (formato en `docs/FORMATO_SERIES.md`), pasa las pruebas y publica una versión: al arrancar entra sola como versión nueva (ADR-0014). Para probar un cambio sin publicar, impórtalo en Catálogo > Series > Importar serie. La vista previa muestra errores y avisos; cada importación crea una versión nueva y las anteriores se conservan.
 - Antes de tocar una serie real, comprueba sus ventanas con «Probar una ventana» y que `just test` sigue en verde: los tests dorados comparan `data/series/` con `fixtures/real/`.
 - **Actualizar una tarifa:** Catálogo > Tarifas > Importar tarifa. Elige el proveedor y el CSV con las columnas `referencia;descripcion;unidad;precio_tarifa;longitud_barra` (y `tipo` opcional). Desde Excel, «Guardar como» → CSV. Revisa la vista previa (los saltos de más del 30 % salen marcados) y confirma. Si algo no cuadra, «Deshacer» en la versión vigente.
 - **Cambiar unos pocos precios:** Catálogo > Artículos, filtra por proveedor y escribe el precio en la tabla, o marca artículos y aplica un porcentaje. Cada cambio queda como una versión de la tarifa.

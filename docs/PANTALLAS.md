@@ -227,3 +227,4 @@ Los permisos se comprueban en la capa de aplicación (`docs/BACKEND.md`, apartad
 6. Formato visible de la numeración (`P-2026-0001`) y las letras de cada serie.
 7. Si el cristal recibido se marca a mano (propuesto) o con un pedido de vidrio, que queda fuera del MVP.
 8. Qué más debe aparecer en el panel de atención del Inicio.
+9. El propietario también quiere usar sus pantallas en el **móvil** (2026-11-21, sin prisa): menú inferior, tablas como tarjetas y editor de línea en una columna. Hoy solo hay una regla para menos de 900 px.

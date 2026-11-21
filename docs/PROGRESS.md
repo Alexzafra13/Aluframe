@@ -26,6 +26,8 @@ Estado: **H3 terminado** (2026-11-21) y publicado como **v0.4.0** en `main` (con
 - Para validar H1–H3 con 5 ventanas reales: descuentos del cristal de cada serie, la referencia de Aluval de cada código de las series (`MARCO_LATERAL`…), una tarifa real de Aluval, 5 ventanas con su hoja de corte y precio cobrado, y elegir margen y mano de obra.
 - Otros: pletinas de falleba, recorte de extremos, confirmar la sierra de 2 mm, posición de las bisagras y logotipo.
 
+**Después de H3 (2026-11-21):** las series de `data/series/` vienen incluidas en el ejecutable y se cargan solas al arrancar (ADR-0014, versión 0.4.1). El propietario tiene el programa instalado para pruebas en su servidor Ubuntu con acceso por Tailscale (`docs/MAINTENANCE.md`, apartado 4).
+
 | Hito | Estado |
 |---|---|
 | H0 Cimientos | **hecho** (2026-11-21) |
