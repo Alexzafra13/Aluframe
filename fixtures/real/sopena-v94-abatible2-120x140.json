@@ -17,6 +17,7 @@
     "accesorios": [
       { "articulo": "ESCUADRA",    "cantidad": 12 },
       { "articulo": "CREMONA",     "cantidad": 1 },
+      { "articulo": "BISAGRA",     "cantidad": 4 },
       { "articulo": "KIT_2_HOJAS", "cantidad": 1 }
     ],
     "vidrio": null,
@@ -24,7 +25,7 @@
       "INVERSOR: longitud 129,7 cm (alto - 10,3); faltan cantidad y ángulo de corte",
       "PLETINA_FALLEBA: falta el cálculo",
       "Vidrio: falta el descuento",
-      "BISAGRA: 2 por hoja hasta 140 cm de alto y 3 por encima (4 en total con este alto); falta saber si van dentro del kit",
+      "BISAGRA: confirmado por el propietario (2026-11-21): 2 por hoja hasta 140 cm de alto incluido y 3 por encima; falta saber si van dentro del kit",
       "Escuadras: falta concretar los tipos"
     ]
   }

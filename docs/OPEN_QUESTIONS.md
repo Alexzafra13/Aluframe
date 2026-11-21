@@ -9,7 +9,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] ¿Se optimizan los cortes por ventana o por trabajo? ¿Qué se hace con los retales?
 - [ ] Grosor de sierra, recorte de extremos y retal mínimo aprovechable.
 - [ ] Aluprom 21 de 4 hojas: confirmar ruedas (8) y tornillos (9 + 16), que son supuestos. Otras tipologías (fija, puertas).
-- [ ] **Fixture de la abatible y bisagras (bloquea su test dorado):** la serie V-94 calcula `2 * si(alto > 140, 3, 2)` = 4 bisagras para 120 × 140, pero `fixtures/real/sopena-v94-abatible2-120x140.json` no las incluye en lo esperado. Propuesto: añadir «BISAGRA: 4» al fixture con la nota de si van dentro del kit, o marcar la cantidad `CONFIRMAR` en la serie. Necesita el permiso del propietario (no se cambia un fixture real sin él).
+- [x] **Fixture de la abatible y bisagras:** el propietario confirma (2026-11-21) 2 bisagras por hoja hasta 140 cm de alto de la ventana, incluido, y 3 por encima. El fixture incluye ahora «BISAGRA: 4» para 120 × 140.
 - [ ] V-94 abatible: cantidad de inversores y su ángulo de corte, cálculo de las pletinas de falleba, tipos de escuadra (exterior e interior de hoja), longitud de barra y si los marcos superior, lateral e inferior son el mismo perfil.
 - [ ] Redondeo: ¿a 0,1 cm hacia abajo es lo correcto? Validarlo con ventanas reales.
 - [ ] Optimizador con cortes a 45°: de momento cada pieza cuenta por su lado más largo (conservador). Revisarlo con el taller.
@@ -67,5 +67,6 @@ Comparado con programas como Productor (Gaia), Cortizo Software, GesFácil, Klae
 - [ ] Barras de longitud distinta de 640 cm: ¿se compran así o son retales? Cómo se registran en stock y cuándo las usa el optimizador.
 
 ## Bisagras y dibujo de la abatible
-- [ ] Bisagras: 2 por hoja hasta 140 cm de alto y 3 por encima. ¿A los 140 cm exactos son 2? ¿El límite es el alto de la ventana o el de la hoja? ¿Van dentro del kit de 2 hojas o se piden aparte?
+- [x] Bisagras: 2 por hoja hasta 140 cm de alto de la ventana (140 incluido) y 3 por encima (confirmado 2026-11-21).
+- [ ] ¿Las bisagras van dentro del kit de 2 hojas o se piden aparte?
 - [ ] Posición de las bisagras en el dibujo (hoy repartidas a ojo): ¿a qué distancia de los extremos van?
