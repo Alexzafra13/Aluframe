@@ -12,7 +12,7 @@ pub struct Porcentaje(i64);
 impl Porcentaje {
     pub const CERO: Porcentaje = Porcentaje(0);
 
-    pub fn desde_puntos_basicos(valor: i64) -> Porcentaje {
+    pub const fn desde_puntos_basicos(valor: i64) -> Porcentaje {
         Porcentaje(valor)
     }
 
