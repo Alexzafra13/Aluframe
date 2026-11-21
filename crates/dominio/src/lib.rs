@@ -3,6 +3,10 @@
 
 pub mod acceso;
 pub mod corte;
+pub mod csv;
 pub mod formula;
+pub mod informe;
+pub mod nif;
 pub mod series;
+pub mod texto;
 pub mod unidades;
