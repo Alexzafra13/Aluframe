@@ -16,7 +16,8 @@ Objetivo: que cualquier persona, o una sesión nueva de Claude sin contexto, pue
 ## 3. Publicar una versión
 1. Sube `version` en `Cargo.toml` (`[workspace.package]`) y anota el cambio en `docs/CAMBIOS.md`.
 2. `just check` y `just e2e` en verde.
-3. En GitHub, Actions > «Publicar versión» > *Run workflow* con la versión (`v0.2.0`), o bien `git tag v0.2.0 && git push origin v0.2.0`. El workflow crea la etiqueta y deja en la página de versiones `alumframe-v0.2.0-linux-x86_64.tar.gz` y `alumframe-v0.2.0-windows-x86_64.zip`.
+3. Lleva el cambio a `main`. El workflow `publicar.yml` ve que esa versión aún no tiene etiqueta, pasa las pruebas, compila y crea la versión `vX.Y.Z` con `alumframe-vX.Y.Z-linux-x86_64.tar.gz` y `alumframe-vX.Y.Z-windows-x86_64.zip`. Un push a `main` sin cambiar la versión no publica nada.
+4. También se puede lanzar a mano en Actions > «Publicar versión» > *Run workflow*.
 
 ## 4. Instalar y actualizar en el taller
 **Servidor Linux:** descomprime el `.tar.gz`, entra en la carpeta y ejecuta `sudo ./instalar.sh`. Instala en `/opt/alumframe`, configura en `/etc/alumframe/alumframe.toml`, guarda los datos en `/var/lib/alumframe` y deja el servicio `alumframe` activo al arrancar. Comprueba `http://IP:9090/health`.

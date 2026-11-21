@@ -2,6 +2,7 @@ name: Publicar versión
 
 on:
   push:
+    branches: [main]
     tags: ["v*"]
   workflow_dispatch:
     inputs:
@@ -14,16 +15,49 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  VERSION: ${{ inputs.version || github.ref_name }}
 
 jobs:
-  linux:
-    name: Servidor Linux (estático, musl)
+  version:
+    name: Decidir si hay versión nueva
     runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.decidir.outputs.version }}
+      publicar: ${{ steps.decidir.outputs.publicar }}
     steps:
       - uses: actions/checkout@v4
-      - name: Comprobar el número de versión
-        run: '[[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Versión no válida: $VERSION"; exit 1; }'
+        with:
+          fetch-depth: 0
+      - id: decidir
+        env:
+          ENTRADA: ${{ inputs.version }}
+        run: |
+          if [ -n "$ENTRADA" ]; then
+            version="$ENTRADA"
+          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            version="$GITHUB_REF_NAME"
+          else
+            version="v$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n 1)"
+          fi
+          [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Versión no válida: $version"; exit 1; }
+          publicar=true
+          if [[ "$GITHUB_REF" == refs/heads/* ]] && git rev-parse -q --verify "refs/tags/$version" >/dev/null; then
+            publicar=false
+            echo "La versión $version ya está publicada; no hay nada que hacer."
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "publicar=$publicar" >> "$GITHUB_OUTPUT"
+
+  linux:
+    name: Servidor Linux (estático, musl)
+    needs: version
+    if: needs.version.outputs.publicar == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace --locked
       - run: sudo apt-get update && sudo apt-get install -y musl-tools
       - run: rustup target add x86_64-unknown-linux-musl
       - run: cargo build --release --locked -p servidor --target x86_64-unknown-linux-musl
@@ -43,8 +77,10 @@ jobs:
 
   windows:
     name: Windows (modo local)
-    needs: linux
+    needs: [version, linux]
     runs-on: windows-2022
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - run: cargo build --release --locked -p servidor
