@@ -37,7 +37,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 
 ## Infraestructura
 - [x] Servidor: mini PC con **Linux**; la oficina usa **Windows** por navegador (`docs/CAMBIOS.md`, 2026-11-21). Pendiente: cuándo se incorpora la tablet del operario.
-- [ ] Caducidad de sesión deseada para la oficina y para el operario.
+- [x] Caducidad de sesión: 2 h sin actividad y 12 h como máximo; el propietario puede elegir al entrar mantenerla hasta cerrar el navegador (`docs/CAMBIOS.md`, 2026-11-21).
 
 ## Funciones de otros programas del sector (revisión 2026-11-20)
 Comparado con programas como Productor (Gaia), Cortizo Software, GesFácil, Klaes o ePref. Decidir cuáles entran en el MVP:

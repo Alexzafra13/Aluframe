@@ -108,7 +108,7 @@ Las migraciones empiezan en la 0001 con usuarios, sesiones, auditoría y versió
 |---|---|
 | `usuario` | id, nombre, rol (`propietario`/`operario`), clave_hash (argon2id: contraseña o PIN), activo, intentos_fallidos, bloqueado_hasta, creado_en, version |
 | `bloqueo_ip` | ip (PK), intentos_fallidos, bloqueado_hasta (bloqueo progresivo por dirección) |
-| `sesion` | id (hash del identificador de 256 bits), usuario_id, creada_en, ultima_actividad_en, caduca_en, token_csrf |
+| `sesion` | id (hash del identificador de 256 bits), usuario_id, creada_en, ultima_actividad_en, caduca_en, token_csrf, hasta_cerrar_navegador (0/1, opción del propietario al entrar) |
 | `configuracion` | clave (PK), valor, actualizado_en, usuario_id |
 | `secuencia_documentos` | serie, anio, ultimo; PK (serie, anio) |
 | `auditoria` | id, cuando_en, usuario_id, accion, entidad, entidad_id, detalle_json (solo añadir) |

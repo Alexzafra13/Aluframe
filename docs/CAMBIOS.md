@@ -42,3 +42,4 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - Ya no hace falta el ADR del envoltorio de servicio de Windows.
 - H0 construido: ver `docs/PROGRESS.md`. Nuevos ADR-0004 a 0008, `docs/design.md` y `docs/MAINTENANCE.md` (secciones de compilación, publicación, instalación y dependencias).
 - `docs/DATOS.md`: tabla `bloqueo_ip` (ip, intentos_fallidos, bloqueado_hasta) para el bloqueo por IP; `sesion.id` guarda la huella SHA-256 del token.
+- Decisión del propietario: al entrar, el propietario puede marcar **«Mantener la sesión abierta hasta cerrar el navegador»** (desmarcada por defecto). Con ella la sesión no caduca por inactividad y dura hasta cerrar el navegador o apagar el PC, con un tope de 30 días. Sin ella: 2 h de inactividad y 12 h como máximo. El operario no tiene esta opción. Migración 0002 (`sesion.hasta_cerrar_navegador`).
