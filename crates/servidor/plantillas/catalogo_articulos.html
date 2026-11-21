@@ -13,7 +13,7 @@
 </header>
 {% let pestana = "Artículos" %}{% include "pestanas_catalogo.html" %}
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
-{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
 <form class="tarjeta formulario-en-linea" method="get" action="/catalogo/articulos" role="search">
   <label>Proveedor
     <select name="proveedor">

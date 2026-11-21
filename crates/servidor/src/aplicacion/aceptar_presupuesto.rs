@@ -102,11 +102,11 @@ pub fn motivos_para_no_aceptar(ficha: &FichaDePresupuesto) -> Vec<String> {
                 .first()
                 .cloned()
                 .unwrap_or_else(|| "está incompleta".into());
-            motivos.push(format!("la línea {} {}", linea.orden, primero));
+            motivos.push(format!("línea {}: {}", linea.orden, primero));
         }
         if linea.revisar_limites {
             motivos.push(format!(
-                "la línea {} tiene medidas fuera de los límites sin revisar",
+                "línea {}: medidas fuera de los límites sin revisar",
                 linea.orden
             ));
         }

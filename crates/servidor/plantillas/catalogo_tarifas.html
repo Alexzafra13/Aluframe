@@ -10,7 +10,7 @@
 </header>
 {% let pestana = "Tarifas" %}{% include "pestanas_catalogo.html" %}
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
-{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
 {% if tarifas.is_empty() %}
 <p class="vacio tarjeta">Aún no hay tarifas. Pulsa «Importar tarifa» y elige el CSV del proveedor; verás una vista previa antes de guardar nada.</p>
 {% else %}

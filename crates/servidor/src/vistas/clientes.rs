@@ -159,6 +159,7 @@ pub struct PaginaFichaCliente {
     pub nueva_direccion: BloqueDireccion,
     pub aviso: Option<String>,
     pub confirmacion: Option<String>,
+    pub presupuestos: Vec<super::FilaDePresupuesto>,
 }
 
 impl PaginaFichaCliente {

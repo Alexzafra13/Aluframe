@@ -1,0 +1,205 @@
+/* H3: presupuestos, editor de línea, hojas, control segmentado y hoja A4 (docs/design.md). */
+
+/* Avisos efímeros: bajan desde arriba, se quedan 4 s y se van (como en iOS). */
+.aviso-efimero { position: fixed; top: 14px; left: 50%; z-index: 50; transform: translateX(-50%); margin: 0; padding: .8rem 1.4rem; border-radius: 999px; background: var(--tinta); color: #fff; font-weight: 500; box-shadow: 0 8px 30px rgb(21 25 29 / .18); pointer-events: none; animation: efimero 4.6s var(--curva-suave) both; }
+@keyframes efimero { 0% { opacity: 0; transform: translate(-50%, -140%); } 8%, 86% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -140%); } }
+
+/* Control segmentado: enlaces (filtros) y radios (capas del dibujo). */
+.segmentado, .segmentado-control { display: inline-flex; position: relative; padding: 3px; gap: 2px; border-radius: 11px; background: rgb(21 25 29 / .07); margin-bottom: 1.25rem; }
+.segmento { display: inline-flex; align-items: center; min-height: 38px; padding: 0 1rem; border-radius: 8px; color: var(--tinta); text-decoration: none; font-weight: 500; transition: background-color var(--normal) ease, box-shadow var(--normal) ease; }
+.segmento.activo { background: var(--superficie); box-shadow: 0 1px 3px rgb(21 25 29 / .12); }
+.segmentado-control { margin: 0; display: inline-grid; grid-template-columns: repeat(3, 1fr); }
+.segmentado-control input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.segmentado-control label { position: relative; z-index: 1; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 1.1rem; border-radius: 8px; cursor: pointer; font-weight: 500; color: var(--apagado); transition: color var(--normal) ease; }
+.segmentado-control input:checked + label { color: var(--tinta); }
+.segmentado-control input:focus-visible + label { outline: 3px solid var(--indicador); outline-offset: 1px; }
+.segmentado-control .pildora { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3); border-radius: 8px; background: var(--superficie); box-shadow: 0 1px 3px rgb(21 25 29 / .14); transition: transform 380ms var(--curva-muelle); }
+.segmentado-control:has(#capa-piezas:checked) .pildora { transform: translateX(100%); }
+.segmentado-control:has(#capa-cristal:checked) .pildora { transform: translateX(200%); }
+
+/* Hojas: <dialog> que sube desde abajo (tablet) o entra por la derecha (ordenador). */
+dialog.hoja { border: 0; padding: 0; margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(460px, 100vw); background: var(--superficie); color: var(--tinta); box-shadow: -10px 0 40px rgb(21 25 29 / .18); }
+dialog.hoja[open] { animation: hoja-entra 340ms var(--curva-suave); }
+dialog.hoja.cerrando { animation: hoja-sale 260ms var(--curva-suave) forwards; }
+dialog.hoja::backdrop { background: rgb(21 25 29 / .38); backdrop-filter: blur(2px); animation: velo-entra 340ms ease; }
+dialog.hoja.cerrando::backdrop { animation: velo-sale 260ms ease forwards; }
+@keyframes hoja-entra { from { transform: translateX(100%); } }
+@keyframes hoja-sale { to { transform: translateX(100%); } }
+@keyframes velo-entra { from { opacity: 0; } }
+@keyframes velo-sale { to { opacity: 0; } }
+@media (max-width: 900px) {
+  dialog.hoja { margin: auto 0 0; width: 100vw; height: auto; max-height: 88dvh; border-radius: 18px 18px 0 0; box-shadow: 0 -10px 40px rgb(21 25 29 / .18); }
+  @keyframes hoja-entra { from { transform: translateY(100%); } }
+  @keyframes hoja-sale { to { transform: translateY(100%); } }
+}
+.hoja-contenido { display: flex; flex-direction: column; gap: .25rem; min-height: 100%; padding: 1.25rem 1.5rem 0; }
+.hoja-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .5rem; }
+.hoja-cabecera h2 { margin: 0; }
+.hoja-pie { position: sticky; bottom: 0; margin-top: auto; display: flex; justify-content: flex-end; gap: .75rem; padding: 1rem 0 1.25rem; background: linear-gradient(transparent, var(--superficie) 30%); }
+.boton-cerrar, .boton-icono { width: var(--tactil); height: var(--tactil); border-radius: 50%; border: 0; background: rgb(21 25 29 / .07); color: var(--apagado); font-size: 1rem; cursor: pointer; transition: background-color var(--rapido) ease, transform var(--rapido) var(--curva-muelle); }
+.boton-cerrar:hover, .boton-icono:hover { background: rgb(21 25 29 / .12); }
+.boton-cerrar:active, .boton-icono:active { transform: scale(.92); }
+
+/* Cabecera de documento con la barra de pasos. */
+.cabecera-documento { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; }
+.cabecera-documento h1 { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.cabecera-documento .antetitulo a { color: inherit; text-decoration: none; }
+.pasos { list-style: none; display: flex; align-items: center; gap: .5rem; margin: 0; padding: 0; flex-wrap: wrap; }
+.paso { display: flex; align-items: center; gap: .5rem; color: var(--apagado); font-weight: 500; }
+.paso + .paso::before { content: ""; width: 34px; height: 1px; background: var(--linea); margin-right: .25rem; }
+.paso-numero { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--linea); font: 600 .9rem var(--condensada); }
+.paso.actual { color: var(--tinta); }
+.paso.actual .paso-numero { background: var(--acero); border-color: var(--acero); color: #fff; }
+
+/* Estados del presupuesto: solo azul y naranja como acentos. */
+.etiqueta-estado-borrador { background: var(--acero-tinte); color: var(--acero); }
+.etiqueta-estado-enviado { background: var(--acero-tinte); color: var(--acero); box-shadow: inset 0 0 0 1.5px var(--acero); }
+.etiqueta-estado-aceptado { background: var(--acero); color: #fff; }
+.etiqueta-estado-rechazado { background: var(--aviso-fondo); color: var(--aviso); }
+.etiqueta-estado-caducado { background: rgb(21 25 29 / .07); color: var(--apagado); }
+.etiqueta-aviso-oscura { background: var(--aviso-fondo); color: var(--aviso); border-radius: 999px; padding: .35rem .9rem; font-weight: 600; font-size: .9rem; }
+
+/* Lista de presupuestos como celdas de iOS. */
+.lista-tarjetas { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.fila-presupuesto { display: grid; grid-template-columns: 9rem 1fr auto auto 9rem; align-items: center; gap: 1rem; min-height: 60px; padding: .5rem 1.25rem; border-radius: 12px; background: var(--superficie); border: 1px solid var(--linea); color: var(--tinta); text-decoration: none; transition: transform var(--rapido) var(--curva-muelle), box-shadow var(--normal) ease; }
+.fila-presupuesto:hover { box-shadow: 0 4px 16px rgb(21 25 29 / .07); }
+.fila-presupuesto:active { transform: scale(.985); }
+.fila-presupuesto .cliente { font-weight: 500; }
+.importe { text-align: right; font-weight: 500; }
+
+/* Ficha del presupuesto. */
+.documento { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: 1.25rem; align-items: start; }
+.cabecera-seccion { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; flex-wrap: wrap; }
+.cabecera-seccion h2 { margin: 0; }
+.tarjetas-linea { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
+.tarjeta-linea { position: relative; animation: aparecer var(--normal) var(--curva-suave) both; }
+.tarjeta-linea:nth-child(2) { animation-delay: 40ms; } .tarjeta-linea:nth-child(3) { animation-delay: 80ms; } .tarjeta-linea:nth-child(4) { animation-delay: 120ms; } .tarjeta-linea:nth-child(n+5) { animation-delay: 160ms; }
+.tarjeta-linea-enlace { display: grid; grid-template-columns: 112px 1fr auto; align-items: center; gap: 1rem; padding: .75rem 3.75rem .75rem .75rem; border-radius: 14px; background: var(--superficie); border: 1px solid var(--linea); color: var(--tinta); text-decoration: none; transition: transform var(--rapido) var(--curva-muelle), box-shadow var(--normal) ease; }
+.tarjeta-linea-enlace:hover { box-shadow: 0 6px 20px rgb(21 25 29 / .08); }
+.tarjeta-linea-enlace:active { transform: scale(.985); }
+.tarjeta-linea-texto { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
+.tarjeta-linea-titulo { font-weight: 600; }
+.tarjeta-linea-lado { display: flex; flex-direction: column; align-items: flex-end; gap: .35rem; }
+.quitar-linea { position: absolute; top: 50%; right: .6rem; transform: translateY(-50%); }
+.miniatura { display: grid; place-items: center; width: 112px; height: 84px; border-radius: 10px; background: var(--papel); overflow: hidden; }
+.miniatura .dibujo-ventana { width: 100%; height: 100%; }
+.miniatura .capa-cotas, .miniatura .capa-piezas { display: none; }
+.miniatura-libre { font: 600 1.6rem var(--condensada); color: var(--apagado); }
+.columna-datos { display: grid; gap: 1.25rem; }
+.columna-datos fieldset[disabled] { opacity: .7; }
+.pila-botones { display: grid; gap: .5rem; margin-bottom: .75rem; }
+.pila-botones form, .pila-botones .boton { width: 100%; }
+.pila-botones form .boton { width: 100%; }
+.lista-simple { list-style: none; padding: 0; margin: .5rem 0 0; display: grid; gap: .35rem; }
+
+/* Pie fijo oscuro con el desglose y el total (diseño aprobado). */
+body.con-pie-fijo .contenido { padding-bottom: 130px; }
+.pie-fijo { position: fixed; left: 280px; right: 0; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1rem 2rem; min-height: 96px; background: var(--menu-fondo); color: #fff; transition: opacity var(--normal) ease; }
+.pie-desglose { display: flex; gap: 2.25rem; margin: 0; flex-wrap: wrap; }
+.pie-desglose dt { font: 500 .8rem var(--condensada); letter-spacing: .12em; text-transform: uppercase; color: var(--menu-grupo); }
+.pie-desglose dd { margin: .2rem 0 0; font: 500 1.05rem var(--mono); color: var(--menu-texto); }
+.pie-total { display: flex; align-items: center; gap: 1.25rem; }
+.pie-total > div { display: flex; flex-direction: column; align-items: flex-end; }
+.pie-total-titulo { font: 500 .8rem var(--condensada); letter-spacing: .12em; text-transform: uppercase; color: var(--menu-grupo); }
+.pie-total-importe { font-size: 2rem; line-height: 1.1; }
+.provisional { opacity: .6; }
+.pie-fijo dd, .pie-total-importe { animation: aparecer var(--rapido) ease both; }
+
+/* Editor de línea (design/01-presupuesto.png). */
+.barra-lineas { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.pestanas-linea { display: flex; gap: .6rem; flex-wrap: wrap; }
+.pestana-linea { display: inline-flex; align-items: center; gap: .6rem; min-height: 52px; padding: 0 1.1rem; border-radius: 12px; border: 1.5px solid var(--linea); background: var(--superficie); color: var(--tinta); text-decoration: none; font-weight: 600; transition: border-color var(--normal) ease, transform var(--rapido) var(--curva-muelle); }
+.pestana-linea.actual { border-color: var(--acero); box-shadow: inset 0 -3px 0 var(--acero); }
+.pestana-linea.anadir { color: var(--tinta); font-weight: 500; }
+.pestana-linea:active { transform: scale(.97); }
+.editor { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); gap: 1.25rem; align-items: start; }
+.columna-editor { display: grid; gap: 1.25rem; }
+.tarjeta-dibujo { padding: 1.25rem; }
+.cabecera-dibujo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; flex-wrap: wrap; }
+.cabecera-dibujo .antetitulo { margin: 0; }
+.lienzo { min-height: 420px; border-radius: 10px; display: grid; place-items: center; padding: 1rem; background-color: #F6F4EE; background-image: linear-gradient(var(--linea) 1px, transparent 1px), linear-gradient(90deg, var(--linea) 1px, transparent 1px); background-size: 28px 28px; transition: opacity var(--normal) ease; }
+.lienzo-figura { margin: 0; width: 100%; animation: aparecer var(--rapido) ease both; }
+.lienzo-vacio { color: var(--apagado); text-align: center; }
+.editor:has(form.htmx-request) .lienzo, body:has(#form-linea.htmx-request) .pie-fijo { opacity: .6; }
+.formulario-linea label { font: 500 .8rem var(--condensada); letter-spacing: .12em; text-transform: uppercase; color: var(--apagado); }
+.formulario-linea .casilla { font: 400 .95rem var(--sans); letter-spacing: 0; text-transform: none; color: var(--tinta); }
+.rejilla-dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 .9rem; }
+.campo-medida { font: 500 1.35rem var(--mono); min-height: 56px; }
+.mas-datos { margin-top: .75rem; }
+.tarjeta-piezas .antetitulo { margin-bottom: .5rem; }
+.lista-piezas { list-style: none; margin: 0; padding: 0; }
+.lista-piezas li { display: grid; grid-template-columns: 36px 1fr auto 5rem; align-items: center; gap: .6rem; min-height: 54px; border-bottom: 1px solid var(--linea); }
+.numero-pieza { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--acero); color: #fff; font: 600 .9rem var(--condensada); }
+.lista-piezas .medida { text-align: right; font-size: 1.05rem; }
+
+/* El dibujo: colores en CSS para pantalla e impresión. */
+.dibujo-ventana { display: block; width: 100%; height: auto; max-height: 64vh; overflow: visible; }
+.dibujo-ventana * { vector-effect: non-scaling-stroke; }
+.dibujo-ventana .marco { fill: #D3D7DB; stroke: #8B939B; stroke-width: 1.5; }
+.dibujo-ventana .hoja { fill: #E7E9EC; stroke: #8B939B; stroke-width: 1.2; }
+.dibujo-ventana .cristal { fill: #D9E6F2; stroke: #8B939B; stroke-width: 1; transition: fill var(--normal) ease; }
+.dibujo-ventana .reflejo { fill: #fff; opacity: .45; }
+.dibujo-ventana .flecha { fill: none; stroke: var(--acero); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.dibujo-ventana .manilla, .dibujo-ventana .bisagra { fill: var(--tinta); }
+.dibujo-ventana .apertura { fill: none; stroke: var(--acero); stroke-width: 1.2; stroke-dasharray: 6 5; }
+.dibujo-ventana .cota { fill: none; stroke: var(--apagado); stroke-width: 1; }
+.dibujo-ventana .texto-cota { fill: var(--apagado); font-family: var(--mono); }
+.dibujo-ventana .pieza circle { fill: var(--acero); stroke: #fff; stroke-width: 2; }
+.dibujo-ventana .pieza text { fill: #fff; font-family: var(--condensada); font-weight: 600; }
+.dibujo-ventana .capa-cotas, .dibujo-ventana .capa-piezas { transition: opacity var(--normal) ease; }
+.capa-texto-cristal { text-align: center; margin-top: .5rem; color: var(--apagado); opacity: 0; transition: opacity var(--normal) ease; }
+.editor:has(#capa-piezas:checked) .capa-cotas { opacity: 0; }
+.editor:has(#capa-cristal:checked) .capa-cotas, .editor:has(#capa-cristal:checked) .capa-piezas { opacity: 0; }
+.editor:has(#capa-cristal:checked) .cristal { fill: #B9D2EA; }
+.editor:has(#capa-cristal:checked) .capa-texto-cristal { opacity: 1; }
+
+/* Ajustes largos: botón de guardar siempre a mano. */
+.pila { display: grid; gap: 0; }
+.opciones-en-fila { display: flex; gap: 1.25rem; flex-wrap: wrap; margin: .75rem 0; }
+.opciones-en-fila legend { width: 100%; }
+.barra-guardar { position: sticky; bottom: 0; display: flex; justify-content: flex-end; padding: 1rem 0; background: linear-gradient(transparent, var(--papel) 35%); }
+
+@media (max-width: 1100px) {
+  .documento, .editor { grid-template-columns: 1fr; }
+  .fila-presupuesto { grid-template-columns: 1fr auto; }
+  .pie-fijo { left: 0; }
+  .pie-desglose { gap: 1.25rem; }
+}
+@media (max-width: 900px) { .pie-fijo { position: sticky; } }
+
+/* Hoja A4 imprimible. */
+body.hoja-impresa { background: #D9D6CD; }
+.barra-impresion { display: flex; justify-content: center; gap: .75rem; padding: 1rem; }
+.a4 { width: 210mm; min-height: 297mm; margin: 0 auto 2rem; padding: 16mm 15mm; background: #fff; color: var(--tinta); box-shadow: 0 10px 40px rgb(21 25 29 / .15); font-size: 10.5pt; }
+.a4 p { margin: 0 0 .15rem; }
+.a4-cabecera { display: flex; justify-content: space-between; gap: 2rem; padding-bottom: 6mm; border-bottom: 2px solid var(--tinta); }
+.a4-empresa-nombre { font: 600 15pt var(--condensada); }
+.a4-documento { text-align: right; }
+.a4-codigo { font-size: 16pt; font-weight: 500; }
+.a4-provisional { color: var(--aviso); font-weight: 600; }
+.a4-cliente { display: flex; gap: 12mm; padding: 6mm 0; }
+.a4-lineas { width: 100%; border-collapse: collapse; }
+.a4-lineas th { font: 500 9pt var(--condensada); text-transform: uppercase; letter-spacing: .08em; color: var(--apagado); text-align: left; border-bottom: 1px solid var(--linea); padding: 2mm 1mm; }
+.a4-lineas td { border-bottom: 1px solid var(--linea); padding: 3mm 1mm; vertical-align: top; }
+.a4-lineas .numero { text-align: right; white-space: nowrap; width: 26mm; padding-left: 4mm; }
+.a4-linea { break-inside: avoid; }
+.a4-ventana { display: flex; gap: 5mm; align-items: center; }
+.a4-dibujo { width: 58mm; flex: none; }
+.a4-dibujo .capa-piezas { display: none; }
+.a4-totales { display: flex; justify-content: flex-end; padding-top: 5mm; break-inside: avoid; }
+.a4-totales dl { margin: 0; min-width: 85mm; }
+.a4-totales dl div { display: flex; justify-content: space-between; gap: 6mm; padding: 1mm 0; }
+.a4-totales dd { margin: 0; }
+.a4-total { border-top: 2px solid var(--tinta); margin-top: 2mm; font-size: 13pt; font-weight: 600; }
+.a4-condiciones { margin-top: 8mm; break-inside: avoid; }
+@page { size: A4; margin: 0; }
+@media print {
+  body.hoja-impresa { background: #fff; }
+  .no-imprimir { display: none !important; }
+  .a4 { margin: 0; box-shadow: none; width: auto; min-height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso-efimero { animation: none; position: static; transform: none; margin: 0 auto 1rem; display: table; }
+  dialog.hoja[open], dialog.hoja.cerrando, dialog.hoja::backdrop { animation: none; }
+}

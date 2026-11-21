@@ -51,8 +51,7 @@
   <div class="acciones pie-formulario">
     <a class="boton" href="{% if let Some(n) = id %}/clientes/{{ n }}{% else %}/clientes{% endif %}">Cancelar</a>
     <button class="boton primario" type="submit">Guardar</button>
-    {% if id.is_none() %}<button class="boton" type="button" disabled aria-describedby="aviso-presupuesto">Guardar y crear presupuesto</button>
-    <span id="aviso-presupuesto" class="texto-apagado pequeno">Los presupuestos llegan en el hito H3.</span>{% endif %}
+    {% if id.is_none() %}<button class="boton" type="submit" name="y_presupuesto" value="1">Guardar y crear presupuesto</button>{% endif %}
   </div>
 </form>
 {% endblock %}

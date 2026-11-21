@@ -184,6 +184,12 @@ pub async fn procesar_alta(
         direcciones.splice(0..0, direccion_fiscal_como_montaje(&valores));
     }
     match crear_cliente(&estado, &actor, datos, direcciones).await {
+        Ok(id) if campos.marcado("y_presupuesto") => {
+            let presupuesto =
+                crate::aplicacion::presupuestos::crear_presupuesto(&estado, &actor, id, None)
+                    .await?;
+            Ok(Redirect::to(&format!("/presupuestos/{presupuesto}/lineas/nueva")).into_response())
+        }
         Ok(id) => Ok(Redirect::to(&format!("/clientes/{id}?aviso=creado")).into_response()),
         Err(ErrorApp::Validacion(aviso)) => {
             formulario.aviso = Some(aviso);

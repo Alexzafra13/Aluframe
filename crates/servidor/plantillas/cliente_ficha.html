@@ -8,12 +8,15 @@
   </div>
   <div class="acciones">
     <a class="boton" href="/clientes/{{ cliente.id }}/editar">Editar datos</a>
-    <button class="boton primario" type="button" disabled aria-describedby="aviso-presupuesto">Nuevo presupuesto</button>
+    <form method="post" action="/presupuestos">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="cliente" value="{{ cliente.id }}">
+      <button class="boton primario" type="submit">Nuevo presupuesto</button>
+    </form>
   </div>
 </header>
-<p id="aviso-presupuesto" class="texto-apagado pequeno">Los presupuestos llegan en el hito H3.</p>
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
-{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
 <div class="dos-columnas">
   <section class="tarjeta">
     <h2>Datos</h2>
@@ -62,10 +65,18 @@
 </div>
 <nav class="pestanas" aria-label="Documentos del cliente">
   <span class="pestana activa">Presupuestos</span>
-  <span class="pestana desactivada">Trabajos</span>
-  <span class="pestana desactivada">Facturas</span>
+  <span class="pestana desactivada" title="Llega en el hito H4">Trabajos</span>
+  <span class="pestana desactivada" title="Llega en el hito H6">Facturas</span>
 </nav>
-<p class="vacio tarjeta">Este cliente aún no tiene presupuestos. Los presupuestos llegan en el hito H3; los trabajos y las facturas, en H4 y H6.</p>
+{% if presupuestos.is_empty() %}
+<p class="vacio tarjeta">Este cliente aún no tiene presupuestos. Pulsa «Nuevo presupuesto».</p>
+{% else %}
+<ul class="lista-tarjetas" role="list">
+  {% for p in presupuestos %}
+  <li><a class="fila-presupuesto" href="/presupuestos/{{ p.id }}"><span class="mono codigo">{{ p.codigo }}</span><span class="cliente">{{ p.fecha }}</span><span></span><span class="etiqueta etiqueta-estado-{{ p.estado }}">{{ p.nombre_estado }}</span><span class="importe mono">{{ p.total }}</span></a></li>
+  {% endfor %}
+</ul>
+{% endif %}
 <section class="tarjeta">
   <h2>Datos personales</h2>
   <p class="texto-apagado">Exportar descarga todo lo guardado de este cliente. Archivar lo oculta de la lista sin borrarlo.</p>

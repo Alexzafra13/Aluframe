@@ -7,7 +7,7 @@
 </header>
 {% include "pestanas_ajustes.html" %}
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
-{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
 <form class="tarjeta" method="post" action="/ajustes/taller">
   <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
   <h2>Corte de barras</h2>

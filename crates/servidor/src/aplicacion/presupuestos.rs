@@ -41,6 +41,18 @@ pub async fn listar_presupuestos(
         .await
 }
 
+pub async fn presupuestos_del_cliente(
+    estado: &EstadoApp,
+    actor: &Actor,
+    cliente_id: i64,
+) -> Result<Vec<FilaPresupuesto>, ErrorApp> {
+    autorizar(actor, Accion::GestionarClientes)?;
+    estado
+        .bd
+        .leer(move |con| presupuestos::listar(con, None, Some(cliente_id)))
+        .await
+}
+
 pub fn cargar(con: &Connection, id: i64) -> Result<FichaDePresupuesto, ErrorApp> {
     let presupuesto = presupuestos::buscar(con, id)?.ok_or(ErrorApp::NoEncontrado)?;
     let cliente = clientes::buscar(con, presupuesto.cliente_id)?.ok_or(ErrorApp::NoEncontrado)?;

@@ -1,0 +1,42 @@
+<dialog class="hoja" id="hoja-libre" aria-labelledby="hoja-libre-titulo">
+  <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/lineas/libre" class="hoja-contenido">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <header class="hoja-cabecera"><h2 id="hoja-libre-titulo">Línea libre</h2><button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button></header>
+    <label for="libre-descripcion">Descripción</label>
+    <input id="libre-descripcion" name="descripcion" required maxlength="300" placeholder="Instalación, reja, material suelto…">
+    <div class="rejilla-campos">
+      <div class="campo"><label for="libre-cantidad">Cantidad</label><input id="libre-cantidad" name="cantidad" value="1" inputmode="decimal" required></div>
+      <div class="campo"><label for="libre-precio">Precio unitario (€)</label><input id="libre-precio" name="precio" inputmode="decimal" required></div>
+      <div class="campo"><label for="libre-descuento">Descuento (%)</label><input id="libre-descuento" name="descuento" inputmode="decimal" placeholder="0"></div>
+      <div class="campo"><label for="libre-iva">IVA</label><select id="libre-iva" name="iva">{% for o in opciones_iva %}<option value="{{ o.valor }}">{{ o.texto }}</option>{% endfor %}</select></div>
+    </div>
+    <div class="hoja-pie"><button class="boton" type="button" data-cerrar-hoja>Cancelar</button><button class="boton primario" type="submit">Añadir línea</button></div>
+  </form>
+</dialog>
+<dialog class="hoja" id="hoja-version" aria-labelledby="hoja-version-titulo">
+  <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/version" class="hoja-contenido">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <header class="hoja-cabecera"><h2 id="hoja-version-titulo">Nueva versión</h2><button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button></header>
+    <p>Se copiarán las líneas en una versión nueva, en borrador. La versión actual se conserva tal cual.</p>
+    <label for="motivo">Motivo (opcional)</label>
+    <input id="motivo" name="motivo" maxlength="200" placeholder="El cliente quiere otro color">
+    <div class="hoja-pie"><button class="boton" type="button" data-cerrar-hoja>Cancelar</button><button class="boton primario" type="submit">Crear versión</button></div>
+  </form>
+</dialog>
+<dialog class="hoja" id="hoja-rechazar" aria-labelledby="hoja-rechazar-titulo">
+  <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/estado/rechazado" class="hoja-contenido">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <header class="hoja-cabecera"><h2 id="hoja-rechazar-titulo">Rechazar presupuesto</h2><button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button></header>
+    <p>Quedará como rechazado. Si el cliente cambia de idea, crea una versión nueva.</p>
+    <div class="hoja-pie"><button class="boton" type="button" data-cerrar-hoja>Cancelar</button><button class="boton peligro" type="submit">Rechazar</button></div>
+  </form>
+</dialog>
+<dialog class="hoja" id="hoja-aceptar" aria-labelledby="hoja-aceptar-titulo">
+  <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/aceptar" class="hoja-contenido">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <header class="hoja-cabecera"><h2 id="hoja-aceptar-titulo">Aceptar {{ codigo }}</h2><button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button></header>
+    <p>Se guardará con estos datos congelados: <strong class="mono">{{ total() }}</strong>. Los cambios posteriores en las series o en las tarifas no lo alteran y ya no se podrá modificar.</p>
+    <p class="texto-apagado pequeno">El trabajo para el taller se crea a partir de aquí cuando llegue el hito H4.</p>
+    <div class="hoja-pie"><button class="boton" type="button" data-cerrar-hoja>Cancelar</button><button class="boton primario" type="submit">Aceptar presupuesto</button></div>
+  </form>
+</dialog>

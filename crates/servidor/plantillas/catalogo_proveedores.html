@@ -8,7 +8,7 @@
 </header>
 {% let pestana = "Proveedores" %}{% include "pestanas_catalogo.html" %}
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
-{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
 <details class="tarjeta"{% if errores.hay() || aviso.is_some() || proveedores.is_empty() %} open{% endif %}>
   <summary>+ Nuevo proveedor</summary>
   <form method="post" action="/catalogo/proveedores">

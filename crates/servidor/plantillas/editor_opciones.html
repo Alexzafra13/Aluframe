@@ -1,0 +1,8 @@
+{% for o in lista %}
+<div class="campo">
+  <label for="opcion-{{ o.codigo }}">{{ o.nombre }}</label>
+  <select id="opcion-{{ o.codigo }}" name="opcion.{{ o.codigo }}">
+    {% for v in o.valores %}<option value="{{ v }}"{% if *v == o.elegido %} selected{% endif %}>{{ v }}</option>{% endfor %}
+  </select>
+</div>
+{% endfor %}

@@ -39,7 +39,7 @@ fn posicion(plano: &Plano, perfil: &str) -> Option<(i64, i64)> {
                 (marco.x + marco.ancho * 35 / 100, marco.y + medio_marco)
             }
             _ if perfil.contains("INFERIOR") => (
-                marco.x + marco.ancho * 35 / 100,
+                marco.x + marco.ancho * 70 / 100,
                 marco.abajo() - medio_marco,
             ),
             _ => (marco.x + medio_marco, marco.y + marco.alto * 72 / 100),

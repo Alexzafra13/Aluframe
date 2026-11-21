@@ -10,7 +10,9 @@ use super::middleware::{
 };
 use super::recursos::servir_recurso;
 use super::rutas::paginas::{SECCIONES_PENDIENTES, mostrar_pendiente};
-use super::rutas::{acceso, ajustes, paginas, primer_arranque, salud, taller};
+use super::rutas::{
+    acceso, ajustes, ajustes_presupuestos, paginas, primer_arranque, salud, taller,
+};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 
@@ -22,6 +24,7 @@ pub fn crear_router(estado: EstadoApp) -> Router {
         .merge(rutas_de_ajustes())
         .merge(super::router_catalogo::rutas_de_catalogo())
         .merge(super::router_clientes::rutas_de_clientes())
+        .merge(super::router_presupuestos::rutas_de_presupuestos())
         .route("/", get(paginas::mostrar_inicio))
         .route("/mi-dia", get(paginas::mostrar_mi_dia));
     for seccion in &SECCIONES_PENDIENTES {
@@ -68,6 +71,10 @@ fn rutas_de_ajustes() -> Router<EstadoApp> {
             post(ajustes::desactivacion),
         )
         .route("/ajustes/usuarios/{id}/activar", post(ajustes::activacion))
+        .route(
+            "/ajustes/presupuestos",
+            get(ajustes_presupuestos::mostrar).post(ajustes_presupuestos::guardar),
+        )
         .route(
             "/ajustes/taller",
             get(taller::mostrar_taller).post(taller::guardar_taller),

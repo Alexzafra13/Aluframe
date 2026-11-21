@@ -39,8 +39,7 @@ pub struct SeccionPendiente {
     pub hito: &'static str,
 }
 
-pub const SECCIONES_PENDIENTES: [SeccionPendiente; 4] = [
-    pendiente("/presupuestos", "presupuestos", "Presupuestos", "H3"),
+pub const SECCIONES_PENDIENTES: [SeccionPendiente; 3] = [
     pendiente("/trabajos", "trabajos", "Trabajos", "H4"),
     pendiente("/stock", "stock", "Stock", "H5"),
     pendiente("/facturas", "facturas", "Facturas", "H6"),

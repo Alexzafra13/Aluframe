@@ -261,3 +261,30 @@ pub fn unidad_de_serie(con: &Connection, linea: &FilaLinea) -> Result<Unidad, Er
         crate::bd::consultas::series::buscar_version(con, id)?.ok_or(ErrorApp::NoEncontrado)?;
     Ok(super::series::reconstruir(version)?.serie.unidad)
 }
+
+/// Totales con su base y cuota por tipo de IVA, para mostrarlos (los guardados salen de aquí).
+pub fn totales_de(lineas: &[FilaLinea], descuento_bp: i64) -> dominio::precio::Totales {
+    let importes: Vec<LineaParaTotales> = lineas
+        .iter()
+        .map(|l| LineaParaTotales {
+            importe: Dinero::desde_centimos(l.precio_cent),
+            tipo_iva: Porcentaje::desde_puntos_basicos(l.tipo_iva_bp),
+        })
+        .collect();
+    calcular_totales(&importes, Porcentaje::desde_puntos_basicos(descuento_bp)).unwrap_or_default()
+}
+
+/// (tipo, base, cuota) ya formateados.
+pub fn ivas_de(totales: &dominio::precio::Totales) -> Vec<(String, String, String)> {
+    totales
+        .bases
+        .iter()
+        .map(|b| {
+            (
+                b.tipo.formatear(false),
+                b.base.formatear(),
+                b.cuota.formatear(),
+            )
+        })
+        .collect()
+}

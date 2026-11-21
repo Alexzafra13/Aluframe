@@ -18,8 +18,8 @@ use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
 use crate::http::formulario::Campos;
 use crate::vistas::{
-    BloqueDireccion, ErroresDeCampo, MENU, PaginaEditarDireccion, PaginaFichaCliente,
-    direcciones_en_ficha, renderizar,
+    BloqueDireccion, ErroresDeCampo, FilaDePresupuesto, MENU, PaginaEditarDireccion,
+    PaginaFichaCliente, direcciones_en_ficha, renderizar,
 };
 
 #[derive(Deserialize)]
@@ -46,6 +46,8 @@ async fn pagina_de_ficha(
     (nueva_direccion, confirmacion): (BloqueDireccion, Option<String>),
 ) -> Result<Response, ErrorApp> {
     let ficha = cargar_cliente(estado, actor, id).await?;
+    let presupuestos =
+        crate::aplicacion::presupuestos::presupuestos_del_cliente(estado, actor, id).await?;
     let con_errores = nueva_direccion.errores.hay();
     let pagina = PaginaFichaCliente {
         usuario: actor.into(),
@@ -57,6 +59,7 @@ async fn pagina_de_ficha(
         nueva_direccion,
         aviso: con_errores.then(|| "Revisa la dirección: no se ha guardado.".to_owned()),
         confirmacion,
+        presupuestos: presupuestos.iter().map(FilaDePresupuesto::from).collect(),
     };
     let estado_http = if con_errores {
         StatusCode::UNPROCESSABLE_ENTITY
