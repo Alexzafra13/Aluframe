@@ -1,8 +1,8 @@
 const { test, expect } = require("@playwright/test");
+const { PROPIETARIO } = require("./comun");
 
 test.describe.configure({ mode: "serial" });
 
-const PROPIETARIO = { nombre: "Dueño del taller", contrasena: "contrasena-segura" };
 const OPERARIO = { nombre: "Juan", pin: "123456" };
 
 async function salir(page) {
