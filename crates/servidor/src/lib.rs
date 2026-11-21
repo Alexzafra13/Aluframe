@@ -8,3 +8,4 @@ pub mod errores;
 pub mod estado;
 pub mod fecha;
 pub mod reloj;
+pub mod vistas;

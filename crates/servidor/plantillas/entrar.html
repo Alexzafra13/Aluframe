@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Entrar{% endblock %}
+{% block scripts %}<script src="/recursos/js/teclado.js" defer></script>{% endblock %}
+{% block clase_body %}pantalla-acceso{% endblock %}
+{% block cuerpo %}
+<main class="acceso">
+  <h1 class="marca"><span class="marca-logo" aria-hidden="true"></span>AlumFrame</h1>
+  {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+  {% match elegido %}
+  {% when Some(u) %}
+  <form class="tarjeta formulario-acceso" method="post" action="/entrar">
+    <input type="hidden" name="usuario_id" value="{{ u.id }}">
+    <p class="usuario-elegido">{{ u.nombre }}</p>
+    {% if u.es_operario %}
+    <label for="clave">PIN</label>
+    <input id="clave" name="clave" type="password" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" required autofocus>
+    <div class="teclado" data-destino="clave">
+      {% for cifra in ["1","2","3","4","5","6","7","8","9"] %}<button type="button" data-cifra="{{ cifra }}">{{ cifra }}</button>{% endfor %}
+      <button type="button" data-borrar aria-label="Borrar">⌫</button><button type="button" data-cifra="0">0</button><button type="submit" class="primario">Entrar</button>
+    </div>
+    {% else %}
+    <label for="clave">Contraseña</label>
+    <input id="clave" name="clave" type="password" autocomplete="current-password" required autofocus>
+    <button class="boton primario ancho" type="submit">Entrar</button>
+    {% endif %}
+    <a class="enlace-secundario" href="/entrar">Cambiar de usuario</a>
+  </form>
+  {% when None %}
+  <p class="texto-apagado">¿Quién eres?</p>
+  <ul class="lista-usuarios">
+    {% for u in usuarios %}
+    <li><a class="tarjeta-usuario" href="/entrar?usuario={{ u.id }}">{{ u.nombre }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endmatch %}
+</main>
+{% endblock %}

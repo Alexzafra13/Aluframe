@@ -1,0 +1,20 @@
+{% extends "marco.html" %}
+{% block titulo %}Inicio{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Hoy en el taller</p>
+  <h1>Trabajos</h1>
+</header>
+<div class="tablero">
+  {% for columna in ["Por cortar", "En montaje", "Listos para entregar"] %}
+  <section class="columna">
+    <h2 class="antetitulo">{{ columna }}</h2>
+    <p class="vacio">Aún no hay trabajos. Aparecerán aquí al aceptar un presupuesto.</p>
+  </section>
+  {% endfor %}
+  <aside class="panel-atencion">
+    <h2 class="antetitulo">Requiere atención</h2>
+    <p class="vacio">Nada pendiente por ahora.</p>
+  </aside>
+</div>
+{% endblock %}

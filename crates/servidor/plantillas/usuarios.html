@@ -1,0 +1,49 @@
+{% extends "marco.html" %}
+{% block titulo %}Usuarios{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Ajustes</p>
+  <h1>Usuarios</h1>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+<section class="tarjeta">
+  <h2>Nuevo operario</h2>
+  <form class="formulario-en-linea" method="post" action="/ajustes/usuarios">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <label>Nombre <input name="nombre" required maxlength="60" autocomplete="off"></label>
+    <label>PIN de 6 cifras <input name="pin" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off"></label>
+    <button class="boton primario" type="submit">Dar de alta</button>
+  </form>
+</section>
+<section class="tarjeta">
+  <h2>Usuarios</h2>
+  <table class="tabla">
+    <thead><tr><th>Nombre</th><th>Rol</th><th>Estado</th><th><span class="oculto">Acciones</span></th></tr></thead>
+    <tbody>
+      {% for u in usuarios %}
+      <tr>
+        <td>{{ u.nombre }}</td>
+        <td>{{ u.rol }}</td>
+        <td>{% if u.activo %}Activo{% else %}Desactivado{% endif %}</td>
+        <td>
+          {% if u.es_operario %}
+          <div class="acciones">
+          <form class="formulario-en-linea" method="post" action="/ajustes/usuarios/{{ u.id }}/pin">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <label>Nuevo PIN <input name="pin" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off"></label>
+            <button class="boton" type="submit">Cambiar PIN</button>
+          </form>
+          <form method="post" action="/ajustes/usuarios/{{ u.id }}/{% if u.activo %}desactivar{% else %}activar{% endif %}">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <button class="boton" type="submit">{% if u.activo %}Desactivar{% else %}Activar{% endif %}</button>
+          </form>
+          </div>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

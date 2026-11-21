@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Configuración inicial{% endblock %}
+{% block clase_body %}pantalla-acceso{% endblock %}
+{% block cuerpo %}
+<main class="acceso">
+  <h1 class="marca"><span class="marca-logo" aria-hidden="true"></span>AlumFrame</h1>
+  <form class="tarjeta formulario-acceso" method="post" action="/primer-arranque">
+    <h2>Bienvenido</h2>
+    <p class="texto-apagado">Crea la cuenta del propietario. Con ella darás de alta a los operarios.</p>
+    {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+    <label for="nombre">Tu nombre</label>
+    <input id="nombre" name="nombre" value="{{ nombre }}" maxlength="60" required autofocus>
+    <label for="contrasena">Contraseña (al menos 10 caracteres)</label>
+    <input id="contrasena" name="contrasena" type="password" minlength="10" autocomplete="new-password" required>
+    <label for="confirmacion">Repite la contraseña</label>
+    <input id="confirmacion" name="confirmacion" type="password" minlength="10" autocomplete="new-password" required>
+    <button class="boton primario ancho" type="submit">Empezar</button>
+  </form>
+</main>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block clase_body %}con-menu{% endblock %}
+{% block cuerpo %}
+<nav class="menu" aria-label="Menú principal">
+  <a class="marca" href="/"><span class="marca-logo" aria-hidden="true"></span>AlumFrame</a>
+  {% for grupo in menu %}
+  <p class="menu-grupo">{{ grupo.titulo }}</p>
+  <ul>
+    {% for entrada in grupo.entradas %}
+    <li><a class="menu-entrada{% if entrada.seccion == seccion %} activa{% endif %}" href="{{ entrada.ruta }}"{% if entrada.seccion == seccion %} aria-current="page"{% endif %}>{{ entrada.nombre }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
+  <div class="menu-pie">
+    <a class="menu-entrada{% if seccion == "ajustes" %} activa{% endif %}" href="/ajustes/usuarios">Ajustes</a>
+    <form method="post" action="/salir">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <button class="menu-entrada boton-enlace" type="submit">Salir</button>
+    </form>
+  </div>
+</nav>
+<div class="area">
+  <header class="barra-superior">
+    <input class="buscador" type="search" placeholder="Buscar cliente, presupuesto o referencia" disabled aria-describedby="aviso-buscador">
+    <span id="aviso-buscador" class="texto-apagado pequeno">La búsqueda llega con los clientes (hito H2)</span>
+    <span class="usuario-actual">{{ usuario.nombre }}</span>
+  </header>
+  <main class="contenido">
+    {% block contenido %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

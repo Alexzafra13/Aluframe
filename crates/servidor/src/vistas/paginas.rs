@@ -1,0 +1,103 @@
+use askama::Template;
+use dominio::acceso::Rol;
+
+use super::GrupoMenu;
+use crate::aplicacion::Actor;
+use crate::aplicacion::usuarios::UsuarioVisible;
+
+pub struct UsuarioEnPantalla {
+    pub nombre: String,
+    pub token_csrf: String,
+    pub es_propietario: bool,
+}
+
+impl From<&Actor> for UsuarioEnPantalla {
+    fn from(actor: &Actor) -> Self {
+        UsuarioEnPantalla {
+            nombre: actor.nombre.clone(),
+            token_csrf: actor.token_csrf.clone(),
+            es_propietario: actor.rol.es_propietario(),
+        }
+    }
+}
+
+pub struct OpcionUsuario {
+    pub id: i64,
+    pub nombre: String,
+    pub rol: &'static str,
+    pub activo: bool,
+    pub es_operario: bool,
+}
+
+impl From<UsuarioVisible> for OpcionUsuario {
+    fn from(usuario: UsuarioVisible) -> Self {
+        OpcionUsuario {
+            id: usuario.id,
+            nombre: usuario.nombre,
+            rol: match usuario.rol {
+                Rol::Propietario => "Propietario",
+                Rol::Operario => "Operario",
+            },
+            activo: usuario.activo,
+            es_operario: usuario.rol == Rol::Operario,
+        }
+    }
+}
+
+#[derive(Template)]
+#[template(path = "inicio.html")]
+pub struct PaginaInicio {
+    pub usuario: UsuarioEnPantalla,
+    pub menu: &'static [GrupoMenu],
+    pub seccion: &'static str,
+}
+
+#[derive(Template)]
+#[template(path = "pendiente.html")]
+pub struct PaginaPendiente {
+    pub usuario: UsuarioEnPantalla,
+    pub menu: &'static [GrupoMenu],
+    pub seccion: &'static str,
+    pub titulo: &'static str,
+    pub hito: &'static str,
+}
+
+#[derive(Template)]
+#[template(path = "usuarios.html")]
+pub struct PaginaUsuarios {
+    pub usuario: UsuarioEnPantalla,
+    pub menu: &'static [GrupoMenu],
+    pub seccion: &'static str,
+    pub usuarios: Vec<OpcionUsuario>,
+    pub aviso: Option<String>,
+    pub confirmacion: Option<String>,
+}
+
+#[derive(Template)]
+#[template(path = "entrar.html")]
+pub struct PaginaEntrar {
+    pub usuarios: Vec<OpcionUsuario>,
+    pub elegido: Option<OpcionUsuario>,
+    pub aviso: Option<String>,
+}
+
+#[derive(Template)]
+#[template(path = "primer_arranque.html")]
+pub struct PaginaPrimerArranque {
+    pub nombre: String,
+    pub aviso: Option<String>,
+}
+
+#[derive(Template)]
+#[template(path = "mi_dia.html")]
+pub struct PaginaMiDia {
+    pub usuario: UsuarioEnPantalla,
+}
+
+#[derive(Template)]
+#[template(path = "error.html")]
+pub struct PaginaError {
+    pub titulo: &'static str,
+    pub mensaje: String,
+    pub codigo: Option<String>,
+}
