@@ -1,0 +1,100 @@
+{% extends "marco.html" %}
+{% block titulo %}{{ nombre }}{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-con-acciones">
+  <div>
+    <p class="antetitulo">Cliente n.º {{ cliente.id }} · {{ cliente.tipo }}{% if cliente.archivado %} · archivado{% endif %}</p>
+    <h1>{{ nombre }}</h1>
+  </div>
+  <div class="acciones">
+    <a class="boton" href="/clientes/{{ cliente.id }}/editar">Editar datos</a>
+    <form method="post" action="/presupuestos">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="cliente" value="{{ cliente.id }}">
+      <button class="boton primario" type="submit">Nuevo presupuesto</button>
+    </form>
+  </div>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+<div class="dos-columnas">
+  <section class="tarjeta">
+    <h2>Datos</h2>
+    <dl class="datos">
+      <dt>NIF o CIF</dt><dd class="mono">{% if let Some(v) = cliente.nif %}{{ v }}{% else %}<span class="texto-apagado">Sin indicar</span>{% endif %}</dd>
+      <dt>Teléfono</dt><dd class="mono">{% if let Some(v) = cliente.telefono %}{{ v }}{% else %}<span class="texto-apagado">Sin indicar</span>{% endif %}</dd>
+      <dt>Correo</dt><dd>{% if let Some(v) = cliente.email %}{{ v }}{% else %}<span class="texto-apagado">Sin indicar</span>{% endif %}</dd>
+      <dt>Dirección fiscal</dt><dd>{% if direccion_fiscal().is_empty() %}<span class="texto-apagado">Sin indicar</span>{% else %}{{ direccion_fiscal() }}{% endif %}</dd>
+      <dt>Forma de pago</dt><dd>{% if let Some(v) = cliente.forma_de_pago %}{{ v }}{% else %}<span class="texto-apagado">Sin indicar</span>{% endif %}</dd>
+      {% if let Some(v) = cliente.notas %}<dt>Notas</dt><dd class="con-saltos">{{ v }}</dd>{% endif %}
+    </dl>
+  </section>
+  <section class="tarjeta">
+    <h2>Direcciones de montaje</h2>
+    {% if direcciones.is_empty() %}
+    <p class="vacio">Sin direcciones de montaje. Añade una abajo o elígela al hacer el presupuesto.</p>
+    {% else %}
+    <ul class="lista-direcciones">
+      {% for d in direcciones %}
+      <li>
+        <div>
+          <strong>{{ d.resumen }}</strong>
+          {% if !d.contacto.is_empty() %}<br><span class="texto-apagado">{{ d.contacto }}</span>{% endif %}
+          {% if !d.notas.is_empty() %}<br><span class="texto-apagado pequeno">{{ d.notas }}</span>{% endif %}
+        </div>
+        <div class="acciones">
+          <a class="boton" href="/clientes/{{ cliente.id }}/direcciones/{{ d.id }}/editar">Editar</a>
+          <form method="post" action="/clientes/{{ cliente.id }}/direcciones/{{ d.id }}/quitar">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <button class="boton" type="submit">Quitar</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <details>
+      <summary>+ Añadir dirección de montaje</summary>
+      <form method="post" action="/clientes/{{ cliente.id }}/direcciones">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        {% let bloque = nueva_direccion %}{% include "direccion_bloque.html" %}
+        <button class="boton primario" type="submit">Añadir</button>
+      </form>
+    </details>
+  </section>
+</div>
+<nav class="pestanas" aria-label="Documentos del cliente">
+  <span class="pestana activa">Presupuestos</span>
+  <span class="pestana desactivada" title="Llega en el hito H4">Trabajos</span>
+  <span class="pestana desactivada" title="Llega en el hito H6">Facturas</span>
+</nav>
+{% if presupuestos.is_empty() %}
+<p class="vacio tarjeta">Este cliente aún no tiene presupuestos. Pulsa «Nuevo presupuesto».</p>
+{% else %}
+<ul class="lista-tarjetas" role="list">
+  {% for p in presupuestos %}
+  <li><a class="fila-presupuesto" href="/presupuestos/{{ p.id }}"><span class="mono codigo">{{ p.codigo }}</span><span class="cliente">{{ p.fecha }}</span><span></span><span class="etiqueta etiqueta-estado-{{ p.estado }}">{{ p.nombre_estado }}</span><span class="importe mono">{{ p.total }}</span></a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+<section class="tarjeta">
+  <h2>Datos personales</h2>
+  <p class="texto-apagado">Exportar descarga todo lo guardado de este cliente. Archivar lo oculta de la lista sin borrarlo.</p>
+  <div class="acciones">
+    <a class="boton" href="/clientes/{{ cliente.id }}/exportar" download>Exportar datos</a>
+    <form method="post" action="/clientes/{{ cliente.id }}/{% if cliente.archivado %}recuperar{% else %}archivar{% endif %}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <button class="boton" type="submit">{% if cliente.archivado %}Recuperar{% else %}Archivar{% endif %}</button>
+    </form>
+  </div>
+  <details class="zona-peligro">
+    <summary>Borrar definitivamente</summary>
+    <form method="post" action="/clientes/{{ cliente.id }}/borrar">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <p>Se borrarán el cliente y sus direcciones de montaje. <strong>No se puede deshacer.</strong> Úsalo cuando el cliente pida que se eliminen sus datos.</p>
+      <label class="casilla"><input type="checkbox" name="confirmar" value="si" required> Entiendo que no se puede deshacer</label>
+      <button class="boton peligro" type="submit">Borrar cliente</button>
+    </form>
+  </details>
+</section>
+{% endblock %}

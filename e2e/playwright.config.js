@@ -27,6 +27,8 @@ module.exports = defineConfig({
       ALUMFRAME_PUERTO: PUERTO,
       ALUMFRAME_CARPETA_DATOS: DATOS,
       ALUMFRAME_ABRIR_NAVEGADOR: "no",
+      // Las pruebas usan la serie y la tarifa ficticias de fixtures/demo (nunca datos reales).
+      ALUMFRAME_DATOS_DEMO: "si",
     },
   },
 });

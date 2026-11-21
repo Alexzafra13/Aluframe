@@ -7,7 +7,7 @@
 </header>
 {% include "pestanas_ajustes.html" %}
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
-{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
 <section class="tarjeta">
   <h2>Nuevo operario</h2>
   <form class="formulario-en-linea" method="post" action="/ajustes/usuarios">

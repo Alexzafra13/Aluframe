@@ -7,6 +7,7 @@ const SERIE = path.join(__dirname, "..", "..", "data", "series", "aluprom-21.yam
 test("el propietario importa una serie real y prueba una ventana", async ({ page }) => {
   await entrarComoPropietario(page);
   await page.getByRole("link", { name: "Catálogo" }).click();
+  await page.getByRole("link", { name: "Series", exact: true }).click();
   await page.getByRole("link", { name: "Importar serie" }).click();
   await page.locator("#archivo").setInputFiles(SERIE);
   await expect(page.locator("#texto")).toHaveValue(/ALUPROM_21/);
@@ -15,7 +16,7 @@ test("el propietario importa una serie real y prueba una ventana", async ({ page
   await page.getByRole("button", { name: "Confirmar e importar" }).click();
   await expect(page.getByRole("status")).toHaveText("Serie ALUPROM_21 importada como versión 1.");
 
-  await page.getByRole("link", { name: "Probar una ventana" }).click();
+  await page.getByRole("row", { name: /ALUPROM_21/ }).getByRole("link", { name: "Probar una ventana" }).click();
   await page.getByLabel("Ancho (cm)").fill("150");
   await page.getByLabel("Alto (cm)").fill("120");
   const resultado = page.locator("#resultado");

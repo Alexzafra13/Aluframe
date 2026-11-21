@@ -3,7 +3,7 @@
 Este archivo permite retomar el trabajo en una conversación nueva sin perder lo decidido.
 
 ## Estado
-H0 y H1 terminados (v0.3.0): acceso, series importables y cálculo de ventanas con plan de corte. Siguiente: H2. El punto de partida de una sesión nueva está en `docs/PROGRESS.md`, apartado «Cómo retomar».
+H0 a H3 terminados: acceso, series, cálculo y plan de corte, clientes, catálogo con tarifas versionadas y presupuestos con dibujo, precio e impresión. Siguiente: validar con 5 ventanas reales y después H4 (trabajos y orden de taller). El punto de partida de una sesión nueva está en `docs/PROGRESS.md`, apartado «Cómo retomar».
 
 ## Qué es
 AlumFrame: programa de gestión para el taller de cerrajería y ventanas de aluminio del padre de Alejandro (web developer en Zafra, Extremadura). Presupuestar ventanas con precio y dibujo, orden de taller con medidas de corte y cristal, stock con avisos y facturación. Se construirá con Claude Code a partir de `CLAUDE.md` y `SPEC.md`.
@@ -50,6 +50,8 @@ Todo se maneja en cm (un decimal de cm = 1 mm). Redondeo provisional: a 0,1 cm h
 **Sopena V-94, ventana europea abatible de 2 hojas (borrador)**
 - Marco: `ancho` y `alto` sin descuento. Hoja: alto `alto − 4,1` y ancho `(ancho − 4,85) / 2`, 4 piezas de cada. Inversor: `alto − 10,3`. Cortes a 45°.
 - Accesorios: 4 escuadras para el marco y 4 por hoja, 1 cremona, 1 kit de 2 hojas, bisagras (2 por hoja hasta 140 cm de alto incluido, 3 por encima). Barras de 640 cm. Pendientes: pletinas de falleba, tipos de escuadra, cantidad de inversores y cristal.
+
+**Proveedores:** las barras de Aluval vienen en 640 cm (confirmado por el propietario, 2026-11-21); las de la V-94 (Sopena), también en 6,40 m.
 
 **Taller:** grosor de sierra 2 mm (provisional, por comprobar).
 

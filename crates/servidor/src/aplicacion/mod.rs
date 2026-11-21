@@ -1,12 +1,26 @@
+pub mod aceptar_presupuesto;
 mod actor;
+pub mod ajustes_presupuesto;
 mod auditar;
+pub mod calculo_de_ventana;
+pub mod catalogo;
+pub mod clientes;
+pub mod datos_del_editor;
+pub mod enlace_con_tarifa;
 pub mod entrar;
+pub mod exportar_cliente;
+pub mod importar_clientes;
 pub mod importar_serie;
+pub mod importar_tarifa;
+pub mod lineas_de_presupuesto;
+pub mod presupuestos;
 pub mod primer_arranque;
 pub mod restablecer_contrasena;
+pub mod resumen_de_linea;
 pub mod series;
 pub mod sesion;
 pub mod taller;
+pub mod tarifas;
 pub mod usuarios;
 
 pub use actor::{Actor, autorizar};

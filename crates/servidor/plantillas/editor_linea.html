@@ -1,0 +1,70 @@
+{% extends "marco.html" %}
+{% block titulo %}Línea · {{ codigo }}{% endblock %}
+{% block clase_body %}con-menu con-pie-fijo{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-documento">
+  <div>
+    <p class="antetitulo"><a href="/presupuestos">Presupuestos</a> / <a href="/presupuestos/{{ id }}">{{ codigo }}</a></p>
+    <h1>{{ cliente }}</h1>
+  </div>
+  {% include "pasos_documento.html" %}
+</header>
+<div class="barra-lineas">
+  <nav class="pestanas-linea" aria-label="Líneas del presupuesto">
+    {% for p in pestanas %}
+    <a class="pestana-linea{% if p.orden == orden %} actual{% endif %}" href="/presupuestos/{{ id }}/lineas/{{ p.orden }}"{% if p.orden == orden %} aria-current="page"{% endif %}>Línea {{ p.orden }} · {{ p.titulo }}{% if !p.completa %} <span class="etiqueta etiqueta-aviso">Incompleta</span>{% endif %}</a>
+    {% endfor %}
+    {% if orden == 0 %}<span class="pestana-linea actual" aria-current="page">Línea nueva</span>{% endif %}
+    <a class="pestana-linea anadir" href="/presupuestos/{{ id }}/lineas/nueva">+ Añadir línea</a>
+  </nav>
+  <button class="boton primario" type="submit" form="form-linea">Guardar línea</button>
+</div>
+<div class="editor">
+  <section class="tarjeta tarjeta-dibujo" aria-labelledby="titulo-dibujo-tarjeta">
+    <div class="cabecera-dibujo">
+      <h2 class="antetitulo" id="titulo-dibujo-tarjeta">Dibujo · medidas en cm</h2>
+      <div class="segmentado-control" role="radiogroup" aria-label="Qué resaltar en el dibujo">
+        <input type="radio" id="capa-cotas" name="capa" value="cotas" checked><label for="capa-cotas">Cotas</label>
+        <input type="radio" id="capa-piezas" name="capa" value="piezas"><label for="capa-piezas">Piezas</label>
+        <input type="radio" id="capa-cristal" name="capa" value="cristal"><label for="capa-cristal">Cristal</label>
+        <span class="pildora" aria-hidden="true"></span>
+      </div>
+    </div>
+    <div id="dibujo" class="lienzo" aria-live="polite">{% include "editor_dibujo.html" %}</div>
+  </section>
+  <div class="columna-editor">
+    <form id="form-linea" class="tarjeta formulario-linea" method="post" action="{{ accion() }}"
+          hx-post="/presupuestos/{{ id }}/lineas/calcular" hx-trigger="input changed delay:250ms, change" hx-target="#dibujo" hx-swap="innerHTML" hx-sync="this:replace">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <label for="seleccion">Serie y tipología</label>
+      <select id="seleccion" name="seleccion" required>
+        {% for s in series %}<option value="{{ s.valor }}"{% if s.valor == valores.seleccion %} selected{% endif %}>{{ s.texto }}</option>{% endfor %}
+      </select>
+      <div class="rejilla-dos">
+        <div class="campo"><label for="ancho">Ancho (cm)</label><input class="campo-medida" id="ancho" name="ancho" value="{{ valores.ancho }}" inputmode="decimal" required autocomplete="off"></div>
+        <div class="campo"><label for="alto">Alto (cm)</label><input class="campo-medida" id="alto" name="alto" value="{{ valores.alto }}" inputmode="decimal" required autocomplete="off"></div>
+        <div class="campo"><label for="vidrio">Vidrio</label><select id="vidrio" name="vidrio"><option value="">El de la serie</option>{% for v in vidrios %}<option value="{{ v.valor }}"{% if v.valor == valores.vidrio %} selected{% endif %}>{{ v.texto }}</option>{% endfor %}</select></div>
+        <div class="campo"><label for="acabado">Color</label><select id="acabado" name="acabado"><option value="">Sin indicar (blanco)</option>{% for a in acabados %}<option value="{{ a.valor }}"{% if a.valor == valores.acabado %} selected{% endif %}>{{ a.texto }}</option>{% endfor %}</select></div>
+      </div>
+      <div id="opciones" class="rejilla-campos">{% let lista = opciones %}{% include "editor_opciones.html" %}</div>
+      <details class="mas-datos">
+        <summary>Cantidad, mano de obra, descuento e IVA</summary>
+        <div class="rejilla-dos">
+          <div class="campo"><label for="cantidad">Cantidad</label><input id="cantidad" name="cantidad" value="{{ valores.cantidad }}" inputmode="numeric"></div>
+          <div class="campo"><label for="mano">Mano de obra por ventana (€)</label><input id="mano" name="mano_de_obra" value="{{ valores.mano_de_obra }}" inputmode="decimal"></div>
+          <div class="campo"><label for="descuento-linea">Descuento (%)</label><input id="descuento-linea" name="descuento" value="{{ valores.descuento }}" inputmode="decimal" placeholder="0"></div>
+          <div class="campo"><label for="iva">IVA</label><select id="iva" name="iva">{% for o in ivas %}<option value="{{ o.valor }}"{% if o.valor == valores.iva %} selected{% endif %}>{{ o.texto }}</option>{% endfor %}</select></div>
+        </div>
+      </details>
+      <label class="casilla"><input type="checkbox" name="limites_revisados" value="1"{% if valores.limites_revisados %} checked{% endif %}> He revisado la medida aunque esté fuera de los límites de la serie</label>
+      <div class="acciones pie-formulario">
+        <button class="boton primario" type="submit">Guardar línea</button>
+        <button class="boton" type="submit" name="siguiente" value="1">Guardar y añadir otra</button>
+        <a class="boton" href="/presupuestos/{{ id }}">Volver</a>
+      </div>
+    </form>
+    <section id="piezas" class="tarjeta tarjeta-piezas">{% include "editor_piezas.html" %}</section>
+  </div>
+</div>
+<footer id="pie" class="pie-fijo" aria-label="Totales de la línea">{% include "editor_pie.html" %}</footer>
+{% endblock %}

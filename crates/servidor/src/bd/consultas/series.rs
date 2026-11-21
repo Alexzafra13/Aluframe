@@ -62,6 +62,19 @@ pub fn buscar_ultima(con: &Connection, codigo: &str) -> Result<Option<VersionGua
         .optional()?)
 }
 
+/// Una versión concreta: las líneas de presupuesto guardan la versión con la que se calcularon.
+pub fn buscar_version(con: &Connection, id: i64) -> Result<Option<VersionGuardada>, ErrorApp> {
+    Ok(con
+        .query_row(
+            "SELECT v.id, s.codigo, s.fabricante, v.numero, v.estado, v.origen_yaml, v.sha256, \
+             v.avisos, v.creada_en FROM serie_version v JOIN serie s ON s.id = v.serie_id \
+             WHERE v.id = ?1",
+            [id],
+            leer_version,
+        )
+        .optional()?)
+}
+
 pub fn insertar_version(con: &Connection, nueva: &NuevaVersion) -> Result<(i64, i64), ErrorApp> {
     con.execute(
         "INSERT INTO serie (codigo, fabricante, creada_en) VALUES (?1, ?2, ?3) \
@@ -112,4 +125,23 @@ pub fn insertar_referencias(
         sentencia.execute(params![version_id, codigo, texto, referencia.proveedor])?;
     }
     Ok(())
+}
+
+/// Por serie (última versión): referencias con artículo en el catálogo y referencias conocidas.
+/// Las que siguen en `CONFIRMAR` no cuentan como conocidas.
+pub fn contar_referencias_enlazadas(
+    con: &Connection,
+) -> Result<BTreeMap<String, (i64, i64)>, ErrorApp> {
+    let mut consulta = con.prepare(
+        "SELECT s.codigo, \
+         count(DISTINCT CASE WHEN EXISTS (SELECT 1 FROM articulo a WHERE a.archivado = 0 \
+           AND a.referencia = r.referencia_texto) THEN r.codigo END), \
+         count(DISTINCT r.codigo) \
+         FROM serie s JOIN serie_version v ON v.serie_id = s.id \
+         JOIN serie_referencia r ON r.serie_version_id = v.id \
+         WHERE v.numero = (SELECT max(numero) FROM serie_version WHERE serie_id = s.id) \
+         AND r.referencia_texto <> ?1 GROUP BY s.codigo",
+    )?;
+    let filas = consulta.query_map([CONFIRMAR], |f| Ok((f.get(0)?, (f.get(1)?, f.get(2)?))))?;
+    Ok(filas.collect::<Result<_, _>>()?)
 }

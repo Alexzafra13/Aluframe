@@ -1,0 +1,104 @@
+{% extends "marco.html" %}
+{% block titulo %}Importar tarifa{% endblock %}
+{% block scripts %}<script src="/recursos/js/archivo.js" defer></script>{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Catálogo · Tarifas</p>
+  <h1>Importar tarifa</h1>
+</header>
+{% let pestana = "Tarifas" %}{% include "pestanas_catalogo.html" %}
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% match previa %}
+{% when None %}
+{% if proveedores.is_empty() %}
+<p class="vacio tarjeta">Primero da de alta el proveedor en la pestaña Proveedores.</p>
+{% else %}
+<form class="tarjeta" method="post" action="/catalogo/tarifas/importar/revisar">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <p class="texto-apagado">Paso 1 de 3. Elige el proveedor y el archivo CSV de su tarifa (desde Excel: «Guardar como» → CSV). Nada se guarda hasta que confirmes.</p>
+  <p class="pequeno">Columnas: <code>{{ plantilla }}</code>. El precio es el del blanco, por unidad de venta, en euros (admite coma decimal y hasta 4 decimales); la longitud de barra, en cm. <code>tipo</code> es opcional.</p>
+  <div class="rejilla-campos">
+    <div class="campo">
+      <label for="proveedor">Proveedor</label>
+      <select id="proveedor" name="proveedor" required>
+        {% for p in proveedores %}<option value="{{ p.valor }}"{% if p.valor == valores.proveedor %} selected{% endif %}>{{ p.texto }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="campo"><label for="nombre">Nombre de la versión</label><input id="nombre" name="nombre" value="{{ valores.nombre }}" placeholder="Tarifa 2027" maxlength="120"></div>
+    <div class="campo"><label for="fecha">Fecha de la tarifa</label><input id="fecha" name="fecha" type="date" value="{{ valores.fecha }}"></div>
+    <div class="campo"><label for="descuento">Descuento de compra (%)</label><input id="descuento" name="descuento" value="{{ valores.descuento }}" inputmode="decimal" placeholder="el habitual del proveedor"></div>
+  </div>
+  <label for="archivo">Archivo (.csv)</label>
+  <input id="archivo" type="file" accept=".csv,text/csv" data-volcar-en="texto">
+  <label for="texto">Contenido</label>
+  <textarea id="texto" name="texto" rows="12" class="mono" required>{{ valores.texto }}</textarea>
+  <button class="boton primario" type="submit">Revisar</button>
+</form>
+{% endif %}
+{% when Some(vista) %}
+<section class="tarjeta">
+  <p class="texto-apagado">Paso 2 de 3. Tarifa de <strong>{{ vista.proveedor }}</strong>. Revisa los cambios: todavía no se ha guardado nada.</p>
+  <ul class="resumen-importacion">
+    <li><strong>{{ vista.nuevos.len() }}</strong> artículos nuevos</li>
+    <li><strong>{{ vista.cambios.len() }}</strong> precios que cambian</li>
+    <li><strong>{{ vista.iguales }}</strong> sin cambios</li>
+    <li><strong>{{ vista.ausentes.len() }}</strong> no aparecen en el archivo (conservan su precio)</li>
+  </ul>
+  {% if !vista.errores.is_empty() %}
+  <h3 class="aviso-titulo">{{ vista.errores.len() }} errores: corrige el archivo y vuelve a revisarlo</h3>
+  <ul class="lista-problemas errores">{% for e in vista.errores %}<li>{{ e }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if !vista.avisos.is_empty() %}
+  <details open>
+    <summary>{{ vista.avisos.len() }} avisos (no impiden importar)</summary>
+    <ul class="lista-problemas">{% for a in vista.avisos %}<li>{{ a }}</li>{% endfor %}</ul>
+  </details>
+  {% endif %}
+  {% if !vista.cambios.is_empty() %}
+  <h3>Precios que cambian</h3>
+  <table class="tabla">
+    <thead><tr><th>Referencia</th><th>Descripción</th><th>Antes</th><th>Ahora</th><th>Diferencia</th></tr></thead>
+    <tbody>
+      {% for c in vista.cambios %}
+      <tr{% if c.salto %} class="fila-aviso"{% endif %}><td class="mono">{{ c.referencia }}</td><td>{{ c.descripcion }}</td><td class="numero">{{ c.anterior }}</td><td class="numero">{{ c.nuevo }}</td><td class="numero {% if c.sube %}cifra-subida{% else %}cifra-bajada{% endif %}">{{ c.variacion }}{% if c.salto %} ⚠{% endif %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  {% if !vista.nuevos.is_empty() %}
+  <details{% if vista.cambios.is_empty() %} open{% endif %}>
+    <summary>{{ vista.nuevos.len() }} artículos nuevos</summary>
+    <table class="tabla">
+      <thead><tr><th>Referencia</th><th>Descripción</th><th>Unidad</th><th>Precio</th></tr></thead>
+      <tbody>
+        {% for n in vista.nuevos %}<tr><td class="mono">{{ n.referencia }}</td><td>{{ n.descripcion }}</td><td>{{ n.unidad }}</td><td class="numero">{{ n.precio }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </details>
+  {% endif %}
+  {% if !vista.ausentes.is_empty() %}
+  <details>
+    <summary>{{ vista.ausentes.len() }} artículos que no vienen en el archivo</summary>
+    <p class="mono pequeno">{{ vista.ausentes.join(", ") }}</p>
+  </details>
+  {% endif %}
+  <div class="acciones pie-formulario">
+    <a class="boton" href="/catalogo/tarifas/importar">Elegir otro archivo</a>
+    {% if vista.se_puede_importar %}
+    <form method="post" action="/catalogo/tarifas/importar">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="sha256" value="{{ vista.sha256 }}">
+      <input type="hidden" name="proveedor" value="{{ valores.proveedor }}">
+      <input type="hidden" name="nombre" value="{{ valores.nombre }}">
+      <input type="hidden" name="fecha" value="{{ valores.fecha }}">
+      <input type="hidden" name="descuento" value="{{ valores.descuento }}">
+      <textarea name="texto" hidden>{{ valores.texto }}</textarea>
+      <button class="boton primario" type="submit">Paso 3: confirmar e importar</button>
+    </form>
+    {% else %}
+    <p class="texto-apagado">No se puede importar mientras haya errores.</p>
+    {% endif %}
+  </div>
+</section>
+{% endmatch %}
+{% endblock %}

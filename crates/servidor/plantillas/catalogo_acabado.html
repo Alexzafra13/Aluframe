@@ -1,0 +1,24 @@
+{% extends "marco.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}{{ valores.nombre }}{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Catálogo · Acabado</p>
+  <h1>{{ valores.nombre }}</h1>
+</header>
+{% let pestana = "Acabados" %}{% include "pestanas_catalogo.html" %}
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+<form class="tarjeta" method="post" action="/catalogo/acabados/{{ id }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="version" value="{{ version }}">
+  {% include "campos_acabado.html" %}
+  <div class="acciones pie-formulario">
+    <a class="boton" href="/catalogo/acabados">Volver</a>
+    <button class="boton primario" type="submit">Guardar cambios</button>
+  </div>
+</form>
+<form class="tarjeta" method="post" action="/catalogo/acabados/{{ id }}/{% if archivado %}recuperar{% else %}archivar{% endif %}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <button class="boton" type="submit">{% if archivado %}Recuperar{% else %}Archivar{% endif %}</button>
+</form>
+{% endblock %}

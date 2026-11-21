@@ -1,0 +1,21 @@
+{% extends "marco.html" %}
+{% block titulo %}{{ tarifa.nombre }}{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Catálogo · Tarifa de {{ tarifa.proveedor }}</p>
+  <h1>{{ tarifa.nombre }}</h1>
+  <p class="texto-apagado">{{ tarifa.origen }} · guardada {{ tarifa.importada }}{% if !tarifa.fecha_tarifa.is_empty() %} · fecha de la tarifa {{ tarifa.fecha_tarifa }}{% endif %} · descuento de compra {{ tarifa.descuento }}{% if tarifa.vigente %} · <strong>vigente</strong>{% endif %}</p>
+</header>
+{% let pestana = "Tarifas" %}{% include "pestanas_catalogo.html" %}
+<section class="tarjeta">
+  <table class="tabla">
+    <thead><tr><th>Referencia</th><th>Descripción</th><th>Unidad</th><th>Precio (blanco)</th></tr></thead>
+    <tbody>
+      {% for p in precios %}
+      <tr><td class="mono">{{ p.referencia }}</td><td>{{ p.descripcion }}</td><td>{{ p.unidad }}</td><td class="numero">{{ p.precio }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="acciones pie-formulario"><a class="boton" href="/catalogo/tarifas">Volver a tarifas</a></div>
+</section>
+{% endblock %}

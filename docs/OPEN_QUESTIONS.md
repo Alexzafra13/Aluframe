@@ -4,10 +4,10 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 
 ## Ventanas y fabricación
 - [ ] Fórmulas de ancho y alto del cristal (descuento) y tipo de vidrio habitual, en cada serie.
-- [ ] `ancho` y `alto`: ¿hueco de obra o medida de la ventana? (las fórmulas dadas sugieren medida de ventana; confirmarlo)
+- [x] `ancho` y `alto` son la **medida de la ventana** (plan de H3 aprobado, 2026-11-21); se valida con las 5 ventanas reales tras H3.
 - [ ] ¿Marco superior, lateral e inferior salen del mismo perfil o de perfiles distintos?
 - [ ] ¿Se optimizan los cortes por ventana o por trabajo? ¿Qué se hace con los retales?
-- [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos y retal mínimo aprovechable, sin dato (se usan 0). Se cambian en Ajustes > Taller.
+- [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos sin dato (se usa 0); retal mínimo 0 por decisión del propietario. Se cambian en Ajustes > Taller.
 - [ ] Aluprom 21 de 4 hojas: confirmar ruedas (8) y tornillos (9 + 16), que son supuestos. Otras tipologías (fija, puertas).
 - [x] **Fixture de la abatible y bisagras:** el propietario confirma (2026-11-21) 2 bisagras por hoja hasta 140 cm de alto de la ventana, incluido, y 3 por encima. El fixture incluye ahora «BISAGRA: 4» para 120 × 140.
 - [ ] V-94 abatible: cantidad de inversores y su ángulo de corte, cálculo de las pletinas de falleba, tipos de escuadra (exterior e interior de hoja) y si los marcos superior, lateral e inferior son el mismo perfil.
@@ -22,8 +22,9 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] Proveedores (Aluval y Sopena de momento) y formato de sus tarifas. El usuario reunirá precios por barra y tarifas.
 - [ ] Recargo por color: el blanco es el más barato y el resto cuesta un porcentaje más. ¿Es el mismo para todas las series o depende del proveedor?
 - [ ] Facturas de compra: ¿llegan en papel, PDF digital o Excel? Decide si se importan (y cómo) o se teclean.
-- [ ] Cómo se cobra el material (barra, metro o kilo) y si el proveedor factura una superficie mínima de cristal.
-- [ ] Margen: ¿sobre coste o sobre venta? Descuentos habituales.
+- [ ] Cómo se cobra el material (barra, metro o kilo) y si el proveedor factura una superficie mínima de cristal. **Desde H3, perfiles por barras enteras o por metros + merma, a elegir en Ajustes > Presupuestos; el presupuesto muestra los dos importes.**
+- [ ] Mano de obra: ¿importe por ventana, por m² o a mano? **Desde H3, importe por ventana en cada línea con un valor por defecto en Ajustes (vacío = 0). Provisional: se suma después del margen (es lo que se cobra, no lleva margen); confirmar.**
+- [ ] Margen: ¿sobre coste o sobre venta? Descuentos habituales. **Desde H3 es configurable en Ajustes > Presupuestos; mientras no se elija, ninguna línea tiene precio final.**
 - [ ] Tipos de IVA, casos especiales, y cómo se redondea la cuota (confirmar con el gestor).
 - [ ] Documentos que realmente se emiten (presupuesto, albarán, factura) y formato de numeración.
 - [ ] Datos fiscales del taller y logotipo.
@@ -66,9 +67,11 @@ Comparado con programas como Productor (Gaia), Cortizo Software, GesFácil, Klae
 - [ ] Cuándo se descuenta el stock: al terminar la orden (como está) o al marcar el paso de corte. Con el trabajo por pasos, descontar al cortar sería más fiel.
 - [ ] ¿Se quiere medir el tiempo por paso o por ventana? De momento no.
 - [ ] Cremona: ¿el lado se mira desde dentro o desde fuera? ¿Cambia alguna pieza (por ejemplo, qué hoja lleva el inversor) según el lado?
-- [ ] Barras de longitud distinta de 640 cm: ¿se compran así o son retales? Cómo se registran en stock y cuándo las usa el optimizador.
+- [x] Barras de longitud distinta de 640 cm (2026-11-21): si alguna serie o marca las vende de otra longitud, se configura en esa serie cuando aparezca. Los retales existentes se registran en el stock al instalar el programa (con su longitud, perfil y color) y el plan de corte los propone antes de abrir barras nuevas (`SPEC.md`, apartado 9 y H5).
+- [x] Retal mínimo aprovechable: **0**, se guarda cualquier sobrante por si encaja en algo (propietario, 2026-11-21). Registrar retales al instalar es opcional.
+- [x] Retales: no se marcan; basta con perfil, color y longitud para buscarlos (propietario, 2026-11-21, de momento).
 
 ## Bisagras y dibujo de la abatible
 - [x] Bisagras: 2 por hoja hasta 140 cm de alto de la ventana (140 incluido) y 3 por encima (confirmado 2026-11-21).
 - [ ] ¿Las bisagras van dentro del kit de 2 hojas o se piden aparte?
-- [ ] Posición de las bisagras en el dibujo (hoy repartidas a ojo): ¿a qué distancia de los extremos van?
+- [ ] Posición de las bisagras en el dibujo (desde H3, al 15 % y al 85 % del alto de la hoja, y en medio si hay tres): ¿a qué distancia de los extremos van?

@@ -4,7 +4,6 @@ mod leer_partes;
 mod leer_serie;
 mod leer_tipologia;
 mod modelo;
-mod problemas;
 mod resultado;
 mod validacion;
 mod valor;
@@ -12,9 +11,9 @@ mod valor;
 #[cfg(test)]
 mod pruebas;
 
+pub use crate::informe::{Informe, Problema};
 pub use calculo::{ErrorCalculo, calcular_ventana};
 pub use modelo::*;
-pub use problemas::{Informe, Problema};
 pub use resultado::{AccesorioCalculado, PiezaCalculada, ResultadoVentana, VidrioCalculado};
 pub use valor::{CONFIRMAR, Dato, Valor};
 

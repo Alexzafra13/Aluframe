@@ -1,0 +1,129 @@
+{% extends "marco.html" %}
+{% block titulo %}{{ codigo }}{% endblock %}
+{% block clase_body %}con-menu con-pie-fijo{% endblock %}
+{% block scripts %}<script src="/recursos/js/hojas.js" defer></script>{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-documento">
+  <div>
+    <p class="antetitulo"><a href="/presupuestos">Presupuestos</a> / {{ codigo }}{% if ficha.presupuesto.numero_version > 1 %} · versión {{ ficha.presupuesto.numero_version }}{% endif %}</p>
+    <h1>{{ cliente }} <span class="etiqueta etiqueta-estado-{{ estado() }}">{{ nombre_estado }}</span></h1>
+  </div>
+  {% include "pasos_documento.html" %}
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+{% if ficha.tarifas_cambiadas %}
+<div class="aviso con-accion" role="alert">
+  <span>La tarifa ha cambiado desde que se calcularon estas ventanas.</span>
+  <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/recalcular">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <button class="boton" type="submit">Recalcular precios</button>
+  </form>
+</div>
+{% endif %}
+<div class="documento">
+  <section class="columna-lineas" aria-labelledby="titulo-lineas">
+    <div class="cabecera-seccion">
+      <h2 id="titulo-lineas">Líneas</h2>
+      {% if editable() %}
+      <div class="acciones">
+        <a class="boton" href="/presupuestos/{{ ficha.presupuesto.id }}/lineas/nueva">+ Añadir ventana</a>
+        <button class="boton" type="button" data-abrir-hoja="hoja-libre">+ Línea libre</button>
+      </div>
+      {% endif %}
+    </div>
+    {% if lineas.is_empty() %}
+    <p class="vacio tarjeta">Sin líneas todavía. Añade una ventana (con su dibujo y su precio) o una línea libre para cerrajería, instalación o material suelto.</p>
+    {% endif %}
+    <ol class="tarjetas-linea" role="list">
+      {% for l in lineas %}
+      <li class="tarjeta-linea">
+        <a class="tarjeta-linea-enlace" href="{% if l.es_ventana && editable() %}/presupuestos/{{ ficha.presupuesto.id }}/lineas/{{ l.orden }}{% else %}#linea-{{ l.orden }}{% endif %}" id="linea-{{ l.orden }}">
+          <span class="miniatura" aria-hidden="true">{% if l.es_ventana %}{{ l.dibujo|safe }}{% else %}<span class="miniatura-libre">€</span>{% endif %}</span>
+          <span class="tarjeta-linea-texto">
+            <span class="tarjeta-linea-titulo">Línea {{ l.orden }} · {{ l.descripcion }}</span>
+            <span class="texto-apagado pequeno">Cantidad {{ l.cantidad }}{% if !l.completa %} · {{ l.motivo }}{% endif %}</span>
+          </span>
+          <span class="tarjeta-linea-lado">
+            <span class="importe mono">{{ l.precio }}</span>
+            {% if l.completa %}<span class="etiqueta etiqueta-azul">Completa</span>{% else %}<span class="etiqueta etiqueta-aviso">Incompleta</span>{% endif %}
+          </span>
+        </a>
+        {% if editable() %}
+        <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/lineas/{{ l.orden }}/quitar" class="quitar-linea">
+          <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+          <button class="boton-icono" type="submit" aria-label="Quitar la línea {{ l.orden }}">✕</button>
+        </form>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+  <aside class="columna-datos">
+    <form class="tarjeta" method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/datos">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="version" value="{{ ficha.presupuesto.version }}">
+      <h2>Datos</h2>
+      <fieldset{% if !editable() %} disabled{% endif %}>
+        <label for="direccion">Dirección de montaje</label>
+        <select id="direccion" name="direccion">
+          <option value="">Sin indicar</option>
+          {% for d in direcciones %}<option value="{{ d.valor }}"{% if d.valor == direccion_elegida() %} selected{% endif %}>{{ d.texto }}</option>{% endfor %}
+        </select>
+        <p class="pequeno"><a href="/clientes/{{ ficha.cliente.id }}">Ficha del cliente</a> (para añadir direcciones)</p>
+        <label for="validez">Válido hasta</label>
+        <input id="validez" name="validez" type="date" value="{% if let Some(v) = ficha.presupuesto.validez_hasta %}{{ v }}{% endif %}">
+        <label for="descuento">Descuento del presupuesto (%)</label>
+        <input id="descuento" name="descuento" value="{{ descuento }}" inputmode="decimal" placeholder="0">
+        <label for="condiciones">Condiciones</label>
+        <textarea id="condiciones" name="condiciones" rows="4">{% if let Some(c) = ficha.presupuesto.condiciones %}{{ c }}{% endif %}</textarea>
+        {% if editable() %}<button class="boton" type="submit">Guardar datos</button>{% endif %}
+      </fieldset>
+    </form>
+    <section class="tarjeta">
+      <h2>Acciones</h2>
+      <div class="pila-botones">
+        <a class="boton" href="/presupuestos/{{ ficha.presupuesto.id }}/imprimir">Imprimir o guardar PDF</a>
+        {% if estado() == "borrador" %}
+        <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/estado/enviado"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton" type="submit">Marcar como enviado</button></form>
+        {% endif %}
+        {% if estado() == "borrador" || estado() == "enviado" || estado() == "rechazado" %}
+        <button class="boton" type="button" data-abrir-hoja="hoja-version">Nueva versión</button>
+        {% endif %}
+        {% if estado() == "borrador" || estado() == "enviado" %}
+        <button class="boton" type="button" data-abrir-hoja="hoja-rechazar">Rechazar</button>
+        {% endif %}
+      </div>
+      {% if estado() == "borrador" || estado() == "enviado" %}
+      {% if motivos.is_empty() %}
+      <button class="boton primario ancho" type="button" data-abrir-hoja="hoja-aceptar">Aceptar presupuesto</button>
+      {% else %}
+      <button class="boton primario ancho" type="button" disabled aria-describedby="motivos-aceptar">Aceptar presupuesto</button>
+      <div id="motivos-aceptar" class="pequeno texto-apagado"><p>No se puede aceptar todavía:</p><ul class="lista-problemas">{% for m in motivos %}<li>{{ m }}</li>{% endfor %}</ul></div>
+      {% endif %}
+      {% endif %}
+    </section>
+    {% if ficha.versiones.len() > 1 %}
+    <details class="tarjeta">
+      <summary>Versiones ({{ ficha.versiones.len() }})</summary>
+      <ul class="lista-simple">{% for v in ficha.versiones %}<li>Versión {{ v.numero_version }}{% if v.vigente %} (vigente){% endif %}{% if let Some(m) = v.motivo %} · {{ m }}{% endif %} · <span class="mono">{{ crate::vistas::euros(*v.total_cent) }}</span></li>{% endfor %}</ul>
+    </details>
+    {% endif %}
+  </aside>
+</div>
+<footer class="pie-fijo" aria-label="Totales">
+  <dl class="pie-desglose">
+    <div><dt>Perfiles</dt><dd>{{ desglose.perfiles }}</dd></div>
+    <div><dt>Cristal</dt><dd>{{ desglose.cristal }}</dd></div>
+    <div><dt>Accesorios</dt><dd>{{ desglose.accesorios }}</dd></div>
+    <div><dt>Mano de obra</dt><dd>{{ desglose.mano_de_obra }}</dd></div>
+    <div><dt>Base</dt><dd>{{ base() }}</dd></div>
+    {% for (tipo, base, cuota) in ivas %}<div><dt>IVA {{ tipo }}</dt><dd title="sobre {{ base }}">{{ cuota }}</dd></div>{% endfor %}
+  </dl>
+  <div class="pie-total">
+    {% if !ficha.presupuesto.completo %}<span class="etiqueta etiqueta-aviso-oscura">Provisional</span>{% endif %}
+    <div><span class="pie-total-titulo">Total</span><span class="pie-total-importe mono">{{ total() }}</span></div>
+  </div>
+</footer>
+{% include "presupuesto_hojas.html" %}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "marco.html" %}
+{% block titulo %}Empresa y precios{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Ajustes</p>
+  <h1>Empresa y precios</h1>
+  <p class="texto-apagado">Lo que dejes sin elegir no se inventa: las ventanas dirán qué falta y no tendrán precio final.</p>
+</header>
+{% let pestana = "presupuestos" %}{% include "pestanas_ajustes.html" %}
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+<form method="post" action="/ajustes/presupuestos" class="pila">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <section class="tarjeta">
+    <h2>Empresa</h2>
+    <p class="texto-apagado pequeno">Aparece en la cabecera del presupuesto impreso.</p>
+    <div class="rejilla-campos">
+      <div class="campo"><label for="empresa-nombre">Nombre o razón social</label><input id="empresa-nombre" name="empresa.nombre" value="{{ v("empresa.nombre") }}" maxlength="200"></div>
+      <div class="campo"><label for="empresa-nif">NIF o CIF</label><input id="empresa-nif" name="empresa.nif" value="{{ v("empresa.nif") }}" maxlength="15"></div>
+      <div class="campo"><label for="empresa-direccion">Dirección</label><input id="empresa-direccion" name="empresa.direccion" value="{{ v("empresa.direccion") }}" maxlength="200"></div>
+      <div class="campo"><label for="empresa-telefono">Teléfono</label><input id="empresa-telefono" name="empresa.telefono" value="{{ v("empresa.telefono") }}" inputmode="tel" maxlength="30"></div>
+      <div class="campo"><label for="empresa-email">Correo</label><input id="empresa-email" name="empresa.email" value="{{ v("empresa.email") }}" type="email" maxlength="200"></div>
+    </div>
+  </section>
+  <section class="tarjeta">
+    <h2>Cómo se calcula el precio</h2>
+    <fieldset class="opciones-en-fila">
+      <legend>Margen</legend>
+      {% for (valor, texto) in [("", "Sin elegir"), ("coste", "Sobre el coste (coste × 1,30)"), ("venta", "Sobre la venta (coste ÷ 0,70)")] %}
+      <label class="casilla"><input type="radio" name="precio.margen_modo" value="{{ valor }}"{% if v("precio.margen_modo") == *valor %} checked{% endif %}> {{ texto }}</label>
+      {% endfor %}
+    </fieldset>
+    <div class="rejilla-campos">
+      <div class="campo"><label for="margen">Margen (%)</label><input id="margen" name="precio.margen" value="{{ v("precio.margen") }}" inputmode="decimal" placeholder="por ejemplo 30"></div>
+    </div>
+    <fieldset class="opciones-en-fila">
+      <legend>Perfiles</legend>
+      {% for (valor, texto) in [("", "Sin elegir"), ("barras", "Barras enteras que gasta la ventana"), ("metros", "Metros cortados más la merma")] %}
+      <label class="casilla"><input type="radio" name="precio.perfiles" value="{{ valor }}"{% if v("precio.perfiles") == *valor %} checked{% endif %}> {{ texto }}</label>
+      {% endfor %}
+    </fieldset>
+    <div class="rejilla-campos">
+      <div class="campo"><label for="merma">Merma (%), solo por metros</label><input id="merma" name="precio.merma" value="{{ v("precio.merma") }}" inputmode="decimal"></div>
+      <div class="campo"><label for="mano">Mano de obra por ventana (€), se puede cambiar en cada línea</label><input id="mano" name="precio.mano_de_obra" value="{{ v("precio.mano_de_obra") }}" inputmode="decimal" placeholder="0"></div>
+    </div>
+  </section>
+  <section class="tarjeta">
+    <h2>IVA</h2>
+    <p class="texto-apagado pequeno">El 21 % y el 10 % son los tipos de la ley. Cuándo aplica el reducido (por ejemplo, reformas de vivienda) lo confirma tu gestor.</p>
+    <div class="rejilla-campos">
+      <div class="campo"><label for="iva-general">IVA general (%)</label><input id="iva-general" name="iva.general" value="{{ v("iva.general") }}" inputmode="decimal" required></div>
+      <div class="campo"><label for="iva-reducido">IVA reducido (%)</label><input id="iva-reducido" name="iva.reducido" value="{{ v("iva.reducido") }}" inputmode="decimal"></div>
+    </div>
+  </section>
+  <section class="tarjeta">
+    <h2>Presupuesto</h2>
+    <div class="rejilla-campos">
+      <div class="campo"><label for="validez">Validez (días)</label><input id="validez" name="presupuesto.validez_dias" value="{{ v("presupuesto.validez_dias") }}" inputmode="numeric" placeholder="sin fecha"></div>
+    </div>
+    <label for="condiciones">Condiciones (plazo, forma de pago, garantía)</label>
+    <textarea id="condiciones" name="presupuesto.condiciones" rows="4">{{ v("presupuesto.condiciones") }}</textarea>
+  </section>
+  <div class="barra-guardar"><button class="boton primario" type="submit">Guardar ajustes</button></div>
+</form>
+{% endblock %}

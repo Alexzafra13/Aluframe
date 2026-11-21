@@ -40,15 +40,18 @@ El diseño tiene 10 entradas. Propongo **8 para el MVP** y se decide al construi
 | Presupuestos | `/presupuestos` | H3 | Lista con filtros por estado (borrador, enviado, aceptado, rechazado, caducado) |
 | Presupuesto | `/presupuestos/{id}` | H3 | Cabecera, líneas, totales y acciones (apartado 6) |
 | Línea de ventana | `/presupuestos/{id}/lineas/{n}` | H3 | Editor con dibujo y cálculo en vivo (apartado 7) |
-| Línea libre | `/presupuestos/{id}/lineas/libre/{n}` | H3 | Descripción, cantidad, precio unitario e IVA |
+| Línea libre | hoja en `/presupuestos/{id}` | H3 | Descripción, cantidad, precio unitario, descuento e IVA |
+| Nueva línea de ventana | `/presupuestos/{id}/lineas/nueva` | H3 | El mismo editor, vacío |
+| Ajustes de empresa y precio | `/ajustes/presupuestos` | H3 | Datos de la empresa, margen, cobro de perfiles, mano de obra, IVA, validez y condiciones |
 | Presupuesto imprimible | `/presupuestos/{id}/imprimir` | H3 | A4 con dibujos y condiciones; sin costes ni márgenes |
 | Trabajos | `/trabajos` | H4 | El mismo tablero del Inicio con vista de lista y filtro por operario |
 | Trabajo | `/trabajos/{id}` | H4 | Pestañas Resumen, Orden de taller, Material y Entrega (apartado 8) |
 | Orden de taller | `/trabajos/{id}/orden` y `/trabajos/{id}/orden/imprimir` | H4 | Una hoja A4 por ventana, como `design/03-hoja-taller.png` |
 | Stock | `/stock` | H5 | Saldos, mínimos, lista de compra sugerida (apartado 9) |
 | Artículo de stock | `/stock/{articulo}` | H5 | Movimientos y retales |
-| Entrada o ajuste de stock | `/stock/movimientos/nuevo` | H5 | Artículo, color, cantidad, longitud si es un retal y motivo |
-| Catálogo | `/catalogo` | H2 | Pestañas Artículos, Proveedores, Acabados, Tarifas y Series |
+| Entrada o ajuste de stock | `/stock/movimientos/nuevo` | H5 | Artículo, color, cantidad, longitud si es un retal y motivo. Sirve también para el inventario inicial de barras y retales al instalar |
+| Catálogo | `/catalogo` | H2 | Pestañas Artículos, Proveedores, Acabados, Tarifas y Series. Fichas en `/catalogo/articulos/{id}`, `/catalogo/proveedores/{id}`, `/catalogo/acabados/{id}`; versiones en `/catalogo/tarifas/{id}` |
+| Importar clientes | `/clientes/importar` | H2 | Asistente en 3 pasos con deshacer |
 | Importar tarifa | `/catalogo/tarifas/importar` | H2 | Asistente en 3 pasos (apartado 10) |
 | Importar serie | `/catalogo/series/importar` | H1 | El mismo asistente, con las comprobaciones de `docs/FORMATO_SERIES.md` |
 | Facturas | `/facturas` | H6 | Lista; pestañas Facturas y Cobros pendientes |

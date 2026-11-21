@@ -77,7 +77,7 @@ Problema: por cada grupo (perfil, acabado), colocar piezas en barras de longitud
 - **Algoritmo base: Best Fit Decreasing.** Ordenar de mayor a menor (desempate: perfil, número de línea, índice) y colocar cada pieza en la barra con menos espacio sobrante que aún la admita. Coste O(n·b). Garantiza usar como mucho en torno a 11/9 del óptimo, y en instancias pequeñas suele coincidir con él.
 - **Objetivos, por orden:** 1) menos barras nuevas; 2) mayor retal aprovechable (concentrar el sobrante en una sola barra); 3) desempate determinista.
 - **Modo exacto (opcional, después del MVP):** búsqueda con ramificación y poda sobre piezas ordenadas, con cota inferior `⌈suma / útil⌉` y poda por simetría. Se limita por **número de nodos** (por ejemplo 200 000), no por tiempo, para seguir siendo determinista. Solo se usa si mejora el resultado base. Se activa únicamente si las pruebas con trabajos reales muestran desperdicio evitable.
-- **Retales en stock:** la interfaz ya admite barras de longitud distinta antes de abrir barras nuevas; se activa con el módulo de stock.
+- **Retales en stock (H5):** hoy el optimizador trabaja con una sola longitud de barra. En H5 se amplía para recibir los retales disponibles del mismo perfil y color (cada uno con su longitud) y llenarlos antes de abrir barras nuevas, con el mismo Best Fit Decreasing; las pruebas de propiedades se extienden (ninguna pieza supera su retal, ninguna se pierde). Los retales se registran al instalar (inventario inicial) y al terminar cada orden.
 - **Vidrio:** se pide a medida; no se optimiza.
 - **Salida:** `PlanDeCorte` con barras, piezas colocadas (con su identificador), retal y desperdicio. Error si una pieza es más larga que la longitud útil.
 - **Pruebas:** cada pieza aparece exactamente una vez; ninguna barra supera su longitud útil; mismo resultado si cambia el orden de entrada; el número de barras nunca baja de la cota inferior; en instancias pequeñas se compara con una búsqueda exhaustiva.
@@ -90,6 +90,7 @@ Orden de cálculo de cada línea: **coste → margen → descuento de línea**. 
 - Aritmética: precio unitario en 1/10 000 €, cantidad en milésimas, producto en `i128` y **un único redondeo** a céntimos (mitad hacia fuera).
 - IVA: cuota por tipo sobre la suma de bases, redondeada una vez **(confirmar con el gestor)**. Estrategia seleccionable (`PorLinea` o `PorDocumento`) para no reescribir si cambia.
 - Pruebas: la suma de las partes siempre coincide con el total; valores límite; casos reales de facturas del taller.
+- **Implementado en H3** (`crates/dominio/src/precio/`): coste = tarifa − descuento de compra (+ recargo del color si el artículo lo lleva); perfiles por barras del plan de corte o por metros cortados + merma, convertidos a la unidad de venta en milésimas; cristal por m² de cada pieza; accesorios por unidad, metro o caja (unidades ÷ unidades por caja). Mano de obra por ventana después del margen (provisional). Precio = (venta + mano de obra) × cantidad − descuento de línea. Cada importe se redondea una vez a céntimos.
 
 ### 5.5 Stock
 - **Libro de movimientos** (entrada, salida, ajuste); el saldo es la suma por artículo. Con unos miles de movimientos, una consulta con índice por artículo es suficiente; no hay saldo duplicado que pueda desincronizarse.

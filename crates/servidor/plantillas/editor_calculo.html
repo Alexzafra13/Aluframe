@@ -1,0 +1,4 @@
+{% include "editor_dibujo.html" %}
+<section id="piezas" class="tarjeta tarjeta-piezas" hx-swap-oob="true">{% include "editor_piezas.html" %}</section>
+<footer id="pie" class="pie-fijo" aria-label="Totales de la línea" hx-swap-oob="true">{% include "editor_pie.html" %}</footer>
+{% if let Some(lista) = opciones %}<div id="opciones" class="rejilla-campos" hx-swap-oob="true">{% include "editor_opciones.html" %}</div>{% endif %}

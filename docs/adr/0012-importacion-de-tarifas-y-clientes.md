@@ -1,0 +1,14 @@
+# ADR-0012: importación de tarifas y clientes desde CSV propio, todo o nada
+
+**Estado:** aceptado (2026-11-21, H2; plan aprobado por el propietario).
+
+1. **Requisito:** importar tarifas de proveedor y clientes con vista previa obligatoria, sin guardar nada hasta confirmar, y poder deshacer (SPEC, apartado 7 y H2).
+2. **Formato:** solo **CSV** en H2. Un Excel se guarda como CSV («Guardar como» → CSV). Leer `.xlsx` exigiría `calamine` y un descompresor zip (varias dependencias transitivas) para algo que Excel ya resuelve; se reconsidera cuando llegue una tarifa real que lo justifique.
+3. **Lector propio** en `crates/dominio/src/csv/` (sin dependencias): comillas dobles con escape `""`, separador `;` o `,` detectado en la cabecera, BOM, finales de línea `\n` y `\r\n`, límite de tamaño. Los importes admiten coma decimal (`12,3456`). El navegador lee el archivo como UTF-8 y, si no lo es, como Windows-1252 (lo habitual al exportar desde Excel en España), con `TextDecoder`; el servidor recibe siempre texto.
+4. **Todo o nada:** una sola fila con error impide confirmar el archivo entero, como en las series. Los avisos (salto de precio de más del 30 %, NIF duplicado en clientes) no lo impiden.
+5. **Sin estado entre pasos:** la vista previa no guarda nada; el texto viaja en un campo oculto y la confirmación lo vuelve a analizar dentro de la transacción y comprueba que su huella SHA-256 coincide con la revisada.
+6. **Tarifas versionadas:** cada importación o ajuste de precios crea una `tarifa` nueva con **todos** los precios del proveedor. Los artículos que no aparecen en el archivo conservan su precio anterior y la vista previa los lista. Deshacer borra la última versión de ese proveedor, vuelve a dejar vigente la anterior y quita los artículos que esa importación creó si nada más los usa. Solo se deshace la última de cada proveedor; desde H3, solo mientras ningún presupuesto la use.
+7. **Plantilla de tarifa:** `referencia, descripcion, unidad, precio_tarifa, longitud_barra` y `tipo` opcional (si falta, `otro`). El precio es el del acabado base (blanco), por unidad de venta, en euros con hasta 4 decimales; la longitud de barra, en cm.
+8. **Plantilla de clientes:** `tipo, nombre, nif, email, telefono, calle, cp, localidad, provincia, pais, forma_de_pago, notas`; todas opcionales. Un NIF que ya existe da un aviso y la fila se salta (no actualiza la ficha). Deshacer quita los clientes de esa importación que no se hayan modificado después.
+9. **Sustitución:** el lector CSV está aislado en un módulo; añadir Excel sería otro lector que produce las mismas filas de texto.
+10. **Descartadas:** crate `csv` (correcta, pero unas pocas líneas propias bastan y evitan dependencias), importar las filas válidas y saltar las erróneas (deja tarifas a medias sin que se note) y guardar la vista previa en la base de datos (estado que limpiar).

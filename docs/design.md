@@ -33,6 +33,10 @@ Subconjunto Latin-1 en woff2 (licencia OFL en `recursos/fuentes/LICENCIA-OFL.txt
 - **Botones:** al menos 44 px de alto; primario relleno en acero y secundario con borde.
 - **Pantallas de acceso y del operario:** tarjetas de nombre de 64 px y teclado numérico con teclas de 64 px.
 - **Estados vacíos:** cada lista explica qué hacer o cuándo aparecerá algo.
+- **Formularios (H2):** rejilla de campos de 240 px mínimo; error junto al campo en `--aviso` con el campo en `--aviso-fondo`; confirmación correcta (NIF) en acero. Ningún botón desactivado sin un texto al lado que diga por qué.
+- **Asistente de importación (H2):** pasos 1-3 con el paso escrito; resumen en una línea (nuevos, cambios, sin cambios, ausentes); filas con salto de precio sobre `--aviso-fondo` y diferencia en naranja (sube) o acero (baja).
+- **Tablas editables (H2):** importes en Plex Mono alineados a la derecha; casillas de 24 px dentro de objetivos de 44 px.
+- **Zona de peligro:** acciones irreversibles dentro de un desplegable, con casilla de confirmación y botón con borde de aviso.
 
 ## Movimiento (inspirado en iOS, decisión del propietario del 2026-11-21)
 Objetivo: que la interfaz se sienta fluida y responda al tacto, sin adornos ni efectos gratuitos y sin coste de rendimiento. Solo se animan `transform` y `opacity`, que el navegador resuelve en la tarjeta gráfica.
@@ -47,6 +51,11 @@ Objetivo: que la interfaz se sienta fluida y responda al tacto, sin adornos ni e
 | Resultados que cambian con HTMX | Se atenúan mientras se calculan y el nuevo resultado aparece con un fundido |
 | PIN del operario | Teclado redondo de 76 px como el del iPhone, puntos que se rellenan, entrada automática al sexto dígito y sacudida si el PIN es incorrecto; no abre el teclado del sistema en la tablet |
 | Lista de usuarios | Inicial en un círculo y flecha «›», como las listas de iOS |
+| Hojas (paneles) | Formularios cortos y confirmaciones salen en una **hoja** con `<dialog>` nativo: sube desde abajo en tablet y entra desde la derecha en ordenador (320 ms, `--curva-suave`) sobre un velo que se oscurece; se cierra con Esc, con «Cancelar» o tocando el velo, y baja con la misma curva. El foco entra en la hoja y vuelve al botón que la abrió (lo hace el navegador). Sin JavaScript propio salvo abrir y cerrar |
+| Control segmentado | Como el de iOS (Cotas, Piezas, Cristal): una «píldora» blanca se desliza bajo la opción elegida |
+| Avisos efímeros | Las confirmaciones («Línea guardada») bajan desde la barra superior como en iOS, se quedan 4 s y se van; los errores se quedan hasta que se corrigen. Lectores de pantalla: `role="status"` |
+| Totales | Al recalcular, el importe nuevo aparece con un fundido corto; mientras calcula, el pie se atenúa |
+| Tarjetas de línea | Entran escalonadas (40 ms entre una y otra) al abrir el presupuesto; una línea nueva aparece desde abajo |
 
 Curvas: `--curva-suave` `cubic-bezier(.2, .8, .2, 1)` y `--curva-muelle` `cubic-bezier(.34, 1.4, .64, 1)`. Duraciones: 160 ms (respuesta) y 260 ms (aparición).
 **Accesibilidad:** con «reducir movimiento» activado en el sistema, se desactivan todas las animaciones.

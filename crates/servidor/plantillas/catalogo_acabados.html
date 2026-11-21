@@ -1,0 +1,38 @@
+{% extends "marco.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}Acabados{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Catálogo</p>
+  <h1>Acabados y colores</h1>
+  <p class="texto-apagado">El acabado base (normalmente el blanco) es el precio de la tarifa; los demás llevan un recargo en % sobre él.</p>
+</header>
+{% let pestana = "Acabados" %}{% include "pestanas_catalogo.html" %}
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+<form class="tarjeta" method="post" action="/catalogo/acabados">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <h2>Nuevo acabado</h2>
+  {% include "campos_acabado.html" %}
+  <button class="boton primario" type="submit">Guardar acabado</button>
+</form>
+{% if acabados.is_empty() %}
+<p class="vacio tarjeta">Aún no hay acabados. Empieza por el blanco marcándolo como acabado base.</p>
+{% else %}
+<section class="tarjeta">
+  <table class="tabla">
+    <thead><tr><th>Acabado</th><th>Recargo</th><th>Estado</th><th><span class="oculto">Acciones</span></th></tr></thead>
+    <tbody>
+      {% for a in acabados %}
+      <tr>
+        <td>{{ a.nombre }}{% if a.es_base %} <span class="etiqueta etiqueta-azul">base</span>{% endif %}</td>
+        <td class="numero">{% if a.es_base %}precio de tarifa{% else %}+{{ crate::vistas::porcentaje(*a.recargo_bp) }}{% endif %}</td>
+        <td>{% if a.archivado %}<span class="etiqueta etiqueta-aviso">archivado</span>{% else %}activo{% endif %}</td>
+        <td><a class="boton" href="/catalogo/acabados/{{ a.id }}">Editar</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+{% endblock %}

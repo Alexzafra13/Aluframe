@@ -118,18 +118,19 @@ Hasta el primer despliegue real hay un único esquema, `crates/servidor/src/bd/e
 ### 7.3 Clientes
 | Tabla | Campos |
 |---|---|
-| `cliente` | id, tipo (`particular`/`empresa`, por defecto `particular`), **todos los demás campos admiten NULL**: nombre_o_razon_social, nif, email, telefono, fiscal_calle, fiscal_cp, fiscal_localidad, fiscal_provincia, fiscal_pais, forma_de_pago, notas, archivado, creado_en, version |
+| `cliente` | id, tipo (`particular`/`empresa`, por defecto `particular`), **todos los demás campos admiten NULL**: nombre_o_razon_social, nif, email, telefono, fiscal_calle, fiscal_cp, fiscal_localidad, fiscal_provincia, fiscal_pais, forma_de_pago, notas, busqueda (nombre, NIF, teléfono, correo y localidad sin tildes), importacion_id, archivado, creado_en, version |
 | `direccion_montaje` | id, cliente_id → cliente (puede no haber ninguna), etiqueta, calle, cp, localidad, provincia, contacto_nombre, contacto_telefono, notas, archivado |
 
 ### 7.4 Catálogo
 | Tabla | Campos |
 |---|---|
-| `proveedor` | id, nombre, nif, contacto, condiciones_pago, notas, archivado |
+| `importacion` | id, tipo (`tarifa`/`clientes`), sha256, filas, estado (`confirmada`/`deshecha`), usuario_id, importada_en, deshecha_en (ADR-0012) |
+| `proveedor` | id, nombre, nif, contacto, condiciones_pago, descuento_habitual_bp, notas, archivado, version |
 | `acabado` | id, nombre, es_base (blanco), recargo_bp, archivado |
 | `acabado_recargo_proveedor` | acabado_id, proveedor_id, recargo_bp (solo si el recargo varía por proveedor; ver decisión 4) |
-| `articulo` | id, proveedor_id, referencia, descripcion, tipo (`perfil`/`vidrio`/`herraje`/`accesorio`/`kit`/`otro`), unidad (`barra`/`metro`/`m2`/`unidad`/`caja`), longitud_barra_dmm (NULL si no es barra), unidades_por_caja, con_acabado, stock_minimo_mil, archivado, version; único (proveedor_id, referencia) |
+| `articulo` | id, proveedor_id, referencia, descripcion, tipo (`perfil`/`vidrio`/`herraje`/`accesorio`/`kit`/`otro`), unidad (`barra`/`metro`/`m2`/`unidad`/`caja`), longitud_barra_dmm (NULL si no es barra), unidades_por_caja, con_acabado, stock_minimo_mil, importacion_id, archivado, creado_en, version; único (proveedor_id, referencia) |
 | `kit_componente` | kit_articulo_id → articulo, componente_articulo_id → articulo, cantidad_mil |
-| `tarifa` | id, proveedor_id, nombre, fecha_tarifa, vigente_desde, descuento_compra_bp, formato_origen, archivo_origen, estado (`vigente`/`sustituida`), importada_en, usuario_id |
+| `tarifa` | id, proveedor_id, nombre, fecha_tarifa, vigente_desde, descuento_compra_bp, formato_origen (`csv`/`ajuste`/`edicion`), archivo_origen, estado (`vigente`/`sustituida`; una vigente por proveedor), importacion_id, importada_en, usuario_id. Cada versión guarda todos los precios del proveedor |
 | `tarifa_precio` | tarifa_id, articulo_id, precio_pu (del acabado base, por unidad de venta), minimo_pedido_mil; PK (tarifa_id, articulo_id) |
 
 ### 7.5 Series de perfiles (las recetas)
@@ -144,9 +145,13 @@ Las tipologías, piezas, vidrios, accesorios y opciones no tienen tablas propias
 ### 7.6 Presupuestos
 | Tabla | Campos |
 |---|---|
-| `presupuesto` | id, serie_numeracion, anio, numero, cliente_id, direccion_montaje_id, estado (`borrador`/`enviado`/`aceptado`/`rechazado`/`caducado`), enviado_en (para "sin respuesta hace n días"), validez_hasta, condiciones, creado_por, creado_en, version; único (serie_numeracion, anio, numero) |
-| `version_presupuesto` | id, presupuesto_id, numero_version, motivo, vigente, base_cent, iva_cent, total_cent, creada_en |
-| `linea_presupuesto` | id, version_id, orden, tipo (`ventana`/`libre`), descripcion, cantidad_mil, serie_version_id, tipologia_id, ancho_dmm, alto_dmm, acabado_id, vidrio_articulo_id, opciones_json, resultado_json, incompleta, revisar_limites (medida fuera de límites), coste_cent, margen_bp, descuento_bp, tipo_iva_bp, precio_cent, precio_unitario_pu (líneas libres) |
+| `presupuesto` | id, anio, numero (`P-AAAA-NNNN`), cliente_id, direccion_montaje_id, estado (`borrador`/`enviado`/`aceptado`/`rechazado`/`caducado`), validez_hasta, condiciones, descuento_bp, enviado_en, aceptado_en, copia_json y copia_sha256 (solo al aceptar; un trigger impide modificar lo aceptado), creado_por, creado_en, version; único (anio, numero) |
+| `version_presupuesto` | id, presupuesto_id, numero_version, motivo, vigente (una por presupuesto), base_cent, iva_cent, total_cent, completo, creada_en |
+| `linea_presupuesto` | id, version_id, orden, tipo (`ventana`/`libre`), descripcion, cantidad_mil, serie_version_id, tipologia, ancho_dmm, alto_dmm, acabado_id, vidrio_articulo_id, opciones_json, resultado_json (piezas, vidrios, accesorios, barras, costes y dibujo), faltan_json, incompleta, revisar_limites, tarifas_json, coste_cent, mano_de_obra_cent, descuento_bp, tipo_iva_bp, precio_unitario_pu (libres), precio_cent |
+| `presupuesto_tarifa` | presupuesto_id, tarifa_id: tarifas usadas por un presupuesto aceptado (no se pueden deshacer) |
+| `secuencia_documentos` | serie (`P`, `T`, `F`, `R`, `A`), anio, ultimo |
+
+Ajustes de empresa y precio en `configuracion`: `empresa.*`, `precio.margen_modo`, `precio.margen`, `precio.perfiles`, `precio.merma`, `precio.mano_de_obra`, `iva.general`, `iva.reducido`, `presupuesto.validez_dias`, `presupuesto.condiciones`.
 
 ### 7.7 Trabajos y orden de taller
 | Tabla | Campos |

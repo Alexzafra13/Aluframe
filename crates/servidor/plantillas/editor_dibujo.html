@@ -1,0 +1,8 @@
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(c) = calculo %}
+<figure class="lienzo-figura">{{ c.dibujo|safe }}
+  {% if !c.vidrios.is_empty() %}<figcaption class="capa-texto-cristal pequeno">Cristal: {{ c.vidrios.join(" · ") }}</figcaption>{% endif %}
+</figure>
+{% else if aviso.is_none() %}
+<div class="lienzo-vacio"><p>Escribe el ancho y el alto para ver la ventana.</p></div>
+{% endif %}

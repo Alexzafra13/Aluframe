@@ -1,0 +1,43 @@
+{% extends "marco.html" %}
+{% block titulo %}Tarifas{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-con-acciones">
+  <div>
+    <p class="antetitulo">Catálogo</p>
+    <h1>Tarifas</h1>
+  </div>
+  <a class="boton primario" href="/catalogo/tarifas/importar">Importar tarifa</a>
+</header>
+{% let pestana = "Tarifas" %}{% include "pestanas_catalogo.html" %}
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+{% if tarifas.is_empty() %}
+<p class="vacio tarjeta">Aún no hay tarifas. Pulsa «Importar tarifa» y elige el CSV del proveedor; verás una vista previa antes de guardar nada.</p>
+{% else %}
+<section class="tarjeta">
+  <p class="texto-apagado pequeno">Cada importación o cambio de precios crea una versión. Los presupuestos guardarán la versión con la que se calcularon. Solo se puede deshacer la versión vigente de cada proveedor.</p>
+  <table class="tabla">
+    <thead><tr><th>Proveedor</th><th>Versión</th><th>Fecha de la tarifa</th><th>Guardada</th><th>Origen</th><th>Descuento de compra</th><th>Precios</th><th><span class="oculto">Acciones</span></th></tr></thead>
+    <tbody>
+      {% for t in tarifas %}
+      <tr>
+        <td>{{ t.proveedor }}</td>
+        <td><a href="/catalogo/tarifas/{{ t.id }}">{{ t.nombre }}</a>{% if t.vigente %} <span class="etiqueta etiqueta-azul">vigente</span>{% endif %}</td>
+        <td>{{ t.fecha_tarifa }}</td>
+        <td>{{ t.importada }}</td>
+        <td>{{ t.origen }}</td>
+        <td class="numero">{{ t.descuento }}</td>
+        <td class="numero">{{ t.precios }}</td>
+        <td>{% if t.vigente %}
+          <form method="post" action="/catalogo/tarifas/{{ t.id }}/deshacer">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <button class="boton" type="submit">Deshacer</button>
+          </form>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+{% endblock %}

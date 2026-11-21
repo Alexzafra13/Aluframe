@@ -37,7 +37,12 @@ Hoy: antes de cada migración se guarda una copia con `VACUUM INTO` en `copias/`
 - Contraseña del propietario olvidada (en el servidor): `sudo -u alumframe ALUMFRAME_CONFIG=/etc/alumframe/alumframe.toml /opt/alumframe/alumframe restablecer-contrasena "Nombre"`.
 - **Añadir o corregir una serie:** edita su YAML (formato en `docs/FORMATO_SERIES.md`) e impórtalo en Catálogo > Series > Importar serie. La vista previa muestra errores y avisos; cada importación crea una versión nueva y las anteriores se conservan.
 - Antes de tocar una serie real, comprueba sus ventanas con «Probar una ventana» y que `just test` sigue en verde: los tests dorados comparan `data/series/` con `fixtures/real/`.
-- Tarifas e IVA: llegan en H2.
+- **Actualizar una tarifa:** Catálogo > Tarifas > Importar tarifa. Elige el proveedor y el CSV con las columnas `referencia;descripcion;unidad;precio_tarifa;longitud_barra` (y `tipo` opcional). Desde Excel, «Guardar como» → CSV. Revisa la vista previa (los saltos de más del 30 % salen marcados) y confirma. Si algo no cuadra, «Deshacer» en la versión vigente.
+- **Cambiar unos pocos precios:** Catálogo > Artículos, filtra por proveedor y escribe el precio en la tabla, o marca artículos y aplica un porcentaje. Cada cambio queda como una versión de la tarifa.
+- **Importar clientes** de una hoja de cálculo: Clientes > Importar clientes (columnas en ADR-0012, todas opcionales).
+- **Petición RGPD de un cliente:** en su ficha, «Exportar datos» (acceso) o «Borrar definitivamente» (supresión).
+- **Margen, cobro de perfiles, mano de obra, IVA y datos de la empresa:** Ajustes > Empresa y precios. Lo que se deje sin elegir hace que las ventanas salgan «incompletas» y lo dicen.
+- **Presupuestos:** si cambia una tarifa, el presupuesto en borrador avisa y ofrece «Recalcular precios». Un presupuesto aceptado no se toca: se guarda congelado con su huella.
 
 ## 7. Actualizar el toolchain y las dependencias
 Cada 6 meses o ante un aviso de seguridad:

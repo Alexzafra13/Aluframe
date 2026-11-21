@@ -1,0 +1,11 @@
+<h2 class="antetitulo">Piezas</h2>
+{% if let Some(c) = calculo %}
+<ol class="lista-piezas" role="list">
+  {% for p in c.piezas %}
+  <li><span class="numero-pieza" aria-hidden="true">{{ p.numero }}</span><span class="nombre-pieza"><span class="oculto">Pieza {{ p.numero }}: </span>{{ p.nombre }} <span class="texto-apagado pequeno">{{ p.corte }}</span></span><span class="mono texto-apagado">×{{ p.cantidad }}</span><span class="mono medida">{{ p.medida }}</span></li>
+  {% endfor %}
+</ol>
+{% for l in c.fuera_de_limites %}<p class="aviso pequeno">{{ l }}</p>{% endfor %}
+{% else %}
+<p class="vacio pequeno">Las piezas aparecen al calcular.</p>
+{% endif %}

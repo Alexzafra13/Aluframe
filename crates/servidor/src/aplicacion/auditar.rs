@@ -24,3 +24,25 @@ pub fn auditar(con: &Connection, evento: Evento) -> Result<(), ErrorApp> {
         },
     )
 }
+
+/// Apunte de cualquier entidad del catálogo o de clientes.
+pub struct Cambio<'a> {
+    pub ahora: OffsetDateTime,
+    pub autor: i64,
+    pub accion: &'a str,
+    pub entidad: &'a str,
+    pub entidad_id: i64,
+}
+
+pub fn anotar(con: &Connection, cambio: &Cambio) -> Result<(), ErrorApp> {
+    registrar(
+        con,
+        &Apunte {
+            cuando_en: &formatear_utc(cambio.ahora),
+            usuario_id: Some(cambio.autor),
+            accion: cambio.accion,
+            entidad: cambio.entidad,
+            entidad_id: Some(cambio.entidad_id),
+        },
+    )
+}

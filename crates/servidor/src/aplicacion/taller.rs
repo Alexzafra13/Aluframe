@@ -50,7 +50,7 @@ pub async fn leer_ajustes_de_taller(estado: &EstadoApp) -> Result<AjustesDeTalle
     estado.bd.leer(leer_de_la_base).await
 }
 
-fn leer_de_la_base(con: &Connection) -> Result<AjustesDeTaller, ErrorApp> {
+pub(crate) fn leer_de_la_base(con: &Connection) -> Result<AjustesDeTaller, ErrorApp> {
     let mut valores = [0i64; 3];
     let mut confirmados = true;
     for (indice, (clave, defecto)) in POR_DEFECTO.iter().enumerate() {

@@ -5,14 +5,16 @@ pub enum Accion {
     VerPanelDelPropietario,
     GestionarUsuarios,
     GestionarCatalogo,
+    GestionarClientes,
     VerMiDia,
 }
 
 pub fn puede_realizar(rol: Rol, accion: Accion) -> bool {
     match accion {
-        Accion::VerPanelDelPropietario | Accion::GestionarUsuarios | Accion::GestionarCatalogo => {
-            rol.es_propietario()
-        }
+        Accion::VerPanelDelPropietario
+        | Accion::GestionarUsuarios
+        | Accion::GestionarCatalogo
+        | Accion::GestionarClientes => rol.es_propietario(),
         Accion::VerMiDia => true,
     }
 }
@@ -27,6 +29,7 @@ mod tests {
             Accion::VerPanelDelPropietario,
             Accion::GestionarUsuarios,
             Accion::GestionarCatalogo,
+            Accion::GestionarClientes,
             Accion::VerMiDia,
         ] {
             assert!(puede_realizar(Rol::Propietario, accion));
@@ -42,5 +45,6 @@ mod tests {
         ));
         assert!(!puede_realizar(Rol::Operario, Accion::GestionarUsuarios));
         assert!(!puede_realizar(Rol::Operario, Accion::GestionarCatalogo));
+        assert!(!puede_realizar(Rol::Operario, Accion::GestionarClientes));
     }
 }

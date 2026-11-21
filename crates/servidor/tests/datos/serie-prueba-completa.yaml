@@ -1,0 +1,44 @@
+# DATOS FICTICIOS SOLO PARA PRUEBAS AUTOMÁTICAS: copia de fixtures/demo/serie-demo.yaml marcada «validada»
+# Sirve para probar la aceptación de presupuestos: las series de demostración nunca dan precio
+# final y las reales aún tienen datos sin confirmar. No es una serie del taller.
+
+serie: PRUEBA_COMPLETA
+fabricante: DEMO
+proveedor: DEMO
+estado: validada
+unidades: cm
+redondeo: { precision: 0.1, sentido: abajo }
+longitud_barra: 600
+
+referencias:
+  DEMO_MARCO_LATERAL:   { referencia: DEMO_MARCO_LATERAL }
+  DEMO_MARCO_SUPERIOR:  { referencia: DEMO_MARCO_SUPERIOR }
+  DEMO_MARCO_INFERIOR:  { referencia: DEMO_MARCO_INFERIOR }
+  DEMO_HOJA_VERTICAL:   { referencia: DEMO_HOJA_VERTICAL }
+  DEMO_HOJA_HORIZONTAL: { referencia: DEMO_HOJA_HORIZONTAL }
+  DEMO_VIDRIO_4MM:      { referencia: DEMO_VIDRIO_4MM }
+  DEMO_KIT:             { referencia: DEMO_KIT }
+  DEMO_RUEDA:           { referencia: DEMO_RUEDA }
+
+parametros:
+  descuento_marco_horizontal: 4
+  descuento_hoja_vertical: 5
+  descuento_hoja_horizontal: 2
+
+tipologias:
+  corredera_2_hojas_demo:
+    nombre: "DEMO corredera 2 hojas (ficticia)"
+    piezas:
+      - { perfil: DEMO_MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                  corte: 90 }
+      - { perfil: DEMO_MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",    corte: 90 }
+      - { perfil: DEMO_MARCO_INFERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",    corte: 90 }
+      - { perfil: DEMO_HOJA_VERTICAL,   cantidad: 4, longitud: "alto - descuento_hoja_vertical",        corte: 90 }
+      - { perfil: DEMO_HOJA_HORIZONTAL, cantidad: 4, longitud: "ancho / 2 - descuento_hoja_horizontal", corte: 90 }
+    dibujo: { tipo: corredera, hojas: 2, hoja_movil: derecha }
+    vidrio:
+      tipo: DEMO_VIDRIO_4MM          # código de `referencias`; se puede cambiar al presupuestar
+      piezas:
+        - { cantidad: 2, ancho: "ancho / 2 - 7", alto: "alto - 9" }   # ficticio
+    accesorios:
+      - { articulo: DEMO_KIT,    cantidad: 1 }
+      - { articulo: DEMO_RUEDA,  cantidad: 4 }

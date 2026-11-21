@@ -1,0 +1,56 @@
+{% extends "marco.html" %}
+{% block titulo %}Presupuestos{% endblock %}
+{% block scripts %}<script src="/recursos/js/hojas.js" defer></script>{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-con-acciones">
+  <div>
+    <p class="antetitulo">Vender</p>
+    <h1>Presupuestos</h1>
+  </div>
+  <button class="boton primario" type="button" data-abrir-hoja="hoja-nuevo">Nuevo presupuesto</button>
+</header>
+<nav class="segmentado" aria-label="Filtrar por estado">
+  {% for (valor, texto) in [("", "Todos"), ("borrador", "Borradores"), ("enviado", "Enviados"), ("aceptado", "Aceptados"), ("rechazado", "Rechazados")] %}
+  <a class="segmento{% if filtro == *valor %} activo{% endif %}" href="/presupuestos{% if !valor.is_empty() %}?estado={{ valor }}{% endif %}"{% if filtro == *valor %} aria-current="page"{% endif %}>{{ texto }}</a>
+  {% endfor %}
+</nav>
+{% if filas.is_empty() %}
+<p class="vacio tarjeta">{% if filtro.is_empty() %}Aún no hay presupuestos. Pulsa «Nuevo presupuesto» o créalo desde la ficha de un cliente.{% else %}No hay presupuestos en este estado.{% endif %}</p>
+{% else %}
+<ul class="lista-tarjetas" role="list">
+  {% for p in filas %}
+  <li>
+    <a class="fila-presupuesto" href="/presupuestos/{{ p.id }}">
+      <span class="mono codigo">{{ p.codigo }}</span>
+      <span class="cliente">{{ p.cliente }}</span>
+      <span class="texto-apagado pequeno">{{ p.fecha }}</span>
+      <span class="etiqueta etiqueta-estado-{{ p.estado }}">{{ p.nombre_estado }}</span>
+      <span class="importe mono">{{ p.total }}{% if !p.completo %}<span class="texto-apagado pequeno"> · provisional</span>{% endif %}</span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+<dialog class="hoja" id="hoja-nuevo" aria-labelledby="hoja-nuevo-titulo">
+  <form method="post" action="/presupuestos" class="hoja-contenido">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <header class="hoja-cabecera">
+      <h2 id="hoja-nuevo-titulo">Nuevo presupuesto</h2>
+      <button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button>
+    </header>
+    {% if clientes.is_empty() %}
+    <p>Primero da de alta el cliente. <a href="/clientes/nuevo">Nuevo cliente</a></p>
+    {% else %}
+    <label for="cliente">Cliente</label>
+    <select id="cliente" name="cliente" required>
+      {% for c in clientes %}<option value="{{ c.valor }}">{{ c.texto }}</option>{% endfor %}
+    </select>
+    <p class="texto-apagado pequeno">¿No está? <a href="/clientes/nuevo">Dar de alta un cliente</a>.</p>
+    {% endif %}
+    <div class="hoja-pie">
+      <button class="boton" type="button" data-cerrar-hoja>Cancelar</button>
+      {% if !clientes.is_empty() %}<button class="boton primario" type="submit">Crear presupuesto</button>{% endif %}
+    </div>
+  </form>
+</dialog>
+{% endblock %}

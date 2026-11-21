@@ -97,7 +97,8 @@ Reglas:
 
 ## 9. Stock
 - El stock actual es la **suma de movimientos** (entrada, salida, ajuste), nunca un número editable.
-- Inventario inicial por artículo y color (barras enteras; los retales se tratan después).
+- Inventario inicial por artículo y color: barras enteras y **retales existentes** (cada uno con su longitud). Es **opcional**: el programa funciona sin inventario y los retales se pueden registrar cuando se quiera, al instalar o más tarde (decisión del propietario, 2026-11-21).
+- **Los retales se usan antes que las barras nuevas:** el plan de corte propone qué retal coger (perfil, color y longitud) y, al terminar la orden, el retal sale del stock y el sobrante entra como retal nuevo. **Retal mínimo: 0** (se guarda cualquier sobrante por si encaja en algo; decisión del propietario). Un retal que se tira se da de baja con un ajuste.
 - Entradas de material con una pantalla de pocos toques. Salidas automáticas al terminar la orden de taller.
 - Stock mínimo por artículo, aviso y lista de compra sugerida a partir de trabajos pendientes.
 
@@ -159,7 +160,7 @@ Aceptar presupuesto, congelar cálculo, orden de taller en pantalla y en hoja im
 
 ### H5. Stock
 Movimientos, inventario inicial, entradas, descuento al terminar la orden, mínimos y lista de compra.
-- Aceptación: terminar una orden descuenta exactamente el material optimizado; el stock nunca se edita a mano sin crear un ajuste.
+- Aceptación: terminar una orden descuenta exactamente el material optimizado; el stock nunca se edita a mano sin crear un ajuste; con retales registrados del mismo perfil y color, el plan de corte los usa antes de abrir barras nuevas y la hoja de taller dice cuál coger.
 
 ### H6. Facturación
 Facturas desde trabajo o libres, imprimibles en A4 (PDF automático según ADR-0003), numeración correlativa, cobros, rectificativas.

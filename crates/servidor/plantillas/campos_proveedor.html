@@ -1,0 +1,10 @@
+<div class="rejilla-campos">
+  {% call m::campo("nombre", "Nombre", valores.nombre, errores.de("nombre"), "required maxlength=\"120\" autocomplete=\"off\"") %}{% endcall %}
+  {% call m::campo("nif", "NIF o CIF", valores.nif, errores.de("nif"), "maxlength=\"15\" autocomplete=\"off\"") %}{% endcall %}
+  {% call m::campo("contacto", "Contacto (persona, teléfono, correo)", valores.contacto, errores.de("contacto"), "") %}{% endcall %}
+  {% call m::campo("condiciones_pago", "Condiciones de pago", valores.condiciones_pago, errores.de("condiciones_pago"), "") %}{% endcall %}
+  {% call m::campo("descuento_habitual", "Descuento habitual (%)", valores.descuento_habitual, errores.de("descuento_habitual"), "inputmode=\"decimal\"") %}{% endcall %}
+</div>
+<label for="notas">Notas</label>
+<textarea id="notas" name="notas" rows="2">{{ valores.notas }}</textarea>
+{% if let Some(e) = errores.de("notas") %}<p class="error-campo">{{ e }}</p>{% endif %}

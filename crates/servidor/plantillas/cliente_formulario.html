@@ -1,0 +1,57 @@
+{% extends "marco.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}{% if id.is_some() %}Editar cliente{% else %}Nuevo cliente{% endif %}{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Clientes</p>
+  <h1>{% if id.is_some() %}Editar cliente{% else %}Nuevo cliente{% endif %}</h1>
+  <p class="texto-apagado">Ningún dato es obligatorio: guarda con lo que tengas y complétalo después.</p>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if errores.hay() %}<p class="aviso" role="alert">Revisa los campos marcados; no se ha guardado nada.</p>{% endif %}
+<form class="tarjeta formulario-cliente" method="post" action="{% if let Some(n) = id %}/clientes/{{ n }}/editar{% else %}/clientes/nuevo{% endif %}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="version" value="{{ version }}">
+  <fieldset class="selector-tipo">
+    <legend>Tipo de cliente</legend>
+    <label class="casilla"><input type="radio" name="tipo" value="particular"{% if !es_empresa() %} checked{% endif %}> Particular</label>
+    <label class="casilla"><input type="radio" name="tipo" value="empresa"{% if es_empresa() %} checked{% endif %}> Empresa</label>
+  </fieldset>
+  <div class="rejilla-campos">
+    {% call m::campo("nombre", "Nombre o razón social", valores.nombre, errores.de("nombre"), "autocomplete=\"off\" maxlength=\"200\"") %}{% endcall %}
+    {% call m::campo("telefono", "Teléfono", valores.telefono, errores.de("telefono"), "inputmode=\"tel\" autocomplete=\"off\"") %}{% endcall %}
+    <div class="campo">
+      <label for="nif">NIF o CIF</label>
+      <input id="nif" name="nif" value="{{ valores.nif }}" autocomplete="off" maxlength="15" hx-get="/clientes/comprobar-nif" hx-trigger="input changed delay:400ms" hx-target="#nif-mensaje" hx-swap="innerHTML"{% if errores.de("nif").is_some() %} aria-invalid="true"{% endif %} aria-describedby="nif-mensaje">
+      <div id="nif-mensaje" aria-live="polite">{% if let Some(e) = errores.de("nif") %}<p class="error-campo">{{ e }}</p>{% endif %}</div>
+    </div>
+    {% call m::campo("email", "Correo", valores.email, errores.de("email"), "type=\"email\" autocomplete=\"off\"") %}{% endcall %}
+    {% call m::campo("forma_de_pago", "Forma de pago habitual", valores.forma_de_pago, errores.de("forma_de_pago"), "list=\"formas-de-pago\"") %}{% endcall %}
+  </div>
+  <datalist id="formas-de-pago"><option value="Efectivo"><option value="Transferencia"><option value="Tarjeta"><option value="Bizum"></datalist>
+  <h2>Dirección fiscal</h2>
+  <div class="rejilla-campos">
+    {% call m::campo("fiscal_calle", "Calle y número", valores.fiscal_calle, errores.de("fiscal_calle"), "") %}{% endcall %}
+    {% call m::campo("fiscal_cp", "Código postal", valores.fiscal_cp, errores.de("fiscal_cp"), "inputmode=\"numeric\" maxlength=\"10\"") %}{% endcall %}
+    {% call m::campo("fiscal_localidad", "Localidad", valores.fiscal_localidad, errores.de("fiscal_localidad"), "") %}{% endcall %}
+    {% call m::campo("fiscal_provincia", "Provincia", valores.fiscal_provincia, errores.de("fiscal_provincia"), "") %}{% endcall %}
+    {% call m::campo("fiscal_pais", "País", valores.fiscal_pais, errores.de("fiscal_pais"), "") %}{% endcall %}
+  </div>
+  {% if id.is_none() %}
+  <h2>Direcciones de montaje</h2>
+  <label class="casilla"><input type="checkbox" name="misma_direccion" value="1"{% if misma_direccion %} checked{% endif %}> La dirección de montaje es la misma que la fiscal</label>
+  <div id="direcciones">
+    {% for bloque in direcciones %}{% include "direccion_bloque.html" %}{% endfor %}
+  </div>
+  {% let siguiente = direcciones.len() %}{% let oob = false %}{% include "boton_anadir_direccion.html" %}
+  {% endif %}
+  <label for="notas">Notas</label>
+  <textarea id="notas" name="notas" rows="3">{{ valores.notas }}</textarea>
+  {% if let Some(e) = errores.de("notas") %}<p class="error-campo">{{ e }}</p>{% endif %}
+  <div class="acciones pie-formulario">
+    <a class="boton" href="{% if let Some(n) = id %}/clientes/{{ n }}{% else %}/clientes{% endif %}">Cancelar</a>
+    <button class="boton primario" type="submit">Guardar</button>
+    {% if id.is_none() %}<button class="boton" type="submit" name="y_presupuesto" value="1">Guardar y crear presupuesto</button>{% endif %}
+  </div>
+</form>
+{% endblock %}
