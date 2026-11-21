@@ -9,13 +9,20 @@ struct Migracion {
     sql: &'static str,
 }
 
-const MIGRACIONES: &[Migracion] = &[Migracion {
-    version: 1,
-    nombre: "inicial",
-    sql: include_str!("migraciones/0001_inicial.sql"),
-}];
+const MIGRACIONES: &[Migracion] = &[
+    Migracion {
+        version: 1,
+        nombre: "inicial",
+        sql: include_str!("migraciones/0001_inicial.sql"),
+    },
+    Migracion {
+        version: 2,
+        nombre: "sesion_hasta_cerrar_navegador",
+        sql: include_str!("migraciones/0002_sesion_hasta_cerrar_navegador.sql"),
+    },
+];
 
-pub const ULTIMA_VERSION: i64 = 1;
+pub const ULTIMA_VERSION: i64 = 2;
 
 #[derive(Debug, Error)]
 pub enum ErrorMigracion {
@@ -194,5 +201,29 @@ mod tests {
             })
             .unwrap();
         assert_eq!(version, ULTIMA_VERSION);
+    }
+
+    #[test]
+    fn actualiza_una_base_existente_guardando_antes_una_copia() {
+        let carpeta = std::env::temp_dir().join(format!("alumframe-v1-{}", std::process::id()));
+        let copia = carpeta.join("copias").join("antes.db");
+        let _ = std::fs::remove_file(&copia);
+        let mut conexion = Connection::open_in_memory().unwrap();
+        crear_tabla_de_versiones(&conexion).unwrap();
+        aplicar(&mut conexion, &MIGRACIONES[0], AHORA).unwrap();
+        assert_eq!(
+            migrar(&mut conexion, Some(&copia), AHORA).unwrap(),
+            ULTIMA_VERSION
+        );
+        assert!(copia.exists());
+        let columnas: i64 = conexion
+            .query_row(
+                "SELECT count(*) FROM pragma_table_info('sesion') \
+                 WHERE name = 'hasta_cerrar_navegador'",
+                [],
+                |fila| fila.get(0),
+            )
+            .unwrap();
+        assert_eq!(columnas, 1);
     }
 }

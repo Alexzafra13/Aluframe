@@ -3,7 +3,7 @@ use rusqlite::Connection;
 use time::OffsetDateTime;
 
 use super::auditar::{Evento, auditar};
-use super::sesion::crear_sesion;
+use super::sesion::{DuracionDeSesion, crear_sesion};
 use crate::autenticacion::cifrar_clave;
 use crate::bd::consultas::usuarios::{self, NuevoUsuario};
 use crate::errores::ErrorApp;
@@ -63,7 +63,7 @@ fn insertar_propietario(
         usuario: id,
     };
     auditar(tx, evento)?;
-    crear_sesion(tx, id, ahora)
+    crear_sesion(tx, id, ahora, DuracionDeSesion::Normal)
 }
 
 pub async fn cifrar_en_segundo_plano(clave: String) -> Result<String, ErrorApp> {

@@ -22,6 +22,11 @@ pub fn cookie_de_sesion(token: &str) -> String {
     )
 }
 
+/// Sin Max-Age el navegador la borra al cerrarse.
+pub fn cookie_hasta_cerrar_el_navegador(token: &str) -> String {
+    format!("{NOMBRE_COOKIE_SESION}={token}; HttpOnly; SameSite=Lax; Path=/")
+}
+
 pub fn cookie_de_cierre() -> String {
     format!("{NOMBRE_COOKIE_SESION}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0")
 }
@@ -55,5 +60,12 @@ mod tests {
         let cookie = cookie_de_sesion("t");
         assert!(cookie.contains("HttpOnly"));
         assert!(cookie.contains("SameSite=Lax"));
+    }
+
+    #[test]
+    fn la_cookie_hasta_cerrar_el_navegador_no_tiene_caducidad() {
+        let cookie = cookie_hasta_cerrar_el_navegador("t");
+        assert!(cookie.contains("HttpOnly"));
+        assert!(!cookie.contains("Max-Age"));
     }
 }

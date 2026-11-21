@@ -8,6 +8,7 @@ pub struct NuevaSesion<'a> {
     pub creada_en: &'a str,
     pub caduca_en: &'a str,
     pub token_csrf: &'a str,
+    pub hasta_cerrar_navegador: bool,
 }
 
 pub struct FilaSesion {
@@ -15,18 +16,20 @@ pub struct FilaSesion {
     pub ultima_actividad_en: String,
     pub caduca_en: String,
     pub token_csrf: String,
+    pub hasta_cerrar_navegador: bool,
 }
 
 pub fn insertar(con: &Connection, nueva: &NuevaSesion) -> Result<(), ErrorApp> {
     con.execute(
-        "INSERT INTO sesion (id, usuario_id, creada_en, ultima_actividad_en, caduca_en, token_csrf) \
-         VALUES (?1, ?2, ?3, ?3, ?4, ?5)",
+        "INSERT INTO sesion (id, usuario_id, creada_en, ultima_actividad_en, caduca_en, \
+         token_csrf, hasta_cerrar_navegador) VALUES (?1, ?2, ?3, ?3, ?4, ?5, ?6)",
         params![
             nueva.huella,
             nueva.usuario_id,
             nueva.creada_en,
             nueva.caduca_en,
-            nueva.token_csrf
+            nueva.token_csrf,
+            nueva.hasta_cerrar_navegador
         ],
     )?;
     Ok(())
@@ -35,8 +38,8 @@ pub fn insertar(con: &Connection, nueva: &NuevaSesion) -> Result<(), ErrorApp> {
 pub fn buscar(con: &Connection, huella: &str) -> Result<Option<FilaSesion>, ErrorApp> {
     Ok(con
         .query_row(
-            "SELECT usuario_id, ultima_actividad_en, caduca_en, token_csrf \
-             FROM sesion WHERE id = ?1",
+            "SELECT usuario_id, ultima_actividad_en, caduca_en, token_csrf, \
+             hasta_cerrar_navegador FROM sesion WHERE id = ?1",
             [huella],
             |fila| {
                 Ok(FilaSesion {
@@ -44,6 +47,7 @@ pub fn buscar(con: &Connection, huella: &str) -> Result<Option<FilaSesion>, Erro
                     ultima_actividad_en: fila.get(1)?,
                     caduca_en: fila.get(2)?,
                     token_csrf: fila.get(3)?,
+                    hasta_cerrar_navegador: fila.get(4)?,
                 })
             },
         )

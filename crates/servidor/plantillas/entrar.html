@@ -21,6 +21,8 @@
     {% else %}
     <label for="clave">Contraseña</label>
     <input id="clave" name="clave" type="password" autocomplete="current-password" required autofocus>
+    <label class="casilla"><input type="checkbox" name="mantener_sesion" value="si"> Mantener la sesión abierta hasta cerrar el navegador</label>
+    <p class="texto-apagado pequeno">Márcalo solo en el PC de la oficina.</p>
     <button class="boton primario ancho" type="submit">Entrar</button>
     {% endif %}
     <a class="enlace-secundario" href="/entrar">Cambiar de usuario</a>

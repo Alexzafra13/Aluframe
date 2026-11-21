@@ -3,7 +3,7 @@ use rusqlite::Connection;
 use time::{Duration, OffsetDateTime};
 
 use super::auditar::{Evento, auditar};
-use super::sesion::crear_sesion;
+use super::sesion::{DuracionDeSesion, crear_sesion};
 use crate::autenticacion::comprobar_clave;
 use crate::bd::consultas::{bloqueo_ip, usuarios};
 use crate::errores::ErrorApp;
@@ -14,13 +14,20 @@ pub struct SolicitudDeEntrada {
     pub usuario_id: i64,
     pub clave: String,
     pub ip: String,
+    pub duracion: DuracionDeSesion,
 }
 
 #[derive(Debug)]
 pub enum ResultadoDeEntrada {
-    Correcta { token: String, rol: Rol },
+    Correcta {
+        token: String,
+        rol: Rol,
+        duracion: DuracionDeSesion,
+    },
     Incorrecta,
-    Bloqueada { minutos: u64 },
+    Bloqueada {
+        minutos: u64,
+    },
 }
 
 pub async fn entrar(
@@ -75,11 +82,16 @@ impl Intento<'_> {
     fn aceptar(&self, usuario: &usuarios::FilaUsuario) -> Result<ResultadoDeEntrada, ErrorApp> {
         usuarios::reiniciar_fallos(self.tx, usuario.id)?;
         bloqueo_ip::olvidar(self.tx, &self.solicitud.ip)?;
-        let token = crear_sesion(self.tx, usuario.id, self.ahora)?;
+        let duracion = match usuario.rol {
+            Rol::Propietario => self.solicitud.duracion,
+            Rol::Operario => DuracionDeSesion::Normal,
+        };
+        let token = crear_sesion(self.tx, usuario.id, self.ahora, duracion)?;
         self.auditar(Some(usuario.id), "entrar", usuario.id)?;
         Ok(ResultadoDeEntrada::Correcta {
             token,
             rol: usuario.rol,
+            duracion,
         })
     }
 

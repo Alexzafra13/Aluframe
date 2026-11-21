@@ -7,9 +7,9 @@ use dominio::acceso::Rol;
 use serde::Deserialize;
 
 use crate::aplicacion::entrar::{ResultadoDeEntrada, SolicitudDeEntrada, entrar};
-use crate::aplicacion::sesion::cerrar_sesion;
+use crate::aplicacion::sesion::{DuracionDeSesion, cerrar_sesion};
 use crate::aplicacion::usuarios::listar_para_entrar;
-use crate::autenticacion::{cookie_de_cierre, cookie_de_sesion};
+use crate::autenticacion::{cookie_de_cierre, cookie_de_sesion, cookie_hasta_cerrar_el_navegador};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 use crate::http::extractores::{ActorActual, IpCliente};
@@ -24,6 +24,7 @@ pub struct EleccionDeUsuario {
 pub struct FormularioDeEntrada {
     usuario_id: i64,
     clave: String,
+    mantener_sesion: Option<String>,
 }
 
 pub async fn mostrar_entrar(
@@ -39,15 +40,31 @@ pub async fn procesar_entrar(
     Form(formulario): Form<FormularioDeEntrada>,
 ) -> Result<Response, ErrorApp> {
     let usuario_id = formulario.usuario_id;
+    let duracion = if formulario.mantener_sesion.is_some() {
+        DuracionDeSesion::HastaCerrarElNavegador
+    } else {
+        DuracionDeSesion::Normal
+    };
     let solicitud = SolicitudDeEntrada {
         usuario_id,
         clave: formulario.clave,
         ip,
+        duracion,
     };
     let aviso = match entrar(&estado, solicitud).await? {
-        ResultadoDeEntrada::Correcta { token, rol } => {
+        ResultadoDeEntrada::Correcta {
+            token,
+            rol,
+            duracion,
+        } => {
             let destino = if rol == Rol::Operario { "/mi-dia" } else { "/" };
-            let cookie = [(SET_COOKIE, cookie_de_sesion(&token))];
+            let valor = match duracion {
+                DuracionDeSesion::Normal => cookie_de_sesion(&token),
+                DuracionDeSesion::HastaCerrarElNavegador => {
+                    cookie_hasta_cerrar_el_navegador(&token)
+                }
+            };
+            let cookie = [(SET_COOKIE, valor)];
             return Ok((cookie, Redirect::to(destino)).into_response());
         }
         ResultadoDeEntrada::Incorrecta => "El PIN o la contraseña no son correctos.".to_owned(),

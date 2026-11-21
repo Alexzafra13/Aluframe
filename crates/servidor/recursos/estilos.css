@@ -100,6 +100,8 @@ body.con-menu { display: grid; grid-template-columns: 280px 1fr; }
 .teclado { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-top: 1rem; }
 .teclado button { min-height: 64px; border-radius: 12px; border: 1px solid var(--linea); background: #fff; font: 600 1.5rem var(--mono); cursor: pointer; }
 .teclado .primario { font: 600 1.15rem var(--sans); }
+.casilla { display: flex; align-items: center; gap: .6rem; min-height: var(--tactil); font-weight: 400; }
+.casilla input { width: 24px; min-height: 24px; margin: 0; accent-color: var(--acero); }
 .enlace-secundario { display: inline-block; margin-top: 1rem; }
 .barra-operario { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; background: var(--menu-fondo); color: #fff; }
 .barra-operario .marca { font-size: 1.4rem; }
