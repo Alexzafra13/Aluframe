@@ -33,6 +33,10 @@ Subconjunto Latin-1 en woff2 (licencia OFL en `recursos/fuentes/LICENCIA-OFL.txt
 - **Botones:** al menos 44 px de alto; primario relleno en acero y secundario con borde.
 - **Pantallas de acceso y del operario:** tarjetas de nombre de 64 px y teclado numérico con teclas de 64 px.
 - **Estados vacíos:** cada lista explica qué hacer o cuándo aparecerá algo.
+- **Formularios (H2):** rejilla de campos de 240 px mínimo; error junto al campo en `--aviso` con el campo en `--aviso-fondo`; confirmación correcta (NIF) en acero. Ningún botón desactivado sin un texto al lado que diga por qué.
+- **Asistente de importación (H2):** pasos 1-3 con el paso escrito; resumen en una línea (nuevos, cambios, sin cambios, ausentes); filas con salto de precio sobre `--aviso-fondo` y diferencia en naranja (sube) o acero (baja).
+- **Tablas editables (H2):** importes en Plex Mono alineados a la derecha; casillas de 24 px dentro de objetivos de 44 px.
+- **Zona de peligro:** acciones irreversibles dentro de un desplegable, con casilla de confirmación y botón con borde de aviso.
 
 ## Movimiento (inspirado en iOS, decisión del propietario del 2026-11-21)
 Objetivo: que la interfaz se sienta fluida y responda al tacto, sin adornos ni efectos gratuitos y sin coste de rendimiento. Solo se animan `transform` y `opacity`, que el navegador resuelve en la tarjeta gráfica.

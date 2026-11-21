@@ -1,11 +1,11 @@
 # Progreso
 
-Estado: **H1 terminado** (2026-11-21), publicado como v0.3.0. Siguiente: **H2, catálogo, clientes e importación de tarifas**.
+Estado: **H2 terminado** (2026-11-21) en la rama `claude/sesion-h2-inicial-0eu0lb`, pendiente de llevar a `main`. Siguiente: **H3, presupuestos**.
 
 ## Cómo retomar en una sesión nueva
-1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`; para H2, además `SPEC.md` (H2), `docs/DATOS.md` (7.3 y 7.4) y `docs/PANTALLAS.md` (5 y 10).
+1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`; para H3, además `SPEC.md` (H3 y apartado 7), `docs/DATOS.md` (7.6), `docs/PANTALLAS.md` (6 y 7), `docs/BACKEND.md` (5.4) y ADR-0012.
 2. Comprueba que todo está en verde: `just instalar-hooks`, `just check`, `just e2e`.
-3. Propón el plan de H2 y **espera la aprobación** del propietario antes de escribir código.
+3. Propón el plan de H3 y **espera la aprobación** del propietario antes de escribir código.
 
 **Reglas que no están en SPEC y conviene no olvidar**
 - **Sin migraciones** hasta el primer despliegue real: se amplía `crates/servidor/src/bd/esquema.sql` (ADR-0011). Si cambia, borra `datos-dev/`.
@@ -22,7 +22,7 @@ Estado: **H1 terminado** (2026-11-21), publicado como v0.3.0. Siguiente: **H2, c
 |---|---|
 | H0 Cimientos | **hecho** (2026-11-21) |
 | H1 Motor de dominio | **hecho** (2026-11-21) |
-| H2 Catálogo, clientes e importación | pendiente |
+| H2 Catálogo, clientes e importación | **hecho** (2026-11-21) |
 | H3 Presupuestos | pendiente |
 | H4 Trabajos y orden de taller | pendiente |
 | H5 Stock | pendiente |
@@ -75,3 +75,22 @@ Estado: **H1 terminado** (2026-11-21), publicado como v0.3.0. Siguiente: **H2, c
 - **Movimiento al estilo iOS** sin cambiar colores ni estructura: transiciones entre pantallas, indicador del menú que se desliza, respuesta al pulsar, barra superior translúcida y PIN con puntos y entrada automática (`docs/design.md`).
 - **Ajustes > Taller:** grosor de sierra (2 mm provisional, dado por el propietario), recorte de extremos y retal mínimo, guardados en la tabla `configuracion` y usados por «Probar una ventana».
 - La serie V-94 usa barras de 6,40 m (confirmado).
+
+### H2. Catálogo, clientes e importación (2026-11-21)
+**Hecho**
+- **Clientes:** lista con búsqueda mientras se escribe (sin tildes ni mayúsculas) y paginación, alta sin ningún campo obligatorio («Cliente sin nombre (n.º N)»), NIF/NIE/CIF comprobado al teclear, varias direcciones de montaje (y «la misma que la fiscal»), ficha, edición con aviso si otra persona guardó antes sin perder lo escrito, archivo, **exportación y borrado definitivo** (RGPD). El buscador de la barra superior busca clientes.
+- **Importar clientes** desde CSV en 3 pasos; los NIF que ya existen se saltan con aviso; deshacer quita los no modificados.
+- **Catálogo:** pestañas Artículos, Proveedores, Acabados (un único acabado base sin recargo), Tarifas y Series (con «referencias con artículo»).
+- **Tarifas:** importación CSV en 3 pasos con vista previa (nuevos, cambios con diferencia en %, sin cambios, ausentes, errores y avisos; salto > 30 % avisado), confirmación que vuelve a analizar y exige la misma huella SHA-256, **versiones completas** por proveedor, edición de precios en la tabla y ajuste por porcentaje como versiones nuevas, histórico por artículo y **deshacer** la versión vigente.
+- Dominio nuevo: lector CSV propio, NIF, `PrecioUnitario` (1/10 000 €), `Porcentaje` (puntos básicos), lectura y comparación de tarifas, validación de clientes y del catálogo.
+- **Criterios de aceptación:** «importar un CSV con errores muestra los avisos y no guarda nada hasta confirmar» (`tests/tarifas.rs::un_csv_con_errores_muestra_los_avisos_y_no_guarda_nada` y E2E `h2-tarifas`) y «deshacer restaura los precios» (`deshacer_restaura_los_precios_y_quita_los_articulos_nuevos` y E2E): **cumplidos**.
+- Pruebas: 224 entre unitarias e integración y 12 E2E, todas en verde; cobertura del dominio 96,7 % de líneas.
+
+**Decisiones:** ADR-0012 (solo CSV, todo o nada, versiones completas, deshacer la última de cada proveedor). `proveedor.descuento_habitual_bp` añadido. El navegador lee el CSV como UTF-8 o Windows-1252. Los mensajes de confirmación viajan como claves fijas en la URL, nunca como texto libre.
+
+**Pendiente**
+- Una **tarifa real** para comprobar su formato (y si compensa leer Excel directamente).
+- `kit_componente` (H5) y recargo de color por proveedor (decisión 4 de DATOS).
+- Al llegar los presupuestos (H3): bloquear deshacer una tarifa usada y anonimizar en lugar de borrar clientes con documentos.
+- `cargo deny` no está instalado en las sesiones en la nube; se ejecuta en CI.
+

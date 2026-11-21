@@ -48,7 +48,8 @@ El diseño tiene 10 entradas. Propongo **8 para el MVP** y se decide al construi
 | Stock | `/stock` | H5 | Saldos, mínimos, lista de compra sugerida (apartado 9) |
 | Artículo de stock | `/stock/{articulo}` | H5 | Movimientos y retales |
 | Entrada o ajuste de stock | `/stock/movimientos/nuevo` | H5 | Artículo, color, cantidad, longitud si es un retal y motivo |
-| Catálogo | `/catalogo` | H2 | Pestañas Artículos, Proveedores, Acabados, Tarifas y Series |
+| Catálogo | `/catalogo` | H2 | Pestañas Artículos, Proveedores, Acabados, Tarifas y Series. Fichas en `/catalogo/articulos/{id}`, `/catalogo/proveedores/{id}`, `/catalogo/acabados/{id}`; versiones en `/catalogo/tarifas/{id}` |
+| Importar clientes | `/clientes/importar` | H2 | Asistente en 3 pasos con deshacer |
 | Importar tarifa | `/catalogo/tarifas/importar` | H2 | Asistente en 3 pasos (apartado 10) |
 | Importar serie | `/catalogo/series/importar` | H1 | El mismo asistente, con las comprobaciones de `docs/FORMATO_SERIES.md` |
 | Facturas | `/facturas` | H6 | Lista; pestañas Facturas y Cobros pendientes |
