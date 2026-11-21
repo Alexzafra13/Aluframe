@@ -178,4 +178,21 @@ mod tests {
         );
         assert!(conexion.execute("DELETE FROM auditoria", []).is_err());
     }
+
+    #[test]
+    fn la_copia_previa_es_una_base_integra_con_los_mismos_datos() {
+        let carpeta = std::env::temp_dir().join(format!("alumframe-copia-{}", std::process::id()));
+        let destino = carpeta.join("copias").join("previa.db");
+        let _ = std::fs::remove_file(&destino);
+        let mut conexion = Connection::open_in_memory().unwrap();
+        migrar(&mut conexion, None, AHORA).unwrap();
+        copiar_antes_de_migrar(&conexion, &destino).unwrap();
+        let copia = Connection::open(&destino).unwrap();
+        let version: i64 = copia
+            .query_row("SELECT max(version) FROM version_esquema", [], |fila| {
+                fila.get(0)
+            })
+            .unwrap();
+        assert_eq!(version, ULTIMA_VERSION);
+    }
 }
