@@ -9,7 +9,7 @@ use servidor::aplicacion::Actor;
 use servidor::aplicacion::primer_arranque::{DatosDelPropietario, crear_propietario_inicial};
 use servidor::aplicacion::sesion::identificar;
 use servidor::aplicacion::usuarios::crear_operario;
-use servidor::bd::{BaseDeDatos, migrar};
+use servidor::bd::{BaseDeDatos, preparar_esquema};
 use servidor::estado::EstadoApp;
 use servidor::http::crear_router;
 use servidor::reloj::RelojFijo;
@@ -27,7 +27,7 @@ pub struct Contexto {
 impl Contexto {
     pub async fn nuevo() -> Contexto {
         let bd = BaseDeDatos::en_memoria().unwrap();
-        bd.con_escritor(|con| migrar(con, None, "2026-11-21T08:00:00Z").unwrap())
+        bd.con_escritor(|con| preparar_esquema(con, "2026-11-21T08:00:00Z").unwrap())
             .unwrap();
         let reloj = Arc::new(RelojFijo::new(datetime!(2026-11-21 08:00 UTC)));
         let estado = EstadoApp::nuevo(bd, reloj.clone()).await.unwrap();

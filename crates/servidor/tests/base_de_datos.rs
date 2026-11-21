@@ -8,7 +8,7 @@ use std::sync::Arc;
 use comun::{CONTRASENA, Contexto};
 use servidor::aplicacion::entrar::{ResultadoDeEntrada, SolicitudDeEntrada, entrar};
 use servidor::aplicacion::restablecer_contrasena::restablecer_contrasena;
-use servidor::bd::{BaseDeDatos, migrar};
+use servidor::bd::{BaseDeDatos, preparar_esquema};
 use servidor::estado::EstadoApp;
 use servidor::reloj::RelojDelSistema;
 
@@ -23,7 +23,7 @@ fn carpeta_temporal(nombre: &str) -> PathBuf {
 async fn la_base_en_archivo_usa_wal_y_los_lectores_ven_lo_escrito() {
     let ruta = carpeta_temporal("wal").join("alumframe.db");
     let mut conexion = rusqlite::Connection::open(&ruta).unwrap();
-    migrar(&mut conexion, None, "2026-11-21T08:00:00Z").unwrap();
+    preparar_esquema(&mut conexion, "2026-11-21T08:00:00Z").unwrap();
     drop(conexion);
     let bd = BaseDeDatos::abrir(&ruta).unwrap();
     let modo: String = bd

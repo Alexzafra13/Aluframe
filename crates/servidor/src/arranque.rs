@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use thiserror::Error;
 
-use crate::bd::{BaseDeDatos, ErrorMigracion, migrar};
+use crate::bd::{BaseDeDatos, ErrorEsquema, preparar_esquema};
 use crate::config::{Configuracion, ErrorConfiguracion, NOMBRE_ARCHIVO_CONFIGURACION};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -17,7 +17,7 @@ pub enum ErrorArranque {
     #[error(transparent)]
     Configuracion(#[from] ErrorConfiguracion),
     #[error(transparent)]
-    Migracion(#[from] ErrorMigracion),
+    Esquema(#[from] ErrorEsquema),
     #[error("No se pudo abrir la base de datos: {0}")]
     BaseDeDatos(#[from] rusqlite::Error),
     #[error("No se pudo crear la carpeta de datos {ruta}: {causa}")]
@@ -54,14 +54,9 @@ pub async fn preparar_estado(config: &Configuracion) -> Result<EstadoApp, ErrorA
         causa,
     })?;
     let reloj: Arc<dyn Reloj> = Arc::new(RelojDelSistema);
-    let ahora = formatear_utc(reloj.ahora());
-    let copia = config
-        .carpeta_copias()
-        .join(format!("antes-de-migrar-{}.db", ahora.replace(':', "-")));
     {
         let mut conexion = rusqlite::Connection::open(config.ruta_base_de_datos())?;
-        let version = migrar(&mut conexion, Some(&copia), &ahora)?;
-        tracing::info!(version, "esquema de la base de datos al día");
+        preparar_esquema(&mut conexion, &formatear_utc(reloj.ahora()))?;
     }
     let bd = BaseDeDatos::abrir(&config.ruta_base_de_datos())?;
     Ok(EstadoApp::nuevo(bd, reloj)

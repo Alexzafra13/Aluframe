@@ -9,7 +9,7 @@ use servidor::arranque::{cargar_configuracion, preparar_estado, servir_http};
 const AYUDA: &str = "Uso: alumframe [orden]
 
 Sin orden      arranca el servidor (puerto 9090 por defecto)
-migrar         aplica las migraciones pendientes y termina
+preparar-base  crea o comprueba la base de datos y termina
 restablecer-contrasena <nombre>
                cambia la contraseña del propietario desde la consola
 version        muestra la versión";
@@ -25,7 +25,7 @@ fn main() -> anyhow::Result<()> {
         .as_slice()
     {
         [] => tiempo_de_ejecucion.block_on(servir()),
-        ["migrar"] => tiempo_de_ejecucion.block_on(migrar()),
+        ["preparar-base"] => tiempo_de_ejecucion.block_on(preparar_base()),
         ["restablecer-contrasena", nombre] => {
             tiempo_de_ejecucion.block_on(restablecer((*nombre).to_owned()))
         }
@@ -50,11 +50,11 @@ async fn servir() -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn migrar() -> anyhow::Result<()> {
+async fn preparar_base() -> anyhow::Result<()> {
     let config = cargar_configuracion()?;
     preparar_estado(&config).await?;
     println!(
-        "Base de datos al día en {}",
+        "Base de datos preparada en {}",
         config.ruta_base_de_datos().display()
     );
     Ok(())

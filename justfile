@@ -43,7 +43,7 @@ release: check build
     @echo "Ejecutable listo en target/release/alumframe"
 
 db-migrate:
-    cargo run -p servidor -- migrar
+    cargo run -p servidor -- preparar-base
 
 cobertura:
     cargo llvm-cov --package dominio --fail-under-lines 90
