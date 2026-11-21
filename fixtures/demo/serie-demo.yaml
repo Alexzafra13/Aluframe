@@ -3,6 +3,8 @@
 # El programa no los carga en el uso real.
 
 serie: DEMO_FICTICIA
+fabricante: DEMO
+proveedor: DEMO
 estado: demo
 unidades: cm
 redondeo: { precision: 0.1, sentido: abajo }
