@@ -1,8 +1,10 @@
 mod menu;
 mod paginas;
+mod series;
 
 pub use menu::{GrupoMenu, MENU};
 pub use paginas::*;
+pub use series::*;
 
 use askama::Template;
 use axum::response::Html;

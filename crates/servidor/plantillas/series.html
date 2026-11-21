@@ -1,0 +1,35 @@
+{% extends "marco.html" %}
+{% block titulo %}Series{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-con-acciones">
+  <div>
+    <p class="antetitulo">Catálogo</p>
+    <h1>Series de perfiles</h1>
+  </div>
+  <a class="boton primario" href="/catalogo/series/importar">Importar serie</a>
+</header>
+{% include "pestanas_catalogo.html" %}
+{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+{% if series.is_empty() %}
+<p class="vacio tarjeta">Aún no hay series. Pulsa «Importar serie» y elige el archivo YAML de una serie, por ejemplo <code>aluprom-21.yaml</code>.</p>
+{% else %}
+<section class="tarjeta">
+  <table class="tabla">
+    <thead><tr><th>Serie</th><th>Fabricante</th><th>Estado</th><th>Versión</th><th>Datos pendientes</th><th>Tipologías</th><th><span class="oculto">Acciones</span></th></tr></thead>
+    <tbody>
+      {% for s in series %}
+      <tr>
+        <td class="mono">{{ s.codigo }}</td>
+        <td>{{ s.fabricante }}</td>
+        <td><span class="etiqueta {% if s.estado == "validada" %}etiqueta-azul{% else %}etiqueta-aviso{% endif %}">{{ s.estado }}</span></td>
+        <td class="mono">v{{ s.version }}</td>
+        <td>{{ s.avisos }}</td>
+        <td>{{ s.tipologias }}</td>
+        <td><a class="boton" href="/catalogo/series/{{ s.codigo }}/probar">Probar una ventana</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+{% endblock %}

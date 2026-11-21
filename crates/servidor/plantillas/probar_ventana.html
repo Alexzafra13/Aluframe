@@ -1,0 +1,77 @@
+{% extends "marco.html" %}
+{% block titulo %}Probar una ventana{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Catálogo · Series · {{ codigo }} v{{ version }}</p>
+  <h1>Probar una ventana</h1>
+  <p class="texto-apagado">Calcula el despiece con las fórmulas de la serie para compararlo con una hoja de corte real. No guarda nada.</p>
+</header>
+<form class="tarjeta formulario-en-linea" method="get" action="/catalogo/series/{{ codigo }}/probar"
+      hx-get="/catalogo/series/{{ codigo }}/probar" hx-trigger="input changed delay:300ms, change"
+      hx-target="#resultado" hx-select="#resultado" hx-swap="outerHTML" hx-push-url="true">
+  <label>Tipología
+    <select name="tipologia">
+      {% for (valor, nombre) in tipologias %}
+      <option value="{{ valor }}"{% if *valor == elegida %} selected{% endif %}>{{ nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Ancho (cm) <input name="ancho" value="{{ ancho }}" inputmode="decimal" required></label>
+  <label>Alto (cm) <input name="alto" value="{{ alto }}" inputmode="decimal" required></label>
+  <button class="boton primario" type="submit">Calcular</button>
+</form>
+<div id="resultado">
+  {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+  {% if let Some(p) = prueba %}
+  {% if p.incompleta %}
+  <section class="tarjeta borde-aviso">
+    <h2>Incompleta: no admite precio final</h2>
+    <ul class="lista-problemas">{% for x in p.pendientes %}<li>{{ x }}</li>{% endfor %}</ul>
+  </section>
+  {% endif %}
+  {% for x in p.fuera_de_limites %}<p class="aviso">{{ x }} Revisar.</p>{% endfor %}
+  <section class="tarjeta">
+    <h2>Perfiles</h2>
+    <table class="tabla">
+      <thead><tr><th>N.º</th><th>Perfil</th><th>Cant.</th><th>Medida (cm)</th><th>Corte</th><th>Fórmula</th></tr></thead>
+      <tbody>
+        {% for f in p.piezas %}
+        <tr><td class="mono">{{ f.numero }}</td><td class="mono">{{ f.perfil }}</td><td class="mono">{{ f.cantidad }}</td><td class="mono medida">{{ f.medida }}</td><td class="mono">{{ f.corte }}</td><td class="mono texto-apagado">{{ f.formula }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  <section class="tarjeta">
+    <h2>Vidrio</h2>
+    {% match p.vidrio %}
+    {% when Some(vidrios) %}
+    <table class="tabla">
+      <thead><tr><th>Tipo</th><th>Cant.</th><th>Ancho × alto (cm)</th></tr></thead>
+      <tbody>{% for v in vidrios %}<tr><td class="mono">{{ v.tipo }}</td><td class="mono">{{ v.cantidad }}</td><td class="mono">{{ v.medidas }}</td></tr>{% endfor %}</tbody>
+    </table>
+    {% when None %}
+    <p class="vacio">Sin medida de cristal: falta el descuento en la serie.</p>
+    {% endmatch %}
+  </section>
+  <section class="tarjeta">
+    <h2>Accesorios</h2>
+    {% if p.accesorios.is_empty() %}<p class="vacio">Ninguno calculado.</p>{% else %}
+    <table class="tabla">
+      <thead><tr><th>Artículo</th><th>Cantidad</th></tr></thead>
+      <tbody>{% for (articulo, cantidad) in p.accesorios %}<tr><td class="mono">{{ articulo }}</td><td class="mono">{{ cantidad }}</td></tr>{% endfor %}</tbody>
+    </table>
+    {% endif %}
+  </section>
+  <section class="tarjeta">
+    <h2>Barras</h2>
+    {% for x in p.avisos_de_corte %}<p class="texto-apagado pequeno">{{ x }}</p>{% endfor %}
+    {% for g in p.barras %}
+    <h3 class="mono">{{ g.perfil }}: {{ g.barras.len() }} barra{% if g.barras.len() != 1 %}s{% endif %}</h3>
+    <ul class="lista-barras">
+      {% for b in g.barras %}<li><span class="mono">Barra {{ b.numero }}:</span> {{ b.piezas }} <span class="texto-apagado">· sobra {{ b.sobrante }} cm</span></li>{% endfor %}
+    </ul>
+    {% endfor %}
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
