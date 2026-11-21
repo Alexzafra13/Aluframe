@@ -5,6 +5,8 @@ mod comun;
 use axum::http::StatusCode;
 use comun::presupuestos::{SERIE_DEMO, elegir_reglas, preparar_demo};
 use comun::{Contexto, PIN, destino, formulario, get, post, texto};
+use dominio::clientes::{EntradaDeCliente, validar_cliente};
+use servidor::aplicacion::clientes::crear_cliente;
 use servidor::aplicacion::entrar::{ResultadoDeEntrada, SolicitudDeEntrada, entrar};
 
 async fn preparado() -> (Contexto, String, String) {
@@ -32,6 +34,28 @@ async fn crea_el_presupuesto_desde_el_cliente_y_abre_el_editor() {
     .await;
     assert!(editor.contains("DEMO_FICTICIA · DEMO corredera 2 hojas (ficticia)"));
     assert!(editor.contains("Escribe el ancho y el alto"));
+}
+
+#[tokio::test]
+async fn sin_series_el_editor_explica_donde_importarlas() {
+    let contexto = Contexto::nuevo().await;
+    let (token, actor) = contexto.con_propietario().await;
+    let cliente = validar_cliente(&EntradaDeCliente::default()).unwrap();
+    crear_cliente(&contexto.estado, &actor, cliente, vec![])
+        .await
+        .unwrap();
+    let cuerpo = formulario(&[("_csrf", &actor.token_csrf), ("cliente", "1")]);
+    contexto
+        .pedir(post("/presupuestos", Some(&token), &cuerpo))
+        .await;
+    let editor = texto(
+        contexto
+            .pedir(get("/presupuestos/1/lineas/nueva", Some(&token)))
+            .await,
+    )
+    .await;
+    assert!(editor.contains("No hay ninguna serie cargada"));
+    assert!(editor.contains("href=\"/catalogo/series/importar\""));
 }
 
 #[tokio::test]

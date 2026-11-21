@@ -37,6 +37,7 @@
           hx-post="/presupuestos/{{ id }}/lineas/calcular" hx-trigger="input changed delay:250ms, change" hx-target="#dibujo" hx-swap="innerHTML" hx-sync="this:replace">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <label for="seleccion">Serie y tipología</label>
+      {% if series.is_empty() %}<p class="aviso" role="alert">No hay ninguna serie cargada. Impórtala en <a href="/catalogo/series/importar">Catálogo → Series → Importar serie</a>.</p>{% endif %}
       <select id="seleccion" name="seleccion" required>
         {% for s in series %}<option value="{{ s.valor }}"{% if s.valor == valores.seleccion %} selected{% endif %}>{{ s.texto }}</option>{% endfor %}
       </select>
