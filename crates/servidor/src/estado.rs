@@ -13,6 +13,7 @@ pub struct EstadoApp {
     pub bd: BaseDeDatos,
     reloj: Arc<dyn Reloj>,
     hay_usuarios: Arc<AtomicBool>,
+    permitir_datos_demo: bool,
 }
 
 impl EstadoApp {
@@ -22,11 +23,22 @@ impl EstadoApp {
             bd,
             reloj,
             hay_usuarios: Arc::new(AtomicBool::new(cuantos > 0)),
+            permitir_datos_demo: false,
         })
     }
 
     pub fn ahora(&self) -> OffsetDateTime {
         self.reloj.ahora()
+    }
+
+    /// Las series de demostración (datos ficticios) solo se aceptan en pruebas y demos.
+    pub fn con_datos_demo(mut self, permitir: bool) -> EstadoApp {
+        self.permitir_datos_demo = permitir;
+        self
+    }
+
+    pub fn permite_datos_demo(&self) -> bool {
+        self.permitir_datos_demo
     }
 
     pub fn hay_usuarios(&self) -> bool {

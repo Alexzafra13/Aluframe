@@ -64,7 +64,9 @@ pub async fn preparar_estado(config: &Configuracion) -> Result<EstadoApp, ErrorA
         tracing::info!(version, "esquema de la base de datos al día");
     }
     let bd = BaseDeDatos::abrir(&config.ruta_base_de_datos())?;
-    Ok(EstadoApp::nuevo(bd, reloj).await?)
+    Ok(EstadoApp::nuevo(bd, reloj)
+        .await?
+        .con_datos_demo(config.permitir_datos_demo))
 }
 
 pub async fn servir_http(config: &Configuracion, estado: EstadoApp) -> std::io::Result<()> {

@@ -21,6 +21,7 @@ pub struct Configuracion {
     pub puerto: u16,
     pub carpeta_datos: PathBuf,
     pub abrir_navegador: Option<bool>,
+    pub permitir_datos_demo: bool,
 }
 
 #[derive(Debug, Error)]
@@ -46,6 +47,7 @@ impl Default for Configuracion {
             puerto: PUERTO_POR_DEFECTO,
             carpeta_datos: PathBuf::from("datos"),
             abrir_navegador: None,
+            permitir_datos_demo: false,
         }
     }
 }
@@ -101,6 +103,9 @@ impl Configuracion {
         }
         if let Some(valor) = leer_variable("ALUMFRAME_ABRIR_NAVEGADOR") {
             self.abrir_navegador = Some(valor == "si");
+        }
+        if let Some(valor) = leer_variable("ALUMFRAME_DATOS_DEMO") {
+            self.permitir_datos_demo = valor == "si";
         }
         Ok(self)
     }
