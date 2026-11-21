@@ -68,7 +68,7 @@ Comparado con programas como Productor (Gaia), Cortizo Software, GesFácil, Klae
 - [ ] Cremona: ¿el lado se mira desde dentro o desde fuera? ¿Cambia alguna pieza (por ejemplo, qué hoja lleva el inversor) según el lado?
 - [x] Barras de longitud distinta de 640 cm (2026-11-21): si alguna serie o marca las vende de otra longitud, se configura en esa serie cuando aparezca. Los retales existentes se registran en el stock al instalar el programa (con su longitud, perfil y color) y el plan de corte los propone antes de abrir barras nuevas (`SPEC.md`, apartado 9 y H5).
 - [x] Retal mínimo aprovechable: **0**, se guarda cualquier sobrante por si encaja en algo (propietario, 2026-11-21). Registrar retales al instalar es opcional.
-- [ ] Retales: ¿se marcan físicamente (etiqueta, rotulador) para identificarlos al cogerlos, o basta con perfil, color y longitud?
+- [x] Retales: no se marcan; basta con perfil, color y longitud para buscarlos (propietario, 2026-11-21, de momento).
 
 ## Bisagras y dibujo de la abatible
 - [x] Bisagras: 2 por hoja hasta 140 cm de alto de la ventana (140 incluido) y 3 por encima (confirmado 2026-11-21).
