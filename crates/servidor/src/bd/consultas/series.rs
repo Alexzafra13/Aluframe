@@ -24,8 +24,6 @@ pub struct NuevaVersion<'a> {
     pub origen_yaml: &'a str,
     pub sha256: &'a str,
     pub avisos: i64,
-    /// Vacío cuando la carga el propio programa (series incluidas, ADR-0014).
-    pub importada_por: Option<i64>,
     pub creada_en: &'a str,
 }
 
@@ -104,7 +102,7 @@ pub fn insertar_version(con: &Connection, nueva: &NuevaVersion) -> Result<(i64, 
     )?;
     con.execute(
         "INSERT INTO serie_version (serie_id, numero, estado, origen_yaml, sha256, avisos, \
-         importada_por, creada_en) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+         creada_en) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
         params![
             serie_id,
             numero,
@@ -112,7 +110,6 @@ pub fn insertar_version(con: &Connection, nueva: &NuevaVersion) -> Result<(i64, 
             nueva.origen_yaml,
             nueva.sha256,
             nueva.avisos,
-            nueva.importada_por,
             nueva.creada_en
         ],
     )?;

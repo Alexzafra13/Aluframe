@@ -137,7 +137,7 @@ Hasta el primer despliegue real hay un único esquema, `crates/servidor/src/bd/e
 | Tabla | Campos |
 |---|---|
 | `serie` | id, codigo (`ALUPROM_21`), fabricante, creada_en |
-| `serie_version` | id, serie_id, numero, estado (`borrador`/`validada`/`demo`), origen_yaml (texto original), sha256, avisos, importada_por, creada_en; único (serie_id, numero); no se modifica ni se borra (ADR-0009) |
+| `serie_version` | id, serie_id, numero, estado (`borrador`/`validada`/`demo`), origen_yaml (texto original), sha256, avisos, creada_en (quién la importó consta en la auditoría); único (serie_id, numero); no se modifica ni se borra (ADR-0009) |
 | `serie_referencia` | serie_version_id, codigo (`MARCO_LATERAL`, `BISAGRA`), referencia_texto (`CONFIRMAR` si falta), proveedor_texto; PK (serie_version_id, codigo). En H2 se añade el enlace con el artículo de la tarifa |
 
 Las tipologías, piezas, vidrios, accesorios y opciones no tienen tablas propias: se leen del YAML de la versión (ADR-0009).

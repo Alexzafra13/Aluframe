@@ -71,7 +71,6 @@ CREATE TABLE serie_version (
     origen_yaml TEXT NOT NULL,
     sha256 TEXT NOT NULL CHECK (length(sha256) = 64),
     avisos INTEGER NOT NULL CHECK (avisos >= 0),
-    importada_por INTEGER REFERENCES usuario (id) ON DELETE RESTRICT,
     creada_en TEXT NOT NULL,
     UNIQUE (serie_id, numero)
 ) STRICT;

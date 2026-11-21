@@ -163,7 +163,6 @@ pub(super) fn guardar(
         origen_yaml: texto,
         sha256: &sha,
         avisos,
-        importada_por: autor,
         creada_en: ahora,
     };
     let (version_id, numero) = series::insertar_version(tx, &nueva)?;

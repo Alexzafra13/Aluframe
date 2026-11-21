@@ -7,7 +7,7 @@ Hasta la v0.4.0 una instalación nueva arrancaba sin ninguna serie y había que 
 
 ## Decisión
 - Los YAML de `data/series/` se **incluyen en el ejecutable** al compilar, con `rust-embed`, que ya se usaba para los recursos estáticos. No hay dependencias nuevas.
-- **Al arrancar**, cada serie incluida pasa por la misma validación que la importación a mano. Si su archivo exacto (SHA-256) no ha estado nunca en esa serie, se guarda como **versión nueva**, que pasa a ser la vigente, sin usuario (`importada_por` vacío) y con el apunte de auditoría `cargar_serie_incluida`. Si ya estuvo, no se toca.
+- **Al arrancar**, cada serie incluida pasa por la misma validación que la importación a mano. Si su archivo exacto (SHA-256) no ha estado nunca en esa serie, se guarda como **versión nueva**, que pasa a ser la vigente, con el apunte de auditoría `cargar_serie_incluida` (sin usuario). La columna `importada_por` se quita de `serie_version`: quién importó a mano consta en la auditoría (`importar_serie`). Si ya estuvo, no se toca.
 - Si el propietario importa otra versión a mano, se respeta mientras el archivo incluido no cambie. Cuando una versión nueva del programa trae ese archivo cambiado, entra como versión nueva y la del propietario queda en el historial (opción A, elegida por el propietario).
 - Una serie incluida con errores **no impide arrancar**: se salta y se anota en el registro. La prueba `incluye_todas_las_series_de_data_series` y los tests dorados evitan publicarla así.
 - Las series de **demostración** (`fixtures/demo/`) nunca se incluyen ni se cargan solas.
