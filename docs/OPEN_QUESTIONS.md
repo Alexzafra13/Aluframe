@@ -4,7 +4,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 
 ## Ventanas y fabricación
 - [ ] Fórmulas de ancho y alto del cristal (descuento) y tipo de vidrio habitual, en cada serie.
-- [ ] `ancho` y `alto`: ¿hueco de obra o medida de la ventana? (las fórmulas dadas sugieren medida de ventana; confirmarlo)
+- [x] `ancho` y `alto` son la **medida de la ventana** (plan de H3 aprobado, 2026-11-21); se valida con las 5 ventanas reales tras H3.
 - [ ] ¿Marco superior, lateral e inferior salen del mismo perfil o de perfiles distintos?
 - [ ] ¿Se optimizan los cortes por ventana o por trabajo? ¿Qué se hace con los retales?
 - [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos sin dato (se usa 0); retal mínimo 0 por decisión del propietario. Se cambian en Ajustes > Taller.
@@ -22,8 +22,9 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] Proveedores (Aluval y Sopena de momento) y formato de sus tarifas. El usuario reunirá precios por barra y tarifas.
 - [ ] Recargo por color: el blanco es el más barato y el resto cuesta un porcentaje más. ¿Es el mismo para todas las series o depende del proveedor?
 - [ ] Facturas de compra: ¿llegan en papel, PDF digital o Excel? Decide si se importan (y cómo) o se teclean.
-- [ ] Cómo se cobra el material (barra, metro o kilo) y si el proveedor factura una superficie mínima de cristal.
-- [ ] Margen: ¿sobre coste o sobre venta? Descuentos habituales.
+- [ ] Cómo se cobra el material (barra, metro o kilo) y si el proveedor factura una superficie mínima de cristal. **Desde H3, perfiles por barras enteras o por metros + merma, a elegir en Ajustes > Presupuestos; el presupuesto muestra los dos importes.**
+- [ ] Mano de obra: ¿importe por ventana, por m² o a mano? **Desde H3, importe por línea con un valor por defecto en Ajustes (vacío = 0).**
+- [ ] Margen: ¿sobre coste o sobre venta? Descuentos habituales. **Desde H3 es configurable en Ajustes > Presupuestos; mientras no se elija, ninguna línea tiene precio final.**
 - [ ] Tipos de IVA, casos especiales, y cómo se redondea la cuota (confirmar con el gestor).
 - [ ] Documentos que realmente se emiten (presupuesto, albarán, factura) y formato de numeración.
 - [ ] Datos fiscales del taller y logotipo.
