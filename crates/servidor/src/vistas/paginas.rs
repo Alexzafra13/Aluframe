@@ -24,6 +24,7 @@ impl From<&Actor> for UsuarioEnPantalla {
 pub struct OpcionUsuario {
     pub id: i64,
     pub nombre: String,
+    pub inicial: String,
     pub rol: &'static str,
     pub activo: bool,
     pub es_operario: bool,
@@ -33,6 +34,7 @@ impl From<UsuarioVisible> for OpcionUsuario {
     fn from(usuario: UsuarioVisible) -> Self {
         OpcionUsuario {
             id: usuario.id,
+            inicial: usuario.nombre.chars().next().map(|c| c.to_uppercase().collect()).unwrap_or_default(),
             nombre: usuario.nombre,
             rol: match usuario.rol {
                 Rol::Propietario => "Propietario",

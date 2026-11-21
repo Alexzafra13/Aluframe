@@ -6,7 +6,7 @@
   <h1>Probar una ventana</h1>
   <p class="texto-apagado">Calcula el despiece con las fórmulas de la serie para compararlo con una hoja de corte real. No guarda nada.</p>
 </header>
-<form class="tarjeta formulario-en-linea" method="get" action="/catalogo/series/{{ codigo }}/probar"
+<form class="tarjeta formulario-en-linea formulario-calculo" method="get" action="/catalogo/series/{{ codigo }}/probar"
       hx-get="/catalogo/series/{{ codigo }}/probar" hx-trigger="input changed delay:300ms, change"
       hx-target="#resultado" hx-select="#resultado" hx-swap="outerHTML" hx-push-url="true">
   <label>Tipología

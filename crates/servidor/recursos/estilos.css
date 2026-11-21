@@ -135,3 +135,64 @@ body.con-menu { display: grid; grid-template-columns: 280px 1fr; }
   .tablero { grid-template-columns: 1fr; }
   .columna, .panel-atencion { min-height: auto; }
 }
+
+:root {
+  --curva-suave: cubic-bezier(.2, .8, .2, 1);
+  --curva-muelle: cubic-bezier(.34, 1.4, .64, 1);
+  --rapido: 160ms;
+  --normal: 260ms;
+}
+
+@view-transition { navigation: auto; }
+.menu { view-transition-name: menu; }
+.barra-superior { view-transition-name: barra-superior; }
+.indicador-menu { position: absolute; left: -1rem; top: 10px; bottom: 10px; width: 4px; border-radius: 0 3px 3px 0; background: var(--indicador); view-transition-name: indicador-menu; }
+.menu-entrada.activa::before { content: none; }
+::view-transition-group(indicador-menu) { animation-duration: 380ms; animation-timing-function: var(--curva-suave); }
+::view-transition-old(root) { animation: 120ms ease-out both desvanecer; }
+::view-transition-new(root) { animation: var(--normal) var(--curva-suave) both aparecer; }
+@keyframes desvanecer { to { opacity: 0; } }
+@keyframes aparecer { from { opacity: 0; transform: translateY(6px); } }
+
+.barra-superior { position: sticky; top: 0; z-index: 5; background: rgb(236 233 224 / .82); backdrop-filter: saturate(180%) blur(14px); -webkit-backdrop-filter: saturate(180%) blur(14px); }
+
+.boton, .teclado button, .tarjeta-usuario { transition: transform var(--rapido) var(--curva-muelle), background-color var(--normal) ease, box-shadow var(--normal) ease, color var(--normal) ease; -webkit-tap-highlight-color: transparent; }
+.boton:hover { box-shadow: 0 1px 2px rgb(21 25 29 / .08), 0 4px 12px rgb(21 25 29 / .06); }
+.boton.primario:hover { background: #1A4469; }
+.boton:active, .teclado button:active, .tarjeta-usuario:active { transform: scale(.96); transition-duration: 80ms; }
+.menu-entrada { transition: background-color var(--normal) ease, color var(--normal) ease; }
+.pestana { transition: color var(--normal) ease, border-color var(--normal) var(--curva-suave); }
+input, select, textarea { transition: border-color var(--normal) ease, box-shadow var(--normal) ease; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--acero); box-shadow: 0 0 0 4px var(--acero-tinte); }
+.tabla tbody tr { transition: background-color var(--rapido) ease; }
+.tabla tbody tr:hover { background: rgb(21 25 29 / .025); }
+.confirmacion, .aviso { animation: entrar-aviso var(--normal) var(--curva-suave) both; }
+@keyframes entrar-aviso { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
+
+#resultado { transition: opacity var(--normal) ease, transform var(--normal) var(--curva-suave); }
+#resultado.htmx-added { opacity: 0; transform: translateY(4px); }
+.htmx-request ~ #resultado { opacity: .55; }
+
+.tarjeta-usuario { gap: 1rem; }
+.tarjeta-usuario::after { content: "›"; margin-left: auto; color: var(--apagado); font-size: 1.6rem; line-height: 1; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--acero-tinte); color: var(--acero); font: 600 1.1rem var(--condensada); flex: none; }
+.avatar.grande { width: 72px; height: 72px; font-size: 1.8rem; margin: 0 auto .75rem; }
+
+.con-teclado { text-align: center; }
+.con-teclado .campo-pin, .con-teclado .boton-entrar-pin, .con-teclado label[for="clave"] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.puntos-pin { display: none; justify-content: center; gap: 1rem; margin: 1.25rem 0 1.75rem; }
+.con-teclado .puntos-pin { display: flex; }
+.puntos-pin span { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--tinta); transition: background-color var(--rapido) ease, transform var(--rapido) var(--curva-muelle); }
+.puntos-pin span.lleno { background: var(--tinta); transform: scale(1.1); }
+.puntos-pin.agitar { animation: agitar 420ms var(--curva-suave); }
+@keyframes agitar { 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+.con-teclado .teclado { grid-template-columns: repeat(3, 76px); justify-content: center; gap: 1rem 1.5rem; }
+.con-teclado .teclado button { width: 76px; height: 76px; min-height: 0; border-radius: 50%; border: 0; background: rgb(21 25 29 / .07); font: 400 1.9rem var(--sans); }
+.con-teclado .teclado button:active { background: rgb(21 25 29 / .18); }
+.con-teclado .teclado [data-borrar] { background: transparent; font-size: 1.4rem; }
+.con-teclado .teclado .hueco { visibility: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+}

@@ -1,11 +1,34 @@
-document.addEventListener("click", function (evento) {
-  const tecla = evento.target.closest(".teclado button[type=button]");
-  if (!tecla) return;
-  const campo = document.getElementById(tecla.closest(".teclado").dataset.destino);
-  if (tecla.hasAttribute("data-borrar")) {
-    campo.value = campo.value.slice(0, -1);
-  } else if (campo.value.length < 6) {
-    campo.value += tecla.dataset.cifra;
+document.addEventListener("DOMContentLoaded", function () {
+  const teclado = document.querySelector(".teclado[data-destino]");
+  if (!teclado) return;
+  const campo = document.getElementById(teclado.dataset.destino);
+  const formulario = campo.form;
+  const puntos = formulario.querySelectorAll(".puntos-pin span");
+  formulario.classList.add("con-teclado");
+  campo.inputMode = "none";
+
+  function pintar() {
+    puntos.forEach(function (punto, indice) {
+      punto.classList.toggle("lleno", indice < campo.value.length);
+    });
+    if (campo.value.length === 6) {
+      setTimeout(function () { formulario.requestSubmit(); }, 120);
+    }
   }
-  campo.focus();
+
+  teclado.addEventListener("click", function (evento) {
+    const tecla = evento.target.closest("button");
+    if (!tecla) return;
+    if (tecla.hasAttribute("data-borrar")) {
+      campo.value = campo.value.slice(0, -1);
+    } else if (campo.value.length < 6) {
+      campo.value += tecla.dataset.cifra;
+    }
+    pintar();
+  });
+  campo.addEventListener("input", function () {
+    campo.value = campo.value.replace(/\D/g, "").slice(0, 6);
+    pintar();
+  });
+  pintar();
 });
