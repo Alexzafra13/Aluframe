@@ -8,6 +8,13 @@ Instalar o actualizar:
 
 Datos: /var/lib/alumframe (alumframe.db y copias)
 Configuración: /etc/alumframe/alumframe.toml
+Borrar los datos de prueba (solo mientras no haya datos reales; si el registro dice
+«La base de datos es de otra versión de desarrollo»):
+  sudo systemctl stop alumframe
+  sudo find /var/lib/alumframe -mindepth 1 -delete
+  sudo systemctl start alumframe
+  (No uses «sudo rm -rf /var/lib/alumframe/*»: tu usuario no puede leer la carpeta,
+  el * no se expande y no se borra nada.)
 Volver a la versión anterior:
   sudo systemctl stop alumframe
   sudo cp /opt/alumframe/alumframe.anterior /opt/alumframe/alumframe

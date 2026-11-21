@@ -30,7 +30,8 @@ Si el repositorio vuelve a ser privado, `curl` baja un archivo de 9 bytes («Not
  Instala en `/opt/alumframe`, configura en `/etc/alumframe/alumframe.toml`, guarda los datos en `/var/lib/alumframe` y deja el servicio `alumframe` activo al arrancar. Comprueba `http://IP:9090/health`.
 - Actualizar: lo mismo con la versión nueva; la anterior queda en `/opt/alumframe/alumframe.anterior`.
 - Volver atrás: ver `despliegue/linux/LEEME.txt`. (Hasta el primer despliegue real no hay migraciones: ADR-0011.)
-- Registros: `journalctl -u alumframe`.
+- Registros: `journalctl -u alumframe`. El instalador espera a que `/health` responda y, si no arranca, muestra los últimos registros.
+- **Borrar los datos de prueba** (mientras no haya datos reales, si el esquema cambia): `sudo systemctl stop alumframe`, `sudo find /var/lib/alumframe -mindepth 1 -delete` y `sudo systemctl start alumframe`. No sirve `sudo rm -rf /var/lib/alumframe/*`: el `*` lo expande tu usuario, que no puede leer la carpeta, y no se borra nada.
 - **Series:** las de `data/series/` vienen dentro del ejecutable y se cargan solas al arrancar (ADR-0014); no hay que importarlas.
 - **Acceso desde fuera del taller:** con **Tailscale**, sin abrir puertos en el router. En el servidor, `curl -fsSL https://tailscale.com/install.sh | sh`, `sudo tailscale up` y `sudo systemctl enable --now tailscaled`; en el móvil o portátil, la app Tailscale con la misma cuenta, y se abre `http://IP-TAILSCALE:9090` (`tailscale ip -4`). Con `ufw`: `sudo ufw allow in on tailscale0 to any port 9090 proto tcp` y `sudo ufw allow from 192.168.1.0/24 to any port 9090 proto tcp`. No se publica con un proxy inverso: el bloqueo por IP vería todas las peticiones con la IP del proxy.
 

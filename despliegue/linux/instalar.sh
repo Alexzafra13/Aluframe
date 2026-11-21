@@ -32,6 +32,21 @@ install -m 644 "$origen/alumframe.service" /etc/systemd/system/alumframe.service
 systemctl daemon-reload
 systemctl enable --now alumframe
 
+# Se espera a que responda: así un fallo al arrancar se ve aquí y no al abrir el navegador.
+puerto="$(awk -F= '/^puerto/ {gsub(/[ "]/, "", $2); print $2}' /etc/alumframe/alumframe.toml)"
+puerto="${puerto:-9090}"
+if command -v curl >/dev/null 2>&1; then
+  for _ in $(seq 1 20); do
+    curl -fsS "http://127.0.0.1:${puerto}/health" >/dev/null 2>&1 && break
+    sleep 0.5
+  done
+  if ! curl -fsS "http://127.0.0.1:${puerto}/health" >/dev/null 2>&1; then
+    echo "AlumFrame no ha arrancado. Últimos registros:" >&2
+    journalctl -u alumframe -n 5 --no-pager >&2 || true
+    exit 1
+  fi
+fi
+
 ip_local="$(hostname -I 2>/dev/null | awk '{print $1}')"
-echo "AlumFrame instalado. Ábrelo en el navegador: http://${ip_local:-IP-DEL-SERVIDOR}:9090"
+echo "AlumFrame instalado. Ábrelo en el navegador: http://${ip_local:-IP-DEL-SERVIDOR}:${puerto}"
 echo "Estado: systemctl status alumframe   ·   Registros: journalctl -u alumframe"
