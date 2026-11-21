@@ -36,7 +36,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] Verifactu y factura electrónica entre empresas: Hacienda anunció en octubre de 2026 el aplazamiento a octubre de 2028 (sin norma publicada). Confirmar con el gestor cuándo aplica al taller, qué formato y envío se exigirá al facturar a constructoras, y si el programa se ofrecerá a terceros (podría implicar obligaciones como productor de software).
 
 ## Infraestructura
-- [ ] Servidor: mini PC dedicado en el taller; sistema operativo (Windows o Linux); cuándo se incorpora la tablet del operario.
+- [x] Servidor: mini PC con **Linux**; la oficina usa **Windows** por navegador (`docs/CAMBIOS.md`, 2026-11-21). Pendiente: cuándo se incorpora la tablet del operario.
 - [ ] Caducidad de sesión deseada para la oficina y para el operario.
 
 ## Funciones de otros programas del sector (revisión 2026-11-20)

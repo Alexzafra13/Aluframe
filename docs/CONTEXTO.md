@@ -58,7 +58,7 @@ Todo se maneja en cm (un decimal de cm = 1 mm). Redondeo provisional: a 0,1 cm h
 - [ ] Cómo se cobra el material (barra, metro o kilo) y margen habitual.
 - [ ] Tipos de IVA y casos especiales (confirmar con el gestor).
 - [ ] Datos fiscales del taller y logotipo para los PDF; formato de numeración de documentos.
-- [ ] Confirmar el servidor (mini PC en el taller, sistema operativo) y cuándo se incorporará la tablet del operario.
+- [x] Servidor: mini PC con Linux; PC de oficina con Windows (navegador). Pendiente: cuándo llega la tablet.
 - [x] Serie de 4 hojas (en borrador; ruedas y tornillos son supuestos).
 - [x] Dar el visto bueno a ADR-0002 (interfaz generada en el servidor en lugar de React, rusqlite en lugar de SQLx, CSS propio en lugar de Tailwind).
 - [x] Dar el visto bueno al diseño de `design/`.

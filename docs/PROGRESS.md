@@ -17,7 +17,6 @@ Estado: **fase de especificación (versión 1)**. No hay código todavía. Docum
 - Antes de H0: plantillas (Askama o Maud), zona horaria (Europe/Madrid), herramienta de cobertura, formato del archivo de configuración.
 - Antes de H1: dónde viven las series en ejecución (propuesta: base de datos, versionadas).
 - Antes de H3: ADR-0003, PDF automático en el servidor.
-- Antes de H7: envoltorio de servicio en Windows.
 
 ## Registro de decisiones y cambios
 (Se rellena durante la construcción: hecho, decisiones y pendiente de cada hito.)

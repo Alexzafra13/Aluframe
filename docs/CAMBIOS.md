@@ -32,3 +32,11 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - Referencias cruzadas en `SPEC.md`, `CLAUDE.md`, `PROMPT_INICIAL.md`, `PROGRESS.md` y `OPEN_QUESTIONS.md`.
 - Decisiones del propietario (2026-11-21): **ningún dato de cliente es obligatorio**; **las medidas de un trabajo aceptado solo las cambia el propietario** (revisión con motivo, el operario nunca); el operario ve una lista de tarjetas y abre una ventana a pantalla completa; los descuentos que faltan los dará más adelante. Nueva tabla `cambio_ventana_trabajo` y apartado de modificación de trabajos en `docs/BACKEND.md`.
 - Paquete para empezar en Claude Code: `README.md` con los pasos de arranque y `design/prototipos/` con el prototipo de dibujo como referencia.
+
+## 2026-11-21 (inicio de H0)
+- Decisiones del propietario: el **servidor** del taller es **Linux** (servicio systemd) y el **PC de la oficina** es **Windows** (navegador, con acceso directo en modo aplicación). El ejecutable de Windows se usa en modo local para probar o como plan de emergencia.
+- Puerto por defecto: **9090**.
+- Base de datos: **SQLite** (se confirma ADR-0002; PostgreSQL descartado).
+- Primer usuario: **asistente de primer arranque** (solo aparece si no hay usuarios) y comando `alumframe restablecer-contrasena` para recuperar el acceso.
+- Plantillas: **Askama** (ADR-0003).
+- Ya no hace falta el ADR del envoltorio de servicio de Windows.
