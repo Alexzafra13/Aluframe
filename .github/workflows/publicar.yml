@@ -3,12 +3,18 @@ name: Publicar versión
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versión a publicar (por ejemplo v0.1.0)"
+        required: true
 
 permissions:
   contents: write
 
 env:
   CARGO_TERM_COLOR: always
+  VERSION: ${{ inputs.version || github.ref_name }}
 
 jobs:
   linux:
@@ -16,22 +22,28 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Comprobar el número de versión
+        run: '[[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Versión no válida: $VERSION"; exit 1; }'
       - run: sudo apt-get update && sudo apt-get install -y musl-tools
       - run: rustup target add x86_64-unknown-linux-musl
       - run: cargo build --release --locked -p servidor --target x86_64-unknown-linux-musl
       - name: Empaquetar
         run: |
-          carpeta=alumframe-${GITHUB_REF_NAME}-linux-x86_64
+          carpeta=alumframe-${VERSION}-linux-x86_64
           mkdir -p "$carpeta"
           cp target/x86_64-unknown-linux-musl/release/alumframe "$carpeta/"
           cp -r despliegue/linux/. "$carpeta/"
           tar czf "$carpeta.tar.gz" "$carpeta"
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.VERSION }}
+          target_commitish: ${{ github.sha }}
+          name: AlumFrame ${{ env.VERSION }}
           files: alumframe-*.tar.gz
 
   windows:
     name: Windows (modo local)
+    needs: linux
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
@@ -39,11 +51,13 @@ jobs:
       - name: Empaquetar
         shell: pwsh
         run: |
-          $carpeta = "alumframe-$env:GITHUB_REF_NAME-windows-x86_64"
+          $carpeta = "alumframe-$env:VERSION-windows-x86_64"
           New-Item -ItemType Directory $carpeta | Out-Null
           Copy-Item target/release/alumframe.exe $carpeta/
           Copy-Item despliegue/windows/* $carpeta/
           Compress-Archive -Path $carpeta -DestinationPath "$carpeta.zip"
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.VERSION }}
+          target_commitish: ${{ github.sha }}
           files: alumframe-*.zip
