@@ -1,0 +1,35 @@
+[workspace]
+resolver = "3"
+members = ["crates/dominio", "crates/servidor"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97"
+license = "LicenseRef-privado"
+publish = false
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+cognitive_complexity = "warn"
+too_many_lines = "warn"
+too_many_arguments = "warn"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3
