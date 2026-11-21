@@ -47,7 +47,7 @@ El diseño tiene 10 entradas. Propongo **8 para el MVP** y se decide al construi
 | Orden de taller | `/trabajos/{id}/orden` y `/trabajos/{id}/orden/imprimir` | H4 | Una hoja A4 por ventana, como `design/03-hoja-taller.png` |
 | Stock | `/stock` | H5 | Saldos, mínimos, lista de compra sugerida (apartado 9) |
 | Artículo de stock | `/stock/{articulo}` | H5 | Movimientos y retales |
-| Entrada o ajuste de stock | `/stock/movimientos/nuevo` | H5 | Artículo, color, cantidad, longitud si es un retal y motivo |
+| Entrada o ajuste de stock | `/stock/movimientos/nuevo` | H5 | Artículo, color, cantidad, longitud si es un retal y motivo. Sirve también para el inventario inicial de barras y retales al instalar |
 | Catálogo | `/catalogo` | H2 | Pestañas Artículos, Proveedores, Acabados, Tarifas y Series. Fichas en `/catalogo/articulos/{id}`, `/catalogo/proveedores/{id}`, `/catalogo/acabados/{id}`; versiones en `/catalogo/tarifas/{id}` |
 | Importar clientes | `/clientes/importar` | H2 | Asistente en 3 pasos con deshacer |
 | Importar tarifa | `/catalogo/tarifas/importar` | H2 | Asistente en 3 pasos (apartado 10) |

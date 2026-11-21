@@ -66,7 +66,9 @@ Comparado con programas como Productor (Gaia), Cortizo Software, GesFácil, Klae
 - [ ] Cuándo se descuenta el stock: al terminar la orden (como está) o al marcar el paso de corte. Con el trabajo por pasos, descontar al cortar sería más fiel.
 - [ ] ¿Se quiere medir el tiempo por paso o por ventana? De momento no.
 - [ ] Cremona: ¿el lado se mira desde dentro o desde fuera? ¿Cambia alguna pieza (por ejemplo, qué hoja lleva el inversor) según el lado?
-- [ ] Barras de longitud distinta de 640 cm: ¿se compran así o son retales? Cómo se registran en stock y cuándo las usa el optimizador.
+- [x] Barras de longitud distinta de 640 cm (2026-11-21): si alguna serie o marca las vende de otra longitud, se configura en esa serie cuando aparezca. Los retales existentes se registran en el stock al instalar el programa (con su longitud, perfil y color) y el plan de corte los propone antes de abrir barras nuevas (`SPEC.md`, apartado 9 y H5).
+- [ ] Retal mínimo aprovechable: hace falta el dato para saber qué sobrante se guarda como retal (hoy 0, Ajustes > Taller).
+- [ ] Retales: ¿se marcan físicamente (etiqueta, rotulador) para identificarlos al cogerlos, o basta con perfil, color y longitud?
 
 ## Bisagras y dibujo de la abatible
 - [x] Bisagras: 2 por hoja hasta 140 cm de alto de la ventana (140 incluido) y 3 por encima (confirmado 2026-11-21).
