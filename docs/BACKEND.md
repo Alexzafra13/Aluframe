@@ -90,6 +90,7 @@ Orden de cálculo de cada línea: **coste → margen → descuento de línea**. 
 - Aritmética: precio unitario en 1/10 000 €, cantidad en milésimas, producto en `i128` y **un único redondeo** a céntimos (mitad hacia fuera).
 - IVA: cuota por tipo sobre la suma de bases, redondeada una vez **(confirmar con el gestor)**. Estrategia seleccionable (`PorLinea` o `PorDocumento`) para no reescribir si cambia.
 - Pruebas: la suma de las partes siempre coincide con el total; valores límite; casos reales de facturas del taller.
+- **Implementado en H3** (`crates/dominio/src/precio/`): coste = tarifa − descuento de compra (+ recargo del color si el artículo lo lleva); perfiles por barras del plan de corte o por metros cortados + merma, convertidos a la unidad de venta en milésimas; cristal por m² de cada pieza; accesorios por unidad, metro o caja (unidades ÷ unidades por caja). Mano de obra por ventana después del margen (provisional). Precio = (venta + mano de obra) × cantidad − descuento de línea. Cada importe se redondea una vez a céntimos.
 
 ### 5.5 Stock
 - **Libro de movimientos** (entrada, salida, ajuste); el saldo es la suma por artículo. Con unos miles de movimientos, una consulta con índice por artículo es suficiente; no hay saldo duplicado que pueda desincronizarse.
