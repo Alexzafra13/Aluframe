@@ -173,10 +173,15 @@ pub async fn archivar_cliente(
     .await
 }
 
-/// Derecho de supresión (RGPD). Cuando existan presupuestos o facturas (H3, H6) habrá que
-/// anonimizar en lugar de borrar los clientes que los tengan.
+/// Derecho de supresión (RGPD). Con presupuestos no se borra; anonimizar llega con las
+/// facturas (H6), que obligan a conservar los datos fiscales.
 pub async fn borrar_cliente(estado: &EstadoApp, actor: &Actor, id: i64) -> Result<(), ErrorApp> {
     cambiar(estado, actor, "borrar_cliente", move |tx, _| {
+        if crate::bd::consultas::presupuestos::tiene_presupuestos(tx, id)? {
+            return Err(ErrorApp::Validacion(
+                "Este cliente tiene presupuestos y no se puede borrar: archívalo.".into(),
+            ));
+        }
         clientes::borrar(tx, id)?;
         Ok(((), id))
     })

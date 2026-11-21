@@ -156,6 +156,11 @@ pub async fn deshacer_tarifa(
                 "Solo se puede deshacer la última versión de la tarifa de cada proveedor.".into(),
             ));
         }
+        if crate::bd::consultas::presupuestos::tarifa_usada(tx, id)? {
+            return Err(ErrorApp::Validacion(
+                "Esta versión ya se usa en un presupuesto aceptado y no se puede deshacer.".into(),
+            ));
+        }
         tarifas::borrar_vigente(tx, &tarifa)?;
         if let Some(importacion) = tarifa.importacion_id {
             importaciones::marcar_deshecha(tx, importacion, ahora)?;

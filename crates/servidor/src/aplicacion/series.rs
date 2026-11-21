@@ -63,7 +63,7 @@ pub async fn cargar_serie(
 }
 
 /// Lo guardado ya se validó al importar; si ahora no se lee, el programa cambió y hay que saberlo.
-fn reconstruir(version: VersionGuardada) -> Result<SerieGuardada, ErrorApp> {
+pub(crate) fn reconstruir(version: VersionGuardada) -> Result<SerieGuardada, ErrorApp> {
     let fallo = |detalle: String| {
         ErrorApp::Interno(format!(
             "serie {} v{}: {detalle}",

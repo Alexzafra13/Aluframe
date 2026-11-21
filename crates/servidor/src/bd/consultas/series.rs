@@ -62,6 +62,19 @@ pub fn buscar_ultima(con: &Connection, codigo: &str) -> Result<Option<VersionGua
         .optional()?)
 }
 
+/// Una versión concreta: las líneas de presupuesto guardan la versión con la que se calcularon.
+pub fn buscar_version(con: &Connection, id: i64) -> Result<Option<VersionGuardada>, ErrorApp> {
+    Ok(con
+        .query_row(
+            "SELECT v.id, s.codigo, s.fabricante, v.numero, v.estado, v.origen_yaml, v.sha256, \
+             v.avisos, v.creada_en FROM serie_version v JOIN serie s ON s.id = v.serie_id \
+             WHERE v.id = ?1",
+            [id],
+            leer_version,
+        )
+        .optional()?)
+}
+
 pub fn insertar_version(con: &Connection, nueva: &NuevaVersion) -> Result<(i64, i64), ErrorApp> {
     con.execute(
         "INSERT INTO serie (codigo, fabricante, creada_en) VALUES (?1, ?2, ?3) \

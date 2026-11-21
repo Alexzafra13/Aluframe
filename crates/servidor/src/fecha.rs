@@ -22,6 +22,17 @@ pub fn a_hora_de_madrid(instante: OffsetDateTime) -> OffsetDateTime {
     instante.to_offset(desfase)
 }
 
+/// Fecha del día en Madrid como `AAAA-MM-DD`, más los días indicados.
+pub fn fecha_de_madrid(instante: OffsetDateTime, mas_dias: i64) -> String {
+    let fecha = a_hora_de_madrid(instante).date() + time::Duration::days(mas_dias);
+    let formato = format_description!("[year]-[month]-[day]");
+    fecha.format(formato).unwrap_or_default()
+}
+
+pub fn anio_de_madrid(instante: OffsetDateTime) -> i64 {
+    i64::from(a_hora_de_madrid(instante).year())
+}
+
 pub fn formatear_para_pantalla(instante: OffsetDateTime) -> String {
     let formato = format_description!("[day]/[month]/[year] [hour]:[minute]");
     a_hora_de_madrid(instante)

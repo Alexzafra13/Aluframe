@@ -227,3 +227,95 @@ CREATE TABLE tarifa_precio (
 ) STRICT;
 
 CREATE INDEX tarifa_precio_por_articulo ON tarifa_precio (articulo_id);
+
+-- H3: presupuestos (DATOS 7.6). Numeración sin huecos solo para facturas (BACKEND 5.6).
+
+CREATE TABLE secuencia_documentos (
+    serie TEXT NOT NULL CHECK (serie IN ('P', 'T', 'F', 'R', 'A')),
+    anio INTEGER NOT NULL CHECK (anio BETWEEN 2000 AND 9999),
+    ultimo INTEGER NOT NULL CHECK (ultimo >= 0),
+    PRIMARY KEY (serie, anio)
+) STRICT;
+
+CREATE TABLE presupuesto (
+    id INTEGER PRIMARY KEY,
+    anio INTEGER NOT NULL,
+    numero INTEGER NOT NULL CHECK (numero >= 1),
+    cliente_id INTEGER NOT NULL REFERENCES cliente (id) ON DELETE RESTRICT,
+    direccion_montaje_id INTEGER REFERENCES direccion_montaje (id) ON DELETE RESTRICT,
+    estado TEXT NOT NULL DEFAULT 'borrador'
+        CHECK (estado IN ('borrador', 'enviado', 'aceptado', 'rechazado', 'caducado')),
+    validez_hasta TEXT,
+    condiciones TEXT,
+    descuento_bp INTEGER NOT NULL DEFAULT 0 CHECK (descuento_bp BETWEEN 0 AND 10000),
+    enviado_en TEXT,
+    aceptado_en TEXT,
+    copia_json TEXT,
+    copia_sha256 TEXT CHECK (copia_sha256 IS NULL OR length(copia_sha256) = 64),
+    creado_por INTEGER REFERENCES usuario (id) ON DELETE RESTRICT,
+    creado_en TEXT NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    UNIQUE (anio, numero),
+    CHECK ((estado = 'aceptado') = (copia_json IS NOT NULL))
+) STRICT;
+
+CREATE INDEX presupuesto_por_cliente ON presupuesto (cliente_id);
+
+-- Lo aceptado no se toca: la copia congelada es la que vale (DATOS, regla 3).
+CREATE TRIGGER presupuesto_aceptado_no_se_modifica BEFORE UPDATE ON presupuesto
+WHEN OLD.estado = 'aceptado'
+BEGIN
+    SELECT RAISE(ABORT, 'Un presupuesto aceptado no se modifica');
+END;
+
+CREATE TABLE version_presupuesto (
+    id INTEGER PRIMARY KEY,
+    presupuesto_id INTEGER NOT NULL REFERENCES presupuesto (id) ON DELETE RESTRICT,
+    numero_version INTEGER NOT NULL CHECK (numero_version >= 1),
+    motivo TEXT,
+    vigente INTEGER NOT NULL CHECK (vigente IN (0, 1)),
+    base_cent INTEGER NOT NULL DEFAULT 0,
+    iva_cent INTEGER NOT NULL DEFAULT 0,
+    total_cent INTEGER NOT NULL DEFAULT 0,
+    completo INTEGER NOT NULL DEFAULT 0 CHECK (completo IN (0, 1)),
+    creada_en TEXT NOT NULL,
+    UNIQUE (presupuesto_id, numero_version)
+) STRICT;
+
+CREATE UNIQUE INDEX version_vigente_unica ON version_presupuesto (presupuesto_id) WHERE vigente = 1;
+
+CREATE TABLE linea_presupuesto (
+    id INTEGER PRIMARY KEY,
+    version_id INTEGER NOT NULL REFERENCES version_presupuesto (id) ON DELETE RESTRICT,
+    orden INTEGER NOT NULL CHECK (orden >= 1),
+    tipo TEXT NOT NULL CHECK (tipo IN ('ventana', 'libre')),
+    descripcion TEXT NOT NULL,
+    cantidad_mil INTEGER NOT NULL CHECK (cantidad_mil > 0),
+    serie_version_id INTEGER REFERENCES serie_version (id) ON DELETE RESTRICT,
+    tipologia TEXT,
+    ancho_dmm INTEGER CHECK (ancho_dmm IS NULL OR ancho_dmm > 0),
+    alto_dmm INTEGER CHECK (alto_dmm IS NULL OR alto_dmm > 0),
+    acabado_id INTEGER REFERENCES acabado (id) ON DELETE RESTRICT,
+    vidrio_articulo_id INTEGER REFERENCES articulo (id) ON DELETE RESTRICT,
+    opciones_json TEXT NOT NULL DEFAULT '{}',
+    resultado_json TEXT,
+    faltan_json TEXT NOT NULL DEFAULT '[]',
+    incompleta INTEGER NOT NULL CHECK (incompleta IN (0, 1)),
+    revisar_limites INTEGER NOT NULL DEFAULT 0 CHECK (revisar_limites IN (0, 1)),
+    tarifas_json TEXT NOT NULL DEFAULT '[]',
+    coste_cent INTEGER NOT NULL DEFAULT 0,
+    mano_de_obra_cent INTEGER NOT NULL DEFAULT 0,
+    descuento_bp INTEGER NOT NULL DEFAULT 0 CHECK (descuento_bp BETWEEN 0 AND 10000),
+    tipo_iva_bp INTEGER NOT NULL CHECK (tipo_iva_bp BETWEEN 0 AND 10000),
+    precio_unitario_pu INTEGER,
+    precio_cent INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (version_id, orden),
+    CHECK ((tipo = 'ventana') = (serie_version_id IS NOT NULL))
+) STRICT;
+
+-- Tarifas que usa un presupuesto aceptado: esas ya no se pueden deshacer (ADR-0012).
+CREATE TABLE presupuesto_tarifa (
+    presupuesto_id INTEGER NOT NULL REFERENCES presupuesto (id) ON DELETE RESTRICT,
+    tarifa_id INTEGER NOT NULL REFERENCES tarifa (id) ON DELETE RESTRICT,
+    PRIMARY KEY (presupuesto_id, tarifa_id)
+) STRICT;

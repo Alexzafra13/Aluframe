@@ -57,3 +57,8 @@ pub struct DatosDeLinea {
     pub mano_de_obra: Dinero,
     pub descuento: Porcentaje,
 }
+
+/// `importe × (1 + porcentaje)` con un redondeo; para descuentos, porcentaje negativo.
+pub fn aplicar_porcentaje(importe: Dinero, porcentaje: Porcentaje) -> Option<Dinero> {
+    importe::aumentar(importe, porcentaje)
+}
