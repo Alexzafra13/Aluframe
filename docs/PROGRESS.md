@@ -1,12 +1,12 @@
 # Progreso
 
-Estado: **H3 terminado** (2026-11-21). H2 y H3 están en la rama `claude/sesion-h2-inicial-0eu0lb` y **aún no en `main`** (falta el permiso del propietario). Siguiente: **H4, trabajos y orden de taller**.
+Estado: **H3 terminado** (2026-11-21) y publicado como **v0.4.0** en `main` (con H2). Siguiente: **H4, trabajos y orden de taller**.
 
 **Validación con el taller aplazada (decisión del propietario, 2026-11-21).** SPEC pide probar H1–H3 con 5 ventanas reales antes de seguir, pero aún no hay datos para hacerlo (ver «Datos que faltan»). Se sigue con H4, que no depende de ellos, y la validación se hará en cuanto lleguen; si descubre fallos, se corrigen antes de cerrar el hito en curso.
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`; para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
-2. Parte de la rama de trabajo: si H2 y H3 siguen sin estar en `main`, trabaja sobre `claude/sesion-h2-inicial-0eu0lb` (o crea la rama nueva a partir de ella), nunca desde `main`.
+2. Parte de `main` actualizada y trabaja en una rama nueva para H4.
 3. Comprueba que todo está en verde: `just instalar-hooks`, `just check`, `just e2e`. En la nube `just` no está instalado: `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, `cargo test --workspace --locked`, y para los E2E `cargo build --release --locked -p servidor` y luego, en `e2e/`, `npm ci` y `ALUMFRAME_BIN=../target/release/alumframe npx playwright test --trace off`.
 4. Propón el plan de H4 y **espera la aprobación** del propietario antes de escribir código.
 
