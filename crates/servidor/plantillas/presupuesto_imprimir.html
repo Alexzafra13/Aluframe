@@ -26,7 +26,7 @@
     {% if !direccion_montaje.is_empty() %}<div><p class="antetitulo">Dirección de montaje</p><p>{{ direccion_montaje }}</p></div>{% endif %}
   </section>
   <table class="a4-lineas">
-    <thead><tr><th>N.º</th><th>Descripción</th><th class="numero">Cantidad</th><th class="numero">Importe</th></tr></thead>
+    <thead><tr><th>N.º</th><th>Descripción</th><th class="numero">Cantidad</th><th class="numero">Importe sin IVA</th></tr></thead>
     <tbody>
       {% for l in lineas %}
       <tr class="a4-linea">
@@ -41,9 +41,9 @@
   <section class="a4-totales">
     <dl>
       {% if !descuento.is_empty() %}<div><dt>Descuento</dt><dd class="mono">{{ descuento }}</dd></div>{% endif %}
-      <div><dt>Base imponible</dt><dd class="mono">{{ base }}</dd></div>
+      <div><dt>Base imponible (sin IVA)</dt><dd class="mono">{{ base }}</dd></div>
       {% for (tipo, base, cuota) in bases %}<div><dt>IVA {{ tipo }} sobre {{ base }}</dt><dd class="mono">{{ cuota }}</dd></div>{% endfor %}
-      <div class="a4-total"><dt>Total</dt><dd class="mono">{{ total }}</dd></div>
+      <div class="a4-total"><dt>Total con IVA</dt><dd class="mono">{{ total }}</dd></div>
     </dl>
   </section>
   {% if !condiciones.is_empty() %}<section class="a4-condiciones"><p class="antetitulo">Condiciones</p><p class="con-saltos">{{ condiciones }}</p></section>{% endif %}

@@ -58,7 +58,7 @@ async fn el_calculo_en_vivo_devuelve_dibujo_piezas_y_total() {
     let html = texto(respuesta).await;
     assert!(html.contains("<svg class=\"dibujo-ventana\""));
     assert!(html.contains("id=\"piezas\"") && html.contains("hx-swap-oob"));
-    assert!(html.contains("Total línea"));
+    assert!(html.contains("Línea sin IVA"));
     let malo = [
         ("_csrf", csrf.as_str()),
         ("seleccion", "1|corredera_2_hojas_demo"),
@@ -143,6 +143,7 @@ async fn la_hoja_impresa_no_lleva_costes() {
     .await;
     assert!(impreso.contains("P-2026-0001") && impreso.contains("Taller de prueba"));
     assert!(impreso.contains("Provisional"));
+    assert!(impreso.contains("Importe sin IVA") && impreso.contains("Total con IVA"));
     assert!(
         !impreso.contains("Perfiles"),
         "la hoja del cliente no lleva costes"

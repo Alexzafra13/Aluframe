@@ -117,12 +117,12 @@
     <div><dt>Cristal</dt><dd>{{ desglose.cristal }}</dd></div>
     <div><dt>Accesorios</dt><dd>{{ desglose.accesorios }}</dd></div>
     <div><dt>Mano de obra</dt><dd>{{ desglose.mano_de_obra }}</dd></div>
-    <div><dt>Base</dt><dd>{{ base() }}</dd></div>
+    <div><dt>Sin IVA</dt><dd>{{ base() }}</dd></div>
     {% for (tipo, base, cuota) in ivas %}<div><dt>IVA {{ tipo }}</dt><dd title="sobre {{ base }}">{{ cuota }}</dd></div>{% endfor %}
   </dl>
   <div class="pie-total">
     {% if !ficha.presupuesto.completo %}<span class="etiqueta etiqueta-aviso-oscura">Provisional</span>{% endif %}
-    <div><span class="pie-total-titulo">Total</span><span class="pie-total-importe mono">{{ total() }}</span></div>
+    <div><span class="pie-total-titulo">Total con IVA</span><span class="pie-total-importe mono">{{ total() }}</span></div>
   </div>
 </footer>
 {% include "presupuesto_hojas.html" %}

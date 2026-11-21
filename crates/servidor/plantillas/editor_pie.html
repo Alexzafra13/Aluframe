@@ -7,9 +7,9 @@
 </dl>
 <div class="pie-total">
   {% if let Some(f) = c.faltan.first() %}<span class="etiqueta etiqueta-aviso-oscura" title="{{ c.faltan.join(" · ") }}">{{ f }}{% if c.faltan.len() > 1 %} (+{{ c.faltan.len() - 1 }}){% endif %}</span>{% endif %}
-  <div><span class="pie-total-titulo">Total línea</span><span class="pie-total-importe mono">{% if c.completa %}{{ c.precio }}{% else %}<span class="provisional">{{ c.precio }}</span>{% endif %}</span></div>
+  <div><span class="pie-total-titulo">Línea sin IVA</span><span class="pie-total-importe mono">{% if c.completa %}{{ c.precio }}{% else %}<span class="provisional">{{ c.precio }}</span>{% endif %}</span></div>
 </div>
 {% else %}
 <dl class="pie-desglose"><div><dt>Perfiles</dt><dd>—</dd></div><div><dt>Cristal</dt><dd>—</dd></div><div><dt>Accesorios</dt><dd>—</dd></div><div><dt>Mano de obra</dt><dd>—</dd></div></dl>
-<div class="pie-total"><div><span class="pie-total-titulo">Total línea</span><span class="pie-total-importe mono">—</span></div></div>
+<div class="pie-total"><div><span class="pie-total-titulo">Línea sin IVA</span><span class="pie-total-importe mono">—</span></div></div>
 {% endif %}
