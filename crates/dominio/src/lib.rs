@@ -4,4 +4,5 @@
 pub mod acceso;
 pub mod corte;
 pub mod formula;
+pub mod series;
 pub mod unidades;

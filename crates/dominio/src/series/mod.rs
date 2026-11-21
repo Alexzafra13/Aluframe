@@ -1,0 +1,37 @@
+mod calculo;
+mod lector;
+mod leer_partes;
+mod leer_serie;
+mod leer_tipologia;
+mod modelo;
+mod problemas;
+mod resultado;
+mod validacion;
+mod valor;
+
+#[cfg(test)]
+mod pruebas;
+
+pub use calculo::{ErrorCalculo, calcular_ventana};
+pub use modelo::*;
+pub use problemas::{Informe, Problema};
+pub use resultado::{AccesorioCalculado, PiezaCalculada, ResultadoVentana, VidrioCalculado};
+pub use valor::{CONFIRMAR, Dato, Valor};
+
+/// Lee y valida un archivo de serie: con errores no hay serie; los avisos acompañan a la serie.
+pub fn importar_serie(raiz: &Valor) -> Result<(Serie, Informe), Informe> {
+    let mut lector = lector::Lector::new();
+    let serie = leer_serie::leer_cabecera_y_tipologias(&mut lector, raiz);
+    let mut informe = lector.informe;
+    match serie {
+        Some(serie) if !informe.tiene_errores() => {
+            validacion::validar_serie(&serie, &mut informe);
+            if informe.tiene_errores() {
+                Err(informe)
+            } else {
+                Ok((serie, informe))
+            }
+        }
+        _ => Err(informe),
+    }
+}
