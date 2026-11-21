@@ -1,0 +1,84 @@
+{% extends "marco.html" %}
+{% block titulo %}Importar clientes{% endblock %}
+{% block scripts %}<script src="/recursos/js/archivo.js" defer></script>{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Clientes</p>
+  <h1>Importar clientes</h1>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% match previsualizacion %}
+{% when None %}
+<form class="tarjeta" method="post" action="/clientes/importar/revisar">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <p class="texto-apagado">Paso 1 de 3. Elige un archivo CSV (desde Excel: «Guardar como» → CSV) o pega su contenido. Nada se guarda hasta que confirmes.</p>
+  <p class="pequeno">Columnas que se reconocen (todas opcionales, en cualquier orden): <code>{{ plantilla }}</code></p>
+  <label for="archivo">Archivo (.csv)</label>
+  <input id="archivo" type="file" accept=".csv,text/csv" data-volcar-en="texto">
+  <label for="texto">Contenido</label>
+  <textarea id="texto" name="texto" rows="12" class="mono" required>{{ texto }}</textarea>
+  <button class="boton primario" type="submit">Revisar</button>
+</form>
+{% if !importaciones.is_empty() %}
+<section class="tarjeta">
+  <h2>Últimas importaciones</h2>
+  <table class="tabla">
+    <thead><tr><th>Fecha</th><th>Clientes</th><th>Estado</th><th><span class="oculto">Acciones</span></th></tr></thead>
+    <tbody>
+      {% for i in importaciones %}
+      <tr>
+        <td>{{ i.cuando }}</td>
+        <td>{{ i.filas }}</td>
+        <td>{% if i.deshecha %}Deshecha{% else %}Confirmada{% endif %}</td>
+        <td>{% if !i.deshecha %}
+          <form method="post" action="/clientes/importaciones/{{ i.id }}/deshacer">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <button class="boton" type="submit">Deshacer</button>
+          </form>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+{% when Some(vista) %}
+<section class="tarjeta">
+  <p class="texto-apagado">Paso 2 de 3. Revisa lo que se va a importar. Todavía no se ha guardado nada.</p>
+  {% if !vista.errores.is_empty() %}
+  <h3 class="aviso-titulo">{{ vista.errores.len() }} errores: corrige el archivo y vuelve a revisarlo</h3>
+  <ul class="lista-problemas errores">{% for e in vista.errores %}<li>{{ e }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if !vista.avisos.is_empty() %}
+  <details open>
+    <summary>{{ vista.avisos.len() }} avisos (no impiden importar)</summary>
+    <ul class="lista-problemas">{% for a in vista.avisos %}<li>{{ a }}</li>{% endfor %}</ul>
+  </details>
+  {% endif %}
+  {% if !vista.clientes.is_empty() %}
+  <h3>{{ vista.clientes.len() }} clientes nuevos</h3>
+  <table class="tabla">
+    <thead><tr><th>Línea</th><th>Nombre</th><th>NIF</th><th>Teléfono</th><th>Localidad</th></tr></thead>
+    <tbody>
+      {% for c in vista.clientes %}
+      <tr><td class="mono">{{ c.linea }}</td><td>{{ c.nombre }}</td><td class="mono">{{ c.nif }}</td><td class="mono">{{ c.telefono }}</td><td>{{ c.localidad }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  <div class="acciones pie-formulario">
+    <a class="boton" href="/clientes/importar">Elegir otro archivo</a>
+    {% if vista.se_puede_importar() %}
+    <form method="post" action="/clientes/importar">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="sha256" value="{{ vista.sha256 }}">
+      <textarea name="texto" hidden>{{ texto }}</textarea>
+      <button class="boton primario" type="submit">Paso 3: confirmar e importar {{ vista.clientes.len() }} clientes</button>
+    </form>
+    {% else %}
+    <p class="texto-apagado">No se puede importar mientras haya errores.</p>
+    {% endif %}
+  </div>
+</section>
+{% endmatch %}
+{% endblock %}

@@ -3,6 +3,7 @@ pub mod ajustes;
 pub mod clientes;
 pub mod clientes_ficha;
 pub mod clientes_fragmentos;
+pub mod importar_clientes;
 pub mod paginas;
 pub mod primer_arranque;
 pub mod salud;

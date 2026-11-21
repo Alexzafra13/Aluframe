@@ -208,3 +208,36 @@ pub struct PaginaEditarDireccion {
     pub nombre_cliente: String,
     pub direccion: BloqueDireccion,
 }
+
+#[derive(Template)]
+#[template(path = "importar_clientes.html")]
+pub struct PaginaImportarClientes {
+    pub usuario: UsuarioEnPantalla,
+    pub menu: &'static [GrupoMenu],
+    pub seccion: &'static str,
+    pub texto: String,
+    pub previsualizacion: Option<crate::aplicacion::importar_clientes::PrevisualizacionDeClientes>,
+    pub importaciones: Vec<ImportacionEnLista>,
+    pub aviso: Option<String>,
+    pub plantilla: String,
+}
+
+pub struct ImportacionEnLista {
+    pub id: i64,
+    pub cuando: String,
+    pub filas: i64,
+    pub deshecha: bool,
+}
+
+impl From<&crate::bd::consultas::importaciones::FilaImportacion> for ImportacionEnLista {
+    fn from(fila: &crate::bd::consultas::importaciones::FilaImportacion) -> Self {
+        ImportacionEnLista {
+            id: fila.id,
+            cuando: crate::fecha::leer_utc(&fila.importada_en)
+                .map(crate::fecha::formatear_para_pantalla)
+                .unwrap_or_default(),
+            filas: fila.filas,
+            deshecha: fila.estado == "deshecha",
+        }
+    }
+}
