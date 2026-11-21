@@ -31,6 +31,8 @@ pub struct FiltroClientes {
     importados: Option<usize>,
     importacion: Option<i64>,
     aviso: Option<String>,
+    quitados: Option<usize>,
+    conservados: Option<usize>,
 }
 
 pub fn es_htmx(cabeceras: &HeaderMap) -> bool {
@@ -43,7 +45,7 @@ pub async fn mostrar_clientes(
     cabeceras: HeaderMap,
     Query(filtro): Query<FiltroClientes>,
 ) -> Result<Response, ErrorApp> {
-    let texto = filtro.q.unwrap_or_default();
+    let texto = filtro.q.clone().unwrap_or_default();
     let archivados = filtro.archivados.is_some();
     let consulta = ConsultaDeClientes {
         texto: texto.clone(),
@@ -55,12 +57,7 @@ pub async fn mostrar_clientes(
     if es_htmx(&cabeceras) {
         return Ok(renderizar(&FragmentoListaClientes { lista })?.into_response());
     }
-    let confirmacion = match (filtro.importados, filtro.aviso.as_deref()) {
-        (Some(n), _) => Some(format!("Importados {n} clientes.")),
-        (None, Some("borrado")) => Some("Cliente borrado definitivamente.".to_owned()),
-        (None, Some(otro)) => Some(otro.to_owned()),
-        _ => None,
-    };
+    let confirmacion = texto_de_confirmacion(&filtro);
     let pagina = PaginaClientes {
         usuario: (&actor).into(),
         menu: MENU,
@@ -263,4 +260,21 @@ pub async fn procesar_edicion(
         }
         Err(otro) => Err(otro),
     }
+}
+
+fn texto_de_confirmacion(filtro: &FiltroClientes) -> Option<String> {
+    if let Some(n) = filtro.importados {
+        return Some(format!("Importados {n} clientes."));
+    }
+    if let Some(quitados) = filtro.quitados {
+        let mut texto = format!("Importación deshecha: {quitados} clientes quitados.");
+        if let Some(n) = filtro.conservados.filter(|n| *n > 0) {
+            texto.push_str(&format!(
+                " {n} se conservan porque se modificaron después de importarlos."
+            ));
+        }
+        return Some(texto);
+    }
+    (filtro.aviso.as_deref() == Some("borrado"))
+        .then(|| "Cliente borrado definitivamente.".to_owned())
 }

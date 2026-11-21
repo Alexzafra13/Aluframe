@@ -92,25 +92,6 @@ pub async fn deshacer(
     Path(id): Path<i64>,
 ) -> Result<Response, ErrorApp> {
     let (quitados, conservados) = deshacer_importacion_de_clientes(&estado, &actor, id).await?;
-    let mut mensaje = format!("Importación deshecha: {quitados} clientes quitados.");
-    if conservados > 0 {
-        mensaje.push_str(&format!(
-            " {conservados} se conservan porque se modificaron después de importarlos."
-        ));
-    }
-    let destino = format!("/clientes?aviso={}", codificar(&mensaje));
+    let destino = format!("/clientes?quitados={quitados}&conservados={conservados}");
     Ok(Redirect::to(&destino).into_response())
-}
-
-fn codificar(texto: &str) -> String {
-    let mut codificado = String::new();
-    for byte in texto.bytes() {
-        match byte {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' => {
-                codificado.push(char::from(byte))
-            }
-            otro => codificado.push_str(&format!("%{otro:02X}")),
-        }
-    }
-    codificado
 }
