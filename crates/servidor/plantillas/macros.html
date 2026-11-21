@@ -1,0 +1,7 @@
+{% macro campo(nombre, etiqueta, valor, error, extra) %}
+<div class="campo">
+  <label for="{{ nombre }}">{{ etiqueta }}</label>
+  <input id="{{ nombre }}" name="{{ nombre }}" value="{{ valor }}" {{ extra|safe }}{% if error.is_some() %} aria-invalid="true" aria-describedby="{{ nombre }}-error"{% endif %}>
+  {% if let Some(texto) = error %}<p class="error-campo" id="{{ nombre }}-error">{{ texto }}</p>{% endif %}
+</div>
+{% endmacro %}

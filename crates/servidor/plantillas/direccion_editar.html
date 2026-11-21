@@ -1,0 +1,17 @@
+{% extends "marco.html" %}
+{% block titulo %}Editar dirección{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">{{ nombre_cliente }}</p>
+  <h1>Editar dirección de montaje</h1>
+</header>
+{% let bloque = direccion %}{% if bloque.errores.hay() %}<p class="aviso" role="alert">Revisa los campos marcados; no se ha guardado nada.</p>{% endif %}
+<form class="tarjeta" method="post" action="/clientes/{{ cliente_id }}/direcciones/{{ direccion_id }}/editar">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  {% include "direccion_bloque.html" %}
+  <div class="acciones">
+    <a class="boton" href="/clientes/{{ cliente_id }}">Cancelar</a>
+    <button class="boton primario" type="submit">Guardar</button>
+  </div>
+</form>
+{% endblock %}

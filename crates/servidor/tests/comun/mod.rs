@@ -114,3 +114,33 @@ pub fn token_de_la_cookie(cookie: &str) -> String {
     let primer_par = cookie.split(';').next().unwrap();
     primer_par.split_once('=').unwrap().1.to_owned()
 }
+
+/// Codifica pares como un formulario `application/x-www-form-urlencoded`.
+pub fn formulario(pares: &[(&str, &str)]) -> String {
+    pares
+        .iter()
+        .map(|(clave, valor)| format!("{}={}", codificar(clave), codificar(valor)))
+        .collect::<Vec<_>>()
+        .join("&")
+}
+
+pub fn codificar(texto: &str) -> String {
+    let mut codificado = String::new();
+    for byte in texto.bytes() {
+        match byte {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' => {
+                codificado.push(char::from(byte))
+            }
+            otro => codificado.push_str(&format!("%{otro:02X}")),
+        }
+    }
+    codificado
+}
+
+pub fn get_htmx(ruta: &str, token: &str) -> Request<Body> {
+    Request::get(ruta)
+        .header(header::COOKIE, format!("alumframe_sesion={token}"))
+        .header("hx-request", "true")
+        .body(Body::empty())
+        .unwrap()
+}

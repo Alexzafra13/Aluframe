@@ -1,4 +1,5 @@
 use axum::Router;
+use axum::extract::DefaultBodyLimit;
 use axum::middleware::{from_fn, from_fn_with_state};
 use axum::response::{Redirect, Response};
 use axum::routing::{get, post};
@@ -9,14 +10,21 @@ use super::middleware::{
 };
 use super::recursos::servir_recurso;
 use super::rutas::paginas::{SECCIONES_PENDIENTES, mostrar_pendiente};
-use super::rutas::{acceso, ajustes, paginas, primer_arranque, salud, series, taller};
+use super::rutas::{
+    acceso, ajustes, clientes, clientes_ficha, clientes_fragmentos, paginas, primer_arranque,
+    salud, series, taller,
+};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
+
+/// Las importaciones CSV (hasta 2 MB de texto) llegan codificadas como formulario.
+const LIMITE_DE_CUERPO: usize = 8 * 1024 * 1024;
 
 pub fn crear_router(estado: EstadoApp) -> Router {
     let mut router = rutas_de_acceso()
         .merge(rutas_de_ajustes())
         .merge(rutas_de_catalogo())
+        .merge(rutas_de_clientes())
         .route("/", get(paginas::mostrar_inicio))
         .route("/mi-dia", get(paginas::mostrar_mi_dia));
     for seccion in &SECCIONES_PENDIENTES {
@@ -27,6 +35,7 @@ pub fn crear_router(estado: EstadoApp) -> Router {
         router = router.route(seccion.ruta, get(manejador));
     }
     router
+        .layer(DefaultBodyLimit::max(LIMITE_DE_CUERPO))
         .layer(from_fn(proteger_csrf))
         .layer(from_fn_with_state(estado.clone(), cargar_sesion))
         .layer(from_fn_with_state(estado.clone(), exigir_configuracion))
@@ -86,5 +95,43 @@ fn rutas_de_catalogo() -> Router<EstadoApp> {
         .route(
             "/catalogo/series/{codigo}/probar",
             get(series::mostrar_prueba),
+        )
+}
+
+fn rutas_de_clientes() -> Router<EstadoApp> {
+    Router::new()
+        .route("/clientes", get(clientes::mostrar_clientes))
+        .route(
+            "/clientes/nuevo",
+            get(clientes::mostrar_alta).post(clientes::procesar_alta),
+        )
+        .route(
+            "/clientes/comprobar-nif",
+            get(clientes_fragmentos::comprobar_nif),
+        )
+        .route(
+            "/clientes/direccion-en-blanco",
+            get(clientes_fragmentos::direccion_en_blanco),
+        )
+        .route("/clientes/{id}", get(clientes_ficha::mostrar_ficha))
+        .route(
+            "/clientes/{id}/editar",
+            get(clientes::mostrar_edicion).post(clientes::procesar_edicion),
+        )
+        .route("/clientes/{id}/archivar", post(clientes_ficha::archivar))
+        .route("/clientes/{id}/recuperar", post(clientes_ficha::recuperar))
+        .route("/clientes/{id}/borrar", post(clientes_ficha::borrar))
+        .route("/clientes/{id}/exportar", get(clientes_ficha::exportar))
+        .route(
+            "/clientes/{id}/direcciones",
+            post(clientes_ficha::nueva_direccion),
+        )
+        .route(
+            "/clientes/{id}/direcciones/{direccion}/editar",
+            get(clientes_ficha::mostrar_direccion).post(clientes_ficha::guardar_direccion),
+        )
+        .route(
+            "/clientes/{id}/direcciones/{direccion}/quitar",
+            post(clientes_ficha::quitar),
         )
 }

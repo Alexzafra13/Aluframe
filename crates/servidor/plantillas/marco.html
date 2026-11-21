@@ -21,8 +21,10 @@
 </nav>
 <div class="area">
   <header class="barra-superior">
-    <input class="buscador" type="search" placeholder="Buscar cliente, presupuesto o referencia" disabled aria-describedby="aviso-buscador">
-    <span id="aviso-buscador" class="texto-apagado pequeno">La búsqueda llega con los clientes (hito H2)</span>
+    {% if usuario.es_propietario %}<form class="buscador-global" method="get" action="/clientes" role="search">
+      <label class="oculto" for="buscar-global">Buscar cliente</label>
+      <input id="buscar-global" class="buscador" type="search" name="q" placeholder="Buscar cliente por nombre, NIF o teléfono" autocomplete="off">
+    </form>{% endif %}
     <span class="usuario-actual">{{ usuario.nombre }}</span>
   </header>
   <main class="contenido">

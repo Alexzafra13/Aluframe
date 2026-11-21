@@ -1,7 +1,9 @@
+mod clientes;
 mod menu;
 mod paginas;
 mod series;
 
+pub use clientes::*;
 pub use menu::{GrupoMenu, MENU};
 pub use paginas::*;
 pub use series::*;

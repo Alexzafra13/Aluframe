@@ -1,0 +1,32 @@
+{% if lista.filas.is_empty() %}
+<p class="vacio tarjeta">
+  {% if !lista.texto.is_empty() %}Ningún cliente coincide con «{{ lista.texto }}». Prueba con otra parte del nombre o con el teléfono.
+  {% else if lista.archivados %}No hay clientes archivados.
+  {% else %}Aún no hay clientes. Pulsa «Nuevo cliente» (no hace falta rellenar nada) o «Importar clientes» si los tienes en una hoja de cálculo.{% endif %}
+</p>
+{% else %}
+<section class="tarjeta">
+  <p class="texto-apagado pequeno">{{ lista.total }} {% if lista.total == 1 %}cliente{% else %}clientes{% endif %}</p>
+  <table class="tabla">
+    <thead><tr><th>Cliente</th><th>NIF</th><th>Teléfono</th><th>Localidad</th><th>Tipo</th></tr></thead>
+    <tbody>
+      {% for c in lista.filas %}
+      <tr>
+        <td><a href="/clientes/{{ c.id }}"{% if c.sin_nombre %} class="texto-apagado"{% endif %}>{{ c.nombre }}</a></td>
+        <td class="mono">{{ c.nif }}</td>
+        <td class="mono">{{ c.telefono }}</td>
+        <td>{{ c.localidad }}</td>
+        <td>{{ c.tipo }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if lista.paginas > 1 %}
+  <nav class="paginacion" aria-label="Páginas">
+    {% if lista.pagina > 1 %}<a class="boton" href="{{ lista.enlace(&(lista.pagina - 1)) }}">Anterior</a>{% endif %}
+    <span>Página {{ lista.pagina }} de {{ lista.paginas }}</span>
+    {% if lista.pagina < lista.paginas %}<a class="boton" href="{{ lista.enlace(&(lista.pagina + 1)) }}">Siguiente</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endif %}

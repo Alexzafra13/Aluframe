@@ -1,5 +1,6 @@
 mod errores;
 mod extractores;
+mod formulario;
 mod middleware;
 mod recursos;
 mod router;
