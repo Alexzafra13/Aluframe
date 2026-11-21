@@ -250,3 +250,31 @@ async fn la_importacion_por_pantalla_lleva_a_las_tarifas() {
     assert_eq!(tarifa.fecha_tarifa.as_deref(), Some("2026-11-01"));
     assert!(tarifa.nombre.starts_with("Importada el"));
 }
+
+#[tokio::test]
+async fn la_serie_cuenta_las_referencias_que_ya_tienen_articulo() {
+    let (contexto, _, actor) = preparar().await;
+    let estado = contexto.estado.clone().con_datos_demo(true);
+    let ruta = format!(
+        "{}/../../fixtures/demo/serie-demo.yaml",
+        env!("CARGO_MANIFEST_DIR")
+    );
+    let serie = std::fs::read_to_string(ruta).unwrap();
+    servidor::aplicacion::importar_serie::importar_serie(&estado, &actor, serie)
+        .await
+        .unwrap();
+    let ruta = format!(
+        "{}/../../fixtures/demo/tarifa-demo.csv",
+        env!("CARGO_MANIFEST_DIR")
+    );
+    let tarifa = std::fs::read_to_string(ruta).unwrap();
+    let sin = servidor::aplicacion::series::contar_referencias_enlazadas(&estado, &actor)
+        .await
+        .unwrap();
+    assert_eq!(sin.values().next(), Some(&(0, 8)));
+    importar(&contexto, &actor, &tarifa).await;
+    let con = servidor::aplicacion::series::contar_referencias_enlazadas(&estado, &actor)
+        .await
+        .unwrap();
+    assert_eq!(con.values().next(), Some(&(8, 8)));
+}

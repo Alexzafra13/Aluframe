@@ -7,7 +7,9 @@ use serde::Deserialize;
 
 use crate::aplicacion::Actor;
 use crate::aplicacion::importar_serie::{importar_serie, previsualizar_serie};
-use crate::aplicacion::series::{cargar_serie, leer_medida, listar_series, probar_ventana};
+use crate::aplicacion::series::{
+    cargar_serie, contar_referencias_enlazadas, leer_medida, listar_series, probar_ventana,
+};
 use crate::aplicacion::taller::{AjustesDeTaller, leer_ajustes_de_taller};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -43,6 +45,15 @@ pub async fn mostrar_series(
     Query(importada): Query<Importada>,
 ) -> Result<Response, ErrorApp> {
     let series = listar_series(&estado, &actor).await?;
+    let enlazadas = contar_referencias_enlazadas(&estado, &actor).await?;
+    let filas = series.iter().map(|s| {
+        let mut fila = FilaSerie::from(s);
+        fila.referencias = match enlazadas.get(&fila.codigo) {
+            Some((con_articulo, total)) => format!("{con_articulo} de {total}"),
+            None => "ninguna conocida".to_owned(),
+        };
+        fila
+    });
     let confirmacion = importada.importada.map(|codigo| {
         format!(
             "Serie {codigo} importada como versión {}.",
@@ -53,7 +64,7 @@ pub async fn mostrar_series(
         usuario: (&actor).into(),
         menu: MENU,
         seccion: SECCION,
-        series: series.iter().map(FilaSerie::from).collect(),
+        series: filas.collect(),
         confirmacion,
     };
     Ok(renderizar(&pagina)?.into_response())

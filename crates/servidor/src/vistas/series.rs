@@ -13,6 +13,7 @@ pub struct FilaSerie {
     pub version: i64,
     pub avisos: i64,
     pub tipologias: String,
+    pub referencias: String,
 }
 
 impl From<&SerieGuardada> for FilaSerie {
@@ -30,6 +31,7 @@ impl From<&SerieGuardada> for FilaSerie {
                 .map(|t| t.nombre.as_str())
                 .collect::<Vec<_>>()
                 .join(", "),
+            referencias: String::new(),
         }
     }
 }

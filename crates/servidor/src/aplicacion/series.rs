@@ -39,6 +39,15 @@ pub async fn listar_series(
     versiones.into_iter().map(reconstruir).collect()
 }
 
+/// Cuántas referencias de cada serie tienen ya artículo (y por tanto precio posible en H3).
+pub async fn contar_referencias_enlazadas(
+    estado: &EstadoApp,
+    actor: &Actor,
+) -> Result<std::collections::BTreeMap<String, (i64, i64)>, ErrorApp> {
+    autorizar(actor, Accion::GestionarCatalogo)?;
+    estado.bd.leer(series::contar_referencias_enlazadas).await
+}
+
 pub async fn cargar_serie(
     estado: &EstadoApp,
     actor: &Actor,

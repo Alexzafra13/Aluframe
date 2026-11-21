@@ -113,3 +113,22 @@ pub fn insertar_referencias(
     }
     Ok(())
 }
+
+/// Por serie (última versión): referencias con artículo en el catálogo y referencias conocidas.
+/// Las que siguen en `CONFIRMAR` no cuentan como conocidas.
+pub fn contar_referencias_enlazadas(
+    con: &Connection,
+) -> Result<BTreeMap<String, (i64, i64)>, ErrorApp> {
+    let mut consulta = con.prepare(
+        "SELECT s.codigo, \
+         count(DISTINCT CASE WHEN EXISTS (SELECT 1 FROM articulo a WHERE a.archivado = 0 \
+           AND a.referencia = r.referencia_texto) THEN r.codigo END), \
+         count(DISTINCT r.codigo) \
+         FROM serie s JOIN serie_version v ON v.serie_id = s.id \
+         JOIN serie_referencia r ON r.serie_version_id = v.id \
+         WHERE v.numero = (SELECT max(numero) FROM serie_version WHERE serie_id = s.id) \
+         AND r.referencia_texto <> ?1 GROUP BY s.codigo",
+    )?;
+    let filas = consulta.query_map([CONFIRMAR], |f| Ok((f.get(0)?, (f.get(1)?, f.get(2)?))))?;
+    Ok(filas.collect::<Result<_, _>>()?)
+}
