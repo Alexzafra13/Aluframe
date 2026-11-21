@@ -1,6 +1,6 @@
 # Progreso
 
-Estado: **H1 terminado** (2026-11-21), publicado como v0.2.0. Siguiente: **H2, catálogo, clientes e importación de tarifas**.
+Estado: **H1 terminado** (2026-11-21), publicado como v0.3.0. Siguiente: **H2, catálogo, clientes e importación de tarifas**.
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`; para H2, además `SPEC.md` (H2), `docs/DATOS.md` (7.3 y 7.4) y `docs/PANTALLAS.md` (5 y 10).
