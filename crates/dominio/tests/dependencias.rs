@@ -16,6 +16,9 @@ fn el_dominio_solo_depende_de_serde_y_thiserror() {
         .collect();
     assert!(!nombres.is_empty());
     for nombre in nombres {
-        assert!(PERMITIDAS.contains(&nombre), "dependencia no permitida: {nombre}");
+        assert!(
+            PERMITIDAS.contains(&nombre),
+            "dependencia no permitida: {nombre}"
+        );
     }
 }

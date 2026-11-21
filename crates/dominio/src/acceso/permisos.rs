@@ -32,7 +32,10 @@ mod tests {
     #[test]
     fn el_operario_solo_ve_su_dia() {
         assert!(puede_realizar(Rol::Operario, Accion::VerMiDia));
-        assert!(!puede_realizar(Rol::Operario, Accion::VerPanelDelPropietario));
+        assert!(!puede_realizar(
+            Rol::Operario,
+            Accion::VerPanelDelPropietario
+        ));
         assert!(!puede_realizar(Rol::Operario, Accion::GestionarUsuarios));
     }
 }
