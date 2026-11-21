@@ -34,7 +34,12 @@ impl From<UsuarioVisible> for OpcionUsuario {
     fn from(usuario: UsuarioVisible) -> Self {
         OpcionUsuario {
             id: usuario.id,
-            inicial: usuario.nombre.chars().next().map(|c| c.to_uppercase().collect()).unwrap_or_default(),
+            inicial: usuario
+                .nombre
+                .chars()
+                .next()
+                .map(|c| c.to_uppercase().collect())
+                .unwrap_or_default(),
             nombre: usuario.nombre,
             rol: match usuario.rol {
                 Rol::Propietario => "Propietario",
