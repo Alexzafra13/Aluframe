@@ -230,3 +230,7 @@ legend { font-family: var(--condensada); font-weight: 600; font-size: 1.05rem; p
 .tabla input { min-height: 40px; }
 .cifra-subida { color: var(--aviso); }
 .cifra-bajada { color: var(--acero); }
+.resumen-importacion { list-style: none; padding: 0; display: flex; gap: 1.5rem; flex-wrap: wrap; margin: 0 0 1rem; }
+.fila-aviso { background: var(--aviso-fondo); }
+.ajuste-precios { margin-bottom: 1rem; }
+.campo-precio { width: 8.5rem; text-align: right; font-family: var(--mono); }

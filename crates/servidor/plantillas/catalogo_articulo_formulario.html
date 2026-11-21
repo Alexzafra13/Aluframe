@@ -1,0 +1,74 @@
+{% extends "marco.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}{% if id.is_some() %}{{ valores.referencia }}{% else %}Nuevo artículo{% endif %}{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Catálogo · Artículo</p>
+  <h1>{% if id.is_some() %}{{ valores.referencia }}{% else %}Nuevo artículo{% endif %}</h1>
+</header>
+{% let pestana = "Artículos" %}{% include "pestanas_catalogo.html" %}
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if errores.hay() %}<p class="aviso" role="alert">Revisa los campos marcados; no se ha guardado nada.</p>{% endif %}
+{% if proveedores.is_empty() && id.is_none() %}
+<p class="vacio tarjeta">Primero da de alta un proveedor en la pestaña Proveedores.</p>
+{% else %}
+<form class="tarjeta" method="post" action="{% if let Some(n) = id %}/catalogo/articulos/{{ n }}{% else %}/catalogo/articulos/nuevo{% endif %}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="version" value="{{ version }}">
+  <div class="rejilla-campos">
+    <div class="campo">
+      <label for="proveedor">Proveedor</label>
+      <select id="proveedor" name="proveedor"{% if id.is_some() %} disabled{% endif %} required>
+        {% for p in proveedores %}<option value="{{ p.valor }}"{% if p.valor == proveedor_elegido %} selected{% endif %}>{{ p.texto }}</option>{% endfor %}
+      </select>
+      {% if let Some(e) = errores.de("proveedor") %}<p class="error-campo">{{ e }}</p>{% endif %}
+    </div>
+    {% call m::campo("referencia", "Referencia del proveedor", valores.referencia, errores.de("referencia"), "required maxlength=\"60\" autocomplete=\"off\"") %}{% endcall %}
+    {% call m::campo("descripcion", "Descripción", valores.descripcion, errores.de("descripcion"), "required maxlength=\"200\"") %}{% endcall %}
+    <div class="campo">
+      <label for="tipo">Tipo</label>
+      <select id="tipo" name="tipo">
+        {% for t in tipos %}<option value="{{ t.valor }}"{% if t.valor == valores.tipo %} selected{% endif %}>{{ t.texto }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="campo">
+      <label for="unidad">Se vende por</label>
+      <select id="unidad" name="unidad">
+        {% for u in unidades %}<option value="{{ u.valor }}"{% if u.valor == valores.unidad %} selected{% endif %}>{{ u.texto }}</option>{% endfor %}
+      </select>
+      {% if let Some(e) = errores.de("unidad") %}<p class="error-campo">{{ e }}</p>{% endif %}
+    </div>
+    {% call m::campo("longitud_barra_cm", "Longitud de barra (cm, solo si se vende por barras)", valores.longitud_barra_cm, errores.de("longitud_barra_cm"), "inputmode=\"decimal\"") %}{% endcall %}
+    {% call m::campo("unidades_por_caja", "Unidades por caja (solo cajas)", valores.unidades_por_caja, errores.de("unidades_por_caja"), "inputmode=\"numeric\"") %}{% endcall %}
+    {% call m::campo("stock_minimo", "Stock mínimo (aviso)", valores.stock_minimo, errores.de("stock_minimo"), "inputmode=\"decimal\"") %}{% endcall %}
+  </div>
+  <label class="casilla"><input type="checkbox" name="con_acabado" value="1"{% if valores.con_acabado %} checked{% endif %}> Se compra en varios colores (lleva recargo de acabado)</label>
+  <div class="acciones pie-formulario">
+    <a class="boton" href="/catalogo/articulos">Volver</a>
+    <button class="boton primario" type="submit">Guardar</button>
+  </div>
+</form>
+{% if let Some(n) = id %}
+<section class="tarjeta">
+  <h2>Histórico de precios</h2>
+  {% if historial.is_empty() %}
+  <p class="vacio">Sin precio todavía: importa una tarifa de su proveedor o escríbelo en la lista de artículos.</p>
+  {% else %}
+  <table class="tabla">
+    <thead><tr><th>Tarifa</th><th>Desde</th><th>Origen</th><th>Precio (blanco)</th></tr></thead>
+    <tbody>
+      {% for h in historial %}
+      <tr><td>{{ h.tarifa }}{% if h.vigente %} <span class="etiqueta etiqueta-azul">vigente</span>{% endif %}</td><td>{{ h.fecha }}</td><td>{{ h.origen }}</td><td class="numero">{{ h.precio }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+<form class="tarjeta" method="post" action="/catalogo/articulos/{{ n }}/{% if archivado %}recuperar{% else %}archivar{% endif %}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <p class="texto-apagado">{% if archivado %}Este artículo está archivado.{% else %}Archivar lo oculta de la lista; los precios y documentos que lo usan se conservan.{% endif %}</p>
+  <button class="boton" type="submit">{% if archivado %}Recuperar{% else %}Archivar{% endif %}</button>
+</form>
+{% endif %}
+{% endif %}
+{% endblock %}

@@ -1,11 +1,15 @@
 pub mod acceso;
 pub mod ajustes;
+pub mod catalogo_articulos;
+pub mod catalogo_fichas;
 pub mod clientes;
 pub mod clientes_ficha;
 pub mod clientes_fragmentos;
 pub mod importar_clientes;
 pub mod paginas;
+pub mod precios;
 pub mod primer_arranque;
 pub mod salud;
 pub mod series;
 pub mod taller;
+pub mod tarifas;

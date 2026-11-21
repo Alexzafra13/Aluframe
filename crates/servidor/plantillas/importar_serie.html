@@ -6,7 +6,7 @@
   <p class="antetitulo">Catálogo · Series</p>
   <h1>Importar serie</h1>
 </header>
-{% include "pestanas_catalogo.html" %}
+{% let pestana = "Series" %}{% include "pestanas_catalogo.html" %}
 {% match previsualizacion %}
 {% when None %}
 <form class="tarjeta" method="post" action="/catalogo/series/importar/revisar">

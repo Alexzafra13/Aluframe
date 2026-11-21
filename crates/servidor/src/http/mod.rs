@@ -4,6 +4,7 @@ mod formulario;
 mod middleware;
 mod recursos;
 mod router;
+mod router_catalogo;
 mod router_clientes;
 mod rutas;
 

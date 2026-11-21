@@ -1,0 +1,5 @@
+<div class="formulario-en-linea">
+  {% call m::campo("nombre", "Nombre (Blanco, Lacado RAL 7016…)", valores.nombre, errores.de("nombre"), "required maxlength=\"60\" autocomplete=\"off\"") %}{% endcall %}
+  {% call m::campo("recargo", "Recargo sobre el blanco (%)", valores.recargo, errores.de("recargo"), "inputmode=\"decimal\"") %}{% endcall %}
+  <label class="casilla"><input type="checkbox" name="es_base" value="1"{% if valores.es_base %} checked{% endif %}> Es el acabado base (precio de tarifa)</label>
+</div>

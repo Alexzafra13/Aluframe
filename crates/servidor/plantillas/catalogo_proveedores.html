@@ -1,0 +1,41 @@
+{% extends "marco.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}Proveedores{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Catálogo</p>
+  <h1>Proveedores</h1>
+</header>
+{% let pestana = "Proveedores" %}{% include "pestanas_catalogo.html" %}
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+<details class="tarjeta"{% if errores.hay() || aviso.is_some() || proveedores.is_empty() %} open{% endif %}>
+  <summary>+ Nuevo proveedor</summary>
+  <form method="post" action="/catalogo/proveedores">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    {% include "campos_proveedor.html" %}
+    <button class="boton primario" type="submit">Guardar proveedor</button>
+  </form>
+</details>
+{% if proveedores.is_empty() %}
+<p class="vacio tarjeta">Aún no hay proveedores. Da de alta el primero (por ejemplo, quien te vende los perfiles) para poder importar su tarifa.</p>
+{% else %}
+<section class="tarjeta">
+  <table class="tabla">
+    <thead><tr><th>Proveedor</th><th>NIF</th><th>Descuento habitual</th><th>Artículos</th><th>Estado</th><th><span class="oculto">Acciones</span></th></tr></thead>
+    <tbody>
+      {% for p in proveedores %}
+      <tr>
+        <td>{{ p.nombre }}</td>
+        <td class="mono">{% if let Some(n) = p.nif %}{{ n }}{% endif %}</td>
+        <td class="numero">{{ crate::vistas::porcentaje(*p.descuento_habitual_bp) }}</td>
+        <td><a href="/catalogo/articulos?proveedor={{ p.id }}">{{ p.articulos }}</a></td>
+        <td>{% if p.archivado %}<span class="etiqueta etiqueta-aviso">archivado</span>{% else %}activo{% endif %}</td>
+        <td><a class="boton" href="/catalogo/proveedores/{{ p.id }}">Editar</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+{% endblock %}

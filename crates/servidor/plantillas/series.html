@@ -8,7 +8,7 @@
   </div>
   <a class="boton primario" href="/catalogo/series/importar">Importar serie</a>
 </header>
-{% include "pestanas_catalogo.html" %}
+{% let pestana = "Series" %}{% include "pestanas_catalogo.html" %}
 {% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
 {% if series.is_empty() %}
 <p class="vacio tarjeta">Aún no hay series. Pulsa «Importar serie» y elige el archivo YAML de una serie, por ejemplo <code>aluprom-21.yaml</code>.</p>

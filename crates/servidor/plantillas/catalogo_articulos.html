@@ -1,0 +1,71 @@
+{% extends "marco.html" %}
+{% block titulo %}Artículos{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-con-acciones">
+  <div>
+    <p class="antetitulo">Catálogo</p>
+    <h1>Artículos</h1>
+  </div>
+  <div class="acciones">
+    <a class="boton" href="/catalogo/tarifas/importar">Importar tarifa</a>
+    <a class="boton primario" href="/catalogo/articulos/nuevo{% if !proveedor_elegido.is_empty() %}?proveedor={{ proveedor_elegido }}{% endif %}">Nuevo artículo</a>
+  </div>
+</header>
+{% let pestana = "Artículos" %}{% include "pestanas_catalogo.html" %}
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="confirmacion" role="status">{{ texto }}</p>{% endif %}
+<form class="tarjeta formulario-en-linea" method="get" action="/catalogo/articulos" role="search">
+  <label>Proveedor
+    <select name="proveedor">
+      <option value="">Todos</option>
+      {% for p in proveedores %}<option value="{{ p.valor }}"{% if p.valor == proveedor_elegido %} selected{% endif %}>{{ p.texto }}</option>{% endfor %}
+    </select>
+  </label>
+  <label class="crece">Referencia o descripción <input type="search" name="q" value="{{ texto }}" autocomplete="off"></label>
+  <label class="casilla"><input type="checkbox" name="archivados" value="1"{% if archivados %} checked{% endif %}> Ver archivados</label>
+  <button class="boton" type="submit">Filtrar</button>
+</form>
+{% if articulos.is_empty() %}
+<p class="vacio tarjeta">
+  {% if proveedores.is_empty() %}Aún no hay proveedores: da de alta uno en la pestaña Proveedores y después importa su tarifa.
+  {% else if !texto.is_empty() || !proveedor_elegido.is_empty() || archivados %}Ningún artículo coincide con el filtro.
+  {% else %}Aún no hay artículos. Importa la tarifa de un proveedor o crea un artículo a mano.{% endif %}
+</p>
+{% else %}
+{% let editable = !proveedor_elegido.is_empty() && !archivados %}
+<section class="tarjeta">
+  {% if editable %}
+  <p class="texto-apagado pequeno">Cambia los precios en la tabla y pulsa «Guardar precios», o marca artículos y súbelos o bájalos un porcentaje. Cada cambio crea una versión nueva de la tarifa que se puede deshacer.</p>
+  <form id="precios" method="post" action="/catalogo/articulos/precios">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="proveedor" value="{{ proveedor_elegido }}">
+  </form>
+  <form id="ajuste" class="formulario-en-linea ajuste-precios" method="post" action="/catalogo/articulos/ajuste">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="proveedor" value="{{ proveedor_elegido }}">
+    <label>Porcentaje a aplicar a los marcados (−5 baja, 5 sube) <input name="porcentaje" inputmode="decimal" required></label>
+    <button class="boton" type="submit">Aplicar a los marcados</button>
+  </form>
+  {% else %}
+  <p class="texto-apagado pequeno">Elige un proveedor en el filtro para editar sus precios.</p>
+  {% endif %}
+  <table class="tabla">
+    <thead><tr>{% if editable %}<th><span class="oculto">Marcar</span></th>{% endif %}<th>Referencia</th><th>Descripción</th><th>Proveedor</th><th>Tipo</th><th>Unidad</th><th>Precio (blanco)</th></tr></thead>
+    <tbody>
+      {% for a in articulos %}
+      <tr>
+        {% if editable %}<td><label class="casilla"><input type="checkbox" form="ajuste" name="sel_{{ a.id }}" value="1"><span class="oculto">Marcar {{ a.referencia }}</span></label></td>{% endif %}
+        <td class="mono"><a href="/catalogo/articulos/{{ a.id }}">{{ a.referencia }}</a></td>
+        <td>{{ a.descripcion }}</td>
+        <td>{{ a.proveedor }}</td>
+        <td>{{ a.tipo }}</td>
+        <td>{{ a.unidad }}{% if !a.barra.is_empty() %} <span class="texto-apagado">({{ a.barra }})</span>{% endif %}</td>
+        <td class="numero">{% if editable %}<label><span class="oculto">Precio de {{ a.referencia }}</span><input class="campo-precio" form="precios" name="precio_{{ a.id }}" value="{{ a.precio_en_campo }}" inputmode="decimal" size="9"></label>{% else if a.precio.is_empty() %}<span class="texto-apagado">sin precio</span>{% else %}{{ a.precio }}{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if editable %}<div class="acciones pie-formulario"><button class="boton primario" type="submit" form="precios">Guardar precios</button></div>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

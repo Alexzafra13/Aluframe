@@ -4,6 +4,7 @@ use dominio::clientes::DatosDeCliente;
 use dominio::nif::Nif;
 use rusqlite::{Connection, OptionalExtension, Row, params};
 
+use super::escapar_like;
 use crate::errores::ErrorApp;
 
 /// Un cliente tal como está guardado; los textos ya vienen validados del dominio.
@@ -82,13 +83,6 @@ pub fn listar(con: &Connection, pagina: &Pagina) -> Result<(Vec<FilaCliente>, i6
         leer_fila,
     )?;
     Ok((filas.collect::<Result<_, _>>()?, total))
-}
-
-fn escapar_like(texto: &str) -> String {
-    texto
-        .replace('\\', "\\\\")
-        .replace('%', "\\%")
-        .replace('_', "\\_")
 }
 
 pub fn buscar(con: &Connection, id: i64) -> Result<Option<FilaCliente>, ErrorApp> {

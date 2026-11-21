@@ -1,12 +1,16 @@
+mod catalogo;
 mod clientes;
 mod menu;
 mod paginas;
 mod series;
+mod tarifas;
 
+pub use catalogo::*;
 pub use clientes::*;
 pub use menu::{GrupoMenu, MENU};
 pub use paginas::*;
 pub use series::*;
+pub use tarifas::*;
 
 use askama::Template;
 use axum::response::Html;
