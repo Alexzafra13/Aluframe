@@ -1,0 +1,34 @@
+# Registro de cambios (versión 1)
+
+La documentación se mantiene en versión 1 hasta que el propietario declare la versión definitiva. Aquí se anotan los cambios relevantes, sin renumerar.
+
+## Hasta 2026-11-19
+- Stack: Rust completo (ADR-0001, aceptado).
+- Criterios por requisito técnico y no por popularidad; interfaz generada en el servidor con HTMX, CSS propio y rusqlite (ADR-0002, aceptado).
+- Diseño de referencia aprobado (`design/`).
+- Nombres del código, variables de fórmulas, claves de datos y roles pasan al español sin tildes.
+- `docs/BACKEND.md` (algoritmos, organización de archivos, reglas de estilo, concurrencia, copias y seguridad).
+- Corrección de incoherencias: algoritmo de cortes unificado (Best Fit Decreasing) y estados de aprobación.
+- Configuración de permisos de Claude Code y prompts de arranque.
+
+## 2026-11-20
+- Las series y la interfaz pasan a **cm** (un decimal de cm = 1 mm); por dentro se mantienen las décimas de mm. Redondeo provisional: a 0,1 cm hacia abajo (antes, 0,1 mm hacia arriba). El diseño de `design/` muestra las medidas en mm: hay que pasarlas a cm al escribir `docs/design.md`.
+- `data/series/aluprom-21.yaml` convertido a cm. Fabricante: Aluval. Nueva tipología `corredera_4_hojas` en borrador (hoja de rodamiento `(ancho − 3) / 4`, el doble de piezas, 2 kits; ruedas y tornillos como supuesto).
+- Nueva serie `data/series/sopena-v94.yaml`: ventana europea abatible de 2 hojas (Sopena V-94), cortes a 45°, en borrador.
+- Fixtures: el de la corredera de 2 hojas pasa a cm (`aluprom21-corredera2-150x120.json`), con el kit de corredera que faltaba y `incompleto: true`; fixtures nuevos de la corredera de 4 hojas (303 × 120) y de la abatible (120 × 140). Todos `validado: false`.
+- Decididos: las series se añaden como datos (no con código); recargo por color como porcentaje sobre el blanco; cada cliente tiene una o varias direcciones de montaje en su ficha.
+- Correcciones de la revisión: `.gitignore` (excepción para las bases de prueba de migraciones, sin `web/dist/`, con salidas de Playwright), `MAINTENANCE.md` (Node solo para E2E), hook previo al push versionado y `just db-migrate` en H0, criterios de PDF alineados con el MVP (impresión A4; PDF automático tras ADR-0003 antes de H3), numeración sin huecos solo para facturas, ADR pendientes de zona horaria y servicio de Windows, y factura electrónica entre empresas junto a Verifactu.
+- Nuevo: modos de ejecución local y servidor (`docs/BACKEND.md`, apartado 14); datos ficticios en `fixtures/demo/`; direcciones de montaje en la ficha del cliente y recargo por color en `SPEC.md`; lista ampliada de lo que queda fuera del MVP.
+- Prototipo clicable de la pantalla de presupuesto con las tres tipologías (no forma parte del código final) y lista de funciones a decidir tras comparar con otros programas del sector (`OPEN_QUESTIONS.md`).
+- Prioridad del MVP aclarada: clientes, presupuestos, trabajos asignados a operarios con marcado de pasos (en curso o hecho), orden de taller. Pedidos a proveedor, aplazados. Opciones de línea (lado de la cremona) en `SPEC.md`; el prototipo ya dibuja la cremona.
+- Evaluador de fórmulas: se añade `si(condición, entonces, si_no)` para cantidades que dependen de la medida (bisagras de la abatible: 2 por hoja hasta 140 cm de alto, 3 por encima). El prototipo dibuja las bisagras y las suma a los accesorios.
+- Nuevo `docs/DATOS.md`: modelo de datos en lenguaje llano y tabla de campos por hito. Pendiente `docs/FORMATO_SERIES.md` y `docs/PANTALLAS.md`.
+
+## 2026-11-21
+- Nuevo `docs/PANTALLAS.md`: organización de la interfaz por tareas (Vender, Taller, Cobrar), pantallas y rutas del propietario y del operario, el Inicio como tablero de trabajos con su panel de atención, permisos, reglas generales y pantallas por hito. Propone un menú de 8 entradas en lugar de 10.
+- Nuevo `docs/FORMATO_SERIES.md`: formato de los archivos de series (cabecera, parámetros, referencias, piezas, vidrio, accesorios, opciones de línea, dibujo, límites), validaciones al importar y versiones.
+- Las series (`aluprom-21.yaml`, `sopena-v94.yaml` y la demo) pasan al formato nuevo: `fabricante`, `proveedor`, tabla `referencias` (enlace con la tarifa), `dibujo` y, en la abatible, la opción `lado_cremona`. El vidrio de la demo usa el formato definitivo.
+- `docs/DATOS.md`: `serie_referencia` sustituye a `serie_perfil`; `vidrio_pieza_serie`; `dibujo_json` y límites en `tipologia`; `cristal_recibido` en `ventana_trabajo`; `enviado_en` en `presupuesto`.
+- Referencias cruzadas en `SPEC.md`, `CLAUDE.md`, `PROMPT_INICIAL.md`, `PROGRESS.md` y `OPEN_QUESTIONS.md`.
+- Decisiones del propietario (2026-11-21): **ningún dato de cliente es obligatorio**; **las medidas de un trabajo aceptado solo las cambia el propietario** (revisión con motivo, el operario nunca); el operario ve una lista de tarjetas y abre una ventana a pantalla completa; los descuentos que faltan los dará más adelante. Nueva tabla `cambio_ventana_trabajo` y apartado de modificación de trabajos en `docs/BACKEND.md`.
+- Paquete para empezar en Claude Code: `README.md` con los pasos de arranque y `design/prototipos/` con el prototipo de dibujo como referencia.

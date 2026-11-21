@@ -1,0 +1,69 @@
+# Serie Aluprom 21 (fabricante: Aluval): BORRADOR con datos aportados por el usuario.
+# Lo marcado con CONFIRMAR debe validarse con una ventana real antes de usarlo para precios.
+# Lo marcado como "supuesto" lo ha deducido el usuario por lógica y no está contrastado.
+# No inventar valores.
+
+serie: ALUPROM_21
+fabricante: ALUVAL
+proveedor: CONFIRMAR                          # quién vende estos perfiles al taller (distribuidor): por confirmar
+estado: borrador
+unidades: cm                                   # el usuario trabaja en cm; un decimal de cm = 1 mm
+redondeo: { precision: 0.1, sentido: abajo }   # provisional: a 0,1 cm (1 mm) hacia abajo; revisar con ventanas reales
+longitud_barra: 640                            # barras nuevas de 6,40 m (confirmado por el usuario)
+
+parametros:
+  descuento_marco_horizontal: 4.1  # marco superior e inferior = ancho - 4,1
+  descuento_hoja_vertical: 5.3     # hoja de cierre y hoja central = alto - 5,3
+  descuento_hoja_horizontal: 2     # corredera de 2 hojas: hoja de rodamiento = ancho / 2 - 2
+  descuento_hoja_4_hojas: 3        # corredera de 4 hojas: hoja de rodamiento = (ancho - 3) / 4
+
+# Qué referencia del proveedor corresponde a cada código de este archivo. Mientras una referencia esté en CONFIRMAR,
+# las piezas se calculan igualmente pero la línea no tiene precio final. Se rellenan al importar la tarifa real.
+referencias:
+  MARCO_LATERAL:    { referencia: CONFIRMAR }
+  MARCO_SUPERIOR:   { referencia: CONFIRMAR }
+  MARCO_INFERIOR:   { referencia: CONFIRMAR }
+  HOJA_CIERRE:      { referencia: CONFIRMAR }
+  HOJA_CENTRAL:     { referencia: CONFIRMAR }
+  HOJA_RODAMIENTO:  { referencia: CONFIRMAR }
+  KIT_CORREDERA:    { referencia: CONFIRMAR }
+  RUEDA_CORREDERA:  { referencia: CONFIRMAR }
+  TORNILLO_4_8x25:  { referencia: CONFIRMAR }
+
+tipologias:
+  corredera_2_hojas:
+    nombre: "Ventana corredera 2 hojas"
+    dibujo: { tipo: corredera, hojas: 2, hoja_movil: derecha }   # hoja móvil: dato por confirmar
+    piezas:
+      - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
+      - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
+      - { perfil: MARCO_INFERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
+      - { perfil: HOJA_CIERRE,     cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90 }
+      - { perfil: HOJA_CENTRAL,    cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90 }
+      - { perfil: HOJA_RODAMIENTO, cantidad: 4, longitud: "ancho / 2 - descuento_hoja_horizontal",   corte: 90 }
+    vidrio:
+      estado: CONFIRMAR            # faltan las fórmulas de ancho y alto del cristal (el usuario las dará cuando sepa el descuento)
+    accesorios:
+      - { articulo: KIT_CORREDERA,   cantidad: 1 }                  # kit de accesorios de montaje; un único artículo
+      - { articulo: RUEDA_CORREDERA, cantidad: 4 }
+      - { articulo: TORNILLO_4_8x25, cantidad: 9, aplica_a: marco }
+      - { articulo: TORNILLO_4_8x25, cantidad: 8, aplica_a: hojas } # 8 en total para las dos hojas
+
+  corredera_4_hojas:
+    nombre: "Ventana corredera 4 hojas"
+    dibujo: { tipo: corredera, hojas: 4 }
+    estado: borrador               # igual que la de 2 hojas salvo la hoja de rodamiento y las cantidades (el doble de hojas)
+    piezas:
+      - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
+      - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
+      - { perfil: MARCO_INFERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
+      - { perfil: HOJA_CIERRE,     cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90 }  # el doble que en la de 2 hojas
+      - { perfil: HOJA_CENTRAL,    cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90 }  # el doble que en la de 2 hojas
+      - { perfil: HOJA_RODAMIENTO, cantidad: 8, longitud: "(ancho - descuento_hoja_4_hojas) / 4",    corte: 90 }  # el doble; primero se resta y luego se divide
+    vidrio:
+      estado: CONFIRMAR            # el usuario dará la medida cuando sepa el descuento
+    accesorios:
+      - { articulo: KIT_CORREDERA,   cantidad: 2 }                  # confirmado por el usuario: 2 kits iguales
+      - { articulo: RUEDA_CORREDERA, cantidad: 8 }                  # supuesto: el doble que en la de 2 hojas
+      - { articulo: TORNILLO_4_8x25, cantidad: 9,  aplica_a: marco }  # supuesto: el marco no cambia
+      - { articulo: TORNILLO_4_8x25, cantidad: 16, aplica_a: hojas }  # supuesto: el doble que en la de 2 hojas

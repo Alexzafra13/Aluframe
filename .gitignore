@@ -1,0 +1,22 @@
+# Rust
+/target/
+**/*.rs.bk
+# Base de datos y copias locales
+*.db
+*.db-wal
+*.db-shm
+!tests/bases_de_datos/*.db
+/backups/
+# E2E (Playwright)
+node_modules/
+e2e/test-results/
+e2e/playwright-report/
+# Entorno y secretos
+.env
+.env.*
+# Sistema
+.DS_Store
+Thumbs.db
+# Claude Code (personal)
+.claude/settings.local.json
+CLAUDE.local.md

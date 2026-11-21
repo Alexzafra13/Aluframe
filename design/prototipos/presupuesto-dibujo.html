@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AlumFrame · prototipo</title>
+<style>
+:root{--bg:#f1eee6;--card:#fbf9f4;--tx:#1b2330;--mu:#5f6877;--pr:#1f4e79;--ac:#e8742a;--ok:#2d7a4b;--wa:#9a4b12;--wab:#fbe6d4;--ln:#d9d4c7;--gl:#d7e6f3;--fr:#aab2bd;
+box-sizing:border-box;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--card:#1b212b;--tx:#e8ebf0;--mu:#9aa3b2;--pr:#7fb2e5;--ac:#f0954f;--ok:#6cc58d;--wa:#f0b27a;--wab:#3a2a1c;--ln:#2e3644;--gl:#2a3f55;--fr:#5b6676}}
+:root[data-theme="dark"]{--bg:#12161c;--card:#1b212b;--tx:#e8ebf0;--mu:#9aa3b2;--pr:#7fb2e5;--ac:#f0954f;--ok:#6cc58d;--wa:#f0b27a;--wab:#3a2a1c;--ln:#2e3644;--gl:#2a3f55;--fr:#5b6676}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:14px}h1{font-size:19px;margin:4px 0 2px}h2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);margin:0 0 8px}
+.sub{color:var(--mu);font-size:13px;margin:0 0 12px}.card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:12px;margin-bottom:12px}
+label{display:block;font-size:12px;color:var(--mu);margin-bottom:3px}select,input{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:9px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g1{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:14px}th{font-size:11px;color:var(--mu);text-align:left;font-weight:600;padding:4px 6px;border-bottom:1px solid var(--ln)}td{padding:6px;border-bottom:1px solid var(--ln)}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.wrap{overflow-x:auto}.tag{display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;background:var(--wab);color:var(--wa);margin:2px 4px 2px 0}.tag.ok{background:transparent;color:var(--ok);border:1px solid var(--ok)}
+.pend{color:var(--wa)}.err{color:#c0392b;font-size:13px;margin-top:6px}svg{width:100%;height:auto;max-height:260px;display:block}svg text{fill:var(--mu);font-size:11px}
+.nota{font-size:12px;color:var(--mu);margin-top:8px}
+</style></head><body><main>
+<h1>AlumFrame · prototipo</h1>
+<p class="sub">Fórmulas en borrador, sin validar con ventanas reales. Medidas en cm; redondeo a 0,1 cm hacia abajo.</p>
+<div class="card"><h2>Presupuesto · línea de ventana</h2><div class="g">
+<div class="g1"><label for="s">Serie y tipología</label><select id="s"><option value="c2">Aluprom 21 · Corredera 2 hojas</option><option value="c4">Aluprom 21 · Corredera 4 hojas (borrador)</option><option value="ab">Sopena V-94 · Europea abatible 2 hojas (borrador)</option></select></div>
+<div><label for="a">Ancho (cm)</label><input id="a" type="number" inputmode="decimal" step="0.1" min="1" value="150"></div>
+<div><label for="h">Alto (cm)</label><input id="h" type="number" inputmode="decimal" step="0.1" min="1" value="120"></div><div id="crw" class="g1" style="display:none"><label for="cr">Cremona (vista desde dentro)</label><select id="cr"><option value="d">En la hoja derecha</option><option value="i">En la hoja izquierda</option></select></div></div>
+<div id="est" style="margin-top:10px"></div><div id="err" class="err"></div></div>
+<div class="card"><h2>Dibujo</h2><div id="dib"></div></div>
+<div class="card"><h2>Hoja de corte · piezas</h2><div class="wrap"><table id="pz"></table></div><div id="inv" class="nota"></div></div>
+<div class="card"><h2>Accesorios</h2><div class="wrap"><table id="ac"></table></div></div>
+<div class="card"><h2>Barras necesarias (Best Fit Decreasing)</h2><div class="g"><div><label for="b">Longitud de barra (cm)</label><input id="b" type="number" step="1" min="1"></div><div><label for="w">Grosor de sierra (cm)</label><input id="w" type="number" step="0.1" min="0" value="0"></div></div>
+<div class="wrap" style="margin-top:8px"><table id="br"></table></div><div class="nota">Agrupado por perfil tal como está en los datos. Grosor de sierra y si marcos y hojas comparten barra: pendientes de confirmar.</div></div>
+</main><script>
+const fl=x=>Math.floor(x*10+1e-9)/10,f=n=>n.toLocaleString('es-ES',{maximumFractionDigits:2});
+const S={
+c2:{h:2,k:'c',B:640,p:[['MARCO_LATERAL',2,(a,h)=>h,90],['MARCO_SUPERIOR',1,a=>a-4.1,90],['MARCO_INFERIOR',1,a=>a-4.1,90],['HOJA_CIERRE',2,(a,h)=>h-5.3,90],['HOJA_CENTRAL',2,(a,h)=>h-5.3,90],['HOJA_RODAMIENTO',4,a=>a/2-2,90]],
+ ac:[['Kit de corredera',1],['Rueda de corredera',4],['Tornillo 4,8×25 (marco)',9],['Tornillo 4,8×25 (hojas)',8]],pe:['Cristal: falta el descuento']},
+c4:{h:4,k:'c',B:640,p:[['MARCO_LATERAL',2,(a,h)=>h,90],['MARCO_SUPERIOR',1,a=>a-4.1,90],['MARCO_INFERIOR',1,a=>a-4.1,90],['HOJA_CIERRE',4,(a,h)=>h-5.3,90],['HOJA_CENTRAL',4,(a,h)=>h-5.3,90],['HOJA_RODAMIENTO',8,a=>(a-3)/4,90]],
+ ac:[['Kit de corredera',2],['Rueda de corredera (supuesto)',8],['Tornillo 4,8×25 marco (supuesto)',9],['Tornillo 4,8×25 hojas (supuesto)',16]],pe:['Cristal: falta el descuento','Ruedas y tornillos: supuestos']},
+ab:{h:2,k:'a',B:null,p:[['MARCO_LATERAL',2,(a,h)=>h,45],['MARCO_SUPERIOR',1,a=>a,45],['MARCO_INFERIOR',1,a=>a,45],['HOJA_ALTO',4,(a,h)=>h-4.1,45],['HOJA_ANCHO',4,a=>(a-4.85)/2,45]],inv:(a,h)=>h-10.3,
+ ac:[['Escuadra (marco)',4],['Escuadra (hojas)',8],['Cremona',1],['Kit 2 hojas',1],['Pletina de falleba','pendiente']],pe:['Cristal: falta el descuento','Inversor: cantidad y ángulo','Pletinas de falleba','Tipos de escuadra','Longitud de barra de la serie']}};
+const $=i=>document.getElementById(i);let last='';
+function dib(t,a,h){const k=Math.min(280/a,190/h),W=a*k,H=h*k,x=20,y=8,m=7,n=t.h;let o=`<svg viewBox="0 0 ${W+40} ${H+34}" role="img" aria-label="Esquema de la ventana"><rect x="${x}" y="${y}" width="${W}" height="${H}" fill="var(--fr)" stroke="var(--mu)"/>`;
+const sw=(W-2*m)/n;for(let i=0;i<n;i++){const sx=x+m+i*sw;o+=`<rect x="${sx+2}" y="${y+m}" width="${sw-4}" height="${H-2*m}" fill="var(--gl)" stroke="var(--mu)"/>`;
+if(t.k==='a'){const nb=h>140?3:2,l=i===0,ex=l?sx+sw-2:sx+2,hx=l?sx+2:sx+sw-2,my=y+H/2;o+=`<path d="M${ex} ${y+m} L${hx} ${my} L${ex} ${y+H-m}" fill="none" stroke="var(--ac)" stroke-dasharray="4 3"/>`;(nb===3?[.15,.5,.85]:[.15,.85]).forEach(p=>{o+=`<rect x="${hx-2}" y="${y+H*p-7}" width="4" height="14" rx="1" fill="var(--tx)"/>`});if((i===0)===($('cr').value==='i'))o+=`<rect x="${ex-3}" y="${my-10}" width="5" height="20" rx="2" fill="var(--ac)"/>`}}
+if(t.k==='c'){const ay=y+H/2;o+=`<path d="M${x+W*.55} ${ay} h${W*.25} m-8 -5 l8 5 l-8 5" fill="none" stroke="var(--ac)" stroke-width="2"/>`}
+return o+`<text x="${x+W/2}" y="${H+y+20}" text-anchor="middle">${f(a)} cm</text><text transform="translate(12 ${y+H/2}) rotate(-90)" text-anchor="middle">${f(h)} cm</text></svg>`}
+function bfd(l,B,s){const r=[];l.slice().sort((x,y)=>y-x).forEach(x=>{let b=null;r.forEach(q=>{if(q.l>=x+s-1e-9&&(!b||q.l<b.l))b=q});if(!b){b={l:B,c:[]};r.push(b)}b.l-=x+s;b.c.push(x)});return r}
+function run(){const t=S[$('s').value],a=parseFloat($('a').value),h=parseFloat($('h').value);$('err').textContent='';
+if($('s').value+'|'!==last){last=$('s').value+'|';$('b').value=t.B||''}
+if(!(a>0&&h>0)){$('err').textContent='Introduce un ancho y un alto mayores que cero.';return}
+const P=t.p.map(([n,q,fn,c])=>({n,q,c,L:fl(fn(a,h))}));if(P.some(p=>p.L<=0)){$('err').textContent='Medidas demasiado pequeñas: alguna pieza sale con longitud cero o negativa.';return}
+$('est').innerHTML=t.pe.map(x=>`<span class="tag">${x}</span>`).join('')+`<span class="tag">Incompleta: no admite precio final</span>`;
+$('crw').style.display=t.k==='a'?'block':'none';$('dib').innerHTML=dib(t,a,h);
+$('pz').innerHTML='<tr><th>Pieza</th><th class="n">Cant.</th><th class="n">Longitud (cm)</th><th class="n">Corte</th></tr>'+P.map(p=>`<tr><td>${p.n}</td><td class="n">${p.q}</td><td class="n">${f(p.L)}</td><td class="n">${p.c}°</td></tr>`).join('');
+$('inv').innerHTML=t.inv?`Inversor: longitud ${f(fl(t.inv(a,h)))} cm. <span class="pend">Faltan cantidad y ángulo de corte.</span>`:'';
+$('ac').innerHTML='<tr><th>Artículo</th><th class="n">Cant.</th></tr>'+t.ac.concat(t.k==='a'?[['Bisagras ('+(h>140?3:2)+' por hoja; ¿van en el kit?)',2*(h>140?3:2)]]:[]).map(([n,q])=>`<tr><td>${n==='Cremona'?'Cremona · hoja '+($('cr').value==='i'?'izquierda':'derecha'):n}</td><td class="n ${q==='pendiente'?'pend':''}">${q}</td></tr>`).join('');
+const B=parseFloat($('b').value),s=parseFloat($('w').value)||0;
+if(!(B>0)){$('br').innerHTML='<tr><td class="pend">Indica la longitud de barra (la de esta serie está pendiente).</td></tr>';return}
+const g={};P.forEach(p=>{(g[p.n]=g[p.n]||[]).push(...Array(p.q).fill(p.L))});let tb=0,rows='',bad='';
+for(const n in g){if(g[n].some(x=>x>B)){bad=n;continue}const r=bfd(g[n],B,s),sob=r.reduce((u,q)=>u+q.l,0);tb+=r.length;rows+=`<tr><td>${n}</td><td class="n">${r.length}</td><td class="n">${f(sob)}</td></tr>`}
+$('br').innerHTML='<tr><th>Perfil</th><th class="n">Barras</th><th class="n">Sobrante (cm)</th></tr>'+rows+`<tr><td><b>Total</b></td><td class="n"><b>${tb}</b></td><td></td></tr>`+(bad?`<tr><td colspan="3" class="pend">${bad}: una pieza supera la barra.</td></tr>`:'')}
+['s','a','h','b','w','cr'].forEach(i=>$(i).addEventListener('input',run));run();
+</script></body></html>

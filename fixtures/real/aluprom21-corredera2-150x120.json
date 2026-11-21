@@ -1,0 +1,25 @@
+{
+  "id": "aluprom21-corredera2-150x120",
+  "validado": false,
+  "nota": "Valores derivados de las fórmulas dadas por el usuario para ancho=150 cm y alto=120 cm. Pendiente de contrastar con una hoja de corte real del taller antes de marcar validado=true.",
+  "serie": "ALUPROM_21",
+  "tipologia": "corredera_2_hojas",
+  "entrada": { "ancho": 150, "alto": 120, "unidad": "cm" },
+  "esperado": {
+    "incompleto": true,
+    "piezas": [
+      { "perfil": "MARCO_LATERAL",   "cantidad": 2, "longitud": 120,   "corte": 90 },
+      { "perfil": "MARCO_SUPERIOR",  "cantidad": 1, "longitud": 145.9, "corte": 90 },
+      { "perfil": "MARCO_INFERIOR",  "cantidad": 1, "longitud": 145.9, "corte": 90 },
+      { "perfil": "HOJA_CIERRE",     "cantidad": 2, "longitud": 114.7, "corte": 90 },
+      { "perfil": "HOJA_CENTRAL",    "cantidad": 2, "longitud": 114.7, "corte": 90 },
+      { "perfil": "HOJA_RODAMIENTO", "cantidad": 4, "longitud": 73,    "corte": 90 }
+    ],
+    "accesorios": [
+      { "articulo": "KIT_CORREDERA",   "cantidad": 1 },
+      { "articulo": "RUEDA_CORREDERA", "cantidad": 4 },
+      { "articulo": "TORNILLO_4_8x25", "cantidad": 17 }
+    ],
+    "vidrio": null
+  }
+}

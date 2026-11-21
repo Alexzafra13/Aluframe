@@ -1,0 +1,31 @@
+{
+  "id": "sopena-v94-abatible2-120x140",
+  "validado": false,
+  "nota": "Valores derivados de las fórmulas del usuario para ancho=120 cm y alto=140 cm. La hoja de ancho sale (120 - 4,85) / 2 = 57,575 y se redondea a 57,5 con la regla provisional (0,1 cm hacia abajo). Pendiente de contrastar con una hoja de corte real.",
+  "serie": "SOPENA_V94",
+  "tipologia": "europea_abatible_2_hojas",
+  "entrada": { "ancho": 120, "alto": 140, "unidad": "cm" },
+  "esperado": {
+    "incompleto": true,
+    "piezas": [
+      { "perfil": "MARCO_LATERAL",  "cantidad": 2, "longitud": 140,   "corte": 45 },
+      { "perfil": "MARCO_SUPERIOR", "cantidad": 1, "longitud": 120,   "corte": 45 },
+      { "perfil": "MARCO_INFERIOR", "cantidad": 1, "longitud": 120,   "corte": 45 },
+      { "perfil": "HOJA_ALTO",      "cantidad": 4, "longitud": 135.9, "corte": 45 },
+      { "perfil": "HOJA_ANCHO",     "cantidad": 4, "longitud": 57.5,  "corte": 45 }
+    ],
+    "accesorios": [
+      { "articulo": "ESCUADRA",    "cantidad": 12 },
+      { "articulo": "CREMONA",     "cantidad": 1 },
+      { "articulo": "KIT_2_HOJAS", "cantidad": 1 }
+    ],
+    "vidrio": null,
+    "pendiente": [
+      "INVERSOR: longitud 129,7 cm (alto - 10,3); faltan cantidad y ángulo de corte",
+      "PLETINA_FALLEBA: falta el cálculo",
+      "Vidrio: falta el descuento",
+      "BISAGRA: 2 por hoja hasta 140 cm de alto y 3 por encima (4 en total con este alto); falta saber si van dentro del kit",
+      "Escuadras: falta concretar los tipos"
+    ]
+  }
+}

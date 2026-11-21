@@ -1,0 +1,9 @@
+referencia,descripción,unidad,precio_tarifa,longitud_barra
+DEMO_MARCO_LATERAL,DEMO perfil marco lateral (ficticio),barra,20.00,600
+DEMO_MARCO_SUPERIOR,DEMO perfil marco superior (ficticio),barra,20.00,600
+DEMO_MARCO_INFERIOR,DEMO perfil marco inferior (ficticio),barra,22.00,600
+DEMO_HOJA_VERTICAL,DEMO perfil hoja vertical (ficticio),barra,18.00,600
+DEMO_HOJA_HORIZONTAL,DEMO perfil hoja horizontal (ficticio),barra,18.00,600
+DEMO_VIDRIO_4MM,DEMO vidrio 4 mm (ficticio),m2,15.00,
+DEMO_KIT,DEMO kit de corredera (ficticio),unidad,9.00,
+DEMO_RUEDA,DEMO rueda (ficticio),unidad,1.50,

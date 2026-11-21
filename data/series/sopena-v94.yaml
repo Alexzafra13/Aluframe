@@ -1,0 +1,57 @@
+# Serie V-94 (fabricante: Sopena): ventana europea abatible. BORRADOR con datos aportados por el usuario.
+# Lo marcado con CONFIRMAR debe validarse con una ventana real antes de usarlo para precios.
+# No inventar valores. Las referencias reales de perfil y accesorios se añadirán con la tarifa.
+
+serie: SOPENA_V94
+fabricante: SOPENA
+proveedor: CONFIRMAR                          # quién vende estos perfiles al taller (distribuidor): por confirmar
+estado: borrador
+unidades: cm                                   # el usuario trabaja en cm; un decimal de cm = 1 mm
+redondeo: { precision: 0.1, sentido: abajo }   # provisional: a 0,1 cm (1 mm) hacia abajo; revisar con ventanas reales
+longitud_barra: CONFIRMAR                      # falta la longitud de barra de esta serie
+
+parametros:
+  descuento_hoja_alto: 4.1         # alto de la hoja = alto - 4,1
+  descuento_hoja_ancho: 4.85       # ancho de la hoja = (ancho - 4,85) / 2
+  descuento_inversor: 10.3         # inversor = alto - 10,3
+
+# Qué referencia del proveedor corresponde a cada código de este archivo (ver docs/FORMATO_SERIES.md).
+referencias:
+  MARCO_LATERAL:    { referencia: CONFIRMAR }   # pendiente: ¿los tres lados del marco son el mismo perfil?
+  MARCO_SUPERIOR:   { referencia: CONFIRMAR }
+  MARCO_INFERIOR:   { referencia: CONFIRMAR }
+  HOJA_ALTO:        { referencia: CONFIRMAR }
+  HOJA_ANCHO:       { referencia: CONFIRMAR }
+  INVERSOR:         { referencia: CONFIRMAR }
+  ESCUADRA:         { referencia: CONFIRMAR }   # pendiente: en el catálogo hay escuadra exterior e interior de hoja
+  CREMONA:          { referencia: CONFIRMAR }
+  BISAGRA:          { referencia: CONFIRMAR }
+  KIT_2_HOJAS:      { referencia: CONFIRMAR }
+  PLETINA_FALLEBA:  { referencia: CONFIRMAR }
+
+tipologias:
+  europea_abatible_2_hojas:
+    nombre: "Ventana europea abatible 2 hojas"
+    estado: borrador
+    opciones:
+      - { codigo: lado_cremona, nombre: "Hoja de la cremona (vista desde dentro)", valores: [izquierda, derecha], por_defecto: derecha }
+    dibujo: { tipo: abatible, hojas: 2, bisagras: BISAGRA, cremona: lado_cremona }   # bisagras por hoja = cantidad de BISAGRA / hojas
+    piezas:
+      # El marco mide ancho x alto, sin descuento. Cortes a 45° (confirmado por el usuario para esta ventana).
+      # Pendiente: ¿marco lateral, superior e inferior son el mismo perfil?
+      - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                  corte: 45 }
+      - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho",                                 corte: 45 }
+      - { perfil: MARCO_INFERIOR,  cantidad: 1, longitud: "ancho",                                 corte: 45 }
+      - { perfil: HOJA_ALTO,       cantidad: 4, longitud: "alto - descuento_hoja_alto",            corte: 45 }  # 2 hojas x 2 lados
+      - { perfil: HOJA_ANCHO,      cantidad: 4, longitud: "(ancho - descuento_hoja_ancho) / 2",    corte: 45 }  # 2 hojas x 2 lados
+      - { perfil: INVERSOR,        cantidad: CONFIRMAR, longitud: "alto - descuento_inversor",    corte: CONFIRMAR }
+    vidrio:
+      estado: CONFIRMAR            # el usuario dará la medida cuando sepa el descuento
+    accesorios:
+      # Pendiente: tipos de escuadra (en catálogos de Sopena hay escuadra exterior e interior de hoja).
+      - { articulo: ESCUADRA,        cantidad: 4, aplica_a: marco }   # 4 para el marco
+      - { articulo: ESCUADRA,        cantidad: 8, aplica_a: hojas }   # 4 por hoja, 2 hojas
+      - { articulo: CREMONA,         cantidad: 1 }                    # cierre; la hoja (izquierda o derecha) es opción de línea
+      - { articulo: BISAGRA,         cantidad: "2 * si(alto > 140, 3, 2)", aplica_a: hojas }  # 2 por hoja hasta 140 cm de alto, 3 por encima; CONFIRMAR si van dentro del KIT_2_HOJAS
+      - { articulo: KIT_2_HOJAS,     cantidad: 1 }
+      - { articulo: PLETINA_FALLEBA, cantidad: CONFIRMAR }            # el usuario dará el cálculo
