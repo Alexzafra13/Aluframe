@@ -8,7 +8,7 @@ proveedor: CONFIRMAR                          # quién vende estos perfiles al t
 estado: borrador
 unidades: cm                                   # el usuario trabaja en cm; un decimal de cm = 1 mm
 redondeo: { precision: 0.1, sentido: abajo }   # provisional: a 0,1 cm (1 mm) hacia abajo; revisar con ventanas reales
-longitud_barra: CONFIRMAR                      # falta la longitud de barra de esta serie
+longitud_barra: 640                            # barras de 6,40 m (confirmado por el usuario el 2026-11-21)
 
 parametros:
   descuento_hoja_alto: 4.1         # alto de la hoja = alto - 4,1
