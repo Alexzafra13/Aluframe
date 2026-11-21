@@ -9,7 +9,8 @@ use crate::aplicacion::{Actor, sesion};
 use crate::autenticacion::{leer_cookie_de_sesion, tokens_iguales};
 use crate::estado::EstadoApp;
 
-const LIMITE_DE_FORMULARIO: usize = 256 * 1024;
+/// Una tarifa CSV de 2 MB codificada en un formulario puede triplicar su tamaño.
+const LIMITE_DE_FORMULARIO: usize = 8 * 1024 * 1024;
 const RUTAS_SIN_CONFIGURAR: [&str; 3] = ["/primer-arranque", "/health", "/recursos/"];
 
 pub async fn exigir_configuracion(
