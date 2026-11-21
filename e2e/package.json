@@ -1,0 +1,11 @@
+{
+  "name": "alumframe-e2e",
+  "private": true,
+  "description": "Pruebas de extremo a extremo de AlumFrame (solo desarrollo)",
+  "scripts": {
+    "test": "playwright test --trace off"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}
