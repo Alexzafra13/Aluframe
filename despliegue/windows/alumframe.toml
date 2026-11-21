@@ -1,0 +1,3 @@
+modo = "local"
+puerto = 9090
+carpeta_datos = "datos"

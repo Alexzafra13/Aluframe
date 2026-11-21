@@ -1,0 +1,16 @@
+AlumFrame para el servidor del taller (Linux)
+
+Instalar o actualizar:
+  1. Copia esta carpeta al servidor y entra en ella.
+  2. Ejecuta: sudo ./instalar.sh
+  3. Abre en el navegador de la oficina: http://IP-DEL-SERVIDOR:9090
+     La primera vez aparece el asistente para crear la cuenta del propietario.
+
+Datos: /var/lib/alumframe (alumframe.db y copias)
+Configuración: /etc/alumframe/alumframe.toml
+Volver a la versión anterior:
+  sudo systemctl stop alumframe
+  sudo cp /opt/alumframe/alumframe.anterior /opt/alumframe/alumframe
+  sudo systemctl start alumframe
+Contraseña del propietario olvidada:
+  sudo -u alumframe ALUMFRAME_CONFIG=/etc/alumframe/alumframe.toml /opt/alumframe/alumframe restablecer-contrasena "Nombre"

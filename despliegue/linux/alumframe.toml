@@ -1,0 +1,3 @@
+modo = "servidor"
+puerto = 9090
+carpeta_datos = "/var/lib/alumframe"
