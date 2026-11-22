@@ -1,0 +1,30 @@
+{% extends "marco.html" %}
+{% block titulo %}Importar datos{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Ajustes · Datos</p>
+  <h1>Importar datos</h1>
+</header>
+{% include "pestanas_ajustes.html" %}
+<section class="tarjeta">
+  <p class="texto-apagado">Revisa qué hay ahora y qué trae la copia. Al confirmar, <strong>los datos de ahora se sustituyen por los de la copia</strong>; antes se guarda una copia de lo que hay en la carpeta de copias.</p>
+  <table class="tabla">
+    <thead><tr><th scope="col"></th><th scope="col">Ahora</th><th scope="col">En la copia</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Clientes</th><td class="mono">{{ actual.clientes }}</td><td class="mono">{{ archivo.clientes }}</td></tr>
+      <tr><th scope="row">Presupuestos</th><td class="mono">{{ actual.presupuestos }}</td><td class="mono">{{ archivo.presupuestos }}</td></tr>
+      <tr><th scope="row">Usuarios</th><td class="mono">{{ actual.usuarios }}</td><td class="mono">{{ archivo.usuarios }}</td></tr>
+      <tr><th scope="row">Series</th><td class="mono">{{ actual.series }}</td><td class="mono">{{ archivo.series }}</td></tr>
+      <tr><th scope="row">Último cambio</th><td>{{ actual.ultimo_cambio }}</td><td>{{ archivo.ultimo_cambio }}</td></tr>
+    </tbody>
+  </table>
+  <p>Después tendrás que entrar con los usuarios de la copia.</p>
+  <div class="acciones">
+    <a class="boton" href="/ajustes/datos">Cancelar</a>
+    <form method="post" action="/ajustes/datos/importar/{{ clave }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <button class="boton primario" type="submit">Sustituir los datos por la copia</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

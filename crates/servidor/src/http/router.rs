@@ -11,13 +11,16 @@ use super::middleware::{
 use super::recursos::servir_recurso;
 use super::rutas::paginas::{SECCIONES_PENDIENTES, mostrar_pendiente};
 use super::rutas::{
-    acceso, ajustes, ajustes_presupuestos, paginas, primer_arranque, salud, taller,
+    acceso, ajustes, ajustes_presupuestos, datos, escritorio, paginas, primer_arranque, salud,
+    taller,
 };
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 
 /// Las importaciones CSV (hasta 2 MB de texto) llegan codificadas como formulario.
 const LIMITE_DE_CUERPO: usize = 8 * 1024 * 1024;
+/// Una copia completa de los datos llega como archivo binario (ADR-0016).
+const LIMITE_DE_COPIA: usize = 512 * 1024 * 1024;
 
 pub fn crear_router(estado: EstadoApp) -> Router {
     let mut router = rutas_de_acceso()
@@ -57,6 +60,10 @@ fn rutas_de_acceso() -> Router<EstadoApp> {
             get(acceso::mostrar_entrar).post(acceso::procesar_entrar),
         )
         .route("/salir", post(acceso::salir))
+        .route(
+            "/escritorio/conexion",
+            get(escritorio::mostrar_conexion).post(escritorio::elegir_conexion),
+        )
 }
 
 fn rutas_de_ajustes() -> Router<EstadoApp> {
@@ -78,5 +85,15 @@ fn rutas_de_ajustes() -> Router<EstadoApp> {
         .route(
             "/ajustes/taller",
             get(taller::mostrar_taller).post(taller::guardar_taller),
+        )
+        .route("/ajustes/datos", get(datos::mostrar_datos))
+        .route("/ajustes/datos/exportar", get(datos::descargar_copia))
+        .route(
+            "/ajustes/datos/importar",
+            post(datos::subir_copia).layer(DefaultBodyLimit::max(LIMITE_DE_COPIA)),
+        )
+        .route(
+            "/ajustes/datos/importar/{clave}",
+            get(datos::revisar_copia).post(datos::confirmar_copia),
         )
 }

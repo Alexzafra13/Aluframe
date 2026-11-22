@@ -11,7 +11,9 @@ use crate::estado::EstadoApp;
 
 /// Una tarifa CSV de 2 MB codificada en un formulario puede triplicar su tamaño.
 const LIMITE_DE_FORMULARIO: usize = 8 * 1024 * 1024;
-const RUTAS_SIN_CONFIGURAR: [&str; 3] = ["/primer-arranque", "/health", "/recursos/"];
+/// La elección de conexión del escritorio va antes que nada: puede no usarse esta base.
+const RUTAS_SIN_CONFIGURAR: [&str; 4] =
+    ["/primer-arranque", "/health", "/recursos/", "/escritorio/"];
 
 pub async fn exigir_configuracion(
     State(estado): State<EstadoApp>,

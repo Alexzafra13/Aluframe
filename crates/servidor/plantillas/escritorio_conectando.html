@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Conectando{% endblock %}
+{% block clase_body %}pantalla-acceso{% endblock %}
+{% block scripts %}<meta http-equiv="refresh" content="0; url={{ direccion }}/">{% endblock %}
+{% block cuerpo %}
+<main class="acceso">
+  <h1 class="marca"><span class="marca-logo" aria-hidden="true"></span>AlumFrame</h1>
+  <section class="tarjeta formulario-acceso" role="status">
+    <h2>Conectando con el servidor…</h2>
+    <p class="mono">{{ direccion }}</p>
+    <p class="texto-apagado">Si no se abre, comprueba que el servidor está encendido y, fuera del taller, que Tailscale está activado.</p>
+    <a class="boton primario ancho" href="{{ direccion }}/">Abrir</a>
+    <a class="boton ancho" href="/escritorio/conexion">Elegir otra vez</a>
+  </section>
+</main>
+{% endblock %}

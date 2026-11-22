@@ -6,6 +6,7 @@ pub mod autenticacion;
 pub mod bd;
 pub mod config;
 pub mod errores;
+pub mod escritorio;
 pub mod estado;
 pub mod fecha;
 pub mod http;

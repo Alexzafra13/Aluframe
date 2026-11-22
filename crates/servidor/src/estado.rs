@@ -1,3 +1,4 @@
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -14,6 +15,8 @@ pub struct EstadoApp {
     reloj: Arc<dyn Reloj>,
     hay_usuarios: Arc<AtomicBool>,
     permitir_datos_demo: bool,
+    carpeta_copias: PathBuf,
+    preferencias_escritorio: Option<PathBuf>,
 }
 
 impl EstadoApp {
@@ -24,6 +27,8 @@ impl EstadoApp {
             reloj,
             hay_usuarios: Arc::new(AtomicBool::new(cuantos > 0)),
             permitir_datos_demo: false,
+            carpeta_copias: std::env::temp_dir().join("alumframe-copias"),
+            preferencias_escritorio: None,
         })
     }
 
@@ -37,12 +42,37 @@ impl EstadoApp {
         self
     }
 
+    /// Donde se guardan las copias previas a importar y los archivos en tránsito.
+    pub fn con_carpeta_copias(mut self, carpeta: PathBuf) -> EstadoApp {
+        self.carpeta_copias = carpeta;
+        self
+    }
+
+    /// Solo en la aplicación de escritorio: activa la pantalla para elegir dónde trabajar.
+    pub fn con_preferencias_escritorio(mut self, archivo: PathBuf) -> EstadoApp {
+        self.preferencias_escritorio = Some(archivo);
+        self
+    }
+
+    pub fn preferencias_escritorio(&self) -> Option<&Path> {
+        self.preferencias_escritorio.as_deref()
+    }
+
+    pub fn carpeta_copias(&self) -> &Path {
+        &self.carpeta_copias
+    }
+
     pub fn permite_datos_demo(&self) -> bool {
         self.permitir_datos_demo
     }
 
     pub fn hay_usuarios(&self) -> bool {
         self.hay_usuarios.load(Ordering::Acquire)
+    }
+
+    /// Tras importar datos: una base sin usuarios vuelve a pedir el primer arranque.
+    pub fn fijar_hay_usuarios(&self, hay: bool) {
+        self.hay_usuarios.store(hay, Ordering::Release);
     }
 
     pub fn anotar_que_hay_usuarios(&self) {

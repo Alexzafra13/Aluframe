@@ -83,6 +83,20 @@ impl BaseDeDatos {
         consulta(&conexion)
     }
 
+    /// La conexión de escritura sin transacción: para copiar o restaurar la base entera.
+    pub async fn con_escritor_entero<T, F>(&self, operacion: F) -> Result<T, ErrorApp>
+    where
+        T: Send + 'static,
+        F: FnOnce(&mut Connection) -> Result<T, ErrorApp> + Send + 'static,
+    {
+        let escritor = Arc::clone(&self.escritor);
+        en_hilo_bloqueante(move || {
+            let mut conexion = escritor.lock().map_err(|_| envenenado())?;
+            operacion(&mut conexion)
+        })
+        .await
+    }
+
     pub fn con_escritor<T>(
         &self,
         operacion: impl FnOnce(&mut Connection) -> T,

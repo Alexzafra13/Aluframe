@@ -5,6 +5,7 @@ mod auditar;
 pub mod calculo_de_ventana;
 pub mod catalogo;
 pub mod clientes;
+pub mod datos;
 pub mod datos_del_editor;
 pub mod enlace_con_tarifa;
 pub mod entrar;

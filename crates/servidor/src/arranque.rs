@@ -62,7 +62,8 @@ pub async fn preparar_estado(config: &Configuracion) -> Result<EstadoApp, ErrorA
     let bd = BaseDeDatos::abrir(&config.ruta_base_de_datos())?;
     let estado = EstadoApp::nuevo(bd, reloj)
         .await?
-        .con_datos_demo(config.permitir_datos_demo);
+        .con_datos_demo(config.permitir_datos_demo)
+        .con_carpeta_copias(config.carpeta_copias());
     anotar_series_incluidas(&cargar_series_incluidas(&estado).await?);
     Ok(estado)
 }
@@ -86,19 +87,34 @@ fn anotar_informacion(texto: &str) {
 }
 
 pub async fn servir_http(config: &Configuracion, estado: EstadoApp) -> std::io::Result<()> {
-    let direccion = SocketAddr::new(config.direccion_de_escucha(), config.puerto);
-    let escucha = tokio::net::TcpListener::bind(direccion).await?;
+    let escucha = escuchar(config).await?;
     let url = format!("http://localhost:{}", config.puerto);
-    let datos = config.carpeta_datos.display().to_string();
-    tracing::info!(%datos, %url, "AlumFrame escuchando en {direccion}");
     if config.debe_abrir_navegador() {
         abrir_navegador(&url);
     }
+    servir_hasta(escucha, estado, async {
+        let _ = tokio::signal::ctrl_c().await;
+    })
+    .await
+}
+
+pub async fn escuchar(config: &Configuracion) -> std::io::Result<tokio::net::TcpListener> {
+    let direccion = SocketAddr::new(config.direccion_de_escucha(), config.puerto);
+    let escucha = tokio::net::TcpListener::bind(direccion).await?;
+    let datos = config.carpeta_datos.display().to_string();
+    tracing::info!(%datos, "AlumFrame escuchando en {direccion}");
+    Ok(escucha)
+}
+
+/// Atiende hasta que `apagado` termina (Ctrl+C en el servidor; cerrar la ventana en el escritorio).
+pub async fn servir_hasta(
+    escucha: tokio::net::TcpListener,
+    estado: EstadoApp,
+    apagado: impl std::future::Future<Output = ()> + Send + 'static,
+) -> std::io::Result<()> {
     let aplicacion = crear_router(estado).into_make_service_with_connect_info::<SocketAddr>();
     axum::serve(escucha, aplicacion)
-        .with_graceful_shutdown(async {
-            let _ = tokio::signal::ctrl_c().await;
-        })
+        .with_graceful_shutdown(apagado)
         .await
 }
 

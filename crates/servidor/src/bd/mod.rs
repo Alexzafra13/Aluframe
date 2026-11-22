@@ -1,5 +1,6 @@
 mod conexion;
 pub mod consultas;
+pub mod copia;
 mod esquema;
 
 pub use conexion::BaseDeDatos;

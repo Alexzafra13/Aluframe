@@ -6,6 +6,8 @@ pub enum Accion {
     GestionarUsuarios,
     GestionarCatalogo,
     GestionarClientes,
+    /// Exportar e importar todos los datos (ADR-0016).
+    GestionarDatos,
     VerMiDia,
 }
 
@@ -14,7 +16,8 @@ pub fn puede_realizar(rol: Rol, accion: Accion) -> bool {
         Accion::VerPanelDelPropietario
         | Accion::GestionarUsuarios
         | Accion::GestionarCatalogo
-        | Accion::GestionarClientes => rol.es_propietario(),
+        | Accion::GestionarClientes
+        | Accion::GestionarDatos => rol.es_propietario(),
         Accion::VerMiDia => true,
     }
 }
@@ -30,6 +33,7 @@ mod tests {
             Accion::GestionarUsuarios,
             Accion::GestionarCatalogo,
             Accion::GestionarClientes,
+            Accion::GestionarDatos,
             Accion::VerMiDia,
         ] {
             assert!(puede_realizar(Rol::Propietario, accion));
@@ -46,5 +50,6 @@ mod tests {
         assert!(!puede_realizar(Rol::Operario, Accion::GestionarUsuarios));
         assert!(!puede_realizar(Rol::Operario, Accion::GestionarCatalogo));
         assert!(!puede_realizar(Rol::Operario, Accion::GestionarClientes));
+        assert!(!puede_realizar(Rol::Operario, Accion::GestionarDatos));
     }
 }

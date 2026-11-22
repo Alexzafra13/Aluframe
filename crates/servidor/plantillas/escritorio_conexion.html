@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Dónde trabajar{% endblock %}
+{% block clase_body %}pantalla-acceso{% endblock %}
+{% block cuerpo %}
+<main class="acceso">
+  <h1 class="marca"><span class="marca-logo" aria-hidden="true"></span>AlumFrame</h1>
+  <section class="tarjeta formulario-acceso">
+    <h2>¿Dónde vas a trabajar?</h2>
+    <p class="texto-apagado">Se recuerda para la próxima vez. Para cambiarlo, abre «AlumFrame · cambiar conexión» en el menú Inicio.</p>
+    <form method="post" action="/escritorio/conexion">
+      <input type="hidden" name="conexion" value="este_equipo">
+      <button class="boton{% if !en_servidor %} primario{% endif %} ancho" type="submit">En este equipo</button>
+      <p class="texto-apagado">Los datos se guardan solo en este ordenador. Funciona sin servidor ni internet.</p>
+    </form>
+    <form method="post" action="/escritorio/conexion">
+      <input type="hidden" name="conexion" value="servidor">
+      {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+      <label for="servidor">Dirección del servidor del taller</label>
+      <input id="servidor" name="servidor" value="{{ servidor }}" placeholder="Por ejemplo 192.168.1.100" inputmode="url" autocomplete="off" required>
+      <button class="boton{% if en_servidor %} primario{% endif %} ancho" type="submit">Conectar al servidor</button>
+      <p class="texto-apagado">Trabajas con los datos del servidor, los mismos que ven los demás equipos. Desde fuera del taller, con Tailscale activado.</p>
+    </form>
+  </section>
+</main>
+{% endblock %}
