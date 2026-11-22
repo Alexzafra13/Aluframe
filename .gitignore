@@ -21,3 +21,5 @@ Thumbs.db
 .claude/settings.local.json
 CLAUDE.local.md
 /datos-dev/
+# Instalador de Windows generado
+despliegue/windows/AlumFrame-*-instalar.exe

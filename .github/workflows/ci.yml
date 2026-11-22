@@ -51,3 +51,10 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --workspace --locked
       - run: cargo build --release --locked -p servidor
+      - name: Comprobar que el instalador se genera
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress }
+          & $iscc "/DBinarios=$pwd\target\release" despliegue\windows\alumframe.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

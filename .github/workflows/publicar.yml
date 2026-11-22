@@ -76,7 +76,7 @@ jobs:
           files: alumframe-*.tar.gz
 
   windows:
-    name: Windows (modo local)
+    name: Windows (instalador de la aplicación)
     needs: [version, linux]
     runs-on: windows-2022
     env:
@@ -84,16 +84,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: cargo build --release --locked -p servidor
-      - name: Empaquetar
+      - name: Crear el instalador (Inno Setup)
         shell: pwsh
         run: |
-          $carpeta = "alumframe-$env:VERSION-windows-x86_64"
-          New-Item -ItemType Directory $carpeta | Out-Null
-          Copy-Item target/release/alumframe.exe $carpeta/
-          Copy-Item despliegue/windows/* $carpeta/
-          Compress-Archive -Path $carpeta -DestinationPath "$carpeta.zip"
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress }
+          $numero = $env:VERSION.TrimStart("v")
+          & $iscc "/DVersion=$numero" "/DBinarios=$pwd\target\release" despliegue\windows\alumframe.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item "despliegue\windows\AlumFrame-$numero-instalar.exe" "AlumFrame-$env:VERSION-windows-instalar.exe"
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
           target_commitish: ${{ github.sha }}
-          files: alumframe-*.zip
+          files: AlumFrame-*-windows-instalar.exe
