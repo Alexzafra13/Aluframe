@@ -7,6 +7,9 @@ use crate::unidades::Longitud;
 pub struct BarraCortada {
     pub piezas: Vec<PiezaACortar>,
     pub sobrante: Longitud,
+    /// El retal del stock que se usa (su identificador); `None` es una barra nueva.
+    #[serde(default)]
+    pub retal: Option<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -18,6 +21,11 @@ pub struct PlanDeCorte {
 impl PlanDeCorte {
     pub fn numero_de_barras(&self) -> usize {
         self.barras.len()
+    }
+
+    /// Barras enteras que hay que abrir: sin contar los retales del stock que se aprovechan.
+    pub fn barras_nuevas(&self) -> usize {
+        self.barras.iter().filter(|b| b.retal.is_none()).count()
     }
 
     pub fn retales(&self) -> Vec<Longitud> {

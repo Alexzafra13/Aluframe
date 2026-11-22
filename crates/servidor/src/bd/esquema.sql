@@ -554,3 +554,19 @@ CREATE TABLE cobro (
 
 CREATE INDEX cobro_por_factura ON cobro (factura_id) WHERE factura_id IS NOT NULL;
 CREATE INDEX cobro_por_trabajo ON cobro (trabajo_id) WHERE trabajo_id IS NOT NULL;
+
+-- H5: piezas que se vuelven a cortar durante la fabricación (corte mal, rayón, golpe…): al
+-- terminar la orden se descuentan también, para que el stock cuadre con lo gastado.
+CREATE TABLE pieza_repetida (
+    id INTEGER PRIMARY KEY,
+    ventana_id INTEGER NOT NULL REFERENCES ventana_trabajo (id) ON DELETE RESTRICT,
+    numero INTEGER NOT NULL CHECK (numero >= 1),
+    perfil TEXT NOT NULL,
+    longitud_dmm INTEGER NOT NULL CHECK (longitud_dmm > 0),
+    cantidad INTEGER NOT NULL CHECK (cantidad BETWEEN 1 AND 20),
+    motivo TEXT NOT NULL CHECK (length(trim(motivo)) >= 1),
+    usuario_id INTEGER NOT NULL REFERENCES usuario (id) ON DELETE RESTRICT,
+    cuando_en TEXT NOT NULL
+) STRICT;
+
+CREATE INDEX pieza_repetida_por_ventana ON pieza_repetida (ventana_id);

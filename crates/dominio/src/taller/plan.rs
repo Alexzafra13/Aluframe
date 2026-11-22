@@ -3,7 +3,10 @@
 
 use std::collections::BTreeMap;
 
-use crate::corte::{ErrorCorte, ParametrosDeCorte, PiezaACortar, PlanDeCorte, optimizar_cortes};
+use crate::corte::{
+    ErrorCorte, ParametrosDeCorte, PiezaACortar, PlanDeCorte, RetalDisponible,
+    optimizar_con_retales,
+};
 use crate::unidades::Longitud;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -27,11 +30,14 @@ pub struct BarrasDePerfil {
     pub origen: BTreeMap<u32, (u32, u32)>,
 }
 
+/// Retales del stock por (perfil, color), para usarlos antes de abrir barras nuevas.
+pub type RetalesPorPerfil = BTreeMap<(String, String), Vec<RetalDisponible>>;
+
 /// `parametros` lleva sierra, recorte y retal; la longitud de barra es la de cada perfil.
 /// Un perfil sin longitud de barra conocida no se planifica (queda fuera del resultado).
 pub fn planificar_trabajo(
     piezas: &[PiezaDeTrabajo],
-    longitudes_barra: &BTreeMap<String, Longitud>,
+    (longitudes_barra, retales): (&BTreeMap<String, Longitud>, &RetalesPorPerfil),
     parametros: ParametrosDeCorte,
 ) -> Vec<BarrasDePerfil> {
     let mut grupos: BTreeMap<(String, String), Vec<&PiezaDeTrabajo>> = BTreeMap::new();
@@ -59,8 +65,11 @@ pub fn planificar_trabajo(
                 longitud_barra,
                 ..parametros
             };
+            let disponibles = retales
+                .get(&(perfil.clone(), color.clone()))
+                .map_or(&[][..], Vec::as_slice);
             Some(BarrasDePerfil {
-                plan: optimizar_cortes(&a_cortar, &parametros),
+                plan: optimizar_con_retales(&a_cortar, disponibles, &parametros),
                 perfil,
                 color,
                 longitud_barra,
@@ -110,7 +119,7 @@ mod pruebas {
             recorte_extremos: Longitud::CERO,
             retal_minimo: Longitud::CERO,
         };
-        let plan = planificar_trabajo(&piezas, &barras, parametros);
+        let plan = planificar_trabajo(&piezas, (&barras, &BTreeMap::new()), parametros);
         assert_eq!(plan.len(), 3);
         let blanco = plan
             .iter()

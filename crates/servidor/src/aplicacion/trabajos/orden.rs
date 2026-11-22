@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 
 use dominio::acceso::Accion;
-use dominio::taller::{BarrasDePerfil, PiezaDeTrabajo, planificar_trabajo};
+use dominio::taller::{BarrasDePerfil, PiezaDeTrabajo, RetalesPorPerfil, planificar_trabajo};
 use dominio::unidades::Longitud;
 
 use super::consultar::{FichaDeTrabajo, cargar};
@@ -18,7 +18,11 @@ pub struct OrdenDeTaller {
     pub ajustes: AjustesDeTaller,
 }
 
-pub fn planificar(ficha: &FichaDeTrabajo, ajustes: &AjustesDeTaller) -> Vec<BarrasDePerfil> {
+pub fn planificar(
+    ficha: &FichaDeTrabajo,
+    ajustes: &AjustesDeTaller,
+    retales: &RetalesPorPerfil,
+) -> Vec<BarrasDePerfil> {
     let mut piezas = Vec::new();
     let mut barras = BTreeMap::new();
     for ventana in &ficha.ventanas {
@@ -40,7 +44,7 @@ pub fn planificar(ficha: &FichaDeTrabajo, ajustes: &AjustesDeTaller) -> Vec<Barr
     }
     planificar_trabajo(
         &piezas,
-        &barras,
+        (&barras, retales),
         ajustes.parametros_de_corte(Longitud::CERO),
     )
 }
@@ -57,7 +61,7 @@ pub async fn cargar_orden(
             let ficha = cargar(con, id)?;
             let ajustes = taller::leer_de_la_base(con)?;
             Ok(OrdenDeTaller {
-                plan: planificar(&ficha, &ajustes),
+                plan: planificar(&ficha, &ajustes, &RetalesPorPerfil::new()),
                 ficha,
                 ajustes,
             })

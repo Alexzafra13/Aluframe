@@ -201,3 +201,74 @@ proptest! {
         prop_assert!(9 * plan.numero_de_barras() <= 11 * optimo + 6);
     }
 }
+
+fn retales(longitudes_dmm: &[i64]) -> Vec<RetalDisponible> {
+    (0u32..)
+        .zip(longitudes_dmm)
+        .map(|(id, l)| RetalDisponible {
+            id: 100 + id,
+            longitud: Longitud::desde_decimas_de_mm(*l),
+        })
+        .collect()
+}
+
+#[test]
+fn usa_el_retal_antes_de_abrir_una_barra_nueva() {
+    let plan = optimizar_con_retales(
+        &piezas(&[7_300, 7_300]),
+        &retales(&[15_000]),
+        &parametros(640, 0),
+    )
+    .unwrap();
+    assert_eq!(plan.numero_de_barras(), 1);
+    assert_eq!(plan.barras_nuevas(), 0);
+    assert_eq!(plan.barras[0].retal, Some(100));
+    assert_eq!(plan.barras[0].sobrante, Longitud::desde_decimas_de_mm(400));
+}
+
+#[test]
+fn si_no_cabe_en_el_retal_abre_barra_y_los_retales_sin_usar_no_salen() {
+    let plan = optimizar_con_retales(
+        &piezas(&[12_000]),
+        &retales(&[5_000, 3_000]),
+        &parametros(640, 0),
+    )
+    .unwrap();
+    assert_eq!(plan.barras_nuevas(), 1);
+    assert_eq!(
+        plan.numero_de_barras(),
+        1,
+        "los retales sin usar no aparecen"
+    );
+}
+
+proptest! {
+    #[test]
+    fn con_retales_ninguna_pieza_supera_su_barra_ni_se_pierde(
+        longitudes in prop::collection::vec(500i64..=60_000, 0..20),
+        disponibles in prop::collection::vec(500i64..=30_000, 0..6),
+    ) {
+        let lista = piezas(&longitudes);
+        let stock = retales(&disponibles);
+        let params = parametros(640, 30);
+        let plan = optimizar_con_retales(&lista, &stock, &params).unwrap();
+        let mut colocadas: Vec<u32> = plan.piezas().map(|p| p.id).collect();
+        colocadas.sort_unstable();
+        let mut esperadas: Vec<u32> = lista.iter().map(|p| p.id).collect();
+        esperadas.sort_unstable();
+        prop_assert_eq!(colocadas, esperadas);
+        for barra in &plan.barras {
+            let capacidad = match barra.retal {
+                Some(id) => stock.iter().find(|r| r.id == id).unwrap().longitud.decimas_de_mm(),
+                None => params.longitud_util().unwrap().decimas_de_mm(),
+            };
+            let gastado: i64 = barra.piezas.iter().map(|p| params.consumo(p).unwrap().decimas_de_mm()).sum();
+            prop_assert!(gastado + barra.sobrante.decimas_de_mm() == capacidad);
+            prop_assert!(gastado <= capacidad);
+        }
+        let usados: Vec<u32> = plan.barras.iter().filter_map(|b| b.retal).collect();
+        let mut sin_repetir = usados.clone();
+        sin_repetir.dedup();
+        prop_assert_eq!(usados.len(), sin_repetir.len(), "cada retal se usa una vez");
+    }
+}

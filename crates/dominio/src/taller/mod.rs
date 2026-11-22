@@ -6,5 +6,5 @@ mod plan;
 mod tablero;
 
 pub use pasos::{AccionDePaso, EstadoDePaso, PASOS_POR_DEFECTO, aplicar_accion, leer_pasos};
-pub use plan::{BarrasDePerfil, PiezaDeTrabajo, planificar_trabajo};
+pub use plan::{BarrasDePerfil, PiezaDeTrabajo, RetalesPorPerfil, planificar_trabajo};
 pub use tablero::{ColumnaDelTablero, EstadoDeTrabajo, calcular_estado, columna_del_tablero};
