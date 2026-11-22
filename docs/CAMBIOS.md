@@ -119,4 +119,5 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - **La base de datos queda fijada** (ADR-0021, sustituye a ADR-0011): el esquema actual es la migración 0001 y los cambios futuros serán migraciones que conservan los datos, con copia previa. **Desde esta versión no se borran los datos al actualizar**; las bases de 0.8–0.10 se adoptan tal cual. Una copia de una versión anterior se puede importar (se actualiza); una más nueva, no.
 - Servicio de Linux: escritura permitida en `/mnt`, `/media` y `/run/media`, y copia al parar con `systemctl stop`. `LEEME.txt` del servidor con los pasos para montar un disco de copias.
 - `CLAUDE.md`, `BACKEND.md`, `DATOS.md` y `MAINTENANCE.md` al día con las migraciones y las copias. **Versión 0.11.0.**
+- **0.11.1 (propietario):** las notificaciones salen debajo de la barra superior, centradas en la zona de trabajo, sin tapar el buscador. En pantallas de poca altura el menú lateral se compacta y su pie (plegar, Ajustes, Salir) queda siempre a la vista; si aun así no cabe, se desplaza la lista del menú, no la página.
 

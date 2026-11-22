@@ -1,8 +1,10 @@
 /* H3: presupuestos, editor de línea, hojas, control segmentado y hoja A4 (docs/design.md). */
 
-/* Avisos efímeros: bajan desde arriba, se quedan 4 s y se van (como en iOS). */
-.aviso-efimero { position: fixed; top: 14px; left: 50%; z-index: 50; transform: translateX(-50%); margin: 0; padding: .8rem 1.4rem; border-radius: 999px; background: var(--tinta); color: #fff; font-weight: 500; box-shadow: 0 8px 30px rgb(21 25 29 / .18); pointer-events: none; animation: efimero 4.6s var(--curva-suave) both; }
-@keyframes efimero { 0% { opacity: 0; transform: translate(-50%, -140%); } 8%, 86% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -140%); } }
+/* Avisos efímeros: aparecen debajo de la barra superior (sin tapar el buscador), centrados en la
+   zona de trabajo; se quedan 4 s y se van. */
+.aviso-efimero { position: fixed; top: 92px; left: 50%; width: max-content; max-width: min(640px, calc(100vw - 4rem)); text-align: center; z-index: 50; transform: translateX(-50%); margin: 0; padding: .8rem 1.4rem; border-radius: 999px; background: var(--tinta); color: #fff; font-weight: 500; box-shadow: 0 8px 30px rgb(21 25 29 / .18); pointer-events: none; animation: efimero 4.6s var(--curva-suave) both; }
+body.con-menu .aviso-efimero { left: calc(var(--ancho-menu) + (100vw - var(--ancho-menu)) / 2); max-width: min(640px, calc(100vw - var(--ancho-menu) - 4rem)); }
+@keyframes efimero { 0% { opacity: 0; transform: translate(-50%, -16px); } 8%, 86% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -16px); } }
 
 /* Control segmentado: enlaces (filtros) y radios (capas del dibujo). */
 .segmentado, .segmentado-control { display: inline-flex; position: relative; padding: 3px; gap: 2px; border-radius: 11px; background: rgb(21 25 29 / .07); margin-bottom: 1.25rem; }
