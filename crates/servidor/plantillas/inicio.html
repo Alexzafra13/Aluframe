@@ -25,6 +25,9 @@
     <h2 class="antetitulo" id="titulo-atencion">Avisos del taller</h2>
     {% if avisos.is_empty() %}<p class="vacio">Nada pendiente. Aquí llegan los «falta algo» de los operarios.</p>{% endif %}
     <ul class="lista-simple">{% for a in avisos %}<li><a href="{{ a.enlace }}">{{ a.texto }}</a></li>{% endfor %}</ul>
+    <h2 class="antetitulo">Stock bajo</h2>
+    {% if stock_bajo.is_empty() %}<p class="vacio">Nada bajo mínimo.</p>{% endif %}
+    <ul class="lista-simple">{% for a in stock_bajo %}<li><a href="{{ a.enlace }}">{{ a.texto }}</a></li>{% endfor %}</ul>
   </aside>
 </div>
 {% endblock %}

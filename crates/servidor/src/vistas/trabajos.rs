@@ -78,6 +78,7 @@ pub struct PaginaInicio {
     pub seccion: &'static str,
     pub columnas: Vec<(&'static str, Vec<TarjetaTrabajo>)>,
     pub avisos: Vec<AvisoDelTaller>,
+    pub stock_bajo: Vec<AvisoDelTaller>,
 }
 
 /// Las tres columnas del tablero y los avisos «falta algo» de los operarios.
@@ -154,6 +155,30 @@ pub struct VentanaEnPantalla {
     pub cristal_recibido: bool,
     pub revision: i64,
     pub medida_cambiada: bool,
+    /// (número, nombre) de cada pieza del dibujo, para «Repetir pieza».
+    pub piezas: Vec<(u32, String)>,
+    /// «2 × pieza 4 (Hoja lateral): rayón · Luis».
+    pub repetidas: Vec<String>,
+}
+
+impl From<&crate::bd::consultas::pasos::FilaPaso> for PasoEnPantalla {
+    fn from(p: &crate::bd::consultas::pasos::FilaPaso) -> Self {
+        PasoEnPantalla {
+            id: p.id,
+            version: p.version,
+            nombre: p.nombre.clone(),
+            estado: p.estado.clone(),
+            quien: p.usuario_nombre.clone().unwrap_or_default(),
+        }
+    }
+}
+
+fn describir_repetida(r: &crate::bd::consultas::repetidas::FilaRepetida) -> String {
+    let perfil = dominio::texto::nombre_legible(&r.perfil);
+    format!(
+        "{} × pieza {} ({perfil}): {} · {}",
+        r.cantidad, r.numero, r.motivo, r.usuario
+    )
 }
 
 impl From<&VentanaDeTrabajo> for VentanaEnPantalla {
@@ -164,23 +189,21 @@ impl From<&VentanaDeTrabajo> for VentanaEnPantalla {
             titulo: titulo_y_medidas(&v.fila.descripcion).0,
             descripcion: v.fila.descripcion.clone(),
             dibujo: v.congelado.resumen.dibujo.clone(),
-            pasos: v
-                .pasos
-                .iter()
-                .map(|p| PasoEnPantalla {
-                    id: p.id,
-                    version: p.version,
-                    nombre: p.nombre.clone(),
-                    estado: p.estado.clone(),
-                    quien: p.usuario_nombre.clone().unwrap_or_default(),
-                })
-                .collect(),
+            pasos: v.pasos.iter().map(PasoEnPantalla::from).collect(),
             hechos: v.hechos(),
             asignado: v.fila.asignado_a.map(|a| a.to_string()).unwrap_or_default(),
             falta_algo: v.fila.falta_algo.clone(),
             cristal_recibido: v.fila.cristal_recibido,
             revision: v.fila.revision,
             medida_cambiada: v.fila.medida_cambiada,
+            piezas: v
+                .congelado
+                .resumen
+                .piezas
+                .iter()
+                .map(|p| (p.numero, dominio::texto::nombre_legible(&p.perfil)))
+                .collect(),
+            repetidas: v.repetidas.iter().map(describir_repetida).collect(),
         }
     }
 }
@@ -200,6 +223,7 @@ pub struct PaginaTrabajo {
     pub direccion: String,
     pub estado: &'static str,
     pub abierto: bool,
+    pub orden_terminada: bool,
     pub importe: String,
     pub progreso: (usize, usize),
     pub asignado_a: Option<i64>,
@@ -234,6 +258,7 @@ impl PaginaTrabajo {
             direccion: t.direccion_montaje.clone().unwrap_or_default(),
             estado: ficha.estado().nombre(),
             abierto,
+            orden_terminada: t.orden_terminada,
             importe: euros(t.importe_cent),
             progreso: ficha.progreso(),
             asignado_a: t.asignado_a,

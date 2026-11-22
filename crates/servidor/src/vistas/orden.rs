@@ -1,5 +1,7 @@
 //! Orden de taller impresa: una hoja A4 por ventana y el plan de corte del trabajo (H4).
 
+use std::collections::BTreeMap;
+
 use askama::Template;
 use dominio::corte::BarraCortada;
 use dominio::taller::BarrasDePerfil;
@@ -66,7 +68,7 @@ fn dibujar_barra(barra: &BarraCortada, grupo: &BarrasDePerfil) -> String {
     )
 }
 
-fn texto_de_barra(barra: &BarraCortada, retal_minimo: Longitud) -> String {
+fn texto_de_barra(barra: &BarraCortada, (retal_minimo, retal): (Longitud, Option<i64>)) -> String {
     let piezas: Vec<String> = barra
         .piezas
         .iter()
@@ -77,14 +79,29 @@ fn texto_de_barra(barra: &BarraCortada, retal_minimo: Longitud) -> String {
     } else {
         "desecho"
     };
+    let origen = retal.map_or_else(String::new, |l| {
+        format!("Coger el retal de {} del stock: ", mm(l))
+    });
     format!(
-        "{} · sobrante {} ({tipo})",
+        "{origen}{} · sobrante {} ({tipo})",
         piezas.join(" + "),
         mm(barra.sobrante.decimas_de_mm())
     )
 }
 
-fn grupo(barras: &BarrasDePerfil) -> GrupoDeCorte {
+fn titulo_con_cuentas(titulo: &str, plan: &dominio::corte::PlanDeCorte) -> String {
+    let nuevas = match plan.barras_nuevas() {
+        1 => "1 barra nueva".to_owned(),
+        n => format!("{n} barras nuevas"),
+    };
+    match plan.numero_de_barras() - plan.barras_nuevas() {
+        0 => format!("{titulo} · {nuevas}"),
+        1 => format!("{titulo} · {nuevas} y 1 retal del stock"),
+        r => format!("{titulo} · {nuevas} y {r} retales del stock"),
+    }
+}
+
+fn grupo(barras: &BarrasDePerfil, largos: &BTreeMap<u32, i64>) -> GrupoDeCorte {
     let titulo = format!(
         "{} · {} · barra de {}",
         nombre_legible(&barras.perfil),
@@ -93,16 +110,19 @@ fn grupo(barras: &BarrasDePerfil) -> GrupoDeCorte {
     );
     match &barras.plan {
         Ok(plan) => GrupoDeCorte {
-            titulo: match plan.numero_de_barras() {
-                1 => format!("{titulo} · 1 barra"),
-                n => format!("{titulo} · {n} barras"),
-            },
+            titulo: titulo_con_cuentas(&titulo, plan),
             barras: plan
                 .barras
                 .iter()
                 .map(|b| BarraDibujada {
                     svg: dibujar_barra(b, barras),
-                    texto: texto_de_barra(b, plan.retal_minimo),
+                    texto: texto_de_barra(
+                        b,
+                        (
+                            plan.retal_minimo,
+                            b.retal.and_then(|id| largos.get(&id).copied()),
+                        ),
+                    ),
                 })
                 .collect(),
             error: None,
@@ -140,7 +160,11 @@ impl PaginaOrden {
                     hoja: HojaDeVentana::desde(&v.fila.descripcion, &v.congelado),
                 })
                 .collect(),
-            grupos: orden.plan.iter().map(grupo).collect(),
+            grupos: orden
+                .plan
+                .iter()
+                .map(|g| grupo(g, &orden.enlace.largo_de_retal))
+                .collect(),
             ajustes: format!(
                 "Grosor de sierra {} mm · recorte de extremos {} mm · retal desde {} mm",
                 mm(a.grosor_sierra.decimas_de_mm()),

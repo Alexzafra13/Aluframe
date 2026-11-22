@@ -168,6 +168,7 @@ Ajustes de empresa y precio en `configuracion`: `empresa.*`, `precio.margen_modo
 | Tabla | Campos |
 |---|---|
 | `movimiento_stock` | id, articulo_id, acabado_id (NULL si no tiene color), longitud_dmm (NULL = barra estándar del artículo), tipo (`entrada`/`salida`/`ajuste`), cantidad_mil (con signo), motivo, orden_taller_id, usuario_id, cuando_en; único (orden_taller_id, articulo_id, acabado_id, longitud_dmm) para que terminar una orden sea idempotente |
+| `pieza_repetida` | id, ventana_id, numero (de la pieza en el dibujo), perfil, longitud_dmm, cantidad, motivo (corte mal, rayón…), usuario_id, cuando_en. Entra en el plan de corte y se descuenta al terminar la orden (H5) |
 | `reserva_stock` | id, trabajo_id, articulo_id, acabado_id, cantidad_mil, estado (`activa`/`liberada`/`consumida`) (ver decisión 9) |
 
 El saldo de un artículo es `SUM(cantidad_mil)` por artículo y color, con índice en `articulo_id`. No hay saldo duplicado.

@@ -54,3 +54,12 @@
   .ventana-operario { grid-template-columns: 1fr; }
   .paso-operario { flex-wrap: wrap; }
 }
+
+/* Stock (H5). */
+.rejilla-dos-tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.tabla-desplazable { overflow-x: auto; }
+.fila-retal { padding: .5rem 0; border-bottom: 1px solid var(--linea); }
+.repetir-pieza { margin: .5rem 0; }
+.repetir-pieza summary { min-height: var(--tactil); display: flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--acero); }
+.repetidas { color: var(--aviso); }
+.panel-atencion h2 + .vacio, .panel-atencion .lista-simple + h2 { margin-top: 1.25rem; }

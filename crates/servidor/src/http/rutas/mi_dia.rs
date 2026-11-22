@@ -7,7 +7,7 @@ use axum::response::{IntoResponse, Redirect, Response};
 use dominio::taller::AccionDePaso;
 
 use crate::aplicacion::Actor;
-use crate::aplicacion::trabajos::acciones::{anotar_falta, cambiar_paso};
+use crate::aplicacion::trabajos::acciones::{anotar_falta, cambiar_paso, repetir_pieza};
 use crate::aplicacion::trabajos::consultar::ventanas_de_operario;
 use crate::aplicacion::trabajos::operario::abrir_ventana;
 use crate::errores::ErrorApp;
@@ -112,4 +112,31 @@ pub async fn avisar_falta(
     }
     anotar_falta(&estado, &actor, id, Some(nota)).await?;
     Ok(Redirect::to(&format!("/mi-dia/{id}")).into_response())
+}
+
+pub async fn repetir(
+    State(estado): State<EstadoApp>,
+    ActorActual(actor): ActorActual,
+    Path(id): Path<i64>,
+    Form(pares): Form<Vec<(String, String)>>,
+) -> Result<Response, ErrorApp> {
+    let campos = Campos::de(pares);
+    let datos = (
+        id,
+        campos.entero("numero").unwrap_or(0),
+        campos.entero("cantidad").unwrap_or(0),
+    );
+    let resultado = repetir_pieza(&estado, &actor, datos, campos.texto("motivo")).await;
+    let trabajo = campos.texto("volver") == "trabajo";
+    match resultado {
+        Ok(()) if trabajo => {
+            let destino = abrir_ventana(&estado, &actor, id).await?.trabajo.id;
+            Ok(Redirect::to(&format!("/trabajos/{destino}?aviso=repetida")).into_response())
+        }
+        Ok(()) => Ok(Redirect::to(&format!("/mi-dia/{id}")).into_response()),
+        Err(ErrorApp::Validacion(aviso)) => {
+            pagina_de_ventana(&estado, &actor, id, Some(aviso)).await
+        }
+        Err(otro) => Err(otro),
+    }
 }

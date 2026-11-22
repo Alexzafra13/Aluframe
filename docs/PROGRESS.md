@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H4 terminados**; publicada la **v0.8.1**. Siguiente: **H5, stock** (el propietario quiere el programa completo, H5 a H7, antes de pulir).
+Estado (2026-11-22): **H0–H5 terminados**; publicada la **v0.9.0**. Siguiente: **H6, facturas y cobros** (con señal y Bizum), después H7 (copias y migraciones).
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
@@ -55,6 +55,7 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
 | 0.7.1 | Arreglo de la aplicación de Windows: no se apaga mientras la ventana siga abierta |
 | 0.7.2 | Editor: «Guardar ventana» vuelve al presupuesto; «+ Otro concepto» (antes línea libre); aviso de medida fuera de la serie solo cuando ocurre; menú lateral fijo y plegable; Aluprom 21 validada por el propietario |
+| 0.9.0 | **H5:** stock con entradas, ajustes, retales y mínimos; el plan de corte usa los retales del stock y la hoja dice cuál coger; repetir pieza; terminar orden descontando el plan con retales revisados; lista de la compra; stock bajo en el Inicio |
 | 0.8.0 | **H4:** trabajos al aceptar, tablero, ficha, orden de taller A4 en mm con plan de corte del trabajo, Mi día del operario con pasos, modificar medidas con revisión; tablas de H5 y H6 ya creadas |
 | 0.7.0 | Alta de cliente con nombre y teléfono obligatorios (sin prefijo, +34 por defecto); código postal que rellena localidad, provincia y país (ADR-0020); hoja del presupuesto con logotipo o nombre de empresa, datos completos, firma y pie; descripción de la ventana con serie, medidas, color, opciones y cristal |
 
@@ -65,7 +66,7 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | H2 Catálogo, clientes e importación | **hecho** (2026-11-21) |
 | H3 Presupuestos | **hecho** (2026-11-21) |
 | H4 Trabajos y orden de taller | **hecho** (2026-11-22) |
-| H5 Stock | pendiente |
+| H5 Stock | **hecho** (2026-11-22) |
 | H6 Facturación | pendiente |
 | H7 Copias y despliegue | pendiente |
 
@@ -162,4 +163,15 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 **Pendiente**
 - Terminar la orden y descontar stock (H5); albarán y factura desde el trabajo, y señales (H6).
 - La medida del cristal de Aluprom 21 sigue sin dato: sus ventanas no se pueden aceptar todavía (las pruebas usan una serie ficticia «validada»).
+
+### H5. Stock (2026-11-22)
+**Hecho**
+- Libro de stock de solo añadir: entradas (inventario inicial incluido), ajustes con motivo que no dejan negativo, barras enteras y retales con su largo, por artículo y color. Mínimos por artículo, «Bajo mínimo» en el stock y en el Inicio, y lista de la compra (lo que necesitan los trabajos con la orden abierta más el mínimo, menos lo que hay).
+- `dominio::corte::optimizar_con_retales`: los retales del stock del mismo perfil y color se llenan antes de abrir barras nuevas (pruebas de propiedades). La hoja del plan de corte dice «Coger el retal de 3000 del stock».
+- **Repetir pieza** (corte mal, rayón, golpe…) desde «Mi día» o desde el trabajo: entra en el plan y se descuenta.
+- **Terminar orden y descontar stock:** muestra lo que sale y los avisos (artículos que no están en el catálogo), y los retales que propone el plan para revisarlos (quitar, corregir el largo, añadir). Una transacción, una sola vez; el plan cortado queda congelado en la orden.
+- El enlace perfil o accesorio → artículo va por la tabla `referencias` de la versión de la serie con que se aceptó cada ventana.
+- **Criterios de aceptación:** terminar una orden descuenta exactamente el material optimizado (`tests/stock.rs::terminar_la_orden_descuenta_el_plan_y_los_accesorios_una_sola_vez`); el stock no se edita sin un ajuste (`los_ajustes_llevan_motivo_no_dejan_negativo_y_el_libro_no_se_edita`); con retales del mismo perfil y color el plan los usa antes que barras nuevas y la hoja dice cuál coger (`el_plan_usa_el_retal_del_stock_y_al_terminar_entra_el_retal_confirmado`, `tests/stock_pantallas.rs`, E2E `h5-stock`): **cumplidos**.
+
+**Decisiones:** el cristal no se lleva en stock (se pide a medida). Los accesorios se cuentan en unidades de uso (piezas o metros), no en cajas. Una orden puede dejar un artículo en negativo si no se hizo el inventario: se ve en el stock y se corrige con un ajuste. Las reservas de stock al aceptar (decisión 9 de DATOS) no entran en el MVP. Nueva tabla `pieza_repetida`: **hay que borrar los datos de prueba al actualizar**.
 

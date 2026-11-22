@@ -50,6 +50,7 @@ fn leer_fila(f: &Row) -> rusqlite::Result<FilaArticulo> {
     })
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct FiltroArticulos {
     pub proveedor_id: Option<i64>,
     pub texto: String,

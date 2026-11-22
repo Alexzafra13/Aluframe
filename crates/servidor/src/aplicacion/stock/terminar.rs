@@ -129,3 +129,23 @@ pub async fn terminar_orden(
         })
         .await
 }
+
+/// Lo que se verá antes de confirmar: la orden (con su plan) y lo que descontará.
+pub async fn preparar_terminar(
+    estado: &EstadoApp,
+    actor: &Actor,
+    trabajo: i64,
+) -> Result<(OrdenDeTaller, super::prevision::Prevision), ErrorApp> {
+    autorizar(actor, Accion::GestionarTrabajos)?;
+    estado
+        .bd
+        .leer(move |con| {
+            let orden = cargar_en(con, trabajo)?;
+            if orden.ficha.trabajo.orden_terminada {
+                return Err(ErrorApp::Validacion("La orden ya está terminada.".into()));
+            }
+            let prevision = prever(&orden);
+            Ok((orden, prevision))
+        })
+        .await
+}

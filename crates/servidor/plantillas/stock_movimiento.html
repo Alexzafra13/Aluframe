@@ -1,0 +1,9 @@
+<input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+<div class="rejilla-campos">
+  <div class="campo"><label for="{{ prefijo }}-articulo">Artículo</label><select id="{{ prefijo }}-articulo" name="articulo" required>{% for a in articulos %}<option value="{{ a.valor }}">{{ a.texto }}</option>{% endfor %}</select></div>
+  <div class="campo"><label for="{{ prefijo }}-color">Color</label><select id="{{ prefijo }}-color" name="acabado"><option value="">Sin color</option>{% for c in acabados %}<option value="{{ c.valor }}">{{ c.texto }}</option>{% endfor %}</select></div>
+  <div class="campo"><label for="{{ prefijo }}-cantidad">Cantidad{% if prefijo == "ajuste" %} (+ suma, − resta){% endif %}</label><input id="{{ prefijo }}-cantidad" name="cantidad" inputmode="decimal" required placeholder="{% if prefijo == "ajuste" %}-1{% else %}10{% endif %}"></div>
+  <div class="campo"><label for="{{ prefijo }}-largo">Largo del retal (cm), vacío si es barra entera</label><input id="{{ prefijo }}-largo" name="largo" inputmode="decimal"></div>
+</div>
+<label for="{{ prefijo }}-motivo">Motivo{% if prefijo == "ajuste" %} (obligatorio){% endif %}</label>
+<input id="{{ prefijo }}-motivo" name="motivo" maxlength="200" placeholder="{% if prefijo == "ajuste" %}Recuento, rotura…{% else %}Inventario inicial, albarán del proveedor…{% endif %}"{% if prefijo == "ajuste" %} required{% endif %}>

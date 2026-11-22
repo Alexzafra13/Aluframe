@@ -95,3 +95,10 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - **Cristal de Aluprom 21, corredera de 2 hojas (0.8.1):** dos cristales de (ancho / 2 − 9,8) × (alto − 13,1) cm, con la referencia genérica `CRISTAL` (por m²). El ancho es del propietario y coincide con el plano de Aluval; el alto es provisional hasta comprobarlo con un cristal real. Con esto la ventana deja de salir incompleta y se puede aceptar en cuanto sus artículos tengan precio. La ventana de ejemplo de 150 × 120 se actualiza con el dato nuevo y ahora también se comprueba el cristal. La de 4 hojas sigue sin cristal. No cambia la base de datos.
 - Arreglo de la comprobación de CI: las rutas de «Modificar medidas» pasan a su propio archivo (el de trabajos superaba las 300 líneas) y la E2E de series comprueba el cristal de Aluprom 21, que ya no sale incompleta.
 - Decisiones del propietario para H5 (stock al terminar la orden, «Repetir pieza», revisión de retales) y H7 (copias a las 14:00, al cerrar y al arrancar si faltó; 7 diarias y 4 semanales en un disco reconocido por su marca), en `docs/PROGRESS.md`.
+
+## 2026-11-22 (madrugada): H5 stock
+- Stock con entradas, ajustes con motivo, retales con su largo y mínimos; lista de la compra; «Stock bajo» en el Inicio.
+- El plan de corte usa primero los retales del stock del mismo perfil y color, y la hoja dice cuál coger.
+- «Repetir pieza» durante la fabricación (corte mal, rayón, golpe…), desde Mi día o desde el trabajo.
+- «Terminar orden y descontar stock» con revisión de los retales que propone el plan. Una sola vez y en una transacción.
+- Nueva tabla `pieza_repetida`: **hay que borrar los datos de prueba al actualizar**. **Versión 0.9.0.**

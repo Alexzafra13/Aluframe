@@ -14,7 +14,10 @@
   <section aria-labelledby="titulo-ventanas">
     <div class="cabecera-seccion">
       <h2 id="titulo-ventanas">Ventanas</h2>
-      <a class="boton primario" href="/trabajos/{{ id }}/orden">Orden de taller</a>
+      <div class="acciones">
+        <a class="boton primario" href="/trabajos/{{ id }}/orden">Orden de taller</a>
+        {% if orden_terminada %}<span class="etiqueta etiqueta-estado">Orden terminada · stock descontado</span>{% else if abierto %}<a class="boton" href="/trabajos/{{ id }}/terminar">Terminar orden y descontar stock</a>{% endif %}
+      </div>
     </div>
     {% if ventanas.is_empty() %}<p class="vacio tarjeta">Este trabajo no tiene ventanas: solo otros conceptos.</p>{% endif %}
     <ol class="lista-ventanas" role="list">
@@ -32,7 +35,8 @@
         <ol class="pasos-ventana" role="list">
           {% for p in v.pasos %}<li class="paso-ventana paso-{{ p.estado }}"><span>{{ p.nombre }}</span>{% if !p.quien.is_empty() %}<span class="texto-apagado pequeno">{{ p.quien }}</span>{% endif %}</li>{% endfor %}
         </ol>
-        {% if abierto %}
+        {% if abierto && !orden_terminada %}
+        {% let volver = "trabajo" %}{% include "repetir_pieza.html" %}
         <div class="acciones">
           <form method="post" action="/trabajos/{{ id }}/ventanas/{{ v.id }}/operario" class="formulario-en-linea">
             <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">

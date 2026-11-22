@@ -21,6 +21,8 @@ pub mod presupuestos;
 pub mod primer_arranque;
 pub mod salud;
 pub mod series;
+pub mod stock;
 pub mod taller;
 pub mod tarifas;
+pub mod terminar_orden;
 pub mod trabajos;

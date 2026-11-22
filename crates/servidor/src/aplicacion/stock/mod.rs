@@ -1,6 +1,7 @@
 //! Stock (H5): saldos, entradas y ajustes hechos a mano, mínimos y lista de la compra. Nunca se
 //! edita un saldo: siempre se añade un movimiento con su motivo.
 
+pub mod compra;
 pub mod orden;
 pub mod prevision;
 pub mod terminar;

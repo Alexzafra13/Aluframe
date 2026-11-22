@@ -1,0 +1,19 @@
+{% extends "marco.html" %}
+{% block titulo %}Lista de la compra{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-documento">
+  <div>
+    <p class="antetitulo"><a href="/stock">Stock</a></p>
+    <h1>Lista de la compra</h1>
+    <p class="texto-apagado">Lo que necesitan los trabajos con la orden abierta más lo que falta para el mínimo, menos lo que hay. Solo para leer o imprimir.</p>
+  </div>
+  <button class="boton no-imprimir" type="button" data-imprimir>Imprimir</button>
+</header>
+{% if lineas.is_empty() %}<p class="vacio tarjeta">No hace falta comprar nada.</p>{% else %}
+<div class="tarjeta tabla-desplazable"><table class="tabla">
+  <thead><tr><th scope="col">Artículo</th><th scope="col">Color</th><th scope="col" class="numero">Hay</th><th scope="col" class="numero">Necesitan los trabajos</th><th scope="col" class="numero">Mínimo</th><th scope="col" class="numero">Comprar</th></tr></thead>
+  <tbody>{% for l in lineas %}<tr><td><span class="mono">{{ l.referencia }}</span><br><span class="texto-apagado pequeno">{{ l.descripcion }}</span></td><td>{{ l.color }}</td><td class="numero mono">{{ l.hay }}</td><td class="numero mono">{{ l.necesitan }}</td><td class="numero mono">{{ l.minimo }}</td><td class="numero mono"><strong>{{ l.comprar }}</strong> {{ l.unidad }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="/recursos/js/imprimir.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}

@@ -39,6 +39,7 @@
       </ol>
     </section>
   </div>
+  <section class="tarjeta">{% let v = ventana %}{% let volver = "mi-dia" %}{% include "repetir_pieza.html" %}</section>
   <section class="tarjeta" aria-labelledby="titulo-falta">
     <h2 id="titulo-falta">¿Falta algo?</h2>
     {% if let Some(f) = ventana.falta_algo %}<p class="etiqueta etiqueta-aviso">Avisado: {{ f }}</p>{% endif %}

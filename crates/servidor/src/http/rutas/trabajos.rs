@@ -8,6 +8,7 @@ use dominio::acceso::{Accion, Rol};
 use dominio::taller::EstadoDeTrabajo;
 use serde::Deserialize;
 
+use crate::aplicacion::stock::saldos;
 use crate::aplicacion::trabajos::acciones::{
     anotar_falta, asignar_trabajo, asignar_ventana, cerrar_trabajo, marcar_cristal,
 };
@@ -20,8 +21,8 @@ use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
 use crate::http::formulario::Campos;
 use crate::vistas::{
-    MENU, Opcion, PaginaInicio, PaginaOrden, PaginaTrabajo, PaginaTrabajos, TarjetaTrabajo,
-    renderizar, tablero,
+    AvisoDelTaller, MENU, Opcion, PaginaInicio, PaginaOrden, PaginaTrabajo, PaginaTrabajos,
+    TarjetaTrabajo, filas_de_stock, renderizar, tablero,
 };
 
 pub async fn mostrar_inicio(
@@ -34,12 +35,24 @@ pub async fn mostrar_inicio(
     autorizar(&actor, Accion::VerPanelDelPropietario)?;
     let fichas = listar_trabajos(&estado, &actor, false).await?;
     let (columnas, avisos) = tablero(&fichas);
+    let stock_bajo = filas_de_stock(&saldos(&estado, &actor).await?)
+        .into_iter()
+        .filter(|f| f.bajo_minimo)
+        .map(|f| AvisoDelTaller {
+            texto: format!(
+                "{} · {}: quedan {} (mínimo {})",
+                f.referencia, f.descripcion, f.enteras, f.minimo
+            ),
+            enlace: format!("/stock/{}", f.articulo),
+        })
+        .collect();
     let pagina = PaginaInicio {
         usuario: (&actor).into(),
         menu: MENU,
         seccion: "inicio",
         columnas,
         avisos,
+        stock_bajo,
     };
     Ok(renderizar(&pagina)?.into_response())
 }
@@ -81,6 +94,8 @@ fn texto_de_confirmacion(clave: &str) -> Option<String> {
         "entregado" => "Trabajo entregado.",
         "anulado" => "Trabajo anulado.",
         "medidas" => "Medidas cambiadas: la orden de taller lleva la revisión nueva.",
+        "terminada" => "Orden terminada: el stock está descontado.",
+        "repetida" => "Pieza repetida anotada: entra en el plan y se descontará al terminar.",
         _ => return None,
     };
     Some(texto.to_owned())

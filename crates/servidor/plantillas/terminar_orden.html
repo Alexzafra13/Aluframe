@@ -1,0 +1,43 @@
+{% extends "marco.html" %}
+{% block titulo %}Terminar orden · {{ codigo }}{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo"><a href="/trabajos">Trabajos</a> / <a href="/trabajos/{{ id }}">{{ codigo }}</a></p>
+  <h1>Terminar orden y descontar stock</h1>
+  <p class="texto-apagado">{{ cliente }}. Se descuenta en una sola vez y no se puede deshacer: lo que no cuadre se corrige después con un ajuste.</p>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+<form method="post" action="/trabajos/{{ id }}/terminar" class="pila">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <section class="tarjeta" aria-labelledby="titulo-salidas">
+    <h2 id="titulo-salidas">Sale del stock</h2>
+    {% if salidas.is_empty() %}<p class="vacio">Nada que descontar (ningún perfil ni accesorio tiene artículo en el catálogo).</p>{% endif %}
+    <ul class="lista-simple">{% for (texto, cantidad) in salidas %}<li>{{ texto }} <span class="mono">(−{{ cantidad }})</span></li>{% endfor %}</ul>
+    {% for a in avisos %}<p class="aviso pequeno">{{ a }}</p>{% endfor %}
+  </section>
+  <section class="tarjeta" aria-labelledby="titulo-retales">
+    <h2 id="titulo-retales">Retales que entran en el stock</h2>
+    <p class="texto-apagado pequeno">Los que salen según el plan de corte. Quita el que no sirva, corrige el largo o añade alguno que no esperabas.</p>
+    {% if retales.is_empty() %}<p class="vacio">El plan no deja retales aprovechables.</p>{% endif %}
+    {% for r in retales %}
+    <div class="formulario-en-linea fila-retal">
+      <input type="hidden" name="grupo_{{ r.indice }}" value="{{ r.grupo }}">
+      <label class="casilla"><input type="checkbox" name="guardar_{{ r.indice }}" value="si" checked> {{ r.texto }}</label>
+      <label>Largo (cm) <input name="largo_{{ r.indice }}" value="{{ r.largo_cm }}" inputmode="decimal"></label>
+    </div>
+    {% endfor %}
+    {% if !grupos.is_empty() %}
+    {% for n in [0, 1] %}
+    <div class="formulario-en-linea fila-retal">
+      <label>Otro retal <select name="extra_grupo_{{ n }}"><option value="">—</option>{% for g in grupos %}<option value="{{ g.valor }}">{{ g.texto }}</option>{% endfor %}</select></label>
+      <label>Largo (cm) <input name="extra_largo_{{ n }}" inputmode="decimal"></label>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </section>
+  <div class="acciones pie-formulario">
+    <a class="boton" href="/trabajos/{{ id }}">Cancelar</a>
+    <button class="boton primario" type="submit">Terminar orden y descontar</button>
+  </div>
+</form>
+{% endblock %}

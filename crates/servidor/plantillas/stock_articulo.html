@@ -1,0 +1,35 @@
+{% extends "marco.html" %}
+{% block titulo %}Stock · {{ referencia }}{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo"><a href="/stock">Stock</a> / {{ referencia }}</p>
+  <h1>{{ descripcion }}</h1>
+</header>
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+<div class="documento">
+  <section class="tarjeta" aria-labelledby="titulo-movimientos">
+    <h2 id="titulo-movimientos">Movimientos</h2>
+    {% if movimientos.is_empty() %}<p class="vacio">Sin movimientos todavía.</p>{% else %}
+    <div class="tabla-desplazable"><table class="tabla">
+      <thead><tr><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col" class="numero">Cantidad</th><th scope="col">Detalle</th><th scope="col">Motivo</th><th scope="col">Quién</th></tr></thead>
+      <tbody>{% for m in movimientos %}<tr><td>{{ m.cuando }}</td><td>{{ m.tipo }}</td><td class="numero mono">{{ m.cantidad }}</td><td>{{ m.detalle }}</td><td>{{ m.motivo }}</td><td>{{ m.usuario }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+    {% endif %}
+  </section>
+  <aside class="columna-datos">
+    <section class="tarjeta">
+      <h2>Ahora hay</h2>
+      {% for f in filas %}<p><strong>{{ f.color }}:</strong> <span class="mono">{{ f.enteras }}</span> {{ unidad }}{% for r in f.retales %}<br><span class="mono pequeno">{{ r }}</span>{% endfor %}</p>{% endfor %}
+      {% if filas.is_empty() %}<p class="vacio">Nada.</p>{% endif %}
+    </section>
+    <form class="tarjeta" method="post" action="/stock/{{ id }}/minimo">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <h2>Mínimo</h2>
+      <p class="texto-apagado pequeno">Por debajo, sale «Bajo mínimo» en el stock y en el Inicio, y entra en la lista de la compra.</p>
+      <label for="minimo">Mínimo ({{ unidad }})</label>
+      <input id="minimo" name="minimo" value="{{ minimo }}" inputmode="decimal" placeholder="0">
+      <button class="boton primario" type="submit">Guardar el mínimo</button>
+    </form>
+  </aside>
+</div>
+{% endblock %}

@@ -8,8 +8,10 @@ mod orden;
 mod paginas;
 mod presupuestos;
 mod series;
+mod stock;
 mod taller;
 mod tarifas;
+mod terminar;
 mod trabajos;
 
 pub use catalogo::*;
@@ -22,8 +24,10 @@ pub use orden::*;
 pub use paginas::*;
 pub use presupuestos::*;
 pub use series::*;
+pub use stock::*;
 pub use taller::*;
 pub use tarifas::*;
+pub use terminar::*;
 pub use trabajos::*;
 
 use askama::Template;

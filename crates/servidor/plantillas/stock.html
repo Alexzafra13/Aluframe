@@ -1,0 +1,52 @@
+{% extends "marco.html" %}
+{% block titulo %}Stock{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-documento">
+  <div>
+    <p class="antetitulo">Taller</p>
+    <h1>Stock</h1>
+    <p class="texto-apagado">Se descuenta solo al terminar cada orden de taller. Las correcciones se hacen con un ajuste y su motivo.</p>
+  </div>
+  <a class="boton" href="/stock/compra">Lista de la compra</a>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+<nav class="segmentado" aria-label="Qué artículos ver">
+  <a class="segmento{% if !solo_bajo %} activo{% endif %}" href="/stock">Todo</a>
+  <a class="segmento{% if solo_bajo %} activo{% endif %}" href="/stock?bajo=si">Bajo mínimo</a>
+</nav>
+{% if filas.is_empty() %}
+<p class="vacio tarjeta">{% if solo_bajo %}Nada bajo mínimo.{% else %}Aún no hay stock. Empieza con una entrada «Inventario inicial» de cada artículo (las barras enteras y, aparte, cada retal con su largo).{% endif %}</p>
+{% else %}
+<div class="tarjeta tabla-desplazable">
+<table class="tabla">
+  <thead><tr><th scope="col">Artículo</th><th scope="col">Color</th><th scope="col" class="numero">Enteras</th><th scope="col">Retales</th><th scope="col" class="numero">Mínimo</th></tr></thead>
+  <tbody>
+    {% for f in filas %}<tr>
+      <td><a href="/stock/{{ f.articulo }}"><span class="mono">{{ f.referencia }}</span></a><br><span class="texto-apagado pequeno">{{ f.descripcion }}</span></td>
+      <td>{{ f.color }}</td>
+      <td class="numero mono">{{ f.enteras }} <span class="texto-apagado pequeno">{{ f.unidad }}</span>{% if f.bajo_minimo %} <span class="etiqueta etiqueta-aviso">Bajo mínimo</span>{% endif %}</td>
+      <td class="mono pequeno">{% for r in f.retales %}{{ r }}{% if !loop.last %}<br>{% endif %}{% endfor %}</td>
+      <td class="numero mono">{{ f.minimo }}</td>
+    </tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+{% if articulos.is_empty() %}
+<p class="vacio tarjeta">Para meter stock, da de alta antes los artículos en Catálogo &gt; Artículos (o importa la tarifa).</p>
+{% else %}
+<div class="rejilla-dos-tarjetas">
+  <form class="tarjeta" method="post" action="/stock/entrada">
+    <h2>Entrada de material</h2>
+    {% let prefijo = "entrada" %}{% include "stock_movimiento.html" %}
+    <button class="boton primario" type="submit">Anotar entrada</button>
+  </form>
+  <form class="tarjeta" method="post" action="/stock/ajuste">
+    <h2>Ajuste</h2>
+    {% let prefijo = "ajuste" %}{% include "stock_movimiento.html" %}
+    <button class="boton" type="submit">Anotar ajuste</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}
