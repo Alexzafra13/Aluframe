@@ -106,6 +106,8 @@ pub struct PaginaTaller {
     pub grosor_sierra_mm: String,
     pub recorte_extremos_mm: String,
     pub retal_minimo_cm: String,
+    /// Un paso por renglón (decisión 5 del plan de H4).
+    pub pasos: String,
     pub provisional: bool,
     pub aviso: Option<String>,
     pub confirmacion: Option<String>,

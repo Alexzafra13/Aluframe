@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H3 terminados**; publicada la **v0.7.2**. Siguiente: **H4, trabajos y orden de taller** (plan propuesto, falta el visto bueno del propietario; ver abajo).
+Estado (2026-11-22): **H0–H4 terminados**; publicada la **v0.8.0**. Siguiente: **H5, stock** (el propietario quiere el programa completo, H5 a H7, antes de pulir).
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
@@ -19,7 +19,7 @@ Estado (2026-11-22): **H0–H3 terminados**; publicada la **v0.7.2**. Siguiente:
 ## Instalación del propietario (para pruebas, sin datos reales)
 Servidor Ubuntu en casa (`192.168.1.100`, servicio `alumframe`, datos en `/var/lib/alumframe`), acceso desde fuera con Tailscale (`100.104.229.16:9090`). Pasos en `docs/MAINTENANCE.md`, apartado 4. **Pendiente de probar por él:** el instalador de Windows (que no salga consola y que se cierre al cerrar la ventana).
 
-## H4: plan propuesto, a la espera del propietario
+## H4: plan aprobado (sin objeciones del propietario, 2026-11-22) y hecho
 Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de taller A4, asignar operarios, «Mi día» y pasos del operario, modificar medidas con revisiones. Seis decisiones propuestas:
 1. Hoja de taller en mm; el resto de pantallas en cm.
 2. Plan de corte por trabajo (todas sus ventanas, por perfil y color).
@@ -50,6 +50,7 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
 | 0.7.1 | Arreglo de la aplicación de Windows: no se apaga mientras la ventana siga abierta |
 | 0.7.2 | Editor: «Guardar ventana» vuelve al presupuesto; «+ Otro concepto» (antes línea libre); aviso de medida fuera de la serie solo cuando ocurre; menú lateral fijo y plegable; Aluprom 21 validada por el propietario |
+| 0.8.0 | **H4:** trabajos al aceptar, tablero, ficha, orden de taller A4 en mm con plan de corte del trabajo, Mi día del operario con pasos, modificar medidas con revisión; tablas de H5 y H6 ya creadas |
 | 0.7.0 | Alta de cliente con nombre y teléfono obligatorios (sin prefijo, +34 por defecto); código postal que rellena localidad, provincia y país (ADR-0020); hoja del presupuesto con logotipo o nombre de empresa, datos completos, firma y pie; descripción de la ventana con serie, medidas, color, opciones y cristal |
 
 | Hito | Estado |
@@ -58,7 +59,7 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | H1 Motor de dominio | **hecho** (2026-11-21) |
 | H2 Catálogo, clientes e importación | **hecho** (2026-11-21) |
 | H3 Presupuestos | **hecho** (2026-11-21) |
-| H4 Trabajos y orden de taller | pendiente |
+| H4 Trabajos y orden de taller | **hecho** (2026-11-22) |
 | H5 Stock | pendiente |
 | H6 Facturación | pendiente |
 | H7 Copias y despliegue | pendiente |
@@ -142,4 +143,18 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 - **Punto de validación** (SPEC H3): 5 ventanas reales comparadas con el cálculo a mano. Hacen falta los descuentos del cristal, las referencias de proveedor de las series y una tarifa real; hoy las series reales salen incompletas, como debe ser.
 - El trabajo que nace al aceptar llega en H4. Anonimizar clientes con documentos, en H6.
 - Posición real de las bisagras en el dibujo y logotipo en la hoja impresa.
+
+### H4. Trabajos y orden de taller (2026-11-22)
+**Hecho**
+- Al aceptar nace el trabajo (misma transacción) con una ventana por unidad, sus pasos (Ajustes > Taller) y la copia congelada de cada ventana (`aplicacion/trabajos/congelado.rs`).
+- Dominio `dominio::taller`: pasos y sus acciones, estado del trabajo, columna del tablero y plan de corte de todo el trabajo por perfil y color.
+- Pantallas: tablero del Inicio, Trabajos, ficha del trabajo, orden de taller A4 en mm (una hoja por ventana y el plan de corte con barras a escala), Mi día y ventana del operario, Modificar medidas con comparación.
+- Permisos: `GestionarTrabajos` (propietario) y `MarcarPasos` (operario, solo sus ventanas: lo ajeno da 404). El operario no ve precios.
+- **Criterios de aceptación:** cambiar una fórmula tras aceptar no altera el trabajo (`tests/trabajos.rs::cambiar_la_serie_despues_de_aceptar_no_altera_el_trabajo`); el operario no ve precios ni modifica medidas y el propietario sí, con revisión y motivo, y la orden impresa muestra la revisión (`tests/trabajos_pantallas.rs::modificar_medidas_deja_revision_con_motivo_y_la_orden_la_muestra`, E2E `h4-taller`): **cumplidos**.
+
+**Decisiones:** las seis del plan (mm en la hoja, plan de corte por trabajo, una ventana por unidad, casilla para reiniciar pasos, pasos editables, entregado a mano). El aviso «falta algo» vive en la ventana. Modificar medidas no cambia el importe del trabajo (provisional). Las tablas de H5 y H6 se crean ya, para borrar los datos de prueba una sola vez.
+
+**Pendiente**
+- Terminar la orden y descontar stock (H5); albarán y factura desde el trabajo, y señales (H6).
+- La medida del cristal de Aluprom 21 sigue sin dato: sus ventanas no se pueden aceptar todavía (las pruebas usan una serie ficticia «validada»).
 

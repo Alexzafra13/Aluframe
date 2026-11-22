@@ -1,10 +1,10 @@
 /* H4: tablero, trabajos y pantallas del operario (docs/design.md). */
 .contador { display: inline-grid; place-items: center; min-width: 1.6rem; height: 1.6rem; margin-left: .4rem; padding: 0 .4rem; border-radius: 999px; background: rgb(21 25 29 / .08); color: var(--tinta); font: 600 .8rem var(--mono); letter-spacing: 0; }
 .pila-tarjetas { display: grid; gap: .75rem; }
-.tarjeta-trabajo { display: grid; grid-template-columns: 76px 1fr; gap: .9rem; align-items: start; padding: .9rem; border-radius: 12px; background: var(--superficie); border: 1px solid var(--linea); color: var(--tinta); text-decoration: none; transition: transform var(--rapido) var(--curva-muelle), box-shadow var(--normal) ease; }
+.tarjeta-trabajo { display: grid; grid-template-columns: 1fr; gap: .6rem; align-items: start; padding: .9rem; border-radius: 12px; background: var(--superficie); border: 1px solid var(--linea); color: var(--tinta); text-decoration: none; transition: transform var(--rapido) var(--curva-muelle), box-shadow var(--normal) ease; }
 .tarjeta-trabajo:hover { box-shadow: 0 6px 18px rgb(21 25 29 / .08); }
 .tarjeta-trabajo:active { transform: scale(.985); }
-.miniatura-trabajo { width: 76px; height: 64px; }
+.miniatura-trabajo { width: 100%; height: 96px; }
 .tarjeta-trabajo-texto { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
 .etiquetas { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .35rem; }
 .rejilla-tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .9rem; }

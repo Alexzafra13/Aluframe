@@ -19,4 +19,12 @@
   </div>
   <button class="boton primario" type="submit">Guardar</button>
 </form>
+<form class="tarjeta" method="post" action="/ajustes/taller/pasos">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <h2>Pasos de cada ventana</h2>
+  <p class="texto-apagado">Un paso por renglón, en orden. El operario los marca en «Mi día». Valen para los trabajos que se acepten desde ahora; los que ya existen conservan los suyos.</p>
+  <label for="pasos">Pasos</label>
+  <textarea id="pasos" name="pasos" rows="7">{{ pasos }}</textarea>
+  <button class="boton primario" type="submit">Guardar los pasos</button>
+</form>
 {% endblock %}

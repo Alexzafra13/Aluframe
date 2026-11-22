@@ -6,16 +6,47 @@ use rusqlite::Connection;
 use super::congelado::congelar_linea;
 use crate::aplicacion::lineas_de_presupuesto::a_json;
 use crate::aplicacion::presupuestos::FichaDePresupuesto;
+use crate::aplicacion::{Actor, autorizar};
+use crate::bd::consultas::configuracion::Valor;
 use crate::bd::consultas::trabajos::{self, NuevoTrabajo};
 use crate::bd::consultas::{configuracion, pasos, presupuestos, ventanas_trabajo};
 use crate::errores::ErrorApp;
-use crate::fecha::{anio_de_madrid, leer_utc};
+use crate::estado::EstadoApp;
+use crate::fecha::{anio_de_madrid, formatear_utc, leer_utc};
+use dominio::acceso::Accion;
 
 pub const CLAVE_PASOS: &str = "taller.pasos";
 
 pub fn pasos_configurados(con: &Connection) -> Result<Vec<String>, ErrorApp> {
     let texto = configuracion::leer(con, CLAVE_PASOS)?.unwrap_or_default();
     Ok(dominio::taller::leer_pasos(&texto))
+}
+
+pub async fn leer_pasos_del_taller(estado: &EstadoApp) -> Result<Vec<String>, ErrorApp> {
+    estado.bd.leer(pasos_configurados).await
+}
+
+/// Los trabajos que ya existen conservan sus pasos: los nuevos valen desde el siguiente.
+pub async fn guardar_pasos_del_taller(
+    estado: &EstadoApp,
+    actor: &Actor,
+    texto: String,
+) -> Result<(), ErrorApp> {
+    autorizar(actor, Accion::GestionarTrabajos)?;
+    let valor = dominio::taller::leer_pasos(&texto).join("\n");
+    let (ahora, usuario_id) = (formatear_utc(estado.ahora()), actor.id);
+    estado
+        .bd
+        .escribir(move |tx| {
+            let nuevo = Valor {
+                clave: CLAVE_PASOS,
+                valor: &valor,
+                ahora: &ahora,
+                usuario_id,
+            };
+            configuracion::guardar(tx, &nuevo)
+        })
+        .await
 }
 
 /// Una línea con cantidad 3 son 3 ventanas (decisión 3 del plan de H4); 1,5 se redondea arriba.

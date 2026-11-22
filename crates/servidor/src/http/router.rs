@@ -96,6 +96,7 @@ fn rutas_de_ajustes() -> Router<EstadoApp> {
             "/ajustes/taller",
             get(taller::mostrar_taller).post(taller::guardar_taller),
         )
+        .route("/ajustes/taller/pasos", post(taller::guardar_pasos))
         .route("/ajustes/datos", get(datos::mostrar_datos))
         .route("/ajustes/datos/exportar", get(datos::descargar_copia))
         .route(

@@ -8,6 +8,7 @@ use serde::Deserialize;
 use crate::aplicacion::taller::{
     TextosDeTaller, guardar_ajustes_de_taller, leer_ajustes_de_taller,
 };
+use crate::aplicacion::trabajos::crear::{guardar_pasos_del_taller, leer_pasos_del_taller};
 use crate::aplicacion::{Actor, autorizar};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -41,7 +42,26 @@ pub async fn mostrar_taller(
     let confirmacion = guardado
         .guardado
         .map(|_| "Ajustes del taller guardados.".to_owned());
-    pagina(&actor, textos, (!ajustes.confirmados, None, confirmacion))
+    let pasos = leer_pasos_del_taller(&estado).await?.join("\n");
+    pagina(
+        &actor,
+        (textos, pasos),
+        (!ajustes.confirmados, None, confirmacion),
+    )
+}
+
+#[derive(Deserialize)]
+pub struct FormularioPasos {
+    pasos: String,
+}
+
+pub async fn guardar_pasos(
+    State(estado): State<EstadoApp>,
+    ActorActual(actor): ActorActual,
+    Form(formulario): Form<FormularioPasos>,
+) -> Result<Response, ErrorApp> {
+    guardar_pasos_del_taller(&estado, &actor, formulario.pasos).await?;
+    Ok(Redirect::to("/ajustes/taller?guardado=si").into_response())
 }
 
 pub async fn guardar_taller(
@@ -58,7 +78,8 @@ pub async fn guardar_taller(
     match guardar_ajustes_de_taller(&estado, &actor, textos).await {
         Ok(()) => Ok(Redirect::to("/ajustes/taller?guardado=si").into_response()),
         Err(ErrorApp::Validacion(aviso)) => {
-            let respuesta = pagina(&actor, copia, (true, Some(aviso), None))?;
+            let pasos = leer_pasos_del_taller(&estado).await?.join("\n");
+            let respuesta = pagina(&actor, (copia, pasos), (true, Some(aviso), None))?;
             Ok((StatusCode::UNPROCESSABLE_ENTITY, respuesta).into_response())
         }
         Err(otro) => Err(otro),
@@ -77,7 +98,7 @@ type Mensajes = (bool, Option<String>, Option<String>);
 
 fn pagina(
     actor: &Actor,
-    textos: TextosDeTaller,
+    (textos, pasos): (TextosDeTaller, String),
     (provisional, aviso, confirmacion): Mensajes,
 ) -> Result<Response, ErrorApp> {
     let pagina = PaginaTaller {
@@ -88,6 +109,7 @@ fn pagina(
         grosor_sierra_mm: textos.grosor_sierra_mm,
         recorte_extremos_mm: textos.recorte_extremos_mm,
         retal_minimo_cm: textos.retal_minimo_cm,
+        pasos,
         provisional,
         aviso,
         confirmacion,

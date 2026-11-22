@@ -3,7 +3,7 @@ const { entrarComoPropietario } = require("./comun");
 
 // Pantallas del propietario que ya existen; cada hito añade las suyas.
 const PANTALLAS = [
-  "/", "/clientes", "/clientes/nuevo", "/clientes/importar", "/presupuestos",
+  "/", "/clientes", "/clientes/nuevo", "/clientes/importar", "/presupuestos", "/trabajos", "/mi-dia",
   "/catalogo/articulos", "/catalogo/proveedores", "/catalogo/acabados", "/catalogo/tarifas",
   "/catalogo/series", "/catalogo/series/importar", "/catalogo/tarifas/importar",
   "/ajustes/usuarios", "/ajustes/taller", "/ajustes/presupuestos", "/ajustes/datos",

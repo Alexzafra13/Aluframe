@@ -156,9 +156,9 @@ Ajustes de empresa y precio en `configuracion`: `empresa.*`, `precio.margen_modo
 ### 7.7 Trabajos y orden de taller
 | Tabla | Campos |
 |---|---|
-| `trabajo` | id, serie_numeracion, anio, numero, presupuesto_id, version_presupuesto_id, cliente_id, direccion_montaje_id, estado (`pendiente`/`en_curso`/`terminado`/`entregado`/`anulado`), asignado_a (usuario_id), fecha_prevista, congelado_json, creado_en, version |
-| `ventana_trabajo` | id, trabajo_id, linea_presupuesto_id, orden, descripcion, asignado_a (usuario_id), cristal_recibido (0/1, se marca a mano), revision (1 al aceptar), congelado_json (medidas, resultado, opciones, la revisión vigente) |
-| `paso_ventana` | id, ventana_trabajo_id, orden, nombre, estado (`pendiente`/`en_curso`/`hecho`), nota_falta, usuario_id, cambiado_en |
+| `trabajo` | id, anio, numero, presupuesto_id (único), cliente_id, cliente_nombre y direccion_montaje (copiados al aceptar), importe_cent (el aceptado), estado (`pendiente`/`en_curso`/`terminado`/`entregado`/`anulado`), asignado_a (usuario_id), fecha_prevista, creado_en, version. Lo congelado va en cada ventana |
+| `ventana_trabajo` | id, trabajo_id, orden, linea_orden, descripcion, asignado_a (usuario_id), cristal_recibido (0/1, se marca a mano), revision (1 al aceptar), revisada_en, medida_cambiada (aviso al operario hasta que la abre), falta_algo (la nota «falta algo» vive en la ventana, no en cada paso), congelado_json (versión de la serie, tipología, medidas, opciones, color, resultado y longitud de barra; la revisión vigente), version |
+| `paso_ventana` | id, ventana_id, orden, nombre, estado (`pendiente`/`en_curso`/`hecho`), usuario_id, cambiado_en, version (si dos tocan el mismo paso, el segundo recibe aviso) |
 | `cambio_ventana_trabajo` | id, ventana_trabajo_id, revision, congelado_anterior_json, congelado_nuevo_json, motivo, pasos_reiniciados (0/1), usuario_id, cuando_en (solo añadir). Cada **Modificar medidas** del propietario crea una revisión; `ventana_trabajo.congelado_json` guarda la vigente |
 | `paso_historial` | id, paso_id, estado_anterior, estado_nuevo, nota, usuario_id, cuando_en (solo añadir) |
 | `orden_taller` | id, trabajo_id, generada_en, plan_de_corte_json, estado (`abierta`/`terminada`), terminada_en, terminada_por |

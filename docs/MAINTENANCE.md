@@ -60,6 +60,7 @@ Hoy: antes de cada migración se guarda una copia con `VACUUM INTO` en `copias/`
 - **Importar clientes** de una hoja de cálculo: Clientes > Importar clientes (columnas en ADR-0012, todas opcionales).
 - **Petición RGPD de un cliente:** en su ficha, «Exportar datos» (acceso) o «Borrar definitivamente» (supresión).
 - **Margen, cobro de perfiles, mano de obra, IVA y datos de la empresa:** Ajustes > Empresa y precios. Lo que se deje sin elegir hace que las ventanas salgan «incompletas» y lo dicen.
+- **Taller:** al aceptar un presupuesto aparece su trabajo en Inicio y en Trabajos. En la ficha del trabajo se asigna el operario (y la fecha prevista), se imprime la orden de taller y se modifican medidas. Los pasos de cada ventana se cambian en Ajustes > Taller (valen para los trabajos nuevos).
 - **Presupuestos:** si cambia una tarifa, el presupuesto en borrador avisa y ofrece «Recalcular precios». Un presupuesto aceptado no se toca: se guarda congelado con su huella.
 
 ## 7. Actualizar el toolchain y las dependencias

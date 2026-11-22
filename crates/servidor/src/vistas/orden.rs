@@ -93,7 +93,10 @@ fn grupo(barras: &BarrasDePerfil) -> GrupoDeCorte {
     );
     match &barras.plan {
         Ok(plan) => GrupoDeCorte {
-            titulo: format!("{titulo} · {} barras", plan.numero_de_barras()),
+            titulo: match plan.numero_de_barras() {
+                1 => format!("{titulo} · 1 barra"),
+                n => format!("{titulo} · {n} barras"),
+            },
             barras: plan
                 .barras
                 .iter()

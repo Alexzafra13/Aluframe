@@ -18,6 +18,7 @@ use servidor::aplicacion::trabajos::acciones::{
 use servidor::aplicacion::trabajos::consultar::{
     cargar_trabajo, listar_trabajos, ventanas_de_operario,
 };
+use servidor::aplicacion::trabajos::crear::{guardar_pasos_del_taller, leer_pasos_del_taller};
 use servidor::estado::EstadoApp;
 
 /// Presupuesto aceptado con una línea de 2 ventanas de 150 × 120: nace el trabajo 1.
@@ -171,4 +172,16 @@ async fn con_todos_los_pasos_hechos_queda_terminado_y_se_entrega_a_mano() {
     );
     let otra_vez = cerrar_trabajo(&estado, &actor, 1, EstadoDeTrabajo::Anulado).await;
     assert!(otra_vez.is_err());
+}
+
+#[tokio::test]
+async fn los_pasos_de_ajustes_valen_para_los_trabajos_nuevos() {
+    let contexto = Contexto::nuevo().await;
+    let (_, actor) = contexto.con_propietario().await;
+    let texto = "Cortar\nSoldar\n\ncortar\n".to_owned();
+    guardar_pasos_del_taller(&contexto.estado, &actor, texto)
+        .await
+        .unwrap();
+    let pasos = leer_pasos_del_taller(&contexto.estado).await.unwrap();
+    assert_eq!(pasos, ["Cortar", "Soldar"]);
 }
