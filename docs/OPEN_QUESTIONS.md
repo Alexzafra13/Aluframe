@@ -10,7 +10,8 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos sin dato (se usa 0); retal mínimo 0 por decisión del propietario. Se cambian en Ajustes > Taller.
 - [ ] Aluprom 21 de 4 hojas: confirmar ruedas (8) y tornillos (9 + 16), que son supuestos. Otras tipologías (fija, puertas). ¿Lleva el perfil «cierre 4 hojas» 21344?
 - [x] Nombres de las hojas de Aluprom 21: los del catálogo de Aluval, HOJA LATERAL y HOJA CIERRE (propietario, 2026-11-22; ADR-0017).
-- [x] Hojas de Aluprom 21 según el cristal (propietario, 2026-11-22): sencillo → 21310, 21340, 21350; doble (Climalit) → 21312, 21341, 21351. **Pendiente de modelar** el tipo de cristal en la línea para elegir la referencia de precio.
+- [x] Hojas de Aluprom 21 según el cristal (propietario, 2026-11-22): sencillo → 21310, 21340, 21350; doble (Climalit) → 21312, 21341, 21351. Se elige en la línea con la opción «Acristalamiento» (ADR-0018).
+- [ ] Climalit: ¿cambian los descuentos de las hojas o del cristal respecto al sencillo? (hoy se suponen iguales). Tipo de Climalit y cámara: cómo se piden y si cambian algo más (lo concretará el propietario).
 - [ ] Aluprom 21, marcos: el propietario cree que el lateral es siempre 21210 y el superior 21220 (confirmar en el taller). El inferior es siempre el mismo, pero falta saber si es 21230 (con cámara) o 21231 (sin cámara).
 - [x] **Fixture de la abatible y bisagras:** el propietario confirma (2026-11-21) 2 bisagras por hoja hasta 140 cm de alto de la ventana, incluido, y 3 por encima. El fixture incluye ahora «BISAGRA: 4» para 120 × 140.
 - [ ] V-94 abatible: cantidad de inversores y su ángulo de corte, cálculo de las pletinas de falleba, tipos de escuadra (exterior e interior de hoja) y si los marcos superior, lateral e inferior son el mismo perfil.

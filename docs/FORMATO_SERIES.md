@@ -81,11 +81,12 @@ tipologias:
 | `limites` | no | Medidas mínima y máxima de `ancho` y `alto`. Si falta, el programa avisa de que los límites no están definidos y no bloquea. |
 
 ## 4. Fórmulas y piezas
-Cada pieza es `{ perfil, cantidad, longitud, corte }` y, si hace falta, `posicion`.
+Cada pieza es `{ perfil, cantidad, longitud, corte }` y, si hace falta, `posicion` y `perfil_segun`.
 - `perfil`: código que debe existir en `referencias`.
 - `cantidad`: un entero o una fórmula que da un entero.
 - `longitud`: fórmula en la unidad de la serie.
 - `corte`: grados (`90`, `45`) o `CONFIRMAR`. Un corte distinto de 90 se dibuja y se imprime en la hoja de corte.
+- `perfil_segun` (opcional, ADR-0018): otro perfil cuando una opción de la línea toma un valor. `perfil_segun: { acristalamiento: { climalit: HOJA_LATERAL_CLIMALIT } }` usa ese perfil si en la línea se elige «climalit» y `perfil` en cualquier otro caso. La opción y el valor deben existir en la tipología y el perfil, en `referencias`. Cambia el perfil (y con él la referencia, el precio y la silueta), no la cantidad ni la medida, y la pieza conserva su número.
 - `posicion` (opcional, ADR-0017): dónde va el número de la pieza en el dibujo cuando su nombre no lo dice: `marco_lateral`, `marco_superior`, `marco_inferior`, `hoja_lateral`, `hoja_central`, `hoja_superior` o `hoja_inferior`. Sin ella se deduce del nombre (`MARCO_SUPERIOR`, `HOJA_RODAMIENTO`…). Ejemplo: la `HOJA_CIERRE` de Aluval va en el centro de la corredera, `posicion: hoja_central`.
 
 Las fórmulas usan solo lo que permite el evaluador (`docs/BACKEND.md`, apartado 5.1):
@@ -96,7 +97,7 @@ Las fórmulas usan solo lo que permite el evaluador (`docs/BACKEND.md`, apartado
 - `minimo` y `maximo` admiten 2 o más argumentos; `redondear`, `techo` y `suelo` tienen 1 y redondean a un número entero de la unidad de la serie (al más cercano, hacia arriba y hacia abajo).
 - Un campo con un nombre que no está en este documento es un error (evita erratas como `acesorios`).
 
-No se admiten texto, variables nuevas ni funciones propias. Una fórmula con un nombre desconocido es un **error de importación**, no se interpreta. Las opciones de línea (apartado 8) **no** se pueden usar dentro de las fórmulas en el MVP: cambian el dibujo y los textos, no las cuentas. Si una opción tiene que cambiar una cantidad o una medida, se amplía el evaluador con una decisión explícita.
+No se admiten texto, variables nuevas ni funciones propias. Una fórmula con un nombre desconocido es un **error de importación**, no se interpreta. Las opciones de línea (apartado 8) **no** se pueden usar dentro de las fórmulas en el MVP: cambian el dibujo, los textos y, con `perfil_segun`, qué perfil lleva una pieza, no las cuentas. Si una opción tiene que cambiar una cantidad o una medida, se amplía el evaluador con una decisión explícita.
 
 Precisión: se calcula con enteros en décimas de milímetro. `ancho / 2 - 2` con `ancho = 150` da 73; con `ancho = 151` da 73,5; con `(ancho - 4.85) / 2` se aplica el redondeo de la serie al final.
 
