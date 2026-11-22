@@ -67,6 +67,7 @@ fn rutas_de_acceso() -> Router<EstadoApp> {
             "/escritorio/conexion",
             get(escritorio::mostrar_conexion).post(escritorio::elegir_conexion),
         )
+        .route("/escritorio/latido", get(escritorio::latido))
 }
 
 fn rutas_de_ajustes() -> Router<EstadoApp> {

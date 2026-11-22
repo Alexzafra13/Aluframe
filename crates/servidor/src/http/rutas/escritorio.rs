@@ -21,6 +21,12 @@ pub struct Eleccion {
     servidor: String,
 }
 
+/// La ventana de escritorio sigue abierta (ver `escritorio::latido`).
+pub async fn latido() -> axum::http::StatusCode {
+    crate::escritorio::latido::anotar_latido();
+    axum::http::StatusCode::NO_CONTENT
+}
+
 pub async fn mostrar_conexion(State(estado): State<EstadoApp>) -> Result<Response, ErrorApp> {
     let archivo = archivo_de_preferencias(&estado)?;
     let preferencias = Preferencias::cargar(archivo);

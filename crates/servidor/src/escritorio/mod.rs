@@ -1,6 +1,7 @@
 //! Aplicación de escritorio (ADR-0015): el mismo programa en una ventana propia, que trabaja en
 //! este equipo o contra el servidor del taller.
 
+pub mod latido;
 pub mod preferencias;
 pub mod ventana;
 

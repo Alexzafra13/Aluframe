@@ -29,6 +29,8 @@ El paquete de Windows era un `.zip` con `alumframe.exe` en modo local, que dejab
 - **Icono junto al reloj para cerrar el programa:** también necesita una dependencia. Cerrar la ventana ya cierra el programa.
 - **Elegir el modo al instalar:** el propietario prefiere poder cambiarlo desde la aplicación.
 
+**Corrección (2026-11-22, v0.7.1):** el proceso de Edge que se lanza no siempre es el de la ventana. Si Edge ya tenía abierto ese perfil, le pasa la ventana y termina al momento; el programa creía que se había cerrado, se apagaba y la ventana mostraba «127.0.0.1 rechazó la conexión» (primera prueba del propietario en Windows). Ahora la página «late» cada 20 s (`/escritorio/latido`, solo cuando se abre en 127.0.0.1) y el programa se apaga cuando el proceso ha terminado **y** la página lleva 150 s sin latir. Prueba: `sigue_en_marcha_mientras_la_ventana_late_aunque_el_navegador_termine`.
+
 ## Consecuencias
 - El `.zip` de Windows y `crear-acceso-directo.ps1` desaparecen; se publica `AlumFrame-vX.Y.Z-windows-instalar.exe`.
 - El instalador no está firmado: la primera vez Windows SmartScreen avisa («Windows protegió su PC» → «Más información» → «Ejecutar de todas formas»). Firmarlo exige un certificado de pago; se decidirá si hace falta.

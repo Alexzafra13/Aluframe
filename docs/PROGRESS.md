@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H3 terminados**; publicada la **v0.7.0** (clientes, código postal y hoja del presupuesto). Siguiente: **H4, trabajos y orden de taller** (plan propuesto, falta el visto bueno del propietario; ver abajo).
+Estado (2026-11-22): **H0–H3 terminados**; publicada la **v0.7.1** (clientes, código postal, hoja del presupuesto y arreglo de la aplicación de Windows). Siguiente: **H4, trabajos y orden de taller** (plan propuesto, falta el visto bueno del propietario; ver abajo).
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.

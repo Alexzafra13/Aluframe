@@ -8,6 +8,7 @@ use std::sync::Mutex;
 use anyhow::Context;
 use servidor::arranque::{escuchar, preparar_estado, servir_hasta};
 use servidor::config::{Configuracion, Modo};
+use servidor::escritorio::latido::la_ventana_sigue_abierta;
 use servidor::escritorio::preferencias::{ARCHIVO_DE_PREFERENCIAS, Preferencias};
 use servidor::escritorio::ventana::{abrir_ventana, mostrar_error};
 use servidor::escritorio::{carpeta_de_la_aplicacion, responde_alumframe};
@@ -77,13 +78,19 @@ async fn servir_mientras_la_ventana_siga_abierta(
 
 /// `true` cuando la ventana se ha cerrado. Sin Edge ni Chrome se abrió el navegador normal y no
 /// se sabe cuándo se cierra: el programa sigue en marcha hasta apagar o cerrar la sesión.
+/// El proceso de Edge puede terminar sin que se cierre la ventana (si Edge ya tenía abierto el
+/// perfil, se la pasa a ese y termina): solo se apaga cuando además la página deja de latir.
 async fn esperar_a_que_se_cierre(ventana: Option<std::process::Child>) -> anyhow::Result<bool> {
     let Some(mut ventana) = ventana else {
         anotar("sin navegador compatible: se usa el predeterminado");
         return Ok(false);
     };
     tokio::task::spawn_blocking(move || ventana.wait()).await??;
-    anotar("ventana cerrada: AlumFrame se cierra");
+    anotar("el proceso de la ventana ha terminado; se sigue mientras la página dé señales");
+    while la_ventana_sigue_abierta() {
+        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+    }
+    anotar("la ventana ya no da señales: AlumFrame se cierra");
     Ok(true)
 }
 

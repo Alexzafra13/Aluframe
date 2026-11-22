@@ -27,6 +27,7 @@ fn preparar(nombre: &str, puerto: u16) -> (PathBuf, Command) {
         .env("ALUMFRAME_CARPETA_APP", &carpeta)
         .env("ALUMFRAME_NAVEGADOR", &navegador)
         .env("ALUMFRAME_PUERTO", puerto.to_string())
+        .env("ALUMFRAME_SILENCIO_PARA_CERRAR", "2")
         .env("CARPETA", &carpeta);
     (carpeta, orden)
 }
@@ -96,4 +97,26 @@ fn cambiar_conexion_vuelve_a_preguntar_aunque_ya_se_eligiera() {
     let pagina = leer(&carpeta, "pagina.html");
     assert!(pagina.contains("¿Dónde vas a trabajar?"));
     assert!(pagina.contains("value=\"http://192.168.1.100:9090\""));
+}
+
+/// Edge con el perfil ya abierto: el proceso lanzado pasa la ventana al que ya había y termina
+/// al momento, pero la ventana sigue abierta y late. El programa no debe apagarse mientras lata.
+const NAVEGADOR_QUE_PASA_LA_VENTANA: &str = r#"#!/bin/sh
+for a in "$@"; do case "$a" in --app=*) url="${a#--app=}";; esac; done
+base="${url%/*}"
+( for i in 1 2 3 4 5 6; do sleep 1; curl -s "$base/escritorio/latido" >/dev/null && echo "$i" >> "$CARPETA/latidos"; done ) &
+"#;
+
+#[test]
+fn sigue_en_marcha_mientras_la_ventana_late_aunque_el_navegador_termine() {
+    let (carpeta, orden) = preparar("traspaso", 19305);
+    std::fs::write(carpeta.join("navegador.sh"), NAVEGADOR_QUE_PASA_LA_VENTANA).unwrap();
+    let preferencias = "conexion = \"este_equipo\"\n";
+    std::fs::write(carpeta.join("escritorio.toml"), preferencias).unwrap();
+    ejecutar_hasta_que_termine(orden);
+    let atendidos = leer(&carpeta, "latidos").lines().count();
+    assert_eq!(
+        atendidos, 6,
+        "el programa se apagó con la ventana aún abierta"
+    );
 }
