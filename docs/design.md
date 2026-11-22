@@ -76,3 +76,5 @@ Implementación: `crates/servidor/recursos/movil.css` e iconos en `plantillas/ic
 | Hojas | Tan altas como su contenido y de borde a borde |
 
 **Prueba:** `e2e/pruebas/movil.spec.js` recorre todas las pantallas en iPhone y iPad y falla si alguna se sale por los lados.
+
+**Lista de piezas (0.5.4, petición del propietario):** dibujo del perfil (56 px) con el número de la pieza pequeño y gris debajo, nombre y corte, cantidad «×2» en negrita y medida. El número sigue siendo el mismo que el del dibujo de la ventana, pero discreto para que no se confunda con la cantidad.
