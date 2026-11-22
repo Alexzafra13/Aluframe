@@ -128,7 +128,10 @@ body.con-pie-fijo .contenido { padding-bottom: 130px; }
 .mas-datos { margin-top: .75rem; }
 .tarjeta-piezas .antetitulo { margin-bottom: .5rem; }
 .lista-piezas { list-style: none; margin: 0; padding: 0; }
-.lista-piezas li { display: grid; grid-template-columns: 36px 1fr auto 5rem; align-items: center; gap: .6rem; min-height: 54px; border-bottom: 1px solid var(--linea); }
+.lista-piezas li { display: grid; grid-template-columns: 36px 56px 1fr auto 5rem; align-items: center; gap: .6rem; min-height: 58px; border-bottom: 1px solid var(--linea); }
+/* Silueta del perfil (ADR-0017): la sección tal como la dibuja el fabricante, para reconocer la pieza. */
+.silueta { display: block; width: 56px; height: 42px; object-fit: contain; padding: 4px; border-radius: 8px; background: var(--papel); }
+span.silueta { background: transparent; }
 .numero-pieza { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--acero); color: #fff; font: 600 .9rem var(--condensada); }
 .lista-piezas .medida { text-align: right; font-size: 1.05rem; }
 

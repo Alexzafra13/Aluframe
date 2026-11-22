@@ -19,6 +19,18 @@ pub async fn servir_recurso(Path(ruta): Path<String>) -> Response {
     (cabeceras, archivo.data.into_owned()).into_response()
 }
 
+/// Siluetas de perfiles: no cambian dentro de una versión, se guardan un día en el navegador.
+pub async fn servir_silueta(Path(ruta): Path<String>) -> Response {
+    let Some(datos) = crate::series::siluetas::leer_silueta(&ruta) else {
+        return StatusCode::NOT_FOUND.into_response();
+    };
+    let cabeceras = [
+        (CONTENT_TYPE, "image/svg+xml"),
+        (CACHE_CONTROL, "public, max-age=86400"),
+    ];
+    (cabeceras, datos).into_response()
+}
+
 fn tipo_de_contenido(ruta: &str) -> &'static str {
     match ruta.rsplit('.').next() {
         Some("css") => "text/css; charset=utf-8",

@@ -1,9 +1,10 @@
 use askama::Template;
-use dominio::series::OpcionDeLinea;
+use dominio::series::{OpcionDeLinea, Serie};
 use dominio::unidades::Longitud;
 
 use super::{GrupoMenu, Opcion, UsuarioEnPantalla};
 use crate::aplicacion::calculo_de_ventana::CalculoDeVentana;
+use crate::series::siluetas::url_de_silueta;
 
 /// «MARCO_LATERAL» se lee «Marco lateral», como en la hoja de taller.
 pub fn nombre_legible(codigo: &str) -> String {
@@ -62,6 +63,7 @@ pub struct PiezaEnPantalla {
     pub cantidad: u32,
     pub medida: String,
     pub corte: String,
+    pub silueta: Option<String>,
 }
 
 #[derive(Default)]
@@ -84,8 +86,9 @@ fn cm(dmm: i64) -> String {
     Longitud::desde_decimas_de_mm(dmm).formatear_cm()
 }
 
-fn pieza_en_pantalla(p: &dominio::series::PiezaCalculada) -> PiezaEnPantalla {
+fn pieza_en_pantalla(serie: &Serie, p: &dominio::series::PiezaCalculada) -> PiezaEnPantalla {
     PiezaEnPantalla {
+        silueta: url_de_silueta(serie, &p.perfil),
         numero: p.numero,
         nombre: nombre_legible(&p.perfil),
         cantidad: p.cantidad,
@@ -121,7 +124,12 @@ impl From<&CalculoDeVentana> for VistaCalculo {
         };
         VistaCalculo {
             dibujo: c.dibujo.clone(),
-            piezas: c.resultado.piezas.iter().map(pieza_en_pantalla).collect(),
+            piezas: c
+                .resultado
+                .piezas
+                .iter()
+                .map(|p| pieza_en_pantalla(&c.serie, p))
+                .collect(),
             vidrios: vidrios(c),
             faltan: c.precio.faltan.clone(),
             fuera_de_limites: c.resultado.fuera_de_limites.clone(),

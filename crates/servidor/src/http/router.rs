@@ -8,7 +8,7 @@ use super::extractores::ActorActual;
 use super::middleware::{
     anadir_cabeceras_de_seguridad, cargar_sesion, exigir_configuracion, proteger_csrf,
 };
-use super::recursos::servir_recurso;
+use super::recursos::{servir_recurso, servir_silueta};
 use super::rutas::paginas::{SECCIONES_PENDIENTES, mostrar_pendiente};
 use super::rutas::{
     acceso, ajustes, ajustes_presupuestos, datos, escritorio, paginas, primer_arranque, salud,
@@ -50,6 +50,7 @@ fn rutas_de_acceso() -> Router<EstadoApp> {
     Router::new()
         .route("/health", get(salud::comprobar_salud))
         .route("/recursos/{*ruta}", get(servir_recurso))
+        .route("/perfiles/{*ruta}", get(servir_silueta))
         .route(
             "/primer-arranque",
             get(primer_arranque::mostrar_primer_arranque)
