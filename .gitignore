@@ -23,3 +23,5 @@ CLAUDE.local.md
 /datos-dev/
 # Instalador de Windows generado
 despliegue/windows/AlumFrame-*-instalar.exe
+# Python (herramientas de scripts/)
+__pycache__/
