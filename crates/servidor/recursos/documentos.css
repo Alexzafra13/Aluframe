@@ -141,6 +141,8 @@ span.silueta { background: transparent; }
 /* El dibujo: colores en CSS para pantalla e impresión. */
 .dibujo-ventana { display: block; width: 100%; height: auto; max-height: 64vh; overflow: visible; }
 .dibujo-ventana * { vector-effect: non-scaling-stroke; }
+/* Las vetas y texturas son dibujo dentro de un patrón: su grosor va con la escala, no fijo. */
+.dibujo-ventana pattern * { vector-effect: none; }
 /* Color del acabado (ADR-0019): el dibujo lo trae en atributos fill y stroke (la CSP no deja usar
    style). La hoja de estilos solo pinta los dibujos guardados antes, que no los llevan. */
 .dibujo-ventana .marco { stroke-width: 1.5; }

@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use dominio::corte::optimizar_cortes;
-use dominio::dibujo::{ColorDeDibujo, DatosDeDibujo, Herrajes, dibujar_ventana};
+use dominio::dibujo::{ColorDeDibujo, DatosDeDibujo, Herrajes, Superficie, dibujar_ventana};
 use dominio::precio::{
     CosteDeMateriales, DatosDeLinea, PerfilUsado, PrecioDeLinea, calcular_coste_de_materiales,
     calcular_precio_de_linea,
@@ -127,7 +127,10 @@ fn presentar(
 /// El color con que se dibuja el acabado; si sus datos no valen, blanco (nunca falla el cálculo).
 fn color_de_dibujo(acabado: &acabados::FilaAcabado) -> ColorDeDibujo {
     let cierres = Herrajes::desde_texto(&acabado.cierres).unwrap_or(Herrajes::Negro);
-    ColorDeDibujo::nuevo(&acabado.color_dibujo, acabado.madera, cierres).unwrap_or_default()
+    let superficie = Superficie::desde_texto(&acabado.superficie).unwrap_or(Superficie::Brillo);
+    ColorDeDibujo::nuevo(&acabado.color_dibujo, acabado.madera, cierres)
+        .map(|color| color.con_superficie(superficie))
+        .unwrap_or_default()
 }
 
 fn medida(valor: Decimal, unidad: Unidad) -> Longitud {

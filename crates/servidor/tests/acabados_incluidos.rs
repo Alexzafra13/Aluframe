@@ -4,6 +4,7 @@ mod comun;
 
 use comun::{Contexto, formulario, post, texto};
 use dominio::clientes::{EntradaDeCliente, validar_cliente};
+use dominio::dibujo::Superficie;
 use servidor::aplicacion::acabados_incluidos::{
     cargar_acabados_incluidos, leer_archivo_de_acabados,
 };
@@ -30,6 +31,15 @@ fn el_archivo_de_acabados_del_programa_es_valido() {
     let acabados = leer_archivo_de_acabados().unwrap();
     let blanco = acabados.iter().find(|a| a.nombre == "Blanco").unwrap();
     assert!(blanco.base && blanco.ral.as_deref() == Some("9016"));
+    assert_eq!(
+        blanco.color.superficie,
+        Superficie::Brillo,
+        "el blanco va en brillo"
+    );
+    let anodizados = acabados
+        .iter()
+        .filter(|a| a.color.superficie == Superficie::Anodizado);
+    assert!(anodizados.count() >= 2);
     assert!(acabados.iter().filter(|a| a.color.madera).count() >= 3);
 }
 
@@ -104,8 +114,8 @@ async fn la_ventana_se_dibuja_en_el_color_elegido() {
     let (verde, ..) = fila(&contexto.estado, "Verde").await;
     let verde = verde.to_string();
     for (acabado, relleno, cierres) in [
-        ("", "#f1f0ea", "#f4f4f2"),
-        (verde.as_str(), "#114232", "#15191d"),
+        ("", "#f2f2ed", "#f4f4f2"),
+        (verde.as_str(), "#0f4336", "#15191d"),
     ] {
         let html = dibujar_con(&contexto, (&token, &csrf), acabado).await;
         assert!(

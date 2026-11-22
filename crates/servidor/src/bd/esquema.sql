@@ -175,8 +175,9 @@ CREATE TABLE acabado (
     archivado INTEGER NOT NULL DEFAULT 0 CHECK (archivado IN (0, 1)),
     -- Color del acabado (ADR-0019): para el dibujo y la hoja; no interviene en el precio.
     ral TEXT CHECK (ral IS NULL OR length(ral) BETWEEN 1 AND 10),
-    color_dibujo TEXT NOT NULL DEFAULT '#f1f0ea' CHECK (color_dibujo GLOB '#[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]'),
+    color_dibujo TEXT NOT NULL DEFAULT '#f2f2ed' CHECK (color_dibujo GLOB '#[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]'),
     madera INTEGER NOT NULL DEFAULT 0 CHECK (madera IN (0, 1)),
+    superficie TEXT NOT NULL DEFAULT 'brillo' CHECK (superficie IN ('brillo', 'mate', 'texturado', 'anodizado')),
     cierres TEXT NOT NULL DEFAULT 'negro' CHECK (cierres IN ('blanco', 'negro')),
     version INTEGER NOT NULL DEFAULT 1,
     CHECK (es_base = 0 OR recargo_bp = 0)

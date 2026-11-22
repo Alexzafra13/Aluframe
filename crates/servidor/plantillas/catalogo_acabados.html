@@ -21,12 +21,13 @@
 {% else %}
 <section class="tarjeta">
   <table class="tabla">
-    <thead><tr><th>Acabado</th><th>RAL</th><th>Recargo</th><th>Estado</th><th><span class="oculto">Acciones</span></th></tr></thead>
+    <thead><tr><th>Acabado</th><th>RAL</th><th>Superficie</th><th>Recargo</th><th>Estado</th><th><span class="oculto">Acciones</span></th></tr></thead>
     <tbody>
       {% for a in acabados %}
       <tr>
         <td><span class="con-muestra"><svg class="muestra-color" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" rx="5" fill="{{ a.color_dibujo }}"/></svg>{{ a.nombre }}</span>{% if a.es_base %} <span class="etiqueta etiqueta-azul">base</span>{% endif %}</td>
         <td data-etiqueta="RAL">{% if let Some(ral) = a.ral %}<span class="mono">{{ ral }}</span>{% else if a.madera %}imitación madera{% endif %}</td>
+        <td data-etiqueta="Superficie">{{ a.superficie }}</td>
         <td class="numero">{% if a.es_base %}precio de tarifa{% else %}+{{ crate::vistas::porcentaje(*a.recargo_bp) }}{% endif %}</td>
         <td>{% if a.archivado %}<span class="etiqueta etiqueta-aviso">archivado</span>{% else %}activo{% endif %}</td>
         <td><a class="boton" href="/catalogo/acabados/{{ a.id }}">Editar</a></td>
