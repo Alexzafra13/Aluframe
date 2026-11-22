@@ -6,9 +6,9 @@
   <title>{% block titulo %}{% endblock %} · AlumFrame</title>
   <meta name="htmx-config" content='{"includeIndicatorStyles":false}'>
   <link rel="icon" href="/recursos/icono.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/recursos/estilos.css">
-  <link rel="stylesheet" href="/recursos/documentos.css">
-  <link rel="stylesheet" href="/recursos/movil.css">
+  <link rel="stylesheet" href="/recursos/estilos.css?v={{ crate::vistas::VERSION }}">
+  <link rel="stylesheet" href="/recursos/documentos.css?v={{ crate::vistas::VERSION }}">
+  <link rel="stylesheet" href="/recursos/movil.css?v={{ crate::vistas::VERSION }}">
   <meta name="theme-color" content="#ECE9E0">
   <script src="/recursos/js/htmx-2.0.11.min.js" defer></script>
   {% block scripts %}{% endblock %}

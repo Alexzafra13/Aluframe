@@ -98,6 +98,12 @@ code, .mono { overflow-wrap: anywhere; }
   .tarjeta-linea-lado { grid-column: 2; align-items: flex-start; }
   .miniatura { width: 84px; height: 64px; }
   .pie-desglose { display: none; }
+  /* Sin desglose: el aviso a la izquierda (recortado) y el importe entero a la derecha. */
+  .pie-total { flex: 1; min-width: 0; justify-content: space-between; gap: .75rem; }
+  .pie-total .etiqueta-aviso-oscura { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .82rem; }
+  .pie-total > div { flex: none; }
+  .pie-total-titulo, .pie-total-importe { white-space: nowrap; }
+  .pie-total-importe { font-size: 1.6rem; }
   .fila-presupuesto { grid-template-columns: 1fr auto; grid-template-areas: "cliente importe" "codigo estado" "fecha estado"; gap: .15rem .75rem; padding: .85rem 1rem; }
   .fila-presupuesto .cliente { grid-area: cliente; font-weight: 600; }
   .fila-presupuesto .codigo { grid-area: codigo; font-size: .9rem; color: var(--apagado); }

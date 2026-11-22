@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block titulo %}Entrar{% endblock %}
-{% block scripts %}<script src="/recursos/js/teclado.js" defer></script>{% endblock %}
+{% block scripts %}<script src="/recursos/js/teclado.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
 {% block clase_body %}pantalla-acceso{% endblock %}
 {% block cuerpo %}
 <main class="acceso">
