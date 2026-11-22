@@ -7,7 +7,7 @@
     <p class="antetitulo"><a href="/presupuestos">Presupuestos</a> / <a href="/presupuestos/{{ id }}">{{ codigo }}</a></p>
     <h1>{{ cliente }}</h1>
   </div>
-  {% include "pasos_documento.html" %}
+  {% let paso_actual = 1 %}{% include "pasos_documento.html" %}
 </header>
 <div class="barra-lineas">
   <nav class="pestanas-linea" aria-label="Ventanas y conceptos del presupuesto">

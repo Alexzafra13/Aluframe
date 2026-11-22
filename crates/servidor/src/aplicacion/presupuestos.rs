@@ -21,6 +21,8 @@ pub struct FichaDePresupuesto {
     pub versiones: Vec<FilaVersion>,
     /// Alguna línea se calculó con una tarifa que ya no es la vigente.
     pub tarifas_cambiadas: bool,
+    /// El trabajo que nació al aceptarlo.
+    pub trabajo_id: Option<i64>,
 }
 
 impl FichaDePresupuesto {
@@ -69,6 +71,7 @@ pub fn cargar(con: &Connection, id: i64) -> Result<FichaDePresupuesto, ErrorApp>
         direcciones: direcciones::listar(con, cliente.id)?,
         versiones: versiones_presupuesto::listar(con, id)?,
         tarifas_cambiadas: tarifas_cambiadas && presupuesto.estado == "borrador",
+        trabajo_id: crate::bd::consultas::trabajos::de_presupuesto(con, id)?,
         presupuesto,
         cliente,
         lineas,

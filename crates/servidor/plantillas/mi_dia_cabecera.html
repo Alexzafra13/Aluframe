@@ -1,0 +1,9 @@
+<header class="barra-operario">
+  <a class="marca" href="/mi-dia"><span class="marca-logo" aria-hidden="true"></span>Mi día</a>
+  <span class="usuario-actual">{{ usuario.nombre }}</span>
+  {% if usuario.es_propietario %}<a class="boton" href="/">Volver al inicio</a>{% endif %}
+  <form method="post" action="/salir">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <button class="boton" type="submit">Salir</button>
+  </form>
+</header>

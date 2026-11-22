@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Ventana {{ ventana.orden }} · {{ codigo }}{% endblock %}
+{% block clase_body %}pantalla-operario{% endblock %}
+{% block cuerpo %}
+{% include "mi_dia_cabecera.html" %}
+<main class="contenido">
+  <nav class="navegacion-ventanas" aria-label="Otras ventanas del trabajo">
+    <a class="boton" href="/mi-dia">← Mi día</a>
+    {% if let Some(a) = anterior %}<a class="boton" href="/mi-dia/{{ a }}">Anterior</a>{% endif %}
+    {% if let Some(s) = siguiente %}<a class="boton" href="/mi-dia/{{ s }}">Siguiente</a>{% endif %}
+  </nav>
+  <header class="cabecera-pagina">
+    <p class="antetitulo">{{ codigo }} · ventana {{ ventana.orden }}{% if ventana.revision > 1 %} · revisión {{ ventana.revision }}{% endif %}</p>
+    <h1>{{ hoja.titulo }} · {{ hoja.serie }}</h1>
+    <p class="mono medida-titulo">{{ hoja.medidas }} mm · {{ hoja.acabado }}</p>
+    <p>{{ cliente }}</p>
+    {% for o in hoja.opciones %}<p class="etiqueta">{{ o }}</p>{% endfor %}
+  </header>
+  {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+  {% if ventana.medida_cambiada %}<p class="aviso" role="alert">Medida cambiada: trabaja con esta hoja (revisión {{ ventana.revision }}), no con una impresa antes.</p>{% endif %}
+  <div class="ventana-operario">
+    <figure class="tarjeta dibujo-operario">{{ hoja.dibujo|safe }}</figure>
+    <section class="tarjeta" aria-labelledby="titulo-pasos">
+      <h2 id="titulo-pasos">Pasos · {{ ventana.hechos }} de {{ ventana.pasos.len() }}</h2>
+      <ol class="pasos-operario" role="list">
+        {% for p in ventana.pasos %}
+        <li class="paso-operario paso-{{ p.estado }}">
+          <span class="paso-nombre">{{ p.nombre }}{% if p.estado == "hecho" %} ✓{% endif %}{% if !p.quien.is_empty() %}<span class="texto-apagado pequeno"> · {{ p.quien }}</span>{% endif %}</span>
+          <form method="post" action="/mi-dia/pasos/{{ p.id }}" class="acciones-paso">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <input type="hidden" name="version" value="{{ p.version }}">
+            <input type="hidden" name="ventana" value="{{ ventana.id }}">
+            {% if p.estado == "pendiente" %}<button class="boton" name="accion" value="empezar">Empezar</button><button class="boton primario" name="accion" value="terminar">Terminar</button>{% endif %}
+            {% if p.estado == "en_curso" %}<button class="boton" name="accion" value="pausar">Pausar</button><button class="boton primario" name="accion" value="terminar">Terminar</button>{% endif %}
+            {% if p.estado == "hecho" %}<button class="boton" name="accion" value="deshacer">Deshacer</button>{% endif %}
+          </form>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+  </div>
+  <section class="tarjeta" aria-labelledby="titulo-falta">
+    <h2 id="titulo-falta">¿Falta algo?</h2>
+    {% if let Some(f) = ventana.falta_algo %}<p class="etiqueta etiqueta-aviso">Avisado: {{ f }}</p>{% endif %}
+    <form method="post" action="/mi-dia/{{ ventana.id }}/falta" class="formulario-en-linea">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      {% for motivo in ["Falta cristal", "Falta material", "Medida mal"] %}<button class="boton" name="nota" value="{{ motivo }}">{{ motivo }}</button>{% endfor %}
+      <label class="oculto" for="otra-nota">Otro motivo</label>
+      <input id="otra-nota" name="otra" placeholder="Otro motivo" maxlength="200">
+      <button class="boton" name="nota" value="">Avisar</button>
+    </form>
+  </section>
+  <section class="tarjeta">{% include "hoja_piezas.html" %}
+    <h2 class="antetitulo">Cristal</h2>
+    {% if hoja.cristal.is_empty() %}<p><strong>PENDIENTE de medir</strong></p>{% endif %}
+    {% for c in hoja.cristal %}<p class="mono">{{ c }}</p>{% endfor %}
+    <h2 class="antetitulo">Accesorios</h2>
+    <ul class="lista-simple mono">{% for (a, n) in hoja.accesorios %}<li>{{ a }} ×{{ n }}</li>{% endfor %}</ul>
+  </section>
+</main>
+{% endblock %}

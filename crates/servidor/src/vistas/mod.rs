@@ -7,7 +7,9 @@ mod menu;
 mod paginas;
 mod presupuestos;
 mod series;
+mod taller;
 mod tarifas;
+mod trabajos;
 
 pub use catalogo::*;
 pub use clientes::*;
@@ -18,7 +20,9 @@ pub use menu::{GrupoMenu, MENU};
 pub use paginas::*;
 pub use presupuestos::*;
 pub use series::*;
+pub use taller::*;
 pub use tarifas::*;
+pub use trabajos::*;
 
 use askama::Template;
 use axum::response::Html;

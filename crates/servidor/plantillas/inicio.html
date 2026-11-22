@@ -1,20 +1,30 @@
 {% extends "marco.html" %}
 {% block titulo %}Inicio{% endblock %}
 {% block contenido %}
-<header class="cabecera-pagina">
-  <p class="antetitulo">Hoy en el taller</p>
-  <h1>Trabajos</h1>
+<header class="cabecera-pagina cabecera-documento">
+  <div>
+    <p class="antetitulo">Hoy en el taller</p>
+    <h1>Trabajos</h1>
+  </div>
+  <div class="acciones">
+    <a class="boton" href="/clientes/nuevo">Nuevo cliente</a>
+    <a class="boton primario" href="/presupuestos">Nuevo presupuesto</a>
+  </div>
 </header>
 <div class="tablero">
-  {% for columna in ["Por cortar", "En montaje", "Listos para entregar"] %}
-  <section class="columna">
-    <h2 class="antetitulo">{{ columna }}</h2>
-    <p class="vacio">Aún no hay trabajos. Aparecerán aquí al aceptar un presupuesto.</p>
+  {% for (titulo, tarjetas) in columnas %}
+  <section class="columna" aria-labelledby="columna-{{ loop.index }}">
+    <h2 class="antetitulo" id="columna-{{ loop.index }}">{{ titulo }} <span class="contador">{{ tarjetas.len() }}</span></h2>
+    {% if tarjetas.is_empty() %}
+    <p class="vacio">{% if loop.first %}No hay trabajos por cortar. Cuando aceptes un presupuesto aparecerá aquí.{% else if loop.last %}Nada listo para entregar todavía.{% else %}Nada en montaje.{% endif %}</p>
+    {% endif %}
+    <div class="pila-tarjetas">{% for t in tarjetas %}{% include "tarjeta_trabajo.html" %}{% endfor %}</div>
   </section>
   {% endfor %}
-  <aside class="panel-atencion">
-    <h2 class="antetitulo">Requiere atención</h2>
-    <p class="vacio">Nada pendiente por ahora.</p>
+  <aside class="panel-atencion" aria-labelledby="titulo-atencion">
+    <h2 class="antetitulo" id="titulo-atencion">Avisos del taller</h2>
+    {% if avisos.is_empty() %}<p class="vacio">Nada pendiente. Aquí llegan los «falta algo» de los operarios.</p>{% endif %}
+    <ul class="lista-simple">{% for a in avisos %}<li><a href="{{ a.enlace }}">{{ a.texto }}</a></li>{% endfor %}</ul>
   </aside>
 </div>
 {% endblock %}

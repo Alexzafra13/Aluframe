@@ -1,0 +1,136 @@
+//! Lo que el taller ve de una ventana, en mm (decisión 1 del plan de H4) y sin precios: la
+//! pantalla del operario y la orden de taller impresa (design/03-hoja-taller.png).
+
+use askama::Template;
+use dominio::texto::nombre_legible;
+use dominio::unidades::Longitud;
+
+use super::{UsuarioEnPantalla, VentanaEnPantalla, titulo_y_medidas};
+use crate::aplicacion::trabajos::congelado::VentanaCongelada;
+use crate::aplicacion::trabajos::consultar::VentanaDeTrabajo;
+use crate::bd::consultas::trabajos::FilaTrabajo;
+
+pub fn mm(dmm: i64) -> String {
+    Longitud::desde_decimas_de_mm(dmm).formatear_mm()
+}
+
+pub struct PiezaEnHoja {
+    pub numero: u32,
+    pub nombre: String,
+    pub cantidad: u32,
+    pub medida: String,
+    pub corte: String,
+}
+
+fn pieza_en_hoja(p: &crate::aplicacion::resumen_de_linea::PiezaResumida) -> PiezaEnHoja {
+    PiezaEnHoja {
+        numero: p.numero,
+        nombre: nombre_legible(&p.perfil),
+        cantidad: p.cantidad,
+        medida: mm(p.longitud_dmm),
+        corte: p.corte.map(|g| format!("{g}°")).unwrap_or_default(),
+    }
+}
+
+pub struct HojaDeVentana {
+    pub titulo: String,
+    pub serie: String,
+    pub acabado: String,
+    pub medidas: String,
+    pub dibujo: String,
+    pub piezas: Vec<PiezaEnHoja>,
+    /// Vacío mientras la serie no tenga la medida del cristal: se imprime «PENDIENTE de medir».
+    pub cristal: Vec<String>,
+    pub accesorios: Vec<(String, String)>,
+    pub opciones: Vec<String>,
+}
+
+impl HojaDeVentana {
+    pub fn desde(descripcion: &str, c: &VentanaCongelada) -> HojaDeVentana {
+        let r = &c.resumen;
+        HojaDeVentana {
+            titulo: titulo_y_medidas(descripcion).0,
+            serie: nombre_legible(&r.serie),
+            acabado: c.acabado.clone(),
+            medidas: format!("{} × {}", mm(c.ancho_dmm), mm(c.alto_dmm)),
+            dibujo: r.dibujo.clone(),
+            piezas: r.piezas.iter().map(pieza_en_hoja).collect(),
+            cristal: r
+                .vidrios
+                .iter()
+                .map(|v| {
+                    format!(
+                        "{} × {} × {} mm",
+                        v.cantidad,
+                        mm(v.ancho_dmm),
+                        mm(v.alto_dmm)
+                    )
+                })
+                .collect(),
+            accesorios: r
+                .accesorios
+                .iter()
+                .map(|(a, n)| (nombre_legible(a), n.clone()))
+                .collect(),
+            opciones: descripcion
+                .split(" · ")
+                .filter(|t| t.contains(": "))
+                .map(str::to_owned)
+                .collect(),
+        }
+    }
+}
+
+pub struct TarjetaVentana {
+    pub id: i64,
+    pub codigo: String,
+    pub cliente: String,
+    pub titulo: String,
+    pub medidas: String,
+    pub dibujo: String,
+    pub hechos: usize,
+    pub total: usize,
+    pub falta_algo: Option<String>,
+    pub medida_cambiada: bool,
+}
+
+impl TarjetaVentana {
+    pub fn de(v: &VentanaDeTrabajo, t: &FilaTrabajo) -> TarjetaVentana {
+        TarjetaVentana {
+            id: v.fila.id,
+            codigo: format!("{} · ventana {}", t.codigo(), v.fila.orden),
+            cliente: t.cliente_nombre.clone(),
+            titulo: titulo_y_medidas(&v.fila.descripcion).0,
+            medidas: format!(
+                "{} × {} mm",
+                mm(v.congelado.ancho_dmm),
+                mm(v.congelado.alto_dmm)
+            ),
+            dibujo: v.congelado.resumen.dibujo.clone(),
+            hechos: v.hechos(),
+            total: v.pasos.len(),
+            falta_algo: v.fila.falta_algo.clone(),
+            medida_cambiada: v.fila.medida_cambiada,
+        }
+    }
+}
+
+#[derive(Template)]
+#[template(path = "mi_dia.html")]
+pub struct PaginaMiDia {
+    pub usuario: UsuarioEnPantalla,
+    pub tarjetas: Vec<TarjetaVentana>,
+}
+
+#[derive(Template)]
+#[template(path = "mi_dia_ventana.html")]
+pub struct PaginaVentanaOperario {
+    pub usuario: UsuarioEnPantalla,
+    pub codigo: String,
+    pub cliente: String,
+    pub ventana: VentanaEnPantalla,
+    pub hoja: HojaDeVentana,
+    pub anterior: Option<i64>,
+    pub siguiente: Option<i64>,
+    pub aviso: Option<String>,
+}

@@ -1,0 +1,17 @@
+{% extends "marco.html" %}
+{% block titulo %}Trabajos{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Taller</p>
+  <h1>Trabajos</h1>
+  <p class="texto-apagado">Un trabajo nace al aceptar un presupuesto. Asígnalo a un operario para que lo vea en «Mi día».</p>
+</header>
+<nav class="segmentado" aria-label="Qué trabajos ver">
+  <a class="segmento{% if !cerrados %} activo{% endif %}" href="/trabajos"{% if !cerrados %} aria-current="page"{% endif %}>En el taller</a>
+  <a class="segmento{% if cerrados %} activo{% endif %}" href="/trabajos?cerrados=si"{% if cerrados %} aria-current="page"{% endif %}>Todos</a>
+</nav>
+{% if tarjetas.is_empty() %}
+<p class="vacio tarjeta">No hay trabajos{% if !cerrados %} en el taller{% endif %}. Acepta un presupuesto para crear el primero.</p>
+{% endif %}
+<div class="rejilla-tarjetas">{% for t in tarjetas %}<div class="con-estado"><span class="etiqueta etiqueta-estado">{{ t.estado }}</span>{% include "tarjeta_trabajo.html" %}</div>{% endfor %}</div>
+{% endblock %}

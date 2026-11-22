@@ -11,8 +11,7 @@ use super::middleware::{
 use super::recursos::{servir_recurso, servir_silueta};
 use super::rutas::paginas::{SECCIONES_PENDIENTES, mostrar_pendiente};
 use super::rutas::{
-    acceso, ajustes, ajustes_presupuestos, datos, escritorio, paginas, primer_arranque, salud,
-    taller,
+    acceso, ajustes, ajustes_presupuestos, datos, escritorio, primer_arranque, salud, taller,
 };
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -30,8 +29,7 @@ pub fn crear_router(estado: EstadoApp) -> Router {
         .merge(super::router_catalogo::rutas_de_catalogo())
         .merge(super::router_clientes::rutas_de_clientes())
         .merge(super::router_presupuestos::rutas_de_presupuestos())
-        .route("/", get(paginas::mostrar_inicio))
-        .route("/mi-dia", get(paginas::mostrar_mi_dia));
+        .merge(super::router_trabajos::rutas_de_trabajos());
     for seccion in &SECCIONES_PENDIENTES {
         let manejador = move |ActorActual(actor): ActorActual| async move {
             let respuesta: Result<Response, ErrorApp> = mostrar_pendiente(&actor, seccion);

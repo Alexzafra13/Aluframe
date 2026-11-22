@@ -1,36 +1,9 @@
-use axum::extract::State;
-use axum::response::{IntoResponse, Redirect, Response};
-use dominio::acceso::{Accion, Rol};
+use axum::response::{IntoResponse, Response};
+use dominio::acceso::Accion;
 
 use crate::aplicacion::autorizar;
 use crate::errores::ErrorApp;
-use crate::estado::EstadoApp;
-use crate::http::extractores::ActorActual;
-use crate::vistas::{MENU, PaginaInicio, PaginaMiDia, PaginaPendiente, renderizar};
-
-pub async fn mostrar_inicio(ActorActual(actor): ActorActual) -> Result<Response, ErrorApp> {
-    if actor.rol == Rol::Operario {
-        return Ok(Redirect::to("/mi-dia").into_response());
-    }
-    autorizar(&actor, Accion::VerPanelDelPropietario)?;
-    let pagina = PaginaInicio {
-        usuario: (&actor).into(),
-        menu: MENU,
-        seccion: "inicio",
-    };
-    Ok(renderizar(&pagina)?.into_response())
-}
-
-pub async fn mostrar_mi_dia(
-    State(_): State<EstadoApp>,
-    ActorActual(actor): ActorActual,
-) -> Result<Response, ErrorApp> {
-    autorizar(&actor, Accion::VerMiDia)?;
-    let pagina = PaginaMiDia {
-        usuario: (&actor).into(),
-    };
-    Ok(renderizar(&pagina)?.into_response())
-}
+use crate::vistas::{MENU, PaginaPendiente, renderizar};
 
 pub struct SeccionPendiente {
     pub ruta: &'static str,
@@ -39,8 +12,7 @@ pub struct SeccionPendiente {
     pub hito: &'static str,
 }
 
-pub const SECCIONES_PENDIENTES: [SeccionPendiente; 3] = [
-    pendiente("/trabajos", "trabajos", "Trabajos", "H4"),
+pub const SECCIONES_PENDIENTES: [SeccionPendiente; 2] = [
     pendiente("/stock", "stock", "Stock", "H5"),
     pendiente("/facturas", "facturas", "Facturas", "H6"),
 ];

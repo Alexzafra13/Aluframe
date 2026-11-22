@@ -52,14 +52,6 @@ impl From<UsuarioVisible> for OpcionUsuario {
 }
 
 #[derive(Template)]
-#[template(path = "inicio.html")]
-pub struct PaginaInicio {
-    pub usuario: UsuarioEnPantalla,
-    pub menu: &'static [GrupoMenu],
-    pub seccion: &'static str,
-}
-
-#[derive(Template)]
 #[template(path = "pendiente.html")]
 pub struct PaginaPendiente {
     pub usuario: UsuarioEnPantalla,
@@ -94,12 +86,6 @@ pub struct PaginaEntrar {
 pub struct PaginaPrimerArranque {
     pub nombre: String,
     pub aviso: Option<String>,
-}
-
-#[derive(Template)]
-#[template(path = "mi_dia.html")]
-pub struct PaginaMiDia {
-    pub usuario: UsuarioEnPantalla,
 }
 
 #[derive(Template)]

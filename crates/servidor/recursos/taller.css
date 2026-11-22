@@ -1,0 +1,56 @@
+/* H4: tablero, trabajos y pantallas del operario (docs/design.md). */
+.contador { display: inline-grid; place-items: center; min-width: 1.6rem; height: 1.6rem; margin-left: .4rem; padding: 0 .4rem; border-radius: 999px; background: rgb(21 25 29 / .08); color: var(--tinta); font: 600 .8rem var(--mono); letter-spacing: 0; }
+.pila-tarjetas { display: grid; gap: .75rem; }
+.tarjeta-trabajo { display: grid; grid-template-columns: 76px 1fr; gap: .9rem; align-items: start; padding: .9rem; border-radius: 12px; background: var(--superficie); border: 1px solid var(--linea); color: var(--tinta); text-decoration: none; transition: transform var(--rapido) var(--curva-muelle), box-shadow var(--normal) ease; }
+.tarjeta-trabajo:hover { box-shadow: 0 6px 18px rgb(21 25 29 / .08); }
+.tarjeta-trabajo:active { transform: scale(.985); }
+.miniatura-trabajo { width: 76px; height: 64px; }
+.tarjeta-trabajo-texto { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+.etiquetas { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .35rem; }
+.rejilla-tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .9rem; }
+.con-estado { display: grid; gap: .35rem; }
+.con-estado .etiqueta-estado { justify-self: start; }
+.lista-ventanas { list-style: none; margin: 0; padding: 0; display: grid; gap: .9rem; }
+.ventana-cabecera { display: grid; grid-template-columns: 112px 1fr; gap: 1rem; align-items: center; }
+.pasos-ventana { list-style: none; margin: .9rem 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+.paso-ventana { display: inline-flex; flex-direction: column; padding: .4rem .75rem; border-radius: 10px; border: 1px solid var(--linea); background: #fff; font-size: .9rem; }
+.paso-en_curso { border-color: var(--acero); background: var(--acero-tinte); }
+.paso-hecho { border-color: var(--acero); background: var(--acero); color: #fff; }
+.paso-hecho .texto-apagado { color: rgb(255 255 255 / .8); }
+.lista-datos { margin: 0 0 1rem; display: grid; gap: .5rem; }
+.lista-datos div { display: flex; justify-content: space-between; gap: 1rem; }
+.lista-datos dt { color: var(--apagado); }
+.lista-datos dd { margin: 0; text-align: right; }
+@media (max-width: 700px) {
+  .ventana-cabecera { grid-template-columns: 1fr; }
+}
+.etiquetas .etiqueta:not(.etiqueta-aviso), .etiqueta-estado { background: var(--acero-tinte); color: var(--acero); }
+
+/* Operario (tablet y móvil): todo grande y táctil, sin precios (PANTALLAS 13). */
+.pantalla-operario .contenido { max-width: 1200px; margin: 0 auto; font-size: 1.05rem; }
+.rejilla-ventanas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.tarjeta-ventana { display: flex; flex-direction: column; gap: .3rem; padding: 1rem; min-height: 100%; border-radius: 14px; background: var(--superficie); border: 1px solid var(--linea); color: var(--tinta); text-decoration: none; transition: transform var(--rapido) var(--curva-muelle), box-shadow var(--normal) ease; }
+.tarjeta-ventana:hover { box-shadow: 0 6px 20px rgb(21 25 29 / .08); }
+.tarjeta-ventana:active { transform: scale(.98); }
+.miniatura-grande { width: 100%; height: 160px; margin-bottom: .4rem; }
+.progreso { width: 100%; height: 10px; accent-color: var(--acero); }
+.navegacion-ventanas { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.medida-titulo { font-size: 1.4rem; font-weight: 500; }
+.ventana-operario { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr); gap: 1rem; align-items: start; margin-bottom: 1rem; }
+.dibujo-operario { margin: 0; padding: 1rem; }
+.dibujo-operario .dibujo-ventana { max-height: 60vh; }
+.pasos-operario { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.paso-operario { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 64px; padding: .5rem .5rem .5rem 1rem; border-radius: 12px; border: 1px solid var(--linea); background: #fff; }
+.paso-operario .paso-nombre { font-weight: 600; font-size: 1.1rem; }
+.paso-operario.paso-en_curso { border-color: var(--acero); background: var(--acero-tinte); }
+.paso-operario.paso-hecho { background: var(--acero); border-color: var(--acero); color: #fff; }
+.paso-operario.paso-hecho .texto-apagado { color: rgb(255 255 255 / .8); }
+.acciones-paso { display: flex; gap: .5rem; }
+.acciones-paso .boton { min-height: 52px; min-width: 104px; }
+.tabla-piezas caption { text-align: left; margin-bottom: .5rem; }
+.numero-pieza { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--tinta); font: 600 1rem var(--condensada); }
+.medida-grande { font-size: 1.2rem; }
+@media (max-width: 900px) {
+  .ventana-operario { grid-template-columns: 1fr; }
+  .paso-operario { flex-wrap: wrap; }
+}

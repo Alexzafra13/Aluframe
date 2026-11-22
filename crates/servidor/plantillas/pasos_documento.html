@@ -1,5 +1,5 @@
 <ol class="pasos" aria-label="Pasos del documento">
   {% for (n, nombre) in [(1, "Presupuesto"), (2, "Trabajo"), (3, "Orden de taller"), (4, "Factura")] %}
-  <li class="paso{% if *n == 1 %} actual{% endif %}"{% if *n == 1 %} aria-current="step"{% endif %}><span class="paso-numero">{{ n }}</span>{{ nombre }}</li>
+  <li class="paso{% if *n == paso_actual %} actual{% endif %}"{% if *n == paso_actual %} aria-current="step"{% endif %}><span class="paso-numero">{{ n }}</span>{{ nombre }}</li>
   {% endfor %}
 </ol>

@@ -8,7 +8,7 @@
     <p class="antetitulo"><a href="/presupuestos">Presupuestos</a> / {{ codigo }}{% if ficha.presupuesto.numero_version > 1 %} · versión {{ ficha.presupuesto.numero_version }}{% endif %}</p>
     <h1>{{ cliente }} <span class="etiqueta etiqueta-estado-{{ estado() }}">{{ nombre_estado }}</span></h1>
   </div>
-  {% include "pasos_documento.html" %}
+  {% let paso_actual = 1 %}{% include "pasos_documento.html" %}
 </header>
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 {% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
@@ -60,6 +60,7 @@
     </ol>
   </section>
   <aside class="columna-datos">
+    {% if let Some(t) = ficha.trabajo_id %}<a class="boton primario ancho" href="/trabajos/{{ t }}">Ver el trabajo en el taller</a>{% endif %}
     <form class="tarjeta" method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/datos">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <input type="hidden" name="version" value="{{ ficha.presupuesto.version }}">

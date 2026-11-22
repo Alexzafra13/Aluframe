@@ -1,0 +1,14 @@
+<a class="tarjeta-trabajo" href="/trabajos/{{ t.id }}">
+  <span class="miniatura miniatura-trabajo" aria-hidden="true">{{ t.dibujo|safe }}</span>
+  <span class="tarjeta-trabajo-texto">
+    <span class="mono texto-apagado pequeno">{{ t.codigo }}{% if !t.fecha.is_empty() %} · para el {{ t.fecha }}{% endif %}</span>
+    <strong>{{ t.cliente }}</strong>
+    <span>{{ t.titulo }}{% if t.mas > 0 %} y {{ t.mas }} más{% endif %}</span>
+    {% if !t.medidas.is_empty() %}<span class="mono">{{ t.medidas }}</span>{% endif %}
+    <span class="etiquetas">
+      {% if let Some(f) = t.falta_algo %}<span class="etiqueta etiqueta-aviso">{{ f }}</span>{% endif %}
+      <span class="etiqueta">{{ t.progreso }}</span>
+      {% if let Some(o) = t.operario %}<span class="etiqueta">{{ o }}</span>{% else %}<span class="etiqueta etiqueta-aviso">Sin asignar</span>{% endif %}
+    </span>
+  </span>
+</a>

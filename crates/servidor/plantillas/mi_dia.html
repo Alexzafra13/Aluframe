@@ -2,16 +2,27 @@
 {% block titulo %}Mi día{% endblock %}
 {% block clase_body %}pantalla-operario{% endblock %}
 {% block cuerpo %}
-<header class="barra-operario">
-  <span class="marca"><span class="marca-logo" aria-hidden="true"></span>Mi día</span>
-  <span class="usuario-actual">{{ usuario.nombre }}</span>
-  {% if usuario.es_propietario %}<a class="boton" href="/">Volver al inicio</a>{% endif %}
-  <form method="post" action="/salir">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
-    <button class="boton" type="submit">Salir</button>
-  </form>
-</header>
+{% include "mi_dia_cabecera.html" %}
 <main class="contenido">
+  {% if tarjetas.is_empty() %}
   <p class="vacio tarjeta">No tienes ventanas asignadas. Cuando te asignen un trabajo aparecerá aquí.</p>
+  {% endif %}
+  <ol class="rejilla-ventanas" role="list">
+    {% for t in tarjetas %}
+    <li><a class="tarjeta-ventana" href="/mi-dia/{{ t.id }}">
+      <span class="miniatura miniatura-grande" aria-hidden="true">{{ t.dibujo|safe }}</span>
+      <span class="mono texto-apagado pequeno">{{ t.codigo }}</span>
+      <strong>{{ t.cliente }}</strong>
+      <span>{{ t.titulo }}</span>
+      <span class="mono">{{ t.medidas }}</span>
+      <progress class="progreso" max="{{ t.total }}" value="{{ t.hechos }}" aria-label="Pasos hechos">{{ t.hechos }} de {{ t.total }}</progress>
+      <span class="etiquetas">
+        <span class="etiqueta">{{ t.hechos }} de {{ t.total }}</span>
+        {% if let Some(f) = t.falta_algo %}<span class="etiqueta etiqueta-aviso">Falta algo: {{ f }}</span>{% endif %}
+        {% if t.medida_cambiada %}<span class="etiqueta etiqueta-aviso">Medida cambiada</span>{% endif %}
+      </span>
+    </a></li>
+    {% endfor %}
+  </ol>
 </main>
 {% endblock %}
