@@ -12,6 +12,7 @@ pub struct PiezaCalculada {
     pub longitud: Longitud,
     pub corte: Option<u16>,
     pub formula: String,
+    pub posicion: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

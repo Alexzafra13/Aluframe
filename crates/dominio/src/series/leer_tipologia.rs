@@ -94,7 +94,11 @@ fn leer_piezas(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<Vec<Pie
 
 fn leer_pieza(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<PiezaDeSerie> {
     let campos = lector.mapa(elemento, ruta)?;
-    lector.solo_campos(campos, &["perfil", "cantidad", "longitud", "corte"], ruta);
+    lector.solo_campos(
+        campos,
+        &["perfil", "cantidad", "longitud", "corte", "posicion"],
+        ruta,
+    );
     let r = |campo: &str| ruta_hija(ruta, campo);
     let perfil = lector
         .obligatorio(campos, "perfil", ruta)
@@ -108,12 +112,40 @@ fn leer_pieza(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<Pieza
     let corte = lector
         .obligatorio(campos, "corte", ruta)
         .and_then(|v| leer_corte(lector, v, &r("corte")));
+    let posicion = match opcional(campos, "posicion") {
+        Some(v) => Some(leer_posicion(lector, v, &r("posicion"))?),
+        None => None,
+    };
     Some(PiezaDeSerie {
         perfil: perfil?,
         cantidad: cantidad?,
         longitud: longitud?,
         corte: corte?,
+        posicion,
     })
+}
+
+/// Sitios del dibujo donde puede ir el número de una pieza (`dibujo::marcadores`).
+const POSICIONES: [&str; 7] = [
+    "marco_lateral",
+    "marco_superior",
+    "marco_inferior",
+    "hoja_lateral",
+    "hoja_central",
+    "hoja_superior",
+    "hoja_inferior",
+];
+
+fn leer_posicion(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<String> {
+    let texto = lector.texto(valor, ruta)?;
+    if POSICIONES.contains(&texto.as_str()) {
+        return Some(texto.to_uppercase());
+    }
+    lector.informe.error(
+        ruta,
+        format!("posición no válida; usa una de: {}", POSICIONES.join(", ")),
+    );
+    None
 }
 
 fn leer_corte(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<Dato<u16>> {

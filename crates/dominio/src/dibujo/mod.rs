@@ -59,11 +59,7 @@ impl DatosDeDibujo {
             valor.as_deref().and_then(Lado::desde_texto)
         });
         DatosDeDibujo {
-            piezas: resultado
-                .piezas
-                .iter()
-                .map(|p| (p.numero, p.perfil.clone()))
-                .collect(),
+            piezas: resultado.piezas.iter().map(clave_de_posicion).collect(),
             titulo: format!(
                 "{} de {} × {} cm",
                 tipologia.nombre,
@@ -77,6 +73,12 @@ impl DatosDeDibujo {
             hoja_cremona,
         }
     }
+}
+
+/// El número va donde dice `posicion` si la serie la declara; si no, se deduce del nombre.
+fn clave_de_posicion(pieza: &crate::series::PiezaCalculada) -> (u32, String) {
+    let clave = pieza.posicion.as_ref().unwrap_or(&pieza.perfil);
+    (pieza.numero, clave.clone())
 }
 
 /// El SVG de la ventana. Nunca falla: con medidas absurdas dibuja lo que puede.

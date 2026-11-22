@@ -143,6 +143,7 @@ impl<'a> Calculo<'a> {
                 longitud: self.longitud(longitud, &pieza.perfil)?,
                 corte: pieza.corte.valor().copied(),
                 formula: longitud.texto().to_owned(),
+                posicion: pieza.posicion.clone(),
             });
         }
         Ok(piezas)

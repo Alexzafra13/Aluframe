@@ -21,6 +21,9 @@ pub struct Redondeo {
 pub struct Referencia {
     pub referencia: Dato<String>,
     pub proveedor: Option<String>,
+    /// Dibujo de la sección del perfil (`fabricante/archivo`, de `data/perfiles/`): solo para
+    /// reconocer la pieza; no interviene en el precio (ADR-0017).
+    pub silueta: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -62,6 +65,8 @@ pub struct PiezaDeSerie {
     pub cantidad: Dato<Formula>,
     pub longitud: Dato<Formula>,
     pub corte: Dato<u16>,
+    /// Dónde va su número en el dibujo cuando el nombre no lo deja claro (`HOJA_CENTRAL`…).
+    pub posicion: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

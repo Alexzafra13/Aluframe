@@ -196,20 +196,46 @@ fn leer_referencias(lector: &mut Lector, campos: &Campos) -> Option<BTreeMap<Str
         let Some(campos) = lector.mapa(valor, &ruta) else {
             continue;
         };
-        lector.solo_campos(campos, &["referencia", "proveedor"], &ruta);
+        lector.solo_campos(campos, &["referencia", "proveedor", "silueta"], &ruta);
         let referencia = lector
             .obligatorio(campos, "referencia", &ruta)
             .and_then(|v| lector.dato_texto(v, &ruta_hija(&ruta, "referencia")));
         let proveedor = opcional(campos, "proveedor").and_then(|v| lector.texto(v, &ruta));
+        let silueta = opcional(campos, "silueta").and_then(|v| leer_silueta(lector, v, &ruta));
         if let Some(referencia) = referencia {
             referencias.insert(
                 codigo.clone(),
                 Referencia {
                     referencia,
                     proveedor,
+                    silueta,
                 },
             );
         }
     }
     Some(referencias)
+}
+
+/// `fabricante/archivo` en minúsculas: nombra un archivo de `data/perfiles/` sin salir de ella.
+fn leer_silueta(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<String> {
+    let ruta = ruta_hija(ruta, "silueta");
+    let texto = lector.texto(valor, &ruta)?;
+    let parte_valida = |parte: &str| {
+        !parte.is_empty()
+            && parte
+                .bytes()
+                .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-' || b == b'_')
+    };
+    match texto.split_once('/') {
+        Some((fabricante, archivo)) if parte_valida(fabricante) && parte_valida(archivo) => {
+            Some(texto)
+        }
+        _ => {
+            lector.informe.error(
+                &ruta,
+                "escribe fabricante/archivo en minúsculas, por ejemplo aluval/21210",
+            );
+            None
+        }
+    }
 }
