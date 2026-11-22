@@ -83,8 +83,20 @@ details summary { cursor: pointer; font-weight: 500; min-height: var(--tactil); 
 .medida { font-weight: 500; }
 .tarjeta h3 { font-family: var(--condensada); font-weight: 600; margin: 1rem 0 .5rem; }
 
-body.con-menu { display: grid; grid-template-columns: 280px 1fr; }
-.menu { background: var(--menu-fondo); color: var(--menu-texto); padding: 1.5rem 1rem; display: flex; flex-direction: column; min-height: 100vh; position: sticky; top: 0; }
+/* El menú se queda quieto al desplazar la página (tiene su propio desplazamiento si no cabe) y se
+   puede plegar a solo iconos; la preferencia se recuerda en este navegador (menu.js). */
+:root { --ancho-menu: 280px; }
+html.menu-plegado { --ancho-menu: 84px; }
+body.con-menu { display: grid; grid-template-columns: var(--ancho-menu) 1fr; transition: grid-template-columns 360ms var(--curva-suave, ease); }
+.menu { background: var(--menu-fondo); color: var(--menu-texto); padding: 1.5rem 1rem; display: flex; flex-direction: column; position: sticky; top: 0; align-self: start; height: 100vh; height: 100dvh; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+.menu-texto { white-space: nowrap; transition: opacity 220ms ease 80ms; }
+.menu .marca { display: flex; align-items: center; white-space: nowrap; }
+.menu .marca-logo { flex: none; }
+.boton-plegar .icono { transition: transform 360ms var(--curva-muelle, ease); }
+html.menu-plegado .boton-plegar .icono { transform: scaleX(-1); }
+html.menu-plegado .menu-texto { opacity: 0; transition-delay: 0s; pointer-events: none; }
+html.menu-plegado .menu-grupo { height: 1px; margin: .75rem .5rem; background: rgb(255 255 255 / .12); }
+html.menu-plegado .menu-entrada { padding: 0 .9rem; }
 .menu .marca { color: #fff; padding: 0 .5rem 1.5rem; }
 .menu ul { list-style: none; margin: 0 0 1rem; padding: 0; }
 .menu-grupo { font-family: var(--condensada); font-weight: 500; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--menu-grupo); margin: 1rem .5rem .5rem; }
@@ -131,7 +143,7 @@ body.con-menu { display: grid; grid-template-columns: 280px 1fr; }
 
 @media (max-width: 900px) {
   body.con-menu { grid-template-columns: 1fr; }
-  .menu { min-height: auto; position: static; }
+  .menu { min-height: auto; height: auto; position: static; }
   .tablero { grid-template-columns: 1fr; }
   .columna, .panel-atencion { min-height: auto; }
 }

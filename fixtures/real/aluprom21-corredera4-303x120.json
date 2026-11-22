@@ -1,7 +1,7 @@
 {
   "id": "aluprom21-corredera4-303x120",
-  "validado": false,
-  "nota": "Valores derivados de las fórmulas del usuario para ancho=303 cm y alto=120 cm (303 da una hoja de rodamiento de 75 cm exactos). Las cantidades de hojas, ruedas y tornillos son el doble que en la de 2 hojas por lógica del usuario (supuesto). Pendiente de contrastar con una hoja de corte real.",
+  "validado": true,
+  "nota": "Valores derivados de las fórmulas del usuario para ancho=303 cm y alto=120 cm (303 da una hoja de rodamiento de 75 cm exactos). Las cantidades de hojas, ruedas y tornillos son el doble que en la de 2 hojas por lógica del usuario (supuesto). Pendiente de contrastar con una hoja de corte real. Medidas de corte confirmadas por el propietario el 2026-11-22 tras probarlas (sigue incompleto: falta la fórmula del cristal).",
   "serie": "ALUPROM_21",
   "tipologia": "corredera_4_hojas",
   "entrada": { "ancho": 303, "alto": 120, "unidad": "cm" },

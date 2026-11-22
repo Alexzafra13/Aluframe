@@ -153,12 +153,12 @@ pub fn comprobar_limites(tipologia: &Tipologia, ancho: Decimal, alto: Decimal) -
     ] {
         if let Some(minimo) = rango.minimo.valor().filter(|m| medida < **m) {
             avisos.push(format!(
-                "El {nombre} es menor que el mínimo de la serie ({minimo})."
+                "El {nombre} ({medida}) es menor que el mínimo que admite la serie ({minimo})."
             ));
         }
         if let Some(maximo) = rango.maximo.valor().filter(|m| medida > **m) {
             avisos.push(format!(
-                "El {nombre} supera el máximo de la serie ({maximo})."
+                "El {nombre} ({medida}) supera el máximo que admite la serie ({maximo})."
             ));
         }
     }

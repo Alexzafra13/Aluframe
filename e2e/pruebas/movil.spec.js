@@ -60,3 +60,19 @@ test("en el ordenador se usa el menú lateral y no la barra de pestañas", async
   await expect(visibles).toHaveCount(1);
   await expect(visibles.getByRole("link", { name: "Stock" })).toBeVisible();
 });
+
+test("el menú lateral no se desplaza con la página y se pliega a iconos", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 600 });
+  await entrarComoPropietario(page);
+  await page.goto("/ajustes/presupuestos");
+  const menu = page.locator("nav.menu");
+  await page.mouse.wheel(0, 2000);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  expect((await menu.boundingBox()).y).toBe(0);
+  await page.getByRole("button", { name: "Plegar menú" }).click();
+  await expect.poll(async () => (await menu.boundingBox()).width).toBeLessThan(100);
+  await page.goto("/clientes");
+  await expect(page.getByRole("button", { name: "Desplegar menú" })).toHaveAttribute("aria-expanded", "false");
+  await page.getByRole("button", { name: "Desplegar menú" }).click();
+  await expect.poll(async () => (await menu.boundingBox()).width).toBeGreaterThan(250);
+});

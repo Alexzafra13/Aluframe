@@ -32,33 +32,35 @@ test("prepara la serie y la tarifa ficticias y las reglas de precio", async ({ p
 });
 
 // Las series reales vienen incluidas en el programa (ADR-0014): se elige la ficticia a propósito.
-async function ventana(page, ancho, alto, boton) {
+// Guardar vuelve al presupuesto, desde donde se añade la siguiente con «+ Ventana».
+async function ventana(page, ancho, alto) {
+  await page.getByRole("link", { name: "+ Ventana" }).click();
   await page.getByLabel("Serie y tipología").selectOption({ label: "DEMO_FICTICIA · DEMO corredera 2 hojas (ficticia)" });
   await page.getByLabel("Ancho (cm)").fill(ancho);
   await page.getByLabel("Alto (cm)").fill(alto);
   await expect(page.locator("#dibujo svg.dibujo-ventana")).toBeVisible();
   await expect(page.locator("#dibujo .texto-cota").first()).toHaveText(ancho);
-  await page.locator("#form-linea").getByRole("button", { name: boton }).click();
+  await page.locator("#form-linea").getByRole("button", { name: "Guardar ventana" }).click();
+  await expect(page.getByRole("status")).toHaveText("Guardado en el presupuesto.");
 }
 
-/// Criterio de aceptación de H3: 3 ventanas distintas y una línea libre, con dibujo e imprimible.
-test("crea un presupuesto de 3 ventanas y una línea libre y lo imprime", async ({ page }) => {
+/// Criterio de aceptación de H3: 3 ventanas distintas y otro concepto, con dibujo e imprimible.
+test("crea un presupuesto de 3 ventanas y otro concepto y lo imprime", async ({ page }) => {
   await entrarComoPropietario(page);
   await page.getByRole("link", { name: "Clientes" }).click();
   await page.getByRole("link", { name: "Construcciones Peña" }).click();
   await page.getByRole("button", { name: "Nuevo presupuesto" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Construcciones Peña");
-  await ventana(page, "150", "120", "Guardar y añadir otra");
-  await ventana(page, "90", "110", "Guardar y añadir otra");
-  await page.locator("label[for=capa-piezas]").click();
-  await ventana(page, "200", "140", "Guardar línea");
-  await expect(page.getByRole("status")).toHaveText("Línea guardada.");
-  await page.getByRole("button", { name: "+ Línea libre" }).click();
-  const hoja = page.getByRole("dialog", { name: "Línea libre" });
+  await page.getByRole("link", { name: "Volver sin guardar" }).click();
+  await ventana(page, "150", "120");
+  await ventana(page, "90", "110");
+  await ventana(page, "200", "140");
+  await page.getByRole("button", { name: "+ Otro concepto" }).click();
+  const hoja = page.getByRole("dialog", { name: "Otro concepto" });
   await expect(hoja).toBeVisible();
   await hoja.getByLabel("Descripción").fill("Instalación");
   await hoja.getByLabel("Precio unitario (€)").fill("80");
-  await hoja.getByRole("button", { name: "Añadir línea" }).click();
+  await hoja.getByRole("button", { name: "Añadir al presupuesto" }).click();
   await expect(page.locator(".tarjeta-linea")).toHaveCount(4);
   await expect(page.locator(".tarjeta-linea svg.dibujo-ventana")).toHaveCount(3);
   const total = (await page.locator(".pie-total-importe").textContent()).trim();

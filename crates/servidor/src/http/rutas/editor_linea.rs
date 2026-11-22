@@ -35,13 +35,14 @@ fn opciones(pares: Vec<(String, String)>) -> Vec<Opcion> {
 async fn calcular_vista(
     estado: &EstadoApp,
     actor: &Actor,
-    entrada: EntradaDeVentana,
+    (entrada, limites_revisados): (EntradaDeVentana, bool),
 ) -> Result<(Option<VistaCalculo>, Option<String>), ErrorApp> {
     let mano = entrada.mano_de_obra;
     match calcular_ventana_sin_guardar(estado, actor, entrada).await {
         Ok(calculo) => {
             let mut vista = VistaCalculo::from(&calculo);
             vista.mano_de_obra = mano.formatear();
+            vista.limites_revisados = limites_revisados;
             Ok((Some(vista), None))
         }
         Err(ErrorApp::Validacion(aviso)) => Ok((None, Some(aviso))),
@@ -58,7 +59,10 @@ pub async fn calcular(
 ) -> Result<Response, ErrorApp> {
     let valores = valores_del_formulario(&Campos::de(pares.clone()));
     let (calculo, aviso) = match leer_ventana(&valores, opciones_elegidas(&pares)) {
-        Ok((entrada, _, _)) => calcular_vista(&estado, &actor, entrada).await?,
+        Ok((entrada, _, _)) => {
+            let revisados = valores.limites_revisados;
+            calcular_vista(&estado, &actor, (entrada, revisados)).await?
+        }
         Err(ErrorApp::Validacion(aviso)) => (None, Some(aviso)),
         Err(otro) => return Err(otro),
     };
@@ -206,7 +210,10 @@ pub async fn mostrar_linea(
     let opciones: BTreeMap<String, String> =
         serde_json::from_str(&linea.opciones_json).unwrap_or_default();
     let (calculo, aviso) = match leer_ventana(&valores, opciones.clone()) {
-        Ok((entrada, _, _)) => calcular_vista(&estado, &actor, entrada).await?,
+        Ok((entrada, _, _)) => {
+            let revisados = valores.limites_revisados;
+            calcular_vista(&estado, &actor, (entrada, revisados)).await?
+        }
         Err(_) => (None, None),
     };
     let editor = Editor {
@@ -234,9 +241,6 @@ pub async fn guardar(
         Err(error) => Err(error),
     };
     match resultado {
-        Ok(_) if campos.marcado("siguiente") => {
-            Ok(Redirect::to(&format!("/presupuestos/{id}/lineas/nueva")).into_response())
-        }
         Ok(_) => Ok(Redirect::to(&format!("/presupuestos/{id}?aviso=linea")).into_response()),
         Err(ErrorApp::Validacion(aviso)) => {
             let ficha = cargar_presupuesto(estado, actor, id).await?;

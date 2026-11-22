@@ -1,14 +1,14 @@
-# Serie Aluprom 21 (fabricante: Aluval): BORRADOR con datos aportados por el usuario.
-# Lo marcado con CONFIRMAR debe validarse con una ventana real antes de usarlo para precios.
-# Lo marcado como "supuesto" lo ha deducido el usuario por lógica y no está contrastado.
-# No inventar valores.
+# Serie Aluprom 21 (fabricante: Aluval), con datos aportados por el propietario.
+# VALIDADA por el propietario el 2026-11-22 tras probar las medidas de corte de la 2 y la 4 hojas.
+# Lo que sigue en CONFIRMAR es un dato que aún no existe (cristal, referencias de accesorios,
+# proveedor): mientras falte, la ventana sale «incompleta» y no tiene precio final. No inventar valores.
 
 serie: ALUPROM_21
 fabricante: ALUVAL
 proveedor: CONFIRMAR                          # quién vende estos perfiles al taller (distribuidor): por confirmar
-estado: borrador
+estado: validada                               # el propietario lo ha probado y da por buenas las medidas (2026-11-22)
 unidades: cm                                   # el usuario trabaja en cm; un decimal de cm = 1 mm
-redondeo: { precision: 0.1, sentido: abajo }   # provisional: a 0,1 cm (1 mm) hacia abajo; revisar con ventanas reales
+redondeo: { precision: 0.1, sentido: abajo }   # a 0,1 cm (1 mm) hacia abajo (confirmado por el propietario, 2026-11-22)
 longitud_barra: 640                            # barras nuevas de 6,40 m (confirmado por el usuario)
 
 parametros:
@@ -63,7 +63,7 @@ tipologias:
     dibujo: { tipo: corredera, hojas: 4 }
     opciones:                      # el tipo y la cámara del Climalit se concretarán más adelante
       - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [cristal_normal, climalit], por_defecto: cristal_normal }
-    estado: borrador               # igual que la de 2 hojas salvo la hoja de rodamiento y las cantidades (el doble de hojas)
+    # Igual que la de 2 hojas salvo la hoja de rodamiento y las cantidades (el doble de hojas).
     piezas:
       - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
       - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
@@ -75,6 +75,6 @@ tipologias:
       estado: CONFIRMAR            # el usuario dará la medida cuando sepa el descuento
     accesorios:
       - { articulo: KIT_CORREDERA,   cantidad: 2 }                  # confirmado por el usuario: 2 kits iguales
-      - { articulo: RUEDA_CORREDERA, cantidad: 8 }                  # supuesto: el doble que en la de 2 hojas
-      - { articulo: TORNILLO_4_8x25, cantidad: 9,  aplica_a: marco }  # supuesto: el marco no cambia
-      - { articulo: TORNILLO_4_8x25, cantidad: 16, aplica_a: hojas }  # supuesto: el doble que en la de 2 hojas
+      - { articulo: RUEDA_CORREDERA, cantidad: 8 }                  # el doble que en la de 2 hojas (confirmado, 2026-11-22)
+      - { articulo: TORNILLO_4_8x25, cantidad: 9,  aplica_a: marco }  # el marco no cambia (confirmado)
+      - { articulo: TORNILLO_4_8x25, cantidad: 16, aplica_a: hojas }  # el doble que en la de 2 hojas (confirmado)

@@ -150,11 +150,13 @@ async fn la_ficha_muestra_las_lineas_y_por_que_no_se_acepta() {
             .await,
     )
     .await;
-    assert!(ficha.contains("Línea guardada."));
-    assert!(ficha.contains(
-        "Línea 1 · DEMO corredera 2 hojas (ficticia) · Demo ficticia (Demo) · 150 × 120 cm"
-    ));
-    assert!(ficha.contains("Línea 2 · Instalación"));
+    assert!(ficha.contains("Guardado en el presupuesto."));
+    assert!(
+        ficha.contains(
+            "1 · DEMO corredera 2 hojas (ficticia) · Demo ficticia (Demo) · 150 × 120 cm"
+        )
+    );
+    assert!(ficha.contains("2 · Instalación"));
     assert!(ficha.contains("No se puede aceptar todavía"));
 }
 
@@ -177,7 +179,7 @@ async fn la_hoja_impresa_no_lleva_costes() {
 }
 
 #[tokio::test]
-async fn una_linea_libre_sin_descripcion_avisa_en_la_ficha() {
+async fn otro_concepto_sin_descripcion_avisa_en_la_ficha() {
     let (contexto, token, csrf) = preparado().await;
     contexto
         .pedir(post(
@@ -201,7 +203,11 @@ async fn una_linea_libre_sin_descripcion_avisa_en_la_ficha() {
         ))
         .await;
     assert_eq!(respuesta.status(), StatusCode::UNPROCESSABLE_ENTITY);
-    assert!(texto(respuesta).await.contains("Escribe la descripción"));
+    assert!(
+        texto(respuesta)
+            .await
+            .contains("Escribe qué es el concepto")
+    );
 }
 
 #[tokio::test]

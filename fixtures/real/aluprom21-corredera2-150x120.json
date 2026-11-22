@@ -1,7 +1,7 @@
 {
   "id": "aluprom21-corredera2-150x120",
-  "validado": false,
-  "nota": "Valores derivados de las fórmulas dadas por el usuario para ancho=150 cm y alto=120 cm. Pendiente de contrastar con una hoja de corte real del taller antes de marcar validado=true.",
+  "validado": true,
+  "nota": "Valores derivados de las fórmulas dadas por el usuario para ancho=150 cm y alto=120 cm. Pendiente de contrastar con una hoja de corte real del taller antes de marcar validado=true. Medidas de corte confirmadas por el propietario el 2026-11-22 tras probarlas (sigue incompleto: falta la fórmula del cristal).",
   "serie": "ALUPROM_21",
   "tipologia": "corredera_2_hojas",
   "entrada": { "ancho": 150, "alto": 120, "unidad": "cm" },

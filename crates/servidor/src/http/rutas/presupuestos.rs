@@ -90,7 +90,7 @@ pub struct Aviso {
 
 fn texto_de_aviso(clave: &str) -> Option<&'static str> {
     Some(match clave {
-        "linea" => "Línea guardada.",
+        "linea" => "Guardado en el presupuesto.",
         "quitada" => "Línea quitada.",
         "datos" => "Datos guardados.",
         "enviado" => "Marcado como enviado.",

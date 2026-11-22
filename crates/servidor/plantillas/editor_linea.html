@@ -1,5 +1,5 @@
 {% extends "marco.html" %}
-{% block titulo %}Línea · {{ codigo }}{% endblock %}
+{% block titulo %}Ventana · {{ codigo }}{% endblock %}
 {% block clase_body %}con-menu con-pie-fijo{% endblock %}
 {% block contenido %}
 <header class="cabecera-pagina cabecera-documento">
@@ -10,14 +10,14 @@
   {% include "pasos_documento.html" %}
 </header>
 <div class="barra-lineas">
-  <nav class="pestanas-linea" aria-label="Líneas del presupuesto">
+  <nav class="pestanas-linea" aria-label="Ventanas y conceptos del presupuesto">
     {% for p in pestanas %}
-    <a class="pestana-linea{% if p.orden == orden %} actual{% endif %}" href="/presupuestos/{{ id }}/lineas/{{ p.orden }}"{% if p.orden == orden %} aria-current="page"{% endif %}>Línea {{ p.orden }} · {{ p.titulo }}{% if !p.completa %} <span class="etiqueta etiqueta-aviso">Incompleta</span>{% endif %}</a>
+    <a class="pestana-linea{% if p.orden == orden %} actual{% endif %}" href="/presupuestos/{{ id }}/lineas/{{ p.orden }}"{% if p.orden == orden %} aria-current="page"{% endif %}>{{ p.orden }} · {{ p.titulo }}{% if !p.completa %} <span class="etiqueta etiqueta-aviso">Incompleta</span>{% endif %}</a>
     {% endfor %}
-    {% if orden == 0 %}<span class="pestana-linea actual" aria-current="page">Línea nueva</span>{% endif %}
-    <a class="pestana-linea anadir" href="/presupuestos/{{ id }}/lineas/nueva">+ Añadir línea</a>
+    {% if orden == 0 %}<span class="pestana-linea actual" aria-current="page">Ventana nueva</span>{% endif %}
+    <a class="pestana-linea anadir" href="/presupuestos/{{ id }}/lineas/nueva">+ Otra ventana</a>
   </nav>
-  <button class="boton primario" type="submit" form="form-linea">Guardar línea</button>
+  <button class="boton primario" type="submit" form="form-linea">Guardar ventana</button>
 </div>
 <div class="editor">
   <section class="tarjeta tarjeta-dibujo" aria-labelledby="titulo-dibujo-tarjeta">
@@ -57,11 +57,9 @@
           <div class="campo"><label for="iva">IVA</label><select id="iva" name="iva">{% for o in ivas %}<option value="{{ o.valor }}"{% if o.valor == valores.iva %} selected{% endif %}>{{ o.texto }}</option>{% endfor %}</select></div>
         </div>
       </details>
-      <label class="casilla"><input type="checkbox" name="limites_revisados" value="1"{% if valores.limites_revisados %} checked{% endif %}> He revisado la medida aunque esté fuera de los límites de la serie</label>
       <div class="acciones pie-formulario">
-        <button class="boton primario" type="submit">Guardar línea</button>
-        <button class="boton" type="submit" name="siguiente" value="1">Guardar y añadir otra</button>
-        <a class="boton" href="/presupuestos/{{ id }}">Volver</a>
+        <a class="boton" href="/presupuestos/{{ id }}">Volver sin guardar</a>
+        <button class="boton primario" type="submit">Guardar ventana</button>
       </div>
     </form>
     <section id="piezas" class="tarjeta tarjeta-piezas">{% include "editor_piezas.html" %}</section>

@@ -4,7 +4,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 
 ## Ventanas y fabricación
 - [ ] Fórmulas de ancho y alto del cristal (descuento) y tipo de vidrio habitual, en cada serie.
-- [x] `ancho` y `alto` son la **medida de la ventana** (plan de H3 aprobado, 2026-11-21); se valida con las 5 ventanas reales tras H3.
+- [x] `ancho` y `alto` son la **medida de la ventana** (plan de H3 aprobado, 2026-11-21); se valida con las 5 ventanas reales tras H3. Aluprom 21: medidas de corte de la 2 y la 4 hojas validadas por el propietario (2026-11-22).
 - [ ] ¿Marco superior, lateral e inferior salen del mismo perfil o de perfiles distintos?
 - [ ] ¿Se optimizan los cortes por ventana o por trabajo? ¿Qué se hace con los retales?
 - [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos sin dato (se usa 0); retal mínimo 0 por decisión del propietario. Se cambian en Ajustes > Taller.

@@ -161,7 +161,7 @@ fn leer_libre(f: Libre) -> Result<LineaLibre, ErrorApp> {
     let descripcion: String = f.descripcion.trim().chars().take(300).collect();
     if descripcion.is_empty() {
         return Err(ErrorApp::Validacion(
-            "Escribe la descripción de la línea libre.".into(),
+            "Escribe qué es el concepto (por ejemplo, «Mosquitera»).".into(),
         ));
     }
     let cantidad_mil = leer_decimal_es(&f.cantidad)

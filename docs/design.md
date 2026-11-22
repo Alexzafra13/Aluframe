@@ -38,6 +38,10 @@ Subconjunto Latin-1 en woff2 (licencia OFL en `recursos/fuentes/LICENCIA-OFL.txt
 - **Tablas editables (H2):** importes en Plex Mono alineados a la derecha; casillas de 24 px dentro de objetivos de 44 px.
 - **Zona de peligro:** acciones irreversibles dentro de un desplegable, con casilla de confirmación y botón con borde de aviso.
 
+## Menú lateral (0.7.2, petición del propietario)
+- Se queda fijo al desplazar la página (altura de la pantalla, con su propio desplazamiento si no cabe).
+- Se pliega a solo iconos con «Plegar menú» (abajo): las columnas se animan (360 ms, curva suave), los textos se desvanecen y el icono gira. La preferencia se guarda en el navegador (`menu.js`, cargado antes de pintar para que no parpadee). Cada entrada lleva su nombre como `title`.
+
 ## Movimiento (inspirado en iOS, decisión del propietario del 2026-11-21)
 Objetivo: que la interfaz se sienta fluida y responda al tacto, sin adornos ni efectos gratuitos y sin coste de rendimiento. Solo se animan `transform` y `opacity`, que el navegador resuelve en la tarjeta gráfica.
 

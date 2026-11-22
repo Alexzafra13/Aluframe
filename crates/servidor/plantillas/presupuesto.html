@@ -24,16 +24,16 @@
 <div class="documento">
   <section class="columna-lineas" aria-labelledby="titulo-lineas">
     <div class="cabecera-seccion">
-      <h2 id="titulo-lineas">Líneas</h2>
+      <h2 id="titulo-lineas">Ventanas y otros conceptos</h2>
       {% if editable() %}
       <div class="acciones">
-        <a class="boton" href="/presupuestos/{{ ficha.presupuesto.id }}/lineas/nueva">+ Añadir ventana</a>
-        <button class="boton" type="button" data-abrir-hoja="hoja-libre">+ Línea libre</button>
+        <a class="boton primario" href="/presupuestos/{{ ficha.presupuesto.id }}/lineas/nueva">+ Ventana</a>
+        <button class="boton" type="button" data-abrir-hoja="hoja-libre">+ Otro concepto</button>
       </div>
       {% endif %}
     </div>
     {% if lineas.is_empty() %}
-    <p class="vacio tarjeta">Sin líneas todavía. Añade una ventana (con su dibujo y su precio) o una línea libre para cerrajería, instalación o material suelto.</p>
+    <p class="vacio tarjeta">Todavía no hay nada. <strong>Ventana</strong>: se dibuja y se calcula sola con la serie. <strong>Otro concepto</strong>: lo que no se calcula y lleva su precio a mano (mosquitera, persiana, instalación, portes, cerrajería…).</p>
     {% endif %}
     <ol class="tarjetas-linea" role="list">
       {% for l in lineas %}
@@ -41,7 +41,7 @@
         <a class="tarjeta-linea-enlace" href="{% if l.es_ventana && editable() %}/presupuestos/{{ ficha.presupuesto.id }}/lineas/{{ l.orden }}{% else %}#linea-{{ l.orden }}{% endif %}" id="linea-{{ l.orden }}">
           <span class="miniatura" aria-hidden="true">{% if l.es_ventana %}{{ l.dibujo|safe }}{% else %}<span class="miniatura-libre">€</span>{% endif %}</span>
           <span class="tarjeta-linea-texto">
-            <span class="tarjeta-linea-titulo">Línea {{ l.orden }} · {{ l.descripcion }}</span>
+            <span class="tarjeta-linea-titulo">{{ l.orden }} · {{ l.descripcion }}</span>
             <span class="texto-apagado pequeno">Cantidad {{ l.cantidad }}{% if !l.completa %} · {{ l.motivo }}{% endif %}</span>
           </span>
           <span class="tarjeta-linea-lado">

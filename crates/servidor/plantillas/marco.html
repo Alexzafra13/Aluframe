@@ -4,20 +4,21 @@
 {% include "iconos.html" %}
 {% let en_mas = seccion == "stock" || seccion == "catalogo" || seccion == "facturas" || seccion == "ajustes" %}
 <nav class="menu" aria-label="Menú principal">
-  <a class="marca" href="/"><span class="marca-logo" aria-hidden="true"></span>AlumFrame</a>
+  <a class="marca" href="/"><span class="marca-logo" aria-hidden="true"></span><span class="menu-texto">AlumFrame</span></a>
   {% for grupo in menu %}
-  <p class="menu-grupo">{{ grupo.titulo }}</p>
+  <p class="menu-grupo"><span class="menu-texto">{{ grupo.titulo }}</span></p>
   <ul>
     {% for entrada in grupo.entradas %}
-    <li><a class="menu-entrada{% if entrada.seccion == seccion %} activa{% endif %}" href="{{ entrada.ruta }}"{% if entrada.seccion == seccion %} aria-current="page"{% endif %}>{% if entrada.seccion == seccion %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-{{ entrada.seccion }}"/></svg>{{ entrada.nombre }}</a></li>
+    <li><a class="menu-entrada{% if entrada.seccion == seccion %} activa{% endif %}" href="{{ entrada.ruta }}" title="{{ entrada.nombre }}"{% if entrada.seccion == seccion %} aria-current="page"{% endif %}>{% if entrada.seccion == seccion %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-{{ entrada.seccion }}"/></svg><span class="menu-texto">{{ entrada.nombre }}</span></a></li>
     {% endfor %}
   </ul>
   {% endfor %}
   <div class="menu-pie">
-    <a class="menu-entrada{% if seccion == "ajustes" %} activa{% endif %}" href="/ajustes/usuarios">{% if seccion == "ajustes" %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-ajustes"/></svg>Ajustes</a>
+    <button class="menu-entrada boton-enlace boton-plegar" type="button" data-plegar-menu aria-expanded="true" title="Plegar o desplegar el menú"><svg class="icono" aria-hidden="true"><use href="#i-plegar"/></svg><span class="menu-texto">Plegar menú</span></button>
+    <a class="menu-entrada{% if seccion == "ajustes" %} activa{% endif %}" href="/ajustes/usuarios" title="Ajustes">{% if seccion == "ajustes" %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-ajustes"/></svg><span class="menu-texto">Ajustes</span></a>
     <form method="post" action="/salir">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
-      <button class="menu-entrada boton-enlace" type="submit"><svg class="icono" aria-hidden="true"><use href="#i-salir"/></svg>Salir</button>
+      <button class="menu-entrada boton-enlace" type="submit" title="Salir"><svg class="icono" aria-hidden="true"><use href="#i-salir"/></svg><span class="menu-texto">Salir</span></button>
     </form>
   </div>
 </nav>

@@ -94,7 +94,7 @@ dialog.hoja.cerrando::backdrop { animation: velo-sale 260ms ease forwards; }
 
 /* Pie fijo oscuro con el desglose y el total (diseño aprobado). */
 body.con-pie-fijo .contenido { padding-bottom: 130px; }
-.pie-fijo { position: fixed; left: 280px; right: 0; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1rem 2rem; min-height: 96px; background: var(--menu-fondo); color: #fff; transition: opacity var(--normal) ease; }
+.pie-fijo { position: fixed; left: var(--ancho-menu, 280px); right: 0; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1rem 2rem; min-height: 96px; background: var(--menu-fondo); color: #fff; transition: opacity var(--normal) ease, left 360ms var(--curva-suave); }
 .pie-desglose { display: flex; gap: 2.25rem; margin: 0; flex-wrap: wrap; }
 .pie-desglose dt { font: 500 .8rem var(--condensada); letter-spacing: .12em; text-transform: uppercase; color: var(--menu-grupo); }
 .pie-desglose dd { margin: .2rem 0 0; font: 500 1.05rem var(--mono); color: var(--menu-texto); }

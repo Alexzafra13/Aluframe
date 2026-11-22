@@ -77,6 +77,8 @@ pub struct VistaCalculo {
     pub mano_de_obra: String,
     pub precio: String,
     pub completa: bool,
+    /// Lo marcó quien presupuesta: la medida se sale de la serie pero es la que es.
+    pub limites_revisados: bool,
 }
 
 fn cm(dmm: i64) -> String {
@@ -137,6 +139,7 @@ impl From<&CalculoDeVentana> for VistaCalculo {
             mano_de_obra: String::new(),
             precio: c.precio.precio.formatear(),
             completa: c.precio.es_final(),
+            limites_revisados: false,
         }
     }
 }

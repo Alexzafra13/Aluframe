@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H3 terminados**; publicada la **v0.7.1** (clientes, código postal, hoja del presupuesto y arreglo de la aplicación de Windows). Siguiente: **H4, trabajos y orden de taller** (plan propuesto, falta el visto bueno del propietario; ver abajo).
+Estado (2026-11-22): **H0–H3 terminados**; publicada la **v0.7.2**. Siguiente: **H4, trabajos y orden de taller** (plan propuesto, falta el visto bueno del propietario; ver abajo).
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
@@ -36,7 +36,7 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 - **Aluprom 21:** descuento del cristal, referencias de accesorios (kit, ruedas, tornillos), si la de 4 hojas lleva el «cierre 4 hojas» 21344, y si el Climalit cambia descuentos. Los perfiles ya tienen referencia (21210, 21220, 21230; hojas 21310/21340/21350 y Climalit 21312/21341/21351).
 - **Precio:** una tarifa real de Aluval, margen (sobre coste o venta) y mano de obra.
 - **Colores:** confirmar RAL y superficies de `data/acabados.yaml` y el nombre «Embero».
-- **Validación:** 5 ventanas reales con su hoja de corte y precio. Catálogo PDF de la Sopena V-94. Datos fiscales y logotipo.
+- **Validación:** Aluprom 21 (2 y 4 hojas) **validada por el propietario** el 2026-11-22 tras probar las medidas de corte; siguen faltando el descuento del cristal y las referencias de kit, ruedas y tornillos (sin ellos no hay precio final). Sopena V-94 sigue en borrador (falta su catálogo). Datos fiscales y logotipo: ya se cargan en Ajustes.
 
 ## Hecho después de H3 (resumen; detalle en `docs/CAMBIOS.md`)
 | Versión | Qué |
@@ -48,6 +48,8 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | 0.5.3 | Acristalamiento «Cristal normal» o «Climalit» que cambia las hojas (`perfil_segun`, ADR-0018) |
 | 0.5.5–0.5.6 | Arreglos del móvil; corredera de 2 hojas como Aluval (abren las dos, cierre en los laterales) |
 | 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
+| 0.7.1 | Arreglo de la aplicación de Windows: no se apaga mientras la ventana siga abierta |
+| 0.7.2 | Editor: «Guardar ventana» vuelve al presupuesto; «+ Otro concepto» (antes línea libre); aviso de medida fuera de la serie solo cuando ocurre; menú lateral fijo y plegable; Aluprom 21 validada por el propietario |
 | 0.7.0 | Alta de cliente con nombre y teléfono obligatorios (sin prefijo, +34 por defecto); código postal que rellena localidad, provincia y país (ADR-0020); hoja del presupuesto con logotipo o nombre de empresa, datos completos, firma y pie; descripción de la ventana con serie, medidas, color, opciones y cristal |
 
 | Hito | Estado |
