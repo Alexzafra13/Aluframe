@@ -12,7 +12,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [x] Nombres de las hojas de Aluprom 21: los del catálogo de Aluval, HOJA LATERAL y HOJA CIERRE (propietario, 2026-11-22; ADR-0017).
 - [x] Hojas de Aluprom 21 según el cristal (propietario, 2026-11-22): sencillo → 21310, 21340, 21350; doble (Climalit) → 21312, 21341, 21351. Se elige en la línea con la opción «Acristalamiento» (ADR-0018).
 - [ ] Climalit: ¿cambian los descuentos de las hojas o del cristal respecto al sencillo? (hoy se suponen iguales). Tipo de Climalit y cámara: cómo se piden y si cambian algo más (lo concretará el propietario).
-- [ ] Aluprom 21, marcos: el propietario cree que el lateral es siempre 21210 y el superior 21220 (confirmar en el taller). El inferior es siempre el mismo, pero falta saber si es 21230 (con cámara) o 21231 (sin cámara).
+- [x] Aluprom 21, marcos (propietario, 2026-11-22): lateral 21210, superior 21220 e inferior 21230 (con cámara), con cualquier cristal. Recogido en `data/series/aluprom-21.yaml`.
 - [x] **Fixture de la abatible y bisagras:** el propietario confirma (2026-11-21) 2 bisagras por hoja hasta 140 cm de alto de la ventana, incluido, y 3 por encima. El fixture incluye ahora «BISAGRA: 4» para 120 × 140.
 - [ ] V-94 abatible: cantidad de inversores y su ángulo de corte, cálculo de las pletinas de falleba, tipos de escuadra (exterior e interior de hoja) y si los marcos superior, lateral e inferior son el mismo perfil.
 - [ ] Redondeo: ¿a 0,1 cm hacia abajo es lo correcto? Validarlo con ventanas reales.
