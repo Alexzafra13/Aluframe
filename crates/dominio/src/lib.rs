@@ -8,6 +8,7 @@ pub mod codigos_postales;
 pub mod corte;
 pub mod csv;
 pub mod dibujo;
+pub mod factura;
 pub mod formula;
 pub mod iban;
 pub mod imagen;

@@ -12,6 +12,7 @@ pub mod datos_del_editor;
 pub mod enlace_con_tarifa;
 pub mod entrar;
 pub mod exportar_cliente;
+pub mod facturas;
 pub mod importar_clientes;
 pub mod importar_serie;
 pub mod importar_tarifa;
