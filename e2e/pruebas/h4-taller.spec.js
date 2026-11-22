@@ -5,7 +5,7 @@ const { entrarComoPropietario } = require("./comun");
 test.describe.configure({ mode: "serial" });
 
 // Serie ficticia «validada» de las pruebas: las de demostración nunca dan precio final y las
-// reales aún no tienen la medida del cristal. No es una serie del taller.
+// reales necesitan una tarifa real. No es una serie del taller.
 const COMPLETA = path.join(__dirname, "..", "..", "crates", "servidor", "tests", "datos", "serie-prueba-completa.yaml");
 const OPERARIO = { nombre: "Luis", pin: "246802" };
 

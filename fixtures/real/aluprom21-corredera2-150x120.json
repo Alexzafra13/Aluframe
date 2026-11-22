@@ -1,12 +1,12 @@
 {
   "id": "aluprom21-corredera2-150x120",
   "validado": true,
-  "nota": "Valores derivados de las fórmulas dadas por el usuario para ancho=150 cm y alto=120 cm. Pendiente de contrastar con una hoja de corte real del taller antes de marcar validado=true. Medidas de corte confirmadas por el propietario el 2026-11-22 tras probarlas (sigue incompleto: falta la fórmula del cristal).",
+  "nota": "Medidas de corte confirmadas por el propietario el 2026-11-22. Cristal: dos de (ancho / 2 - 9,8) x (alto - 13,1); el ancho lo da el propietario (y el plano de Aluval), el alto es PROVISIONAL hasta comprobarlo con un cristal real.",
   "serie": "ALUPROM_21",
   "tipologia": "corredera_2_hojas",
   "entrada": { "ancho": 150, "alto": 120, "unidad": "cm" },
   "esperado": {
-    "incompleto": true,
+    "incompleto": false,
     "piezas": [
       { "perfil": "MARCO_LATERAL",   "cantidad": 2, "longitud": 120,   "corte": 90 },
       { "perfil": "MARCO_SUPERIOR",  "cantidad": 1, "longitud": 145.9, "corte": 90 },
@@ -20,6 +20,6 @@
       { "articulo": "RUEDA_CORREDERA", "cantidad": 4 },
       { "articulo": "TORNILLO_4_8x25", "cantidad": 17 }
     ],
-    "vidrio": null
+    "vidrio": { "tipo": "CRISTAL", "piezas": [ { "cantidad": 2, "ancho": 65.2, "alto": 106.9 } ] }
   }
 }

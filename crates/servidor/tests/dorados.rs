@@ -96,6 +96,44 @@ fn comprobar(fixture: &Value, resultado: &ResultadoVentana) {
         esperado["vidrio"].is_null(),
         "{id}: vidrio"
     );
+    if let Some(vidrios) = &resultado.vidrio {
+        assert_eq!(
+            vidrios_calculados(vidrios),
+            vidrios_esperados(&esperado["vidrio"]),
+            "{id}: vidrio"
+        );
+    }
+}
+
+type VidrioComparable = (String, u32, Decimal, Decimal);
+
+fn en_cm(longitud: dominio::unidades::Longitud) -> Decimal {
+    longitud.a_decimal(dominio::unidades::Unidad::Cm).unwrap()
+}
+
+fn vidrios_calculados(vidrios: &[dominio::series::VidrioCalculado]) -> Vec<VidrioComparable> {
+    vidrios
+        .iter()
+        .map(|v| (v.tipo.clone(), v.cantidad, en_cm(v.ancho), en_cm(v.alto)))
+        .collect()
+}
+
+fn vidrios_esperados(vidrio: &Value) -> Vec<VidrioComparable> {
+    let tipo = vidrio["tipo"].as_str().unwrap();
+    vidrio["piezas"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|p| {
+            let cantidad = u32::try_from(p["cantidad"].as_u64().unwrap()).unwrap();
+            (
+                tipo.to_owned(),
+                cantidad,
+                decimal(&p["ancho"]),
+                decimal(&p["alto"]),
+            )
+        })
+        .collect()
 }
 
 #[test]
@@ -122,13 +160,12 @@ fn las_ventanas_reales_salen_como_en_sus_fixtures() {
 }
 
 #[test]
-fn la_corredera_de_2_hojas_sale_incompleta_mientras_falte_el_cristal() {
+fn la_corredera_de_4_hojas_sale_incompleta_mientras_falte_el_cristal() {
     let series = series_reales();
-    let cien_cincuenta = Decimal::desde_entero(150);
     let resultado = calcular_ventana(
         &series["ALUPROM_21"],
-        "corredera_2_hojas",
-        cien_cincuenta,
+        "corredera_4_hojas",
+        Decimal::desde_entero(303),
         Decimal::desde_entero(120),
     )
     .unwrap();

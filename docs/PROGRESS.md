@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H4 terminados**; publicada la **v0.8.0**. Siguiente: **H5, stock** (el propietario quiere el programa completo, H5 a H7, antes de pulir).
+Estado (2026-11-22): **H0–H4 terminados**; publicada la **v0.8.1**. Siguiente: **H5, stock** (el propietario quiere el programa completo, H5 a H7, antes de pulir).
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.

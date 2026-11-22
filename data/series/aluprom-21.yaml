@@ -38,6 +38,8 @@ referencias:
   KIT_CORREDERA:    { referencia: "KIT-CORREDERA" }
   RUEDA_CORREDERA:  { referencia: "RUEDA-CORREDERA" }
   TORNILLO_4_8x25:  { referencia: "TORNILLO-4,8X25" }
+  # El cristal se cobra por m² con el artículo de referencia «CRISTAL»; en cada ventana se puede elegir otro.
+  CRISTAL:          { referencia: "CRISTAL" }
 
 tipologias:
   corredera_2_hojas:
@@ -53,7 +55,12 @@ tipologias:
       - { perfil: HOJA_CIERRE,     perfil_segun: { acristalamiento: { climalit: HOJA_CIERRE_CLIMALIT } }, cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }
       - { perfil: HOJA_RODAMIENTO, perfil_segun: { acristalamiento: { climalit: HOJA_RODAMIENTO_CLIMALIT } }, cantidad: 4, longitud: "ancho / 2 - descuento_hoja_horizontal",   corte: 90 }
     vidrio:
-      estado: CONFIRMAR            # ancho del cristal = ancho / 2 - 9,8 (propietario, 2026-11-22, provisional); falta el alto
+      # Dos cristales, uno por hoja (propietario, 2026-11-22). Ancho: ancho / 2 - 9,8 (el propietario, y el
+      # plano de Aluval: (L/2) - 98 mm). Alto: PROVISIONAL, alto de la hoja (alto - 5,3) menos los 7,8 cm que
+      # pierde el cristal en el ancho; el plano no lo acota. Comprobar con un cristal real.
+      tipo: CRISTAL
+      piezas:
+        - { cantidad: 2, ancho: "ancho / 2 - 9.8", alto: "alto - 13.1" }
     accesorios:
       - { articulo: KIT_CORREDERA,   cantidad: 1 }                  # kit de accesorios de montaje; un único artículo
       - { articulo: RUEDA_CORREDERA, cantidad: 4 }
