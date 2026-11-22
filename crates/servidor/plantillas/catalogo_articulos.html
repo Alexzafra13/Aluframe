@@ -60,7 +60,7 @@
         <td>{{ a.proveedor }}</td>
         <td>{{ a.tipo }}</td>
         <td>{{ a.unidad }}{% if !a.barra.is_empty() %} <span class="texto-apagado">({{ a.barra }})</span>{% endif %}</td>
-        <td class="numero">{% if editable %}<label><span class="oculto">Precio de {{ a.referencia }}</span><input class="campo-precio" form="precios" name="precio_{{ a.id }}" value="{{ a.precio_en_campo }}" inputmode="decimal" size="9"></label>{% else if a.precio.is_empty() %}<span class="texto-apagado">sin precio</span>{% else %}{{ a.precio }}{% endif %}</td>
+        <td class="numero" data-etiqueta="Precio:">{% if editable %}<label><span class="oculto">Precio de {{ a.referencia }}</span><input class="campo-precio" form="precios" name="precio_{{ a.id }}" value="{{ a.precio_en_campo }}" inputmode="decimal" size="9"></label>{% else if a.precio.is_empty() %}<span class="texto-apagado">sin precio</span>{% else %}{{ a.precio }}{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>

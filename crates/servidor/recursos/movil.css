@@ -1,0 +1,132 @@
+/* Navegación (menú con iconos, buscador, pestañas de iOS) y adaptación a móvil y tablet.
+   Mismos tokens y acentos que el diseño aprobado; solo se reordena para pantallas pequeñas
+   (docs/design.md, apartado «Móvil»). */
+
+/* Iconos propios (plantillas/iconos.html): trazo fino como los de iOS. */
+.icono { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.icono .relleno, .icono use .relleno { fill: currentColor; stroke: none; }
+symbol .relleno { fill: currentColor; stroke: none; }
+
+/* Menú lateral del ordenador con iconos. */
+.menu-entrada { gap: .85rem; }
+.menu-entrada .icono { opacity: .7; transition: opacity var(--normal) ease; }
+.menu-entrada:hover .icono, .menu-entrada.activa .icono { opacity: 1; }
+.menu-entrada.activa .icono { color: #fff; }
+
+/* Barra superior: buscador como el campo de búsqueda de iOS y usuario con su inicial. */
+.buscador-global { position: relative; display: flex; align-items: center; }
+.icono-buscar { position: absolute; left: 12px; width: 18px; height: 18px; color: var(--apagado); pointer-events: none; }
+.buscador-global .buscador { padding-left: 40px; border-color: transparent; background: rgb(21 25 29 / .06); border-radius: 11px; }
+.buscador-global .buscador:focus { background: #fff; }
+.usuario-actual { display: inline-flex; align-items: center; gap: .6rem; }
+.pequeno-avatar { width: 32px; height: 32px; font-size: .95rem; }
+.marca-movil, .barra-pestanas { display: none; }
+.tarjeta { box-shadow: 0 1px 0 rgb(21 25 29 / .03); }
+/* El primer dato de una fila es su título: se lee como texto, no como enlace web. */
+.tabla td:first-child a { color: var(--tinta); font-weight: 500; text-decoration: none; }
+.tabla td:first-child a:hover { color: var(--acero); text-decoration: underline; }
+/* Los <dialog> del navegador no llegan al borde: las hojas sí, como en iOS. */
+dialog.hoja { max-width: 100vw; }
+.hoja-mas .hoja-contenido { min-height: 0; }
+.cabecera-pagina h1 { letter-spacing: -.01em; }
+/* Listas largas de columnas o referencias sin espacios: que partan antes que desbordar. */
+code, .mono { overflow-wrap: anywhere; }
+
+/* Listas agrupadas de iOS (hoja «Más»). */
+.grupo-ios { list-style: none; margin: .5rem 0 1rem; padding: 0; background: #fff; border: 1px solid var(--linea); border-radius: 13px; overflow: hidden; }
+.grupo-ios li { position: relative; }
+.grupo-ios li + li::before { content: ""; position: absolute; top: 0; left: 3.4rem; right: 0; border-top: 1px solid var(--linea); }
+.celda-ios { display: flex; align-items: center; gap: .95rem; width: 100%; min-height: 54px; padding: 0 1rem; border: 0; background: none; color: var(--tinta); font: 500 1.05rem var(--sans); text-align: left; text-decoration: none; cursor: pointer; transition: background-color var(--rapido) ease; -webkit-tap-highlight-color: transparent; }
+.celda-ios::after { content: "›"; margin-left: auto; color: var(--apagado); font-size: 1.5rem; line-height: 1; }
+.celda-ios:active { background: rgb(21 25 29 / .06); }
+.celda-ios .icono { width: 22px; height: 22px; color: var(--acero); }
+.celda-ios.activa { font-weight: 600; }
+.celda-salir, .celda-salir .icono { color: var(--aviso); }
+.celda-salir::after { content: none; }
+
+@media screen and (max-width: 900px) {
+  body.con-menu { display: block; }
+  .menu { display: none; }
+  .barra-superior { gap: .75rem; padding: calc(.6rem + env(safe-area-inset-top)) 1rem .6rem; border-bottom-color: rgb(21 25 29 / .1); }
+  .marca-movil { display: inline-flex; flex: none; }
+  .marca-movil .marca-logo { width: 30px; height: 30px; border-radius: 8px; }
+  .buscador-global { max-width: none; }
+  .usuario-nombre { display: none; }
+  .contenido { padding: 1.25rem 1rem calc(104px + env(safe-area-inset-bottom)); }
+  h1 { font-size: 2.1rem; }
+  .cabecera-pagina { margin-bottom: 1.1rem; }
+  .cabecera-con-acciones { flex-wrap: wrap; }
+  .tarjeta { padding: 1.1rem; border-radius: 16px; }
+  .aviso-efimero { top: calc(12px + env(safe-area-inset-top)); max-width: calc(100vw - 2rem); }
+
+  /* Barra de pestañas fija abajo, translúcida como la de iOS. */
+  .barra-pestanas { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 5px 4px calc(5px + env(safe-area-inset-bottom)); background: rgb(251 250 246 / .86); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid rgb(21 25 29 / .1); view-transition-name: barra-pestanas; }
+  .pestana-ios { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 50px; padding: 0; border: 0; background: none; color: var(--apagado); font: 500 .7rem var(--sans); letter-spacing: .01em; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color var(--normal) ease; }
+  .pestana-ios .icono { width: 26px; height: 26px; stroke-width: 1.6; transition: transform var(--rapido) var(--curva-muelle); }
+  .pestana-ios:active .icono { transform: scale(.84); transition-duration: 80ms; }
+  .pestana-ios.activa { color: var(--acero); }
+  .pestana-ios.activa .icono { stroke-width: 2; }
+  .pestana-ios .indicador-menu { left: 50%; top: -5px; bottom: auto; width: 22px; height: 3px; margin-left: -11px; border-radius: 0 0 3px 3px; }
+  body.con-pie-fijo .barra-pestanas { display: none; }
+  /* El pie del total ocupa el sitio de la barra de pestañas, de borde a borde. */
+  body.con-pie-fijo .contenido { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+  .pie-fijo { position: fixed; left: 0; right: 0; min-height: 0; padding: .9rem 1.25rem calc(.9rem + env(safe-area-inset-bottom)); }
+
+  /* Hojas que suben desde abajo, con el asa de iOS, y tan altas como su contenido. */
+  dialog.hoja { height: fit-content; }
+  dialog.hoja .hoja-contenido::before { content: ""; display: block; width: 38px; height: 5px; border-radius: 3px; background: rgb(21 25 29 / .2); margin: -.4rem auto .6rem; }
+  dialog.hoja .hoja-pie { padding-bottom: calc(1.25rem + env(safe-area-inset-bottom)); }
+  .hoja-mas .hoja-contenido { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+
+  /* Filtros y pestañas que no caben: se deslizan de lado, sin barra de desplazamiento. */
+  .segmentado, .pestanas { display: flex; flex-wrap: nowrap; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .segmentado::-webkit-scrollbar, .pestanas::-webkit-scrollbar { display: none; }
+  .segmento, .pestana { flex: none; white-space: nowrap; }
+
+  .dos-columnas { grid-template-columns: 1fr; }
+  .formulario-en-linea > * { flex: 1 1 100%; }
+  .formulario-en-linea input:not([type="checkbox"], [type="radio"]), .formulario-en-linea select { width: 100%; }
+  .formulario-en-linea .casilla { flex: 1 1 auto; }
+  .pasos { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: .35rem; }
+  .pasos::-webkit-scrollbar { display: none; }
+  .paso { flex: none; font-size: .9rem; }
+  .paso + .paso::before { width: 16px; }
+  .acciones > .boton, .acciones > form { flex: 1 1 auto; }
+  .acciones > form .boton { width: 100%; }
+  .lienzo { min-height: 260px; }
+  .tarjeta-linea-enlace { grid-template-columns: 84px 1fr; padding-right: 3.5rem; }
+  .tarjeta-linea-lado { grid-column: 2; align-items: flex-start; }
+  .miniatura { width: 84px; height: 64px; }
+  .pie-desglose { display: none; }
+  .fila-presupuesto { grid-template-columns: 1fr auto; grid-template-areas: "cliente importe" "codigo estado" "fecha estado"; gap: .15rem .75rem; padding: .85rem 1rem; }
+  .fila-presupuesto .cliente { grid-area: cliente; font-weight: 600; }
+  .fila-presupuesto .codigo { grid-area: codigo; font-size: .9rem; color: var(--apagado); }
+  .fila-presupuesto > .pequeno { grid-area: fecha; }
+  .fila-presupuesto .etiqueta { grid-area: estado; justify-self: end; align-self: center; }
+  .fila-presupuesto .importe { grid-area: importe; }
+}
+
+/* Tablas como celdas de iOS: una tarjeta por fila, el primer dato como título. */
+@media screen and (max-width: 700px) {
+  .tabla thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tabla, .tabla tbody { display: block; width: 100%; }
+  .tabla tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .9rem; padding: .85rem 0; border-bottom: 1px solid var(--linea); }
+  .tabla tbody tr:last-child { border-bottom: 0; }
+  .tabla tbody tr:hover { background: none; }
+  .tabla th, .tabla td { display: block; padding: 0; border: 0; font-size: .92rem; color: var(--apagado); }
+  .tabla td:first-child, .tabla th[scope="row"] { flex-basis: 100%; font-size: 1.05rem; font-weight: 600; color: var(--tinta); }
+  .tabla td:empty { display: none; }
+  .tabla td[data-etiqueta]::before { content: attr(data-etiqueta) " "; font-family: var(--condensada); font-weight: 500; }
+  .tabla .numero { text-align: left; }
+  .tabla td:has(.boton), .tabla td:has(form), .tabla td:has(input) { flex-basis: 100%; }
+  .tabla td .boton { width: 100%; margin-top: .35rem; }
+  /* Con casilla de selección delante, el título es el dato siguiente. */
+  .tabla td:first-child:has(.casilla) { flex-basis: auto; }
+  .tabla td:first-child:has(.casilla) + td { flex: 1; font-size: 1.05rem; font-weight: 600; color: var(--tinta); }
+  .tabla td:first-child a { display: flex; align-items: center; min-height: 32px; }
+  .tabla td:first-child a::after { content: "›"; margin-left: auto; color: var(--apagado); font-size: 1.5rem; font-weight: 400; line-height: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pestana-ios .icono { transition: none; }
+}

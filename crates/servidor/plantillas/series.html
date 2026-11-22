@@ -23,9 +23,9 @@
         <td>{{ s.fabricante }}</td>
         <td><span class="etiqueta {% if s.estado == "validada" %}etiqueta-azul{% else %}etiqueta-aviso{% endif %}">{{ s.estado }}</span></td>
         <td class="mono">v{{ s.version }}</td>
-        <td>{{ s.avisos }}</td>
+        <td data-etiqueta="Datos pendientes:">{{ s.avisos }}</td>
         <td>{{ s.tipologias }}</td>
-        <td>{{ s.referencias }}</td>
+        <td data-etiqueta="Referencias con artículo:">{{ s.referencias }}</td>
         <td><a class="boton" href="/catalogo/series/{{ s.codigo }}/probar">Probar una ventana</a></td>
       </tr>
       {% endfor %}

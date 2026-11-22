@@ -23,11 +23,11 @@
       <tr>
         <td>{{ t.proveedor }}</td>
         <td><a href="/catalogo/tarifas/{{ t.id }}">{{ t.nombre }}</a>{% if t.vigente %} <span class="etiqueta etiqueta-azul">vigente</span>{% endif %}</td>
-        <td>{{ t.fecha_tarifa }}</td>
-        <td>{{ t.importada }}</td>
+        <td data-etiqueta="Fecha de la tarifa:">{{ t.fecha_tarifa }}</td>
+        <td data-etiqueta="Guardada:">{{ t.importada }}</td>
         <td>{{ t.origen }}</td>
-        <td class="numero">{{ t.descuento }}</td>
-        <td class="numero">{{ t.precios }}</td>
+        <td class="numero" data-etiqueta="Descuento:">{{ t.descuento }}</td>
+        <td class="numero" data-etiqueta="Precios:">{{ t.precios }}</td>
         <td>{% if t.vigente %}
           <form method="post" action="/catalogo/tarifas/{{ t.id }}/deshacer">
             <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
