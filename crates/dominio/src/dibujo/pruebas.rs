@@ -163,7 +163,11 @@ proptest! {
 #[test]
 fn sin_acabado_la_ventana_es_blanca_con_cierres_blancos() {
     let svg = dibujar_ventana(&datos(TipoDibujo::Corredera, 2));
-    assert!(svg.contains(r#"class="marco" "#) && svg.contains(r##"fill="#f1f0ea""##));
+    assert!(svg.contains(r#"class="marco" "#) && svg.contains(r##"fill="#f2f2ed""##));
+    assert!(
+        svg.contains(r#"class="sombra""#),
+        "el marco destaca del fondo"
+    );
     assert!(svg.contains(r##"<g class="herrajes" fill="#f4f4f2">"##));
     assert!(
         !svg.contains("style="),
@@ -186,10 +190,28 @@ fn la_imitacion_madera_lleva_veta_en_marco_y_hojas() {
     let mut nogal = datos(TipoDibujo::Corredera, 2);
     nogal.color = ColorDeDibujo::nuevo("#5e3a23", true, Herrajes::Negro).unwrap();
     let svg = dibujar_ventana(&nogal);
-    assert!(svg.contains(r#"<pattern id="veta-5e3a23""#));
-    assert_eq!(
-        contar(&svg, r#"fill="url(#veta-5e3a23)""#),
-        3,
-        "marco y dos hojas"
+    assert_eq!(contar(&svg, r#"fill="url(#veta-5e3a23bm-h)""#), 1, "marco");
+    assert_eq!(contar(&svg, r#"fill="url(#veta-5e3a23bm-v)""#), 2, "hojas");
+    assert!(
+        svg.contains(r#"patternTransform="rotate(90)""#),
+        "veta vertical en las hojas"
     );
+}
+
+#[test]
+fn cada_superficie_tiene_su_luz_y_el_texturado_su_grano() {
+    let pintar = |superficie| {
+        let mut d = datos(TipoDibujo::Corredera, 2);
+        d.color = ColorDeDibujo::nuevo("#373f43", false, Herrajes::Negro)
+            .unwrap()
+            .con_superficie(superficie);
+        dibujar_ventana(&d)
+    };
+    let texturado = pintar(Superficie::Texturado);
+    assert!(texturado.contains(r#"<pattern id="textura-373f43t""#));
+    assert_eq!(contar(&texturado, r#"class="textura""#), 3);
+    let anodizado = pintar(Superficie::Anodizado);
+    assert!(anodizado.contains(r#"<linearGradient id="luz-373f43a""#));
+    assert!(!anodizado.contains("textura"));
+    assert_ne!(pintar(Superficie::Brillo), pintar(Superficie::Mate));
 }

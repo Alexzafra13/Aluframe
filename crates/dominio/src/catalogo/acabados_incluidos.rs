@@ -2,7 +2,7 @@
 
 use std::collections::BTreeSet;
 
-use crate::dibujo::{ColorDeDibujo, Herrajes};
+use crate::dibujo::{ColorDeDibujo, Herrajes, Superficie};
 use crate::series::Valor;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -47,9 +47,16 @@ fn leer_uno(elemento: &Valor) -> Result<AcabadoIncluido, String> {
     let cierres = texto(elemento, "cierres")
         .and_then(|c| Herrajes::desde_texto(&c))
         .ok_or_else(|| format!("{nombre}: «cierres» debe ser blanco o negro"))?;
+    let superficie = match texto(elemento, "superficie") {
+        None => Superficie::Brillo,
+        Some(s) => Superficie::desde_texto(&s).ok_or_else(|| {
+            format!("{nombre}: «superficie» debe ser brillo, mate, texturado o anodizado")
+        })?,
+    };
     let color = texto(elemento, "color")
         .and_then(|c| ColorDeDibujo::nuevo(&c, booleano(elemento, "madera"), cierres))
-        .ok_or_else(|| format!("{nombre}: «color» debe ser #rrggbb"))?;
+        .ok_or_else(|| format!("{nombre}: «color» debe ser #rrggbb"))?
+        .con_superficie(superficie);
     Ok(AcabadoIncluido {
         nombre,
         ral,

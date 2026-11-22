@@ -32,6 +32,45 @@ impl Herrajes {
     }
 }
 
+/// Cómo está acabada la superficie: cambia el reflejo en el dibujo (y, más adelante, el precio).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Superficie {
+    Brillo,
+    Mate,
+    Texturado,
+    Anodizado,
+}
+
+impl Superficie {
+    pub fn desde_texto(texto: &str) -> Option<Superficie> {
+        match texto {
+            "brillo" => Some(Superficie::Brillo),
+            "mate" => Some(Superficie::Mate),
+            "texturado" => Some(Superficie::Texturado),
+            "anodizado" => Some(Superficie::Anodizado),
+            _ => None,
+        }
+    }
+
+    pub fn como_texto(self) -> &'static str {
+        match self {
+            Superficie::Brillo => "brillo",
+            Superficie::Mate => "mate",
+            Superficie::Texturado => "texturado",
+            Superficie::Anodizado => "anodizado",
+        }
+    }
+
+    pub fn inicial(self) -> char {
+        match self {
+            Superficie::Brillo => 'b',
+            Superficie::Mate => 'm',
+            Superficie::Texturado => 't',
+            Superficie::Anodizado => 'a',
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ColorDeDibujo {
     /// `#rrggbb` en minúsculas (ya validado con `leer_color_hex`).
@@ -39,10 +78,11 @@ pub struct ColorDeDibujo {
     /// Imitación madera: se dibuja con veta.
     pub madera: bool,
     pub herrajes: Herrajes,
+    pub superficie: Superficie,
 }
 
-/// Blanco RAL 9016, el que se usa por defecto en el taller.
-pub const BLANCO_9016: &str = "#f1f0ea";
+/// Blanco RAL 9016 (brillo), el que se usa por defecto en el taller.
+pub const BLANCO_9016: &str = "#f2f2ed";
 
 impl Default for ColorDeDibujo {
     fn default() -> Self {
@@ -50,6 +90,7 @@ impl Default for ColorDeDibujo {
             perfil: BLANCO_9016.to_owned(),
             madera: false,
             herrajes: Herrajes::Blanco,
+            superficie: Superficie::Brillo,
         }
     }
 }
@@ -61,7 +102,12 @@ impl ColorDeDibujo {
             perfil: leer_color_hex(perfil)?,
             madera,
             herrajes,
+            superficie: Superficie::Brillo,
         })
+    }
+
+    pub fn con_superficie(self, superficie: Superficie) -> ColorDeDibujo {
+        ColorDeDibujo { superficie, ..self }
     }
 
     pub fn perfil(&self) -> &str {

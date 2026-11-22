@@ -15,7 +15,7 @@ use std::collections::BTreeMap;
 use crate::series::{Dibujo, ResultadoVentana, Tipologia};
 use crate::unidades::Longitud;
 
-pub use color::{BLANCO_9016, ColorDeDibujo, Herrajes, leer_color_hex};
+pub use color::{BLANCO_9016, ColorDeDibujo, Herrajes, Superficie, leer_color_hex};
 pub use geometria::Lado;
 
 /// Lo que necesita el dibujo, ya resuelto a partir de la serie, la línea y el cálculo.

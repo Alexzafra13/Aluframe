@@ -1,9 +1,9 @@
 use std::fmt::Write;
 
-use super::DatosDeDibujo;
-use super::acabado::{atributos_de_hoja, atributos_de_marco, definiciones, grupo_de_herrajes};
+use super::acabado::{definiciones, grupo_de_herrajes, perfil};
 use super::geometria::{Lado, Plano, Rect};
 use super::marcadores::{colocar, radio};
+use super::{ColorDeDibujo, DatosDeDibujo};
 use crate::series::TipoDibujo;
 
 /// Los colores fijos van en la hoja de estilos (clases); los del acabado, en atributos del
@@ -22,15 +22,14 @@ pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
         escapar(&datos.titulo),
         definiciones(&datos.color)
     );
-    rect_con(
+    perfil(
         &mut s,
-        "marco",
-        plano.marco,
-        &atributos_de_marco(&datos.color),
+        &datos.color,
+        ("marco", plano.marco),
+        plano.grosor_marco,
     );
-    let hoja = atributos_de_hoja(&datos.color);
     for (indice, rectangulo) in plano.hojas.iter().enumerate() {
-        dibujar_hoja(&mut s, plano, (*rectangulo, indice), &hoja);
+        dibujar_hoja(&mut s, plano, (*rectangulo, indice), &datos.color);
     }
     s.push_str(&grupo_de_herrajes(&datos.color));
     match plano.tipo {
@@ -46,20 +45,21 @@ pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
 }
 
 fn rect(s: &mut String, clase: &str, r: Rect) {
-    rect_con(s, clase, r, "");
-}
-
-fn rect_con(s: &mut String, clase: &str, r: Rect, extra: &str) {
     let _ = write!(
         s,
-        r#"<rect class="{clase}" x="{}" y="{}" width="{}" height="{}"{extra}/>"#,
+        r#"<rect class="{clase}" x="{}" y="{}" width="{}" height="{}"/>"#,
         r.x, r.y, r.ancho, r.alto
     );
 }
 
-fn dibujar_hoja(s: &mut String, plano: &Plano, (hoja, indice): (Rect, usize), relleno: &str) {
+fn dibujar_hoja(
+    s: &mut String,
+    plano: &Plano,
+    (hoja, indice): (Rect, usize),
+    color: &ColorDeDibujo,
+) {
     if plano.tipo != TipoDibujo::Fija {
-        rect_con(s, "hoja", hoja, relleno);
+        perfil(s, color, ("hoja", hoja), plano.grosor_hoja);
     }
     let cristal = if plano.tipo == TipoDibujo::Fija {
         hoja
