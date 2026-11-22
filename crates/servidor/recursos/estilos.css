@@ -22,6 +22,9 @@
   --menu-activo: #252A30;
   --menu-texto: #D8DCE0;
   --menu-grupo: #8B939B;
+  /* Rojo de «Salir» y acciones destructivas en el menú oscuro (petición del propietario). */
+  --peligro: #F2555A;
+  --peligro-fondo: rgb(242 85 90 / .14);
   --radio: 10px;
   --tactil: 44px;
   --sans: "IBM Plex Sans", system-ui, sans-serif;
@@ -93,11 +96,10 @@ body.con-menu { display: grid; grid-template-columns: var(--ancho-menu) 1fr; tra
 .menu .marca { display: flex; align-items: center; white-space: nowrap; }
 .menu .marca-logo { flex: none; }
 .boton-plegar .icono { transition: transform 360ms var(--curva-muelle, ease); }
-html.menu-plegado .boton-plegar .icono { transform: scaleX(-1); }
 html.menu-plegado .menu-texto { opacity: 0; transition-delay: 0s; pointer-events: none; }
 html.menu-plegado .menu-grupo { height: 1px; margin: .75rem .5rem; background: rgb(255 255 255 / .12); }
 html.menu-plegado .menu-entrada { padding: 0 .9rem; }
-.menu .marca { color: #fff; padding: 0 .5rem 1.5rem; }
+.menu .marca { color: #fff; padding: 0 .5rem; min-width: 0; }
 .menu ul { list-style: none; margin: 0 0 1rem; padding: 0; }
 .menu-grupo { font-family: var(--condensada); font-weight: 500; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--menu-grupo); margin: 1rem .5rem .5rem; }
 .menu-entrada { display: flex; align-items: center; min-height: 48px; padding: 0 1rem; border-radius: 10px; color: var(--menu-texto); text-decoration: none; font-size: 1.05rem; position: relative; }
@@ -106,6 +108,27 @@ html.menu-plegado .menu-entrada { padding: 0 .9rem; }
 .menu-entrada.activa::before { content: ""; position: absolute; left: -1rem; top: 10px; bottom: 10px; width: 4px; border-radius: 0 3px 3px 0; background: var(--indicador); }
 /* El pie (plegar, ajustes, salir) siempre a la vista; si no cabe todo, se desplaza la lista. */
 .menu-pie { margin-top: auto; position: sticky; bottom: -1.5rem; margin-bottom: -1.5rem; padding: .5rem 0 1.5rem; background: var(--menu-fondo); }
+/* Cabecera: marca y botón de plegar (solo icono, como en Linear o Vercel). Plegado, el botón ocupa
+   el sitio del logotipo. */
+.menu-cabecera { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: 1.25rem; min-height: 44px; }
+.boton-plegar { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 10px; background: none; color: var(--menu-grupo); cursor: pointer; transition: background-color var(--normal, 160ms) ease, color var(--normal, 160ms) ease; }
+.boton-plegar:hover { background: var(--menu-activo); color: #fff; }
+.boton-plegar .icono { transition: transform 360ms var(--curva-suave, ease); }
+html.menu-plegado .menu-cabecera { justify-content: center; }
+html.menu-plegado .menu-cabecera .marca { display: none; }
+html.menu-plegado .boton-plegar .icono { transform: scaleX(-1); }
+/* Pie: quién ha entrado y «Salir» en rojo. */
+.menu-usuario { display: flex; align-items: center; gap: .75rem; margin-top: .75rem; padding: .75rem .5rem 0; border-top: 1px solid rgb(255 255 255 / .08); }
+.avatar.avatar-menu { flex: none; width: 36px; height: 36px; background: var(--menu-activo); color: #fff; font-size: .95rem; }
+.menu-usuario-datos { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.2; }
+.menu-usuario-nombre { color: #fff; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.menu-usuario-rol { color: var(--menu-grupo); font-size: .85rem; }
+.boton-salir { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 10px; background: none; color: var(--peligro); cursor: pointer; transition: background-color var(--normal, 160ms) ease; }
+.boton-salir:hover, .boton-salir:focus-visible { background: var(--peligro-fondo); }
+html.menu-plegado .menu-usuario { flex-direction: column; gap: .5rem; padding-left: 0; padding-right: 0; }
+html.menu-plegado .menu-usuario-datos { display: none; }
+/* Con menú lateral, quién ha entrado ya se ve abajo en el menú. */
+body.con-menu .usuario-actual { display: none; }
 @media screen and (max-height: 820px) {
   .menu { padding-top: 1rem; }
   .menu .marca { padding-bottom: .75rem; }

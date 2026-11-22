@@ -120,4 +120,5 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - Servicio de Linux: escritura permitida en `/mnt`, `/media` y `/run/media`, y copia al parar con `systemctl stop`. `LEEME.txt` del servidor con los pasos para montar un disco de copias.
 - `CLAUDE.md`, `BACKEND.md`, `DATOS.md` y `MAINTENANCE.md` al día con las migraciones y las copias. **Versión 0.11.0.**
 - **0.11.1 (propietario):** las notificaciones salen debajo de la barra superior, centradas en la zona de trabajo, sin tapar el buscador. En pantallas de poca altura el menú lateral se compacta y su pie (plegar, Ajustes, Salir) queda siempre a la vista; si aun así no cabe, se desplaza la lista del menú, no la página.
+- **0.11.2 (propietario):** menú lateral rediseñado: botón de plegar solo con icono junto a la marca, tarjeta con el usuario y su rol abajo y **Salir en rojo**. Detalle en `docs/design.md`.
 

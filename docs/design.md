@@ -82,3 +82,8 @@ Implementación: `crates/servidor/recursos/movil.css` e iconos en `plantillas/ic
 **Prueba:** `e2e/pruebas/movil.spec.js` recorre todas las pantallas en iPhone y iPad y falla si alguna se sale por los lados.
 
 **Lista de piezas (0.5.4, petición del propietario):** dibujo del perfil (56 px) con el número de la pieza pequeño y gris debajo, nombre y corte, cantidad «×2» en negrita y medida. El número sigue siendo el mismo que el del dibujo de la ventana, pero discreto para que no se confunda con la cantidad.
+
+## Menú lateral (0.11.2, petición del propietario)
+- Cabecera: marca y, a la derecha, el botón de plegar **solo con icono** (44 × 44 px, nombre accesible «Plegar menú» / «Desplegar menú»). Plegado, ocupa el sitio de la marca.
+- Pie: Ajustes y una tarjeta con avatar, nombre y rol; **Salir** es un botón con icono en rojo `--peligro: #F2555A` (fondo al pasar `rgb(242 85 90 / .14)`). Excepción pedida por el propietario a la regla de solo azul y naranja: el rojo se reserva para salir y acciones destructivas. En la hoja «Más» del móvil, Salir va en `#D93D42` sobre blanco.
+- Con menú lateral, el nombre de quien ha entrado ya no se repite en la barra superior (sí en el móvil).

@@ -10,8 +10,9 @@
   function rotular(boton) {
     var plegado = raiz.classList.contains("menu-plegado");
     boton.setAttribute("aria-expanded", String(!plegado));
-    var texto = boton.querySelector(".menu-texto");
-    if (texto) texto.textContent = plegado ? "Desplegar menú" : "Plegar menú";
+    var texto = plegado ? "Desplegar menú" : "Plegar menú";
+    boton.setAttribute("aria-label", texto);
+    boton.setAttribute("title", texto);
   }
 
   document.addEventListener("DOMContentLoaded", function () {

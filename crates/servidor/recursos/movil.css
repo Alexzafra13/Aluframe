@@ -46,7 +46,7 @@ code, .mono { overflow-wrap: anywhere; }
 .celda-ios:active { background: rgb(21 25 29 / .06); }
 .celda-ios .icono { width: 22px; height: 22px; color: var(--acero); }
 .celda-ios.activa { font-weight: 600; }
-.celda-salir, .celda-salir .icono { color: var(--aviso); }
+.celda-salir, .celda-salir .icono { color: #D93D42; }
 .celda-salir::after { content: none; }
 
 @media screen and (max-width: 900px) {
@@ -57,6 +57,7 @@ code, .mono { overflow-wrap: anywhere; }
   .marca-movil .marca-logo { width: 30px; height: 30px; border-radius: 8px; }
   .buscador-global { max-width: none; }
   .usuario-nombre { display: none; }
+  body.con-menu .usuario-actual { display: inline-flex; }
   .contenido { padding: 1.25rem 1rem calc(104px + env(safe-area-inset-bottom)); }
   h1 { font-size: 2.1rem; }
   .cabecera-pagina { margin-bottom: 1.1rem; }

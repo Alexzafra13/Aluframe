@@ -4,7 +4,10 @@
 {% include "iconos.html" %}
 {% let en_mas = seccion == "stock" || seccion == "catalogo" || seccion == "facturas" || seccion == "ajustes" %}
 <nav class="menu" aria-label="Menú principal">
-  <a class="marca" href="/"><span class="marca-logo" aria-hidden="true"></span><span class="menu-texto">AlumFrame</span></a>
+  <div class="menu-cabecera">
+    <a class="marca" href="/"><span class="marca-logo" aria-hidden="true"></span><span class="menu-texto">AlumFrame</span></a>
+    <button class="boton-plegar" type="button" data-plegar-menu aria-expanded="true" aria-label="Plegar menú" title="Plegar menú"><svg class="icono" aria-hidden="true"><use href="#i-plegar"/></svg></button>
+  </div>
   {% for grupo in menu %}
   <p class="menu-grupo"><span class="menu-texto">{{ grupo.titulo }}</span></p>
   <ul>
@@ -14,12 +17,15 @@
   </ul>
   {% endfor %}
   <div class="menu-pie">
-    <button class="menu-entrada boton-enlace boton-plegar" type="button" data-plegar-menu aria-expanded="true" title="Plegar o desplegar el menú"><svg class="icono" aria-hidden="true"><use href="#i-plegar"/></svg><span class="menu-texto">Plegar menú</span></button>
     <a class="menu-entrada{% if seccion == "ajustes" %} activa{% endif %}" href="/ajustes/usuarios" title="Ajustes">{% if seccion == "ajustes" %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-ajustes"/></svg><span class="menu-texto">Ajustes</span></a>
-    <form method="post" action="/salir">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
-      <button class="menu-entrada boton-enlace" type="submit" title="Salir"><svg class="icono" aria-hidden="true"><use href="#i-salir"/></svg><span class="menu-texto">Salir</span></button>
-    </form>
+    <div class="menu-usuario">
+      <span class="avatar avatar-menu" aria-hidden="true">{{ usuario.nombre.chars().next().unwrap_or('A') }}</span>
+      <span class="menu-usuario-datos menu-texto"><span class="menu-usuario-nombre">{{ usuario.nombre }}</span><span class="menu-usuario-rol">{% if usuario.es_propietario %}Propietario{% else %}Operario{% endif %}</span></span>
+      <form method="post" action="/salir">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <button class="boton-salir" type="submit" aria-label="Salir" title="Salir"><svg class="icono" aria-hidden="true"><use href="#i-salir"/></svg></button>
+      </form>
+    </div>
   </div>
 </nav>
 <div class="area">
