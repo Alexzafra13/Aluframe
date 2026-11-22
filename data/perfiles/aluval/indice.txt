@@ -1,0 +1,34 @@
+# Siluetas de perfiles de Aluval, sacadas del catálogo «Aluprom 21» (págs. 4-6) con
+# scripts/extraer_siluetas.py. Se citan en las series como `silueta: aluval/<referencia>`.
+# referencia | nombre en el catálogo
+02263 | Marco fijo macho 60
+02264 | Marco fijo hembra 60
+21004 | Tapa clip (para 21219)
+21210 | Marco lateral
+21219 | Marco lateral con clip 21004
+21220 | Marco superior
+21230 | Marco inferior
+21231 | Marco inferior sin cámara
+21310 | Hoja lateral
+21312 | Hoja lateral Climalit
+21313 | Hoja lateral 55
+21314 | Hoja lateral 55 Climalit
+21315 | Hoja lateral 55 C/16
+21316 | Hoja lateral 50 C/16
+21340 | Hoja cierre
+21341 | Hoja cierre Climalit
+21342 | Hoja cierre 50
+21343 | Hoja cierre 50 Climalit
+21344 | Cierre 4 hojas
+21346 | Hoja cierre 50 C/16
+21350 | Hoja rodamiento
+21351 | Hoja rodamiento Climalit
+21352 | Hoja rodamiento C/16
+21564 | Parteluces
+21565 | Parteluces Climalit
+30003 | Base tirador
+30004 | Tirador
+51702 | Junquillo 27
+51703 | Junquillo 20,4
+51706 | Junquillo 15,5
+51733 | Junquillo 5
