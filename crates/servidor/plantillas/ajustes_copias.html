@@ -1,0 +1,52 @@
+{% extends "marco.html" %}
+{% block titulo %}Copias{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Ajustes</p>
+  <h1>Copias de seguridad</h1>
+</header>
+{% include "pestanas_ajustes.html" %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = error %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+<section class="tarjeta" aria-labelledby="titulo-estado">
+  <h2 id="titulo-estado">Cómo van</h2>
+  <p>Última copia en un disco: <strong>{{ ultima }}</strong>{% if !discos_de_la_ultima.is_empty() %} <span class="texto-apagado">({{ discos_de_la_ultima }})</span>{% endif %}</p>
+  {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+  <p class="texto-apagado">Se copia solo cada día a las 14:00 y al cerrar el programa; si el equipo estuvo apagado, al encenderlo. Se guardan las 7 últimas diarias y 4 semanales en el disco y en este equipo.</p>
+  <form method="post" action="/ajustes/copias/ahora">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <button class="boton primario" type="submit">Copiar ahora</button>
+  </form>
+</section>
+<section class="tarjeta" aria-labelledby="titulo-discos">
+  <h2 id="titulo-discos">Disco de copias</h2>
+  <p class="texto-apagado">Vale cualquier pendrive o disco con una carpeta <span class="mono">AlumFrame-copias</span> en su raíz: se reconoce por la carpeta, aunque cambie la letra. Conviene tener dos y alternarlos, y guardar uno fuera del taller.</p>
+  {% for raiz in sin_preparar %}
+  <form method="post" action="/ajustes/copias/preparar" class="fila-accion">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="raiz" value="{{ raiz }}">
+    <span class="mono">{{ raiz }}</span>
+    <button class="boton" type="submit">Usar este disco para las copias</button>
+  </form>
+  {% else %}
+  <p class="texto-apagado">No hay discos nuevos conectados. Al conectar uno, vuelve a esta pantalla.</p>
+  {% endfor %}
+</section>
+{% for lugar in lugares %}
+<section class="tarjeta" aria-label="{{ lugar.titulo }}">
+  <h2>{{ lugar.titulo }}</h2>
+  {% if lugar.copias.is_empty() %}<p class="texto-apagado">Sin copias todavía.</p>{% else %}
+  <table class="tabla">
+    <thead><tr><th scope="col">Copia</th><th scope="col" class="numero">Tamaño</th><th scope="col"><span class="oculto">Acción</span></th></tr></thead>
+    <tbody>
+    {% for c in lugar.copias %}
+      <tr><td class="mono">{{ c.cuando }}</td><td class="numero mono">{{ c.tamano }}</td>
+        <td><form method="post" action="/ajustes/copias/restaurar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="disco" value="{{ lugar.disco }}"><input type="hidden" name="nombre" value="{{ c.nombre }}"><button class="boton" type="submit" aria-label="Revisar la copia del {{ c.cuando }} para restaurarla">Restaurar…</button></form></td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+{% endfor %}
+<p class="texto-apagado">Restaurar enseña primero qué contiene la copia; al confirmar, lo que hay ahora se guarda antes en la carpeta de copias.</p>
+{% endblock %}

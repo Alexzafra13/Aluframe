@@ -29,6 +29,15 @@ pub fn fecha_de_madrid(instante: OffsetDateTime, mas_dias: i64) -> String {
     fecha.format(formato).unwrap_or_default()
 }
 
+/// El instante en hora de Madrid como lo entienden las reglas de las copias.
+pub fn momento_de_madrid(instante: OffsetDateTime) -> dominio::copias::MomentoLocal {
+    let local = a_hora_de_madrid(instante);
+    dominio::copias::MomentoLocal::nuevo(
+        (local.year(), u8::from(local.month()), local.day()),
+        (local.hour(), local.minute()),
+    )
+}
+
 pub fn anio_de_madrid(instante: OffsetDateTime) -> i64 {
     i64::from(a_hora_de_madrid(instante).year())
 }

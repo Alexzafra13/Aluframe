@@ -16,6 +16,8 @@ ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true
 ReadWritePaths=/var/lib/alumframe
+# Discos de copias (carpeta AlumFrame-copias en su raíz); el «-» ignora las que no existan.
+ReadWritePaths=-/mnt -/media -/run/media
 
 [Install]
 WantedBy=multi-user.target

@@ -1,6 +1,6 @@
 # ADR-0011: esquema único de base de datos hasta el primer despliegue real
 
-**Estado:** aceptado (2026-11-21, decisión del propietario).
+**Estado:** sustituido por ADR-0021 (2026-11-22). Aceptado el 2026-11-21 por decisión del propietario.
 
 ## Contexto
 H0 y H1 crearon tres migraciones (0001 a 0003) para un programa que todavía no está instalado en el taller. Mantener migraciones antes de tener datos reales solo añade archivos y pruebas de actualización sin valor.

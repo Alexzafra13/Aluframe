@@ -5,7 +5,7 @@ use std::path::Path;
 
 use rusqlite::{Connection, MAIN_DB, OpenFlags, OptionalExtension};
 
-use super::esquema::{huella_del_esquema, leer_huella_guardada};
+use super::esquema::{preparar_esquema, version_de_la_base, version_del_programa};
 use crate::errores::ErrorApp;
 
 const CABECERA_SQLITE: &[u8; 16] = b"SQLite format 3\0";
@@ -60,21 +60,29 @@ pub fn comprobar_copia(ruta: &Path) -> Result<ResumenDeDatos, ErrorApp> {
             "El archivo está dañado: no se puede importar.".into(),
         ));
     }
-    match leer_huella_guardada(&con).map_err(|_| no_es_copia())? {
-        Some(huella) if huella == huella_del_esquema() => resumir(&con),
-        Some(_) => Err(ErrorApp::Validacion(
-            "La copia es de otra versión de AlumFrame: expórtala e impórtala con la misma versión."
+    // Una copia de una versión anterior se actualiza al restaurarla; una más nueva, no.
+    match version_de_la_base(&con).map_err(|_| no_es_copia())? {
+        Some(version) if version > version_del_programa() => Err(ErrorApp::Validacion(
+            "La copia es de una versión más nueva de AlumFrame: actualiza el programa antes."
                 .into(),
         )),
-        None => Err(no_es_copia()),
+        Some(version) if version >= 1 => resumir(&con),
+        None if tiene_tabla_de_esquema(&con) => Err(ErrorApp::Validacion(
+            "La copia es de otra versión de desarrollo de AlumFrame, anterior a las \
+             actualizaciones automáticas: no se puede importar."
+                .into(),
+        )),
+        _ => Err(no_es_copia()),
     }
 }
 
-/// Sustituye todo el contenido de `con` por el de la copia (ya comprobada).
-pub fn restaurar(con: &mut Connection, origen: &Path) -> Result<(), ErrorApp> {
+/// Sustituye todo el contenido de `con` por el de la copia (ya comprobada) y, si es de una
+/// versión anterior, la actualiza con las migraciones que le falten.
+pub fn restaurar(con: &mut Connection, origen: &Path, ahora_utc: &str) -> Result<(), ErrorApp> {
     con.restore(MAIN_DB, origen, None::<fn(rusqlite::backup::Progress)>)?;
     // La copia trae el modo de diario de un archivo suelto; la base en uso sigue en WAL.
     con.pragma_update(None, "journal_mode", "WAL")?;
+    preparar_esquema(con, ahora_utc).map_err(|e| ErrorApp::Interno(e.to_string()))?;
     Ok(())
 }
 
@@ -84,6 +92,15 @@ fn empieza_como_sqlite(ruta: &Path) -> bool {
     std::fs::File::open(ruta)
         .and_then(|mut archivo| archivo.read_exact(&mut cabecera))
         .is_ok_and(|()| &cabecera == CABECERA_SQLITE)
+}
+
+fn tiene_tabla_de_esquema(con: &Connection) -> bool {
+    con.query_row(
+        "SELECT EXISTS (SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'esquema')",
+        [],
+        |f| f.get(0),
+    )
+    .unwrap_or(false)
 }
 
 fn no_es_copia() -> ErrorApp {

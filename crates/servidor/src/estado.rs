@@ -4,6 +4,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use time::OffsetDateTime;
 
+use crate::aplicacion::copias::discos::DiscosDeCopia;
 use crate::bd::BaseDeDatos;
 use crate::bd::consultas::usuarios;
 use crate::errores::ErrorApp;
@@ -17,6 +18,9 @@ pub struct EstadoApp {
     permitir_datos_demo: bool,
     carpeta_copias: PathBuf,
     preferencias_escritorio: Option<PathBuf>,
+    discos_de_copia: Arc<DiscosDeCopia>,
+    /// Una copia cada vez: la programada, la de «Copiar ahora» y la de cerrar no se pisan.
+    turno_de_copia: Arc<tokio::sync::Mutex<()>>,
 }
 
 impl EstadoApp {
@@ -29,6 +33,8 @@ impl EstadoApp {
             permitir_datos_demo: false,
             carpeta_copias: std::env::temp_dir().join("alumframe-copias"),
             preferencias_escritorio: None,
+            discos_de_copia: Arc::new(DiscosDeCopia::default()),
+            turno_de_copia: Arc::new(tokio::sync::Mutex::new(())),
         })
     }
 
@@ -52,6 +58,19 @@ impl EstadoApp {
     pub fn con_preferencias_escritorio(mut self, archivo: PathBuf) -> EstadoApp {
         self.preferencias_escritorio = Some(archivo);
         self
+    }
+
+    pub fn con_discos_de_copia(mut self, discos: DiscosDeCopia) -> EstadoApp {
+        self.discos_de_copia = Arc::new(discos);
+        self
+    }
+
+    pub fn discos_de_copia(&self) -> &DiscosDeCopia {
+        &self.discos_de_copia
+    }
+
+    pub fn turno_de_copia(&self) -> &tokio::sync::Mutex<()> {
+        &self.turno_de_copia
     }
 
     pub fn preferencias_escritorio(&self) -> Option<&Path> {

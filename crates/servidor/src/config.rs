@@ -22,6 +22,9 @@ pub struct Configuracion {
     pub carpeta_datos: PathBuf,
     pub abrir_navegador: Option<bool>,
     pub permitir_datos_demo: bool,
+    /// Carpetas donde buscar, además de las unidades y montajes habituales, un disco con la
+    /// carpeta `AlumFrame-copias` (por ejemplo, un disco montado en `/srv/copias`).
+    pub discos_de_copia: Vec<PathBuf>,
 }
 
 #[derive(Debug, Error)]
@@ -48,6 +51,7 @@ impl Default for Configuracion {
             carpeta_datos: PathBuf::from("datos"),
             abrir_navegador: None,
             permitir_datos_demo: false,
+            discos_de_copia: Vec::new(),
         }
     }
 }
@@ -106,6 +110,9 @@ impl Configuracion {
         }
         if let Some(valor) = leer_variable("ALUMFRAME_DATOS_DEMO") {
             self.permitir_datos_demo = valor == "si";
+        }
+        if let Some(valor) = leer_variable("ALUMFRAME_DISCOS_COPIA") {
+            self.discos_de_copia = std::env::split_paths(&valor).collect();
         }
         Ok(self)
     }

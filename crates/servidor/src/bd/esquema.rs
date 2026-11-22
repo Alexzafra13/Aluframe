@@ -1,42 +1,116 @@
+//! Migraciones numeradas (ADR-0021, sustituye al esquema único de ADR-0011). Cada una se aplica
+//! en una transacción y **nunca se edita** una vez publicada: un cambio es otra migración.
+//! La versión de la base es `PRAGMA user_version`, que va en la misma transacción.
+
 use rusqlite::{Connection, OptionalExtension, params};
 use thiserror::Error;
 
 use crate::autenticacion::calcular_sha256;
 
-const ESQUEMA: &str = include_str!("esquema.sql");
+#[derive(Debug, Clone, Copy)]
+pub struct Migracion {
+    pub numero: u32,
+    pub sql: &'static str,
+}
+
+pub const MIGRACIONES: &[Migracion] = &[Migracion {
+    numero: 1,
+    sql: include_str!("migraciones/0001_inicial.sql"),
+}];
+
+/// Huella del esquema único de las versiones 0.8.0 a 0.10.0, que es la migración 0001: sus
+/// bases se adoptan como versión 1 sin tocar los datos.
+const HUELLA_DE_LA_0001: &str = "56113df2d94d8fdd5eab5a3bc3a0512a092b6124c6e6515eda162bcfed4bc70e";
 
 #[derive(Debug, Error)]
 pub enum ErrorEsquema {
     #[error(
-        "La base de datos es de otra versión de desarrollo de AlumFrame. Mientras no esté instalado en el taller, borra la carpeta de datos y vuelve a arrancar."
+        "La base de datos es de una versión más nueva de AlumFrame (esquema {base}; este programa \
+         llega al {programa}). Instala la versión más reciente."
     )]
-    EsquemaDistinto,
+    MasNueva { base: u32, programa: u32 },
+    #[error(
+        "La base de datos es de una versión de desarrollo antigua de AlumFrame y no se puede \
+         actualizar. Si no tiene datos reales, borra la carpeta de datos y vuelve a arrancar."
+    )]
+    Desconocida,
     #[error("Error de SQLite al preparar la base de datos: {0}")]
     Sqlite(#[from] rusqlite::Error),
 }
 
-pub fn huella_del_esquema() -> String {
-    calcular_sha256(ESQUEMA)
+pub fn version_del_programa() -> u32 {
+    MIGRACIONES.last().map_or(0, |m| m.numero)
 }
 
-/// Crea el esquema en una base vacía o comprueba que la existente es exactamente este esquema.
-pub fn preparar_esquema(conexion: &mut Connection, ahora_utc: &str) -> Result<(), ErrorEsquema> {
-    match leer_huella_guardada(conexion)? {
-        Some(huella) if huella == huella_del_esquema() => Ok(()),
-        Some(_) => Err(ErrorEsquema::EsquemaDistinto),
-        None if contar_tablas(conexion)? > 0 => Err(ErrorEsquema::EsquemaDistinto),
-        None => crear(conexion, ahora_utc),
+/// La versión del esquema de una base; 0 si está vacía y `None` si no es de AlumFrame o es de
+/// un desarrollo anterior a las migraciones.
+pub fn version_de_la_base(con: &Connection) -> Result<Option<u32>, rusqlite::Error> {
+    let version: u32 = con.query_row("PRAGMA user_version", [], |f| f.get(0))?;
+    if version > 0 {
+        return Ok(Some(version));
+    }
+    if contar_tablas(con)? == 0 {
+        return Ok(Some(0));
+    }
+    let adoptable = leer_huella_guardada(con)?.as_deref() == Some(HUELLA_DE_LA_0001);
+    Ok(adoptable.then_some(1))
+}
+
+/// Las migraciones que faltan por aplicar a esta base.
+pub fn migraciones_pendientes(con: &Connection) -> Result<u32, ErrorEsquema> {
+    let base = comprobar_version(con)?;
+    Ok(version_del_programa() - base)
+}
+
+fn comprobar_version(con: &Connection) -> Result<u32, ErrorEsquema> {
+    let programa = version_del_programa();
+    match version_de_la_base(con)? {
+        Some(base) if base > programa => Err(ErrorEsquema::MasNueva { base, programa }),
+        Some(base) => Ok(base),
+        None => Err(ErrorEsquema::Desconocida),
     }
 }
 
-fn crear(conexion: &mut Connection, ahora_utc: &str) -> Result<(), ErrorEsquema> {
-    let transaccion = conexion.transaction()?;
-    transaccion.execute_batch(ESQUEMA)?;
-    transaccion.execute(
-        "INSERT INTO esquema (huella, creado_en) VALUES (?1, ?2)",
-        params![huella_del_esquema(), ahora_utc],
-    )?;
-    transaccion.commit()?;
+/// Crea la base o la lleva a la versión de este programa.
+pub fn preparar_esquema(conexion: &mut Connection, ahora_utc: &str) -> Result<(), ErrorEsquema> {
+    aplicar_migraciones(conexion, MIGRACIONES, ahora_utc)
+}
+
+/// Aplica en orden las de `migraciones` que faltan. Público para probar migraciones nuevas.
+pub fn aplicar_migraciones(
+    conexion: &mut Connection,
+    migraciones: &[Migracion],
+    ahora_utc: &str,
+) -> Result<(), ErrorEsquema> {
+    let programa = migraciones.last().map_or(0, |m| m.numero);
+    let base = match version_de_la_base(conexion)? {
+        Some(base) if base > programa => return Err(ErrorEsquema::MasNueva { base, programa }),
+        Some(base) => base,
+        None => return Err(ErrorEsquema::Desconocida),
+    };
+    if base == 1 {
+        // Base de 0.8.0–0.10.0 (sin número): se anota que ya está en la versión 1.
+        conexion.pragma_update(None, "user_version", 1)?;
+    }
+    for migracion in migraciones.iter().filter(|m| m.numero > base) {
+        let transaccion = conexion.transaction()?;
+        transaccion.execute_batch(migracion.sql)?;
+        if migracion.numero == 1 {
+            transaccion.execute(
+                "INSERT INTO esquema (huella, creado_en) VALUES (?1, ?2)",
+                params![HUELLA_DE_LA_0001, ahora_utc],
+            )?;
+        } else {
+            // Las versiones 0.10.0 y anteriores solo miran esta huella: así no abren una base
+            // que ya no entienden.
+            transaccion.execute(
+                "UPDATE esquema SET huella = ?1",
+                [calcular_sha256(&format!("migracion-{}", migracion.numero))],
+            )?;
+        }
+        transaccion.pragma_update(None, "user_version", migracion.numero)?;
+        transaccion.commit()?;
+    }
     Ok(())
 }
 
@@ -48,7 +122,7 @@ fn contar_tablas(conexion: &Connection) -> Result<i64, rusqlite::Error> {
     )
 }
 
-pub fn leer_huella_guardada(conexion: &Connection) -> Result<Option<String>, rusqlite::Error> {
+fn leer_huella_guardada(conexion: &Connection) -> Result<Option<String>, rusqlite::Error> {
     let existe: bool = conexion.query_row(
         "SELECT EXISTS (SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'esquema')",
         [],
@@ -63,97 +137,5 @@ pub fn leer_huella_guardada(conexion: &Connection) -> Result<Option<String>, rus
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    const AHORA: &str = "2026-11-21T10:00:00Z";
-
-    fn preparada() -> Connection {
-        let mut conexion = Connection::open_in_memory().unwrap();
-        preparar_esquema(&mut conexion, AHORA).unwrap();
-        conexion
-    }
-
-    #[test]
-    fn crea_todas_las_tablas_en_una_base_vacia() {
-        let conexion = preparada();
-        for tabla in [
-            "auditoria",
-            "bloqueo_ip",
-            "esquema",
-            "serie",
-            "serie_version",
-            "sesion",
-            "usuario",
-        ] {
-            let existe: bool = conexion
-                .query_row(
-                    "SELECT EXISTS (SELECT 1 FROM sqlite_schema WHERE name = ?1)",
-                    [tabla],
-                    |f| f.get(0),
-                )
-                .unwrap();
-            assert!(existe, "{tabla}");
-        }
-        let integridad: String = conexion
-            .query_row("PRAGMA integrity_check", [], |f| f.get(0))
-            .unwrap();
-        assert_eq!(integridad, "ok");
-    }
-
-    #[test]
-    fn preparar_dos_veces_no_cambia_nada() {
-        let mut conexion = preparada();
-        assert!(preparar_esquema(&mut conexion, AHORA).is_ok());
-    }
-
-    #[test]
-    fn rechaza_una_base_de_otro_esquema() {
-        let mut conexion = preparada();
-        conexion
-            .execute("UPDATE esquema SET huella = ?1", [&"0".repeat(64)])
-            .unwrap();
-        assert!(matches!(
-            preparar_esquema(&mut conexion, AHORA),
-            Err(ErrorEsquema::EsquemaDistinto)
-        ));
-        let mut antigua = Connection::open_in_memory().unwrap();
-        antigua
-            .execute_batch("CREATE TABLE version_esquema (version INTEGER)")
-            .unwrap();
-        assert!(matches!(
-            preparar_esquema(&mut antigua, AHORA),
-            Err(ErrorEsquema::EsquemaDistinto)
-        ));
-    }
-
-    #[test]
-    fn la_auditoria_y_las_versiones_de_serie_no_se_modifican() {
-        let conexion = preparada();
-        conexion
-            .execute(
-                "INSERT INTO auditoria (cuando_en, accion, entidad) VALUES (?1, 'prueba', 'x')",
-                [AHORA],
-            )
-            .unwrap();
-        assert!(
-            conexion
-                .execute("UPDATE auditoria SET accion = 'otra'", [])
-                .is_err()
-        );
-        assert!(conexion.execute("DELETE FROM auditoria", []).is_err());
-        conexion
-            .execute_batch(
-                "INSERT INTO serie (codigo, fabricante, creada_en) VALUES ('S', 'F', 'x');
-                 INSERT INTO serie_version (serie_id, numero, estado, origen_yaml, sha256, avisos, creada_en)
-                 VALUES (1, 1, 'borrador', 'serie: S', printf('%064d', 0), 0, 'x');",
-            )
-            .unwrap();
-        assert!(
-            conexion
-                .execute("UPDATE serie_version SET avisos = 1", [])
-                .is_err()
-        );
-        assert!(conexion.execute("DELETE FROM serie_version", []).is_err());
-    }
-}
+#[path = "esquema_pruebas.rs"]
+mod pruebas;

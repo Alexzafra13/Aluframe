@@ -113,3 +113,10 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - Sin cambio de esquema: **no hace falta borrar los datos de prueba**. **Versión 0.10.0.**
 - `MAINTENANCE.md`: al actualizar con borrado de datos, primero se instala la versión nueva y después se borran los datos (al revés, la versión vieja vuelve a crear la base).
 
+## 2026-11-22 (noche): H7 copias y base de datos fijada
+- **Copias automáticas** cada día a las 14:00, al cerrar el programa o parar el servicio, y al arrancar si faltó la de las 14:00. En el equipo y en cualquier pendrive o disco con la carpeta `AlumFrame-copias`, comprobadas en el disco; se guardan 7 diarias y 4 semanales (ADR-0022).
+- **Ajustes > Copias:** cómo van, «Copiar ahora», «Usar este disco para las copias» y «Restaurar…» con revisión previa. El Inicio avisa si falla la copia, si no hay disco o si la última tiene 3 días o más.
+- **La base de datos queda fijada** (ADR-0021, sustituye a ADR-0011): el esquema actual es la migración 0001 y los cambios futuros serán migraciones que conservan los datos, con copia previa. **Desde esta versión no se borran los datos al actualizar**; las bases de 0.8–0.10 se adoptan tal cual. Una copia de una versión anterior se puede importar (se actualiza); una más nueva, no.
+- Servicio de Linux: escritura permitida en `/mnt`, `/media` y `/run/media`, y copia al parar con `systemctl stop`. `LEEME.txt` del servidor con los pasos para montar un disco de copias.
+- `CLAUDE.md`, `BACKEND.md`, `DATOS.md` y `MAINTENANCE.md` al día con las migraciones y las copias. **Versión 0.11.0.**
+

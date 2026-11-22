@@ -1,5 +1,6 @@
 mod catalogo;
 mod clientes;
+mod copias;
 mod datos;
 mod editor_linea;
 mod escritorio;
@@ -18,6 +19,7 @@ mod trabajos;
 
 pub use catalogo::*;
 pub use clientes::*;
+pub use copias::*;
 pub use datos::*;
 pub use editor_linea::*;
 pub use escritorio::*;

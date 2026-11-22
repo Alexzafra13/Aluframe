@@ -2,7 +2,7 @@ use axum::Json;
 use axum::extract::State;
 use serde::Serialize;
 
-use crate::bd::{huella_del_esquema, leer_huella_guardada};
+use crate::bd::{version_de_la_base, version_del_programa};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 
@@ -10,15 +10,15 @@ use crate::estado::EstadoApp;
 pub struct Salud {
     estado: &'static str,
     version: &'static str,
-    esquema: String,
+    esquema: u32,
 }
 
 pub async fn comprobar_salud(State(estado): State<EstadoApp>) -> Result<Json<Salud>, ErrorApp> {
-    let guardada = estado.bd.leer(|con| Ok(leer_huella_guardada(con)?)).await?;
-    let correcta = guardada.as_deref() == Some(huella_del_esquema().as_str());
+    let base = estado.bd.leer(|con| Ok(version_de_la_base(con)?)).await?;
+    let correcta = base == Some(version_del_programa());
     Ok(Json(Salud {
         estado: if correcta { "ok" } else { "esquema_inesperado" },
         version: env!("CARGO_PKG_VERSION"),
-        esquema: guardada.unwrap_or_default().chars().take(12).collect(),
+        esquema: base.unwrap_or_default(),
     }))
 }

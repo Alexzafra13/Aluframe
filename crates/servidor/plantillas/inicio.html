@@ -11,6 +11,7 @@
     <a class="boton primario" href="/presupuestos">Nuevo presupuesto</a>
   </div>
 </header>
+{% if let Some(texto) = aviso_de_copias %}<p class="aviso" role="alert">{{ texto }} <a href="/ajustes/copias">Ver las copias</a></p>{% endif %}
 <div class="tablero">
   {% for (titulo, tarjetas) in columnas %}
   <section class="columna" aria-labelledby="columna-{{ loop.index }}">

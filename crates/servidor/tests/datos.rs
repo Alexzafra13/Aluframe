@@ -115,6 +115,22 @@ async fn rechaza_una_copia_de_otra_version_del_esquema() {
 }
 
 #[tokio::test]
+async fn rechaza_una_copia_de_una_version_mas_nueva() {
+    let (contexto, actor, carpeta) = con_copias().await;
+    let copia = exportar_datos(&contexto.estado, &actor).await.unwrap();
+    let ruta = carpeta.join("nueva.db");
+    std::fs::write(&ruta, copia.bytes).unwrap();
+    let con = rusqlite::Connection::open(&ruta).unwrap();
+    con.pragma_update(None, "user_version", 99).unwrap();
+    drop(con);
+    let bytes = std::fs::read(&ruta).unwrap();
+    let error = recibir_importacion(&contexto.estado, &actor, bytes)
+        .await
+        .unwrap_err();
+    assert!(matches!(error, ErrorApp::Validacion(m) if m.contains("más nueva")));
+}
+
+#[tokio::test]
 async fn una_clave_inventada_no_encuentra_nada() {
     let (contexto, actor, _) = con_copias().await;
     for clave in ["../../etc/passwd", &"a".repeat(64)] {

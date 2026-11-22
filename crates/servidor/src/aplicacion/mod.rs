@@ -6,6 +6,7 @@ mod auditar;
 pub mod calculo_de_ventana;
 pub mod catalogo;
 pub mod clientes;
+pub mod copias;
 pub mod datos;
 pub mod datos_de_empresa;
 pub mod datos_del_editor;

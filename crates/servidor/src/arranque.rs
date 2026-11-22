@@ -5,8 +5,10 @@ use std::sync::Arc;
 use thiserror::Error;
 
 use crate::aplicacion::acabados_incluidos::cargar_acabados_incluidos;
+use crate::aplicacion::copias::discos::DiscosDeCopia;
+use crate::aplicacion::copias::programador::{copiar_al_cerrar, vigilar_copias};
 use crate::aplicacion::series_incluidas::{CargaDeSerie, cargar_series_incluidas};
-use crate::bd::{BaseDeDatos, ErrorEsquema, preparar_esquema};
+use crate::bd::{BaseDeDatos, ErrorEsquema, migraciones_pendientes, preparar_esquema};
 use crate::config::{Configuracion, ErrorConfiguracion, NOMBRE_ARCHIVO_CONFIGURACION};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -56,18 +58,42 @@ pub async fn preparar_estado(config: &Configuracion) -> Result<EstadoApp, ErrorA
         causa,
     })?;
     let reloj: Arc<dyn Reloj> = Arc::new(RelojDelSistema);
-    {
-        let mut conexion = rusqlite::Connection::open(config.ruta_base_de_datos())?;
-        preparar_esquema(&mut conexion, &formatear_utc(reloj.ahora()))?;
-    }
+    preparar_base(config, &formatear_utc(reloj.ahora()))?;
     let bd = BaseDeDatos::abrir(&config.ruta_base_de_datos())?;
     let estado = EstadoApp::nuevo(bd, reloj)
         .await?
         .con_datos_demo(config.permitir_datos_demo)
-        .con_carpeta_copias(config.carpeta_copias());
+        .con_carpeta_copias(config.carpeta_copias())
+        .con_discos_de_copia(DiscosDeCopia {
+            indicados: config.discos_de_copia.clone(),
+            buscar_en_el_sistema: true,
+        });
     anotar_series_incluidas(&cargar_series_incluidas(&estado).await?);
     cargar_acabados_incluidos(&estado).await?;
     Ok(estado)
+}
+
+/// Crea la base o la actualiza; antes de actualizar una con datos, guarda una copia
+/// (`antes-de-actualizar-…`) en la carpeta de copias.
+fn preparar_base(config: &Configuracion, ahora_utc: &str) -> Result<(), ErrorArranque> {
+    let mut conexion = rusqlite::Connection::open(config.ruta_base_de_datos())?;
+    let pendientes = migraciones_pendientes(&conexion)?;
+    let tiene_datos = crate::bd::version_de_la_base(&conexion)?.is_some_and(|v| v > 0);
+    if pendientes > 0 && tiene_datos {
+        let carpeta = config.carpeta_copias();
+        std::fs::create_dir_all(&carpeta).map_err(|causa| ErrorArranque::Carpeta {
+            ruta: carpeta.clone(),
+            causa,
+        })?;
+        let nombre = format!(
+            "antes-de-actualizar-{}.alumframe",
+            ahora_utc.replace(':', "-")
+        );
+        crate::bd::copia::exportar(&conexion, &carpeta.join(&nombre))?;
+        anotar_informacion(&format!("copia previa a la actualización: {nombre}"));
+    }
+    preparar_esquema(&mut conexion, ahora_utc)?;
+    Ok(())
 }
 
 fn anotar_series_incluidas(cargas: &[CargaDeSerie]) {
@@ -94,10 +120,30 @@ pub async fn servir_http(config: &Configuracion, estado: EstadoApp) -> std::io::
     if config.debe_abrir_navegador() {
         abrir_navegador(&url);
     }
-    servir_hasta(escucha, estado, async {
+    servir_hasta(escucha, estado, esperar_orden_de_parar()).await
+}
+
+/// Ctrl+C en la consola o la parada del servicio (`systemctl stop` envía SIGTERM).
+async fn esperar_orden_de_parar() {
+    #[cfg(unix)]
+    {
+        use tokio::signal::unix::{SignalKind, signal};
+        match signal(SignalKind::terminate()) {
+            Ok(mut terminar) => {
+                tokio::select! {
+                    _ = tokio::signal::ctrl_c() => {}
+                    _ = terminar.recv() => {}
+                }
+            }
+            Err(_) => {
+                let _ = tokio::signal::ctrl_c().await;
+            }
+        }
+    }
+    #[cfg(not(unix))]
+    {
         let _ = tokio::signal::ctrl_c().await;
-    })
-    .await
+    }
 }
 
 pub async fn escuchar(config: &Configuracion) -> std::io::Result<tokio::net::TcpListener> {
@@ -108,16 +154,22 @@ pub async fn escuchar(config: &Configuracion) -> std::io::Result<tokio::net::Tcp
     Ok(escucha)
 }
 
-/// Atiende hasta que `apagado` termina (Ctrl+C en el servidor; cerrar la ventana en el escritorio).
+/// Atiende hasta que `apagado` termina (Ctrl+C o parada del servicio en el servidor; cerrar la
+/// ventana en el escritorio). Mientras, vigila las copias; al terminar hace la copia de cierre.
 pub async fn servir_hasta(
     escucha: tokio::net::TcpListener,
     estado: EstadoApp,
     apagado: impl std::future::Future<Output = ()> + Send + 'static,
 ) -> std::io::Result<()> {
-    let aplicacion = crear_router(estado).into_make_service_with_connect_info::<SocketAddr>();
-    axum::serve(escucha, aplicacion)
+    let vigilante = tokio::spawn(vigilar_copias(estado.clone()));
+    let aplicacion =
+        crear_router(estado.clone()).into_make_service_with_connect_info::<SocketAddr>();
+    let resultado = axum::serve(escucha, aplicacion)
         .with_graceful_shutdown(apagado)
-        .await
+        .await;
+    vigilante.abort();
+    copiar_al_cerrar(&estado).await;
+    resultado
 }
 
 fn abrir_navegador(url: &str) {

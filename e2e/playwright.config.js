@@ -7,6 +7,8 @@ const PUERTO = process.env.ALUMFRAME_PUERTO_E2E || "9191";
 const EJECUTABLE =
   process.env.ALUMFRAME_BIN || path.join(__dirname, "..", "target", "release", "alumframe");
 const DATOS = fs.mkdtempSync(path.join(os.tmpdir(), "alumframe-e2e-"));
+// Un «pendrive» de prueba: una carpeta que el programa trata como disco de copias.
+process.env.ALUMFRAME_E2E_PENDRIVE ||= fs.mkdtempSync(path.join(os.tmpdir(), "alumframe-pendrive-"));
 
 module.exports = defineConfig({
   testDir: "pruebas",
@@ -29,6 +31,7 @@ module.exports = defineConfig({
       ALUMFRAME_ABRIR_NAVEGADOR: "no",
       // Las pruebas usan la serie y la tarifa ficticias de fixtures/demo (nunca datos reales).
       ALUMFRAME_DATOS_DEMO: "si",
+      ALUMFRAME_DISCOS_COPIA: process.env.ALUMFRAME_E2E_PENDRIVE,
     },
   },
 });

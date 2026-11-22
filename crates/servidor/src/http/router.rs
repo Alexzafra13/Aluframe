@@ -8,7 +8,8 @@ use super::middleware::{
 };
 use super::recursos::{servir_recurso, servir_silueta};
 use super::rutas::{
-    acceso, ajustes, ajustes_presupuestos, datos, escritorio, primer_arranque, salud, taller,
+    acceso, ajustes, ajustes_presupuestos, copias, datos, escritorio, primer_arranque, salud,
+    taller,
 };
 use crate::estado::EstadoApp;
 
@@ -86,6 +87,15 @@ fn rutas_de_ajustes() -> Router<EstadoApp> {
             get(taller::mostrar_taller).post(taller::guardar_taller),
         )
         .route("/ajustes/taller/pasos", post(taller::guardar_pasos))
+        .merge(rutas_de_datos())
+}
+
+fn rutas_de_datos() -> Router<EstadoApp> {
+    Router::new()
+        .route("/ajustes/copias", get(copias::mostrar_copias))
+        .route("/ajustes/copias/ahora", post(copias::copiar))
+        .route("/ajustes/copias/preparar", post(copias::preparar))
+        .route("/ajustes/copias/restaurar", post(copias::restaurar))
         .route("/ajustes/datos", get(datos::mostrar_datos))
         .route("/ajustes/datos/exportar", get(datos::descargar_copia))
         .route(

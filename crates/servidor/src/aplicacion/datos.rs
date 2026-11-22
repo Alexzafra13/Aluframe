@@ -94,11 +94,12 @@ pub async fn confirmar_importacion(
     );
     let previa = estado.carpeta_copias().join(&nombre_previa);
     let desde = origen.clone();
+    let ahora_utc = formatear_utc(estado.ahora());
     estado
         .bd
         .con_escritor_entero(move |con| {
             copia::exportar(con, &previa)?;
-            copia::restaurar(con, &desde)
+            copia::restaurar(con, &desde, &ahora_utc)
         })
         .await?;
     let _ = std::fs::remove_file(&origen);

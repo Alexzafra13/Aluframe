@@ -31,7 +31,7 @@ Si el repositorio vuelve a ser privado, `curl` baja un archivo de 9 bytes («Not
 - Actualizar: lo mismo con la versión nueva; la anterior queda en `/opt/alumframe/alumframe.anterior`.
 - Volver atrás: ver `despliegue/linux/LEEME.txt`. (Hasta el primer despliegue real no hay migraciones: ADR-0011.)
 - Registros: `journalctl -u alumframe`. El instalador espera a que `/health` responda y, si no arranca, muestra los últimos registros.
-- **Borrar los datos de prueba** (mientras no haya datos reales, si el esquema cambia). **Primero instala la versión nueva** y después: `sudo systemctl stop alumframe`, `sudo find /var/lib/alumframe -mindepth 1 -delete` y `sudo systemctl start alumframe`. No sirve `sudo rm -rf /var/lib/alumframe/*`: el `*` lo expande tu usuario, que no puede leer la carpeta, y no se borra nada. Si se borra antes de instalar, la versión vieja vuelve a crear la base y la nueva no arranca («La base de datos es de otra versión»).
+- **Actualizar ya no borra datos** (desde la 0.11.0, ADR-0021): la base se actualiza sola al arrancar, con una copia previa. **Borrar los datos de prueba** solo hace falta con una base de un desarrollo anterior a la 0.8.0. **Primero instala la versión nueva** y después: `sudo systemctl stop alumframe`, `sudo find /var/lib/alumframe -mindepth 1 -delete` y `sudo systemctl start alumframe`. No sirve `sudo rm -rf /var/lib/alumframe/*`: el `*` lo expande tu usuario, que no puede leer la carpeta, y no se borra nada. Si se borra antes de instalar, la versión vieja vuelve a crear la base y la nueva no arranca («La base de datos es de otra versión»).
 - **Series:** las de `data/series/` vienen dentro del ejecutable y se cargan solas al arrancar (ADR-0014); no hay que importarlas.
 - **Acceso desde fuera del taller:** con **Tailscale**, sin abrir puertos en el router. En el servidor, `curl -fsSL https://tailscale.com/install.sh | sh`, `sudo tailscale up` y `sudo systemctl enable --now tailscaled`; en el móvil o portátil, la app Tailscale con la misma cuenta, y se abre `http://IP-TAILSCALE:9090` (`tailscale ip -4`). Con `ufw`: `sudo ufw allow in on tailscale0 to any port 9090 proto tcp` y `sudo ufw allow from 192.168.1.0/24 to any port 9090 proto tcp`. No se publica con un proxy inverso: el bloqueo por IP vería todas las peticiones con la IP del proxy.
 
@@ -40,10 +40,16 @@ Si el repositorio vuelve a ser privado, `curl` baja un archivo de 9 bytes («Not
 - Actualizar: ejecutar el instalador de la versión nueva con AlumFrame cerrado.
 - Contraseña olvidada en modo local: en PowerShell, `$env:ALUMFRAME_MODO="local"; $env:ALUMFRAME_CARPETA_DATOS="$env:LOCALAPPDATA\AlumFrame\datos"; & "$env:LOCALAPPDATA\Programs\AlumFrame\alumframe-consola.exe" restablecer-contrasena "Nombre"` (la carpeta de instalación puede variar: es la del icono).
 
-**Pasar datos entre equipos:** Ajustes → Datos → «Exportar datos» en el origen y «Importar» en el destino (ADR-0016). Importar **sustituye** los datos; antes guarda una copia de lo que había en la carpeta `copias` de los datos. Solo entre la misma versión del programa.
+**Pasar datos entre equipos:** Ajustes → Datos → «Exportar datos» en el origen y «Importar» en el destino (ADR-0016). Importar **sustituye** los datos; antes guarda una copia de lo que había en la carpeta `copias` de los datos. Se puede importar una copia de la misma versión o de una anterior (se actualiza al importarla), no de una más nueva.
 
-## 5. Copias de seguridad (H7)
-Hoy: antes de cada migración se guarda una copia con `VACUUM INTO` en `copias/`. La copia nocturna, la retención y la restauración guiada llegan en H7. **Nunca copies `alumframe.db` con el programa en marcha.**
+## 5. Copias de seguridad (ADR-0022)
+- Solas: cada día a las 14:00, al cerrar el programa (o parar el servicio) y al arrancar si faltó la de las 14:00. Se guardan en `copias/automaticas` de la carpeta de datos y en cada disco conectado con una carpeta `AlumFrame-copias` en su raíz: 7 diarias y 4 semanales.
+- **Preparar un pendrive o disco:** conéctalo y en Ajustes > Copias, «Usar este disco para las copias» (o crea a mano la carpeta `AlumFrame-copias`). Conviene tener dos y alternarlos, con uno fuera del taller.
+- **En el servidor Linux** (sin escritorio los discos no se montan solos): pasos en `despliegue/linux/LEEME.txt` (montaje en `/mnt/copias` con `/etc/fstab` y `nofail`). Otra ruta: `discos_de_copia` en `alumframe.toml` y en `ReadWritePaths` del servicio.
+- **Avisos:** el Inicio avisa si la última copia falló, si no hay disco o si la última copia en un disco tiene 3 días o más. Detalle en Ajustes > Copias y en el registro (`journalctl -u alumframe`).
+- **Restaurar:** Ajustes > Copias > «Restaurar…» en la copia elegida; se ve qué contiene antes de confirmar y lo actual se guarda antes. En un equipo nuevo: instala, crea el propietario, conecta el disco y restaura (o Ajustes > Datos > Importar con el archivo `.alumframe`). Una copia de una versión anterior se actualiza al restaurarla.
+- Antes de cada actualización que cambie la base se guarda `copias/antes-de-actualizar-….alumframe`.
+- **Nunca copies `alumframe.db` con el programa en marcha.**
 
 ## 6. Operaciones frecuentes
 - Dar de alta operarios, cambiar su PIN o desactivarlos: Ajustes > Usuarios.
@@ -61,6 +67,7 @@ Hoy: antes de cada migración se guarda una copia con `VACUUM INTO` en `copias/`
 - **Petición RGPD de un cliente:** en su ficha, «Exportar datos» (acceso) o «Borrar definitivamente» (supresión).
 - **Margen, cobro de perfiles, mano de obra, IVA y datos de la empresa:** Ajustes > Empresa y precios. Lo que se deje sin elegir hace que las ventanas salgan «incompletas» y lo dicen.
 - **Stock:** empieza con una entrada «Inventario inicial» de cada artículo (las barras enteras y, aparte, cada retal con su largo en cm). Se descuenta solo al terminar cada orden (ficha del trabajo > «Terminar orden y descontar stock»). Las correcciones, en Stock > Ajuste, con su motivo. El mínimo de cada artículo, en su ficha de stock.
+- **Cambiar la base de datos** (para quien desarrolla): migración nueva en `crates/servidor/src/bd/migraciones/`, nunca editar las publicadas (ADR-0021, «Cómo se añade una migración»).
 - **Taller:** al aceptar un presupuesto aparece su trabajo en Inicio y en Trabajos. En la ficha del trabajo se asigna el operario (y la fecha prevista), se imprime la orden de taller y se modifican medidas. Los pasos de cada ventana se cambian en Ajustes > Taller (valen para los trabajos nuevos).
 - **Presupuestos:** si cambia una tarifa, el presupuesto en borrador avisa y ofrece «Recalcular precios». Un presupuesto aceptado no se toca: se guarda congelado con su huella.
 
@@ -71,7 +78,7 @@ Cada 6 meses o ante un aviso de seguridad:
 3. `cargo deny check`, `just check` y `just e2e`; prueba con una copia de los datos reales.
 
 ## 8. Si la base de datos falla
-`sqlite3 alumframe.db "PRAGMA integrity_check"` con el servicio parado. Si no responde `ok`, restaura la última copia (H7).
+`sqlite3 alumframe.db "PRAGMA integrity_check"` con el servicio parado. Si no responde `ok`, restaura la última copia (apartado 5).
 
 ## 9. Dónde están las decisiones
 `docs/adr/`, `docs/CONTEXTO.md`, `docs/PROGRESS.md` y `docs/CAMBIOS.md`.

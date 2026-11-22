@@ -8,8 +8,24 @@ Instalar o actualizar:
 
 Datos: /var/lib/alumframe (alumframe.db y copias)
 Configuración: /etc/alumframe/alumframe.toml
-Borrar los datos de prueba (solo mientras no haya datos reales; si el registro dice
-«La base de datos es de otra versión de desarrollo»):
+Copias de seguridad: cada día a las 14:00, al parar el servicio y al arrancar si faltó la
+de las 14:00. Se guardan en /var/lib/alumframe/copias/automaticas y en el disco de copias.
+Disco de copias en el servidor (sin escritorio, los discos no se montan solos):
+  1. Conecta el disco y mira su UUID y su formato: lsblk -f
+  2. sudo mkdir -p /mnt/copias
+  3. Añade una línea a /etc/fstab para que se monte siempre (nofail: arranca aunque no esté):
+       ext4:            UUID=xxxx  /mnt/copias  ext4  defaults,nofail  0  2
+       FAT/exFAT/NTFS:  UUID=xxxx  /mnt/copias  auto  nofail,uid=alumframe,gid=alumframe  0  0
+  4. sudo mount -a
+  5. sudo mkdir /mnt/copias/AlumFrame-copias
+     sudo chown alumframe:alumframe /mnt/copias/AlumFrame-copias   (solo en ext4)
+  6. sudo systemctl restart alumframe; en AlumFrame, Ajustes > Copias > Copiar ahora.
+Restaurar una copia: Ajustes > Copias > Restaurar… (enseña antes lo que contiene).
+Al actualizar a una versión que cambia la base de datos, antes se guarda una copia
+«antes-de-actualizar-…» en /var/lib/alumframe/copias.
+
+Borrar los datos de prueba (solo con versiones de desarrollo antiguas, si el registro dice
+«La base de datos es de una versión de desarrollo antigua»):
   sudo systemctl stop alumframe
   sudo find /var/lib/alumframe -mindepth 1 -delete
   sudo systemctl start alumframe
@@ -19,5 +35,7 @@ Volver a la versión anterior:
   sudo systemctl stop alumframe
   sudo cp /opt/alumframe/alumframe.anterior /opt/alumframe/alumframe
   sudo systemctl start alumframe
+  (Si la versión nueva actualizó la base de datos, la anterior no arranca con ella: restaura
+  antes la copia «antes-de-actualizar-…» de /var/lib/alumframe/copias.)
 Contraseña del propietario olvidada:
   sudo -u alumframe ALUMFRAME_CONFIG=/etc/alumframe/alumframe.toml /opt/alumframe/alumframe restablecer-contrasena "Nombre"

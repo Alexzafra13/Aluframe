@@ -4,4 +4,7 @@ pub mod copia;
 mod esquema;
 
 pub use conexion::BaseDeDatos;
-pub use esquema::{ErrorEsquema, huella_del_esquema, leer_huella_guardada, preparar_esquema};
+pub use esquema::{
+    ErrorEsquema, Migracion, aplicar_migraciones, migraciones_pendientes, preparar_esquema,
+    version_de_la_base, version_del_programa,
+};

@@ -1,3 +1,6 @@
 modo = "servidor"
 puerto = 9090
 carpeta_datos = "/var/lib/alumframe"
+# Los discos montados en /mnt, /media y /run/media se buscan solos. Si el disco de copias
+# está en otro sitio, indícalo aquí (y añádelo a ReadWritePaths en alumframe.service):
+# discos_de_copia = ["/srv/copias"]

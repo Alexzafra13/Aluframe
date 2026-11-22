@@ -81,6 +81,7 @@ pub struct PaginaInicio {
     pub stock_bajo: Vec<AvisoDelTaller>,
     pub cobros_vencidos: Vec<AvisoDelTaller>,
     pub sin_respuesta: Vec<AvisoDelTaller>,
+    pub aviso_de_copias: Option<String>,
 }
 
 /// Las tres columnas del tablero y los avisos «falta algo» de los operarios.

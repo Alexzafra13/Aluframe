@@ -185,3 +185,5 @@ span.silueta { background: transparent; }
   .aviso-efimero { animation: none; position: static; transform: none; margin: 0 auto 1rem; display: table; }
   dialog.hoja[open], dialog.hoja.cerrando, dialog.hoja::backdrop { animation: none; }
 }
+
+.fila-accion { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; justify-content: space-between; padding: .5rem 0; border-top: 1px solid var(--linea); }

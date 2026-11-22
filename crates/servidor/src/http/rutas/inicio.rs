@@ -4,6 +4,7 @@ use axum::extract::State;
 use axum::response::{IntoResponse, Redirect, Response};
 use dominio::acceso::{Accion, Rol};
 
+use crate::aplicacion::copias::pantalla::aviso_de_copias;
 use crate::aplicacion::facturas::listar_facturas;
 use crate::aplicacion::presupuestos::listar_presupuestos;
 use crate::aplicacion::stock::saldos;
@@ -84,6 +85,7 @@ pub async fn mostrar_inicio(
         stock_bajo,
         cobros_vencidos,
         sin_respuesta,
+        aviso_de_copias: aviso_de_copias(&estado),
     };
     Ok(renderizar(&pagina)?.into_response())
 }

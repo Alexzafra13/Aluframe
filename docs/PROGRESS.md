@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H6 terminados**; publicada la **v0.10.0**. Siguiente: **H7, copias y esquema fijado** (decisiones del propietario más abajo); después, importar tarifas desde Excel (.xlsx, .xls, .ods) y PDF (asistido).
+Estado (2026-11-22): **H0–H7 terminados**; publicada la **v0.11.0**. Desde ella los datos se conservan al actualizar. Siguiente: importar tarifas desde Excel (.xlsx, .xls, .ods) y PDF (asistido); después el propietario simula con datos a mano y pule la interfaz.
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
@@ -9,7 +9,7 @@ Estado (2026-11-22): **H0–H6 terminados**; publicada la **v0.10.0**. Siguiente
 4. Para un hito, propón el plan y **espera la aprobación** antes de escribir código.
 
 ## Reglas que conviene no olvidar
-- **Sin migraciones** hasta el primer despliegue real (ADR-0011): se amplía `crates/servidor/src/bd/esquema.sql`. Si cambia, en el servidor de pruebas hay que borrar los datos (`docs/MAINTENANCE.md`, apartado 4) y avisar al propietario.
+- **Migraciones desde la 0.11.0** (ADR-0021): cada cambio de la base es un archivo nuevo en `crates/servidor/src/bd/migraciones/` que conserva los datos; **las publicadas no se editan**. Una migración destructiva exige preguntar al propietario.
 - **Datos de serie que vienen con el programa** y se cargan al arrancar: series (`data/series/`, ADR-0014), colores (`data/acabados.yaml`, ADR-0019) y siluetas de perfiles (`data/perfiles/`, ADR-0017). Se corrigen en el repositorio, no en pantalla.
 - **Nada se inventa:** lo no confirmado va como `CONFIRMAR` o queda anotado en `OPEN_QUESTIONS.md`. Sin margen ni modo de cobro elegidos, los presupuestos salen «Provisional».
 - Dependencia nueva: ADR corto y versión con más de 14 días. Archivos ≤ 300 líneas, funciones ≤ 40 (clippy lo vigila). Comentarios solo para el porqué.
@@ -55,6 +55,7 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
 | 0.7.1 | Arreglo de la aplicación de Windows: no se apaga mientras la ventana siga abierta |
 | 0.7.2 | Editor: «Guardar ventana» vuelve al presupuesto; «+ Otro concepto» (antes línea libre); aviso de medida fuera de la serie solo cuando ocurre; menú lateral fijo y plegable; Aluprom 21 validada por el propietario |
+| 0.11.0 | **H7:** copias automáticas (14:00, al cerrar, al arrancar si faltó) en el equipo y en el disco con la carpeta `AlumFrame-copias`, 7 diarias y 4 semanales, aviso en el Inicio, Ajustes > Copias con restaurar; esquema fijado como migración 0001: **los datos ya no se borran al actualizar** |
 | 0.10.0 | **H6:** facturas desde el trabajo o libres, número sin huecos al emitir, hoja A4, rectificativas, cobros parciales (efectivo, Bizum, tarjeta, transferencia u otro), señales a cuenta, albarán de entrega; cobros vencidos y presupuestos sin respuesta en el Inicio. Sin cambio de esquema |
 | 0.9.0 | **H5:** stock con entradas, ajustes, retales y mínimos; el plan de corte usa los retales del stock y la hoja dice cuál coger; repetir pieza; terminar orden descontando el plan con retales revisados; lista de la compra; stock bajo en el Inicio |
 | 0.8.0 | **H4:** trabajos al aceptar, tablero, ficha, orden de taller A4 en mm con plan de corte del trabajo, Mi día del operario con pasos, modificar medidas con revisión; tablas de H5 y H6 ya creadas |
@@ -69,10 +70,11 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | H4 Trabajos y orden de taller | **hecho** (2026-11-22) |
 | H5 Stock | **hecho** (2026-11-22) |
 | H6 Facturación | **hecho** (2026-11-22) |
-| H7 Copias y despliegue | pendiente |
+| H7 Copias y despliegue | **hecho** (2026-11-22) |
 
 ## ADR pendientes
-- Antes del primer despliegue real: congelar el esquema como migración 0001 (ADR-0011).
+- Servicio de Windows: solo si algún día el servidor del taller es Windows (ADR-0022).
+- PDF automático en el servidor (ADR-0003), si hace falta enviar documentos por correo desde el programa.
 
 ## Registro de decisiones y cambios
 ### H0. Cimientos (2026-11-21)
@@ -190,3 +192,17 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 **Decisiones:** el año de la factura es el de emisión, no el de creación del borrador. Emitir sin NIF del cliente pide confirmación (factura simplificada a un particular). Una factura cobrada de más no se bloquea: se ve en la ficha. El PDF automático en el servidor sigue aplazado (ADR-0003): se imprime o guarda como PDF desde el navegador. Sin cambio de esquema: las tablas se crearon en la 0.8.0.
 
 **Pendiente:** Verifactu y factura electrónica entre empresas (fuera del MVP); el IVA y las menciones legales, a revisar con el gestor.
+
+### H7. Copias de seguridad y despliegue (2026-11-22)
+**Hecho**
+- `dominio::copias`: cuándo toca copia (14:00, al arrancar si faltó, reintento a los 30 min tras un fallo, al cerrar salvo si es reciente) y qué copias se conservan (7 diarias y 4 semanales).
+- Copia automática (ADR-0022): `VACUUM INTO`, comprobación, copia en el equipo y en cada disco con la carpeta `AlumFrame-copias`, comprobada de nuevo allí, y rotación. Programador en marcha mientras el programa atiende; copia al cerrar la ventana, con Ctrl+C o al parar el servicio (SIGTERM). Registro en `copias/automaticas/registro.json`.
+- **Ajustes > Copias:** estado, «Copiar ahora», preparar un disco conectado y «Restaurar…» de cualquier copia del equipo o de un disco (pasa por la revisión de la importación). Aviso en el Inicio.
+- **Migraciones (ADR-0021):** el esquema queda congelado como migración 0001; las bases de 0.8–0.10 se adoptan sin tocar sus datos (comprobado con una base creada por el binario anterior); copia previa antes de migrar; una base o una copia más nueva se rechaza; las copias antiguas se actualizan al restaurarlas.
+- Servicio de Linux: puede escribir en los discos de `/mnt`, `/media` y `/run/media`; instrucciones para montar un disco en el servidor en `despliegue/linux/LEEME.txt`.
+- **Criterios de aceptación:** restaurar una copia en una máquina limpia reproduce los datos (`tests/copias.rs::una_copia_del_disco_se_restaura_en_un_equipo_limpio`, E2E `h7-copias`): **cumplido**. Reiniciar la máquina deja el servicio funcionando: el instalador hace `systemctl enable --now` (ya desde H0; no probado en un reinicio real en esta sesión). En Windows se usa la aplicación de escritorio.
+
+**Decisiones:** retención 7 + 4 (sin las 12 mensuales de BACKEND 8); el registro de copias va en un archivo y no en la base; disco reconocido por la carpeta, no por la letra; `user_version` en lugar de una tabla de versión; servicio de Windows aplazado.
+
+**Pendiente:** copia fuera del taller (el PC descarga la del servidor), después del MVP. Probar en el servidor del propietario el disco montado y el reinicio.
+
