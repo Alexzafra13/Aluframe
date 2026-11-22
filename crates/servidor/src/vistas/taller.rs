@@ -134,3 +134,44 @@ pub struct PaginaVentanaOperario {
     pub siguiente: Option<i64>,
     pub aviso: Option<String>,
 }
+
+pub struct Comparacion {
+    pub medidas_antes: String,
+    pub medidas_despues: String,
+    pub antes: Vec<PiezaEnHoja>,
+    pub despues: Vec<PiezaEnHoja>,
+}
+
+impl Comparacion {
+    pub fn de(antes: &VentanaCongelada, despues: &VentanaCongelada) -> Comparacion {
+        let a = HojaDeVentana::desde(&antes.descripcion, antes);
+        let d = HojaDeVentana::desde(&despues.descripcion, despues);
+        Comparacion {
+            medidas_antes: a.medidas,
+            medidas_despues: d.medidas,
+            antes: a.piezas,
+            despues: d.piezas,
+        }
+    }
+}
+
+#[derive(Template)]
+#[template(path = "medidas.html")]
+pub struct PaginaMedidas {
+    pub usuario: UsuarioEnPantalla,
+    pub menu: &'static [super::GrupoMenu],
+    pub seccion: &'static str,
+    pub trabajo: i64,
+    pub ventana: i64,
+    pub version: i64,
+    pub titulo: String,
+    pub revision: i64,
+    pub ancho: String,
+    pub alto: String,
+    pub opciones: Vec<super::OpcionEnPantalla>,
+    pub motivo: String,
+    pub reiniciar: bool,
+    pub pasos_hechos: bool,
+    pub comparacion: Option<Comparacion>,
+    pub aviso: Option<String>,
+}

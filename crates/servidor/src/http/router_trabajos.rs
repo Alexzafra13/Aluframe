@@ -26,6 +26,10 @@ pub fn rutas_de_trabajos() -> Router<EstadoApp> {
             post(trabajos::anotar_cristal),
         )
         .route(
+            "/trabajos/{id}/ventanas/{ventana}/medidas",
+            get(trabajos::mostrar_medidas).post(trabajos::guardar_medidas),
+        )
+        .route(
             "/trabajos/{id}/ventanas/{ventana}/falta",
             post(trabajos::quitar_falta),
         )

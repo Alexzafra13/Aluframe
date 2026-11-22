@@ -116,3 +116,43 @@ async fn el_operario_marca_un_paso_y_un_segundo_toque_avisa() {
         "el segundo toque avisa y recarga"
     );
 }
+
+/// Criterio de aceptación de H4: el propietario cambia medidas con revisión y motivo, la orden
+/// impresa muestra la revisión y el operario no puede modificar medidas.
+#[tokio::test]
+async fn modificar_medidas_deja_revision_con_motivo_y_la_orden_la_muestra() {
+    let contexto = Contexto::nuevo().await;
+    let (token, csrf, operario) = preparado(&contexto).await;
+    let ruta = "/trabajos/1/ventanas/1/medidas";
+    let sin_motivo = formulario(&[
+        ("_csrf", &csrf),
+        ("version", "1"),
+        ("ancho", "160"),
+        ("alto", "120"),
+        ("accion", "confirmar"),
+    ]);
+    let respuesta = contexto.pedir(post(ruta, Some(&token), &sin_motivo)).await;
+    assert_eq!(respuesta.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    let ver = formulario(&[
+        ("_csrf", &csrf),
+        ("version", "1"),
+        ("ancho", "160"),
+        ("alto", "120"),
+        ("motivo", "Midió mal"),
+        ("accion", "ver"),
+    ]);
+    let vista = texto(contexto.pedir(post(ruta, Some(&token), &ver)).await).await;
+    assert!(vista.contains("Antes · 1500 × 1200") && vista.contains("Después · 1600 × 1200"));
+    let confirmar = ver.replace("accion=ver", "accion=confirmar");
+    let respuesta = contexto.pedir(post(ruta, Some(&token), &confirmar)).await;
+    assert_eq!(destino(&respuesta), Some("/trabajos/1?aviso=medidas"));
+    let orden = texto(contexto.pedir(get("/trabajos/1/orden", Some(&token))).await).await;
+    assert!(orden.contains("Revisión 2") && orden.contains(">1600 × 1200<"));
+    let juan = token_de_operario(&contexto, operario).await;
+    let intento = contexto.pedir(get(ruta, Some(&juan))).await;
+    assert_eq!(
+        intento.status(),
+        StatusCode::NOT_FOUND,
+        "el operario no modifica medidas"
+    );
+}

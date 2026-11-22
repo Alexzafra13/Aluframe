@@ -1,0 +1,36 @@
+{% extends "marco.html" %}
+{% block titulo %}Modificar medidas{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo"><a href="/trabajos">Trabajos</a> / <a href="/trabajos/{{ trabajo }}">Trabajo</a> / ventana</p>
+  <h1>Modificar medidas</h1>
+  <p class="texto-apagado">{{ titulo }} · revisión {{ revision }}. Se recalcula con la misma versión de la serie con que se aceptó. El presupuesto aceptado y el importe no cambian; la orden de taller llevará la revisión nueva.</p>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+<form class="tarjeta" method="post" action="/trabajos/{{ trabajo }}/ventanas/{{ ventana }}/medidas">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="version" value="{{ version }}">
+  <div class="rejilla-dos">
+    <div class="campo"><label for="ancho">Ancho (cm)</label><input class="campo-medida" id="ancho" name="ancho" value="{{ ancho }}" inputmode="decimal" required autocomplete="off"></div>
+    <div class="campo"><label for="alto">Alto (cm)</label><input class="campo-medida" id="alto" name="alto" value="{{ alto }}" inputmode="decimal" required autocomplete="off"></div>
+  </div>
+  <div class="rejilla-campos">{% let lista = opciones %}{% include "editor_opciones.html" %}</div>
+  <label for="motivo">Motivo del cambio</label>
+  <input id="motivo" name="motivo" value="{{ motivo }}" maxlength="200" required placeholder="El cliente midió mal el hueco">
+  {% if pasos_hechos %}<label class="casilla"><input type="checkbox" name="reiniciar" value="si"{% if reiniciar %} checked{% endif %}> Esta ventana ya tiene pasos hechos: volver a empezarlos</label>{% endif %}
+  {% if let Some(c) = comparacion %}
+  <section class="comparacion" aria-labelledby="titulo-comparacion">
+    <h2 id="titulo-comparacion">Lo que cambia</h2>
+    <div class="rejilla-dos">
+      <div><p class="antetitulo">Antes · {{ c.medidas_antes }} mm</p><ul class="lista-simple mono">{% for p in c.antes %}<li>{{ p.numero }} {{ p.nombre }} ×{{ p.cantidad }} {{ p.medida }}</li>{% endfor %}</ul></div>
+      <div><p class="antetitulo">Después · {{ c.medidas_despues }} mm</p><ul class="lista-simple mono">{% for p in c.despues %}<li>{{ p.numero }} {{ p.nombre }} ×{{ p.cantidad }} {{ p.medida }}</li>{% endfor %}</ul></div>
+    </div>
+  </section>
+  {% endif %}
+  <div class="acciones pie-formulario">
+    <a class="boton" href="/trabajos/{{ trabajo }}">Cancelar</a>
+    <button class="boton" type="submit" name="accion" value="ver">Ver lo que cambia</button>
+    {% if comparacion.is_some() %}<button class="boton primario" type="submit" name="accion" value="confirmar">Confirmar el cambio</button>{% endif %}
+  </div>
+</form>
+{% endblock %}
