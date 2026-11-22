@@ -21,7 +21,7 @@ parametros:
 # las piezas se calculan igualmente pero la línea no tiene precio final. Se rellenan al importar la tarifa real.
 # Los nombres de las hojas son los del catálogo de Aluval (decisión del propietario, 2026-11-22).
 # `silueta`: dibujo de la sección (data/perfiles/aluval), solo para reconocer la pieza; no fija el precio.
-# Hojas según el acristalamiento (confirmado por el propietario, 2026-11-22): sencillo -> 21310, 21340, 21350;
+# Hojas según el acristalamiento (confirmado por el propietario, 2026-11-22): cristal normal -> 21310, 21340, 21350;
 # Climalit (doble) -> 21312, 21341, 21351. Se elige en la línea con la opción «acristalamiento» (ADR-0018).
 referencias:
   MARCO_LATERAL:    { referencia: "21210", silueta: aluval/21210 }   # confirmado por el propietario (2026-11-22)
@@ -42,7 +42,7 @@ tipologias:
     nombre: "Ventana corredera 2 hojas"
     dibujo: { tipo: corredera, hojas: 2, hoja_movil: derecha }   # hoja móvil: dato por confirmar
     opciones:                      # el tipo y la cámara del Climalit se concretarán más adelante
-      - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [sencillo, climalit], por_defecto: sencillo }
+      - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [cristal_normal, climalit], por_defecto: cristal_normal }
     piezas:
       - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
       - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
@@ -62,7 +62,7 @@ tipologias:
     nombre: "Ventana corredera 4 hojas"
     dibujo: { tipo: corredera, hojas: 4 }
     opciones:                      # el tipo y la cámara del Climalit se concretarán más adelante
-      - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [sencillo, climalit], por_defecto: sencillo }
+      - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [cristal_normal, climalit], por_defecto: cristal_normal }
     estado: borrador               # igual que la de 2 hojas salvo la hoja de rodamiento y las cantidades (el doble de hojas)
     piezas:
       - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
