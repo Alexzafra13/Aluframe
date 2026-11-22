@@ -1,5 +1,24 @@
 {% extends "marco.html" %}
-{% block titulo %}Empresa y precios{% endblock %}
+{% block titulo %}Empresa y precios<section class="tarjeta seccion-logo" aria-labelledby="titulo-logo">
+  <h2 id="titulo-logo">Logotipo</h2>
+  <p class="texto-apagado pequeno">PNG o JPG de hasta 1 MB. Sin logotipo, la hoja lleva el nombre de la empresa en grande.</p>
+  <div class="logo-actual">
+    {% if let Some(direccion) = logo %}<img class="logo-muestra" src="{{ direccion }}" alt="Logotipo actual">{% else %}<p class="logo-muestra logo-vacio">Sin logotipo</p>{% endif %}
+  </div>
+  <form method="post" action="/ajustes/presupuestos/logo" data-subir-archivo data-csrf="{{ usuario.token_csrf }}" class="acciones">
+    <div class="campo"><label for="archivo-logo">Archivo del logotipo</label><input id="archivo-logo" type="file" accept="image/png,image/jpeg" required></div>
+    <button class="boton primario" type="submit">{% if logo.is_some() %}Cambiar logotipo{% else %}Subir logotipo{% endif %}</button>
+    <p class="aviso" role="alert" data-aviso hidden></p>
+  </form>
+  {% if logo.is_some() %}
+  <form method="post" action="/ajustes/presupuestos/logo/quitar">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <button class="boton" type="submit">Quitar logotipo</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}<script src="/recursos/js/subir-copia.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
 {% block contenido %}
 <header class="cabecera-pagina">
   <p class="antetitulo">Ajustes</p>
@@ -13,14 +32,23 @@
   <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
   <section class="tarjeta">
     <h2>Empresa</h2>
-    <p class="texto-apagado pequeno">Aparece en la cabecera del presupuesto impreso.</p>
+    <p class="texto-apagado pequeno">Sale en la cabecera y el pie del presupuesto impreso (y en las facturas). Lo que dejes en blanco no aparece.</p>
     <div class="rejilla-campos">
-      <div class="campo"><label for="empresa-nombre">Nombre o razón social</label><input id="empresa-nombre" name="empresa.nombre" value="{{ v("empresa.nombre") }}" maxlength="200"></div>
+      <div class="campo"><label for="empresa-nombre">Razón social (o tu nombre si eres autónomo)</label><input id="empresa-nombre" name="empresa.nombre" value="{{ v("empresa.nombre") }}" maxlength="200"></div>
+      <div class="campo"><label for="empresa-nombre-comercial">Nombre comercial (si es otro)</label><input id="empresa-nombre-comercial" name="empresa.nombre_comercial" value="{{ v("empresa.nombre_comercial") }}" maxlength="200"></div>
       <div class="campo"><label for="empresa-nif">NIF o CIF</label><input id="empresa-nif" name="empresa.nif" value="{{ v("empresa.nif") }}" maxlength="15"></div>
-      <div class="campo"><label for="empresa-direccion">Dirección</label><input id="empresa-direccion" name="empresa.direccion" value="{{ v("empresa.direccion") }}" maxlength="200"></div>
-      <div class="campo"><label for="empresa-telefono">Teléfono</label><input id="empresa-telefono" name="empresa.telefono" value="{{ v("empresa.telefono") }}" inputmode="tel" maxlength="30"></div>
+      <div class="campo"><label for="empresa-direccion">Dirección (calle y número)</label><input id="empresa-direccion" name="empresa.direccion" value="{{ v("empresa.direccion") }}" maxlength="200"></div>
+      <div class="campo"><label for="empresa-cp">Código postal</label><input id="empresa-cp" name="empresa.cp" value="{{ v("empresa.cp") }}" inputmode="numeric" maxlength="10" autocomplete="off"></div>
+      <div class="campo"><label for="empresa-localidad">Localidad</label><input id="empresa-localidad" name="empresa.localidad" value="{{ v("empresa.localidad") }}" maxlength="200"></div>
+      <div class="campo"><label for="empresa-provincia">Provincia</label><input id="empresa-provincia" name="empresa.provincia" value="{{ v("empresa.provincia") }}" maxlength="200"></div>
+      <div class="campo"><label for="empresa-telefono">Teléfono fijo</label><input id="empresa-telefono" name="empresa.telefono" value="{{ v("empresa.telefono") }}" type="tel" inputmode="tel" maxlength="30" placeholder="924 555 555"></div>
+      <div class="campo"><label for="empresa-movil">Móvil</label><input id="empresa-movil" name="empresa.movil" value="{{ v("empresa.movil") }}" type="tel" inputmode="tel" maxlength="30" placeholder="612 345 678"></div>
       <div class="campo"><label for="empresa-email">Correo</label><input id="empresa-email" name="empresa.email" value="{{ v("empresa.email") }}" type="email" maxlength="200"></div>
+      <div class="campo"><label for="empresa-web">Página web</label><input id="empresa-web" name="empresa.web" value="{{ v("empresa.web") }}" maxlength="200" placeholder="www.ejemplo.es"></div>
+      <div class="campo"><label for="empresa-iban">IBAN para transferencias</label><input id="empresa-iban" name="empresa.iban" value="{{ v("empresa.iban") }}" maxlength="42" autocomplete="off" placeholder="ES00 0000 0000 0000 0000 0000"></div>
     </div>
+    <label for="empresa-pie">Texto al pie (registro mercantil, garantía…)</label>
+    <textarea id="empresa-pie" name="empresa.pie" rows="2" maxlength="600">{{ v("empresa.pie") }}</textarea>
   </section>
   <section class="tarjeta">
     <h2>Cómo se calcula el precio</h2>
@@ -62,4 +90,22 @@
   </section>
   <div class="barra-guardar"><button class="boton primario" type="submit">Guardar ajustes</button></div>
 </form>
+<section class="tarjeta seccion-logo" aria-labelledby="titulo-logo">
+  <h2 id="titulo-logo">Logotipo</h2>
+  <p class="texto-apagado pequeno">PNG o JPG de hasta 1 MB. Sin logotipo, la hoja lleva el nombre de la empresa en grande.</p>
+  <div class="logo-actual">
+    {% if let Some(direccion) = logo %}<img class="logo-muestra" src="{{ direccion }}" alt="Logotipo actual">{% else %}<p class="logo-muestra logo-vacio">Sin logotipo</p>{% endif %}
+  </div>
+  <form method="post" action="/ajustes/presupuestos/logo" data-subir-archivo data-csrf="{{ usuario.token_csrf }}" class="acciones">
+    <div class="campo"><label for="archivo-logo">Archivo del logotipo</label><input id="archivo-logo" type="file" accept="image/png,image/jpeg" required></div>
+    <button class="boton primario" type="submit">{% if logo.is_some() %}Cambiar logotipo{% else %}Subir logotipo{% endif %}</button>
+    <p class="aviso" role="alert" data-aviso hidden></p>
+  </form>
+  {% if logo.is_some() %}
+  <form method="post" action="/ajustes/presupuestos/logo/quitar">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <button class="boton" type="submit">Quitar logotipo</button>
+  </form>
+  {% endif %}
+</section>
 {% endblock %}

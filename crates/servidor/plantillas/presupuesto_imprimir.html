@@ -1,51 +1,84 @@
 {% extends "base.html" %}
 {% block titulo %}{{ codigo }}{% endblock %}
 {% block clase_body %}hoja-impresa{% endblock %}
-{% block scripts %}<script src="/recursos/js/imprimir.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
+{% block scripts %}<link rel="stylesheet" href="/recursos/hoja-a4.css?v={{ crate::vistas::VERSION }}"><script src="/recursos/js/imprimir.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
 {% block cuerpo %}
 <div class="barra-impresion no-imprimir">
   <a class="boton" href="/presupuestos/{{ id }}">Volver al presupuesto</a>
   <button class="boton primario" type="button" data-imprimir>Imprimir o guardar como PDF</button>
 </div>
+{% if empresa.es_vacia() %}<p class="aviso no-imprimir a4-falta-empresa">Faltan los datos de tu empresa: rellénalos en <a href="/ajustes/presupuestos">Ajustes &gt; Empresa y precios</a>.</p>{% endif %}
 <article class="a4">
   <header class="a4-cabecera">
     <div class="a4-empresa">
-      {% if empresa.is_empty() %}<p class="texto-apagado no-imprimir">Rellena los datos de la empresa en Ajustes &gt; Empresa y precios.</p>{% endif %}
-      {% for e in empresa %}<p{% if loop.first %} class="a4-empresa-nombre"{% endif %}>{{ e }}</p>{% endfor %}
+      {% if let Some(logo) = empresa.logo %}
+      <img class="a4-logo" src="{{ logo }}" alt="{{ empresa.titulo }}">
+      {% else %}
+      <p class="a4-marca">{{ empresa.titulo }}</p>
+      {% endif %}
+      {% if let Some(razon) = empresa.razon_social %}<p class="a4-razon">{{ razon }}</p>{% endif %}
+      {% for e in empresa.lineas %}<p>{{ e }}</p>{% endfor %}
     </div>
     <div class="a4-documento">
-      <p class="antetitulo">Presupuesto</p>
+      <p class="a4-tipo">Presupuesto</p>
       <p class="a4-codigo mono">{{ codigo }}</p>
-      <p>Fecha: {{ fecha }}</p>
-      {% if !validez.is_empty() %}<p>Válido hasta: {{ validez }}</p>{% endif %}
+      <dl class="a4-fechas">
+        <div><dt>Fecha</dt><dd>{{ fecha }}</dd></div>
+        {% if !validez.is_empty() %}<div><dt>Válido hasta</dt><dd>{{ validez }}</dd></div>{% endif %}
+      </dl>
       {% if provisional %}<p class="a4-provisional">Provisional: hay líneas sin precio final</p>{% endif %}
     </div>
   </header>
-  <section class="a4-cliente">
-    <div><p class="antetitulo">Cliente</p>{% for c in cliente %}<p>{{ c }}</p>{% endfor %}</div>
-    {% if !direccion_montaje.is_empty() %}<div><p class="antetitulo">Dirección de montaje</p><p>{{ direccion_montaje }}</p></div>{% endif %}
+  <section class="a4-partes">
+    <div class="a4-caja">
+      <p class="a4-etiqueta">Cliente</p>
+      {% for c in cliente %}<p{% if loop.first %} class="a4-cliente-nombre"{% endif %}>{{ c }}</p>{% endfor %}
+    </div>
+    {% if !direccion_montaje.is_empty() %}
+    <div class="a4-caja">
+      <p class="a4-etiqueta">Dirección de montaje</p>
+      <p>{{ direccion_montaje }}</p>
+    </div>
+    {% endif %}
   </section>
   <table class="a4-lineas">
-    <thead><tr><th>N.º</th><th>Descripción</th><th class="numero">Cantidad</th><th class="numero">Importe sin IVA</th></tr></thead>
+    <colgroup><col class="a4-col-n"><col><col class="a4-col-cantidad"><col class="a4-col-importe"></colgroup>
+    <thead><tr><th>N.º</th><th>Descripción</th><th class="numero">Cant.</th><th class="numero">Importe sin IVA</th></tr></thead>
     <tbody>
       {% for l in lineas %}
       <tr class="a4-linea">
-        <td class="mono">{{ l.orden }}</td>
-        <td>{% if l.es_ventana %}<div class="a4-ventana"><div class="a4-dibujo">{{ l.dibujo|safe }}</div><p>{{ l.descripcion }}</p></div>{% else %}{{ l.descripcion }}{% endif %}</td>
+        <td class="mono a4-orden">{{ l.orden }}</td>
+        <td>
+          <div class="a4-concepto{% if l.es_ventana %} con-dibujo{% endif %}">
+            {% if l.es_ventana %}<div class="a4-dibujo">{{ l.dibujo|safe }}</div>{% endif %}
+            <div>
+              <p class="a4-titulo-linea">{{ l.titulo }}</p>
+              {% if !l.detalles.is_empty() %}<ul class="a4-detalles">{% for d in l.detalles %}<li>{{ d }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+          </div>
+        </td>
         <td class="numero mono">{{ l.cantidad }}</td>
         <td class="numero mono">{{ l.precio }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <section class="a4-totales">
-    <dl>
+  <section class="a4-cierre">
+    <div class="a4-pago">
+      {% if !condiciones.is_empty() %}<p class="a4-etiqueta">Condiciones</p><p class="con-saltos">{{ condiciones }}</p>{% endif %}
+      {% if let Some(iban) = empresa.iban %}<p class="a4-etiqueta">Pago por transferencia</p><p class="mono">IBAN {{ iban }}</p>{% endif %}
+    </div>
+    <dl class="a4-totales">
       {% if !descuento.is_empty() %}<div><dt>Descuento</dt><dd class="mono">{{ descuento }}</dd></div>{% endif %}
-      <div><dt>Base imponible (sin IVA)</dt><dd class="mono">{{ base }}</dd></div>
+      <div><dt>Base imponible</dt><dd class="mono">{{ base }}</dd></div>
       {% for (tipo, base, cuota) in bases %}<div><dt>IVA {{ tipo }} sobre {{ base }}</dt><dd class="mono">{{ cuota }}</dd></div>{% endfor %}
       <div class="a4-total"><dt>Total con IVA</dt><dd class="mono">{{ total }}</dd></div>
     </dl>
   </section>
-  {% if !condiciones.is_empty() %}<section class="a4-condiciones"><p class="antetitulo">Condiciones</p><p class="con-saltos">{{ condiciones }}</p></section>{% endif %}
+  <section class="a4-firmas">
+    <div><p class="a4-etiqueta">Conforme, el cliente</p><p class="a4-hueco">Fecha y firma</p></div>
+    <div><p class="a4-etiqueta">Por la empresa</p><p class="a4-hueco">Fecha y firma</p></div>
+  </section>
+  {% if let Some(pie) = empresa.pie %}<footer class="a4-pie con-saltos">{{ pie }}</footer>{% endif %}
 </article>
 {% endblock %}

@@ -14,12 +14,20 @@ use crate::estado::EstadoApp;
 use crate::fecha::formatear_utc;
 
 /// Los textos tal como se ven y se escriben en el formulario (claves de `configuracion`).
-pub const CLAVES: [&str; 14] = [
+pub const CLAVES: [&str; 22] = [
     "empresa.nombre",
+    "empresa.nombre_comercial",
     "empresa.nif",
     "empresa.direccion",
+    "empresa.cp",
+    "empresa.localidad",
+    "empresa.provincia",
     "empresa.telefono",
+    "empresa.movil",
     "empresa.email",
+    "empresa.web",
+    "empresa.iban",
+    "empresa.pie",
     "precio.margen_modo",
     "precio.margen",
     "precio.perfiles",
@@ -45,6 +53,12 @@ impl TextosDeAjustes {
             .find(|(c, _)| c == clave)
             .map_or("", |(_, v)| v.as_str())
     }
+
+    pub fn cambiar(&mut self, clave: &str, valor: String) {
+        if let Some((_, v)) = self.0.iter_mut().find(|(c, _)| c == clave) {
+            *v = valor;
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -55,22 +69,6 @@ pub struct AjustesDePresupuesto {
     pub iva_general: Porcentaje,
     pub iva_reducido: Porcentaje,
     pub validez_dias: Option<i64>,
-}
-
-impl AjustesDePresupuesto {
-    pub fn empresa(&self) -> Vec<String> {
-        [
-            "empresa.nombre",
-            "empresa.nif",
-            "empresa.direccion",
-            "empresa.telefono",
-            "empresa.email",
-        ]
-        .iter()
-        .map(|c| self.textos.valor(c).to_owned())
-        .filter(|v| !v.is_empty())
-        .collect()
-    }
 }
 
 pub fn leer_de_la_base(con: &Connection) -> Result<AjustesDePresupuesto, ErrorApp> {
@@ -137,7 +135,8 @@ fn leer_reglas(textos: &TextosDeAjustes) -> Result<ReglasDePrecio, String> {
 }
 
 /// Comprueba los textos y los convierte; el primer error se muestra junto al formulario.
-pub fn interpretar(textos: TextosDeAjustes) -> Result<AjustesDePresupuesto, String> {
+pub fn interpretar(mut textos: TextosDeAjustes) -> Result<AjustesDePresupuesto, String> {
+    super::datos_de_empresa::normalizar_empresa(&mut textos)?;
     let reglas = leer_reglas(&textos)?;
     let mano = textos.valor("precio.mano_de_obra").trim();
     let mano_de_obra = if mano.is_empty() {

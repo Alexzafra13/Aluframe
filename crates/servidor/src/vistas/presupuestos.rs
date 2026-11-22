@@ -10,6 +10,7 @@ pub struct PaginaAjustesPresupuestos {
     pub menu: &'static [GrupoMenu],
     pub seccion: &'static str,
     pub textos: TextosDeAjustes,
+    pub logo: Option<String>,
     pub aviso: Option<String>,
     pub confirmacion: Option<String>,
 }
@@ -23,6 +24,7 @@ impl PaginaAjustesPresupuestos {
 use dominio::unidades::{Dinero, Porcentaje};
 
 use super::Opcion;
+use crate::aplicacion::datos_de_empresa::CabeceraDeEmpresa;
 use crate::aplicacion::presupuestos::FichaDePresupuesto;
 use crate::aplicacion::resumen_de_linea::ResumenDeVentana;
 use crate::bd::consultas::lineas_presupuesto::FilaLinea;
@@ -204,7 +206,9 @@ pub fn porcentaje_texto(bp: i64) -> String {
 pub struct LineaImpresa {
     pub orden: i64,
     pub es_ventana: bool,
-    pub descripcion: String,
+    /// El primer tramo de la descripción; el resto va en renglones debajo.
+    pub titulo: String,
+    pub detalles: Vec<String>,
     pub cantidad: String,
     pub precio: String,
     pub dibujo: String,
@@ -217,7 +221,7 @@ pub struct PaginaPresupuestoImpreso {
     pub codigo: String,
     pub fecha: String,
     pub validez: String,
-    pub empresa: Vec<String>,
+    pub empresa: CabeceraDeEmpresa,
     pub cliente: Vec<String>,
     pub direccion_montaje: String,
     pub lineas: Vec<LineaImpresa>,

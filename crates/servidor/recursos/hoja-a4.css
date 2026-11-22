@@ -1,0 +1,58 @@
+/* Hoja A4 del presupuesto (y de las facturas): sobria, en tinta, con el azul solo en detalles. */
+body.hoja-impresa { background: #D9D6CD; }
+.barra-impresion { display: flex; justify-content: center; gap: .75rem; padding: 1rem; }
+.a4-falta-empresa { max-width: 210mm; margin: 0 auto 1rem; }
+.a4 { display: flex; flex-direction: column; width: 210mm; min-height: 297mm; margin: 0 auto 2rem; padding: 14mm 15mm 12mm; background: #fff; color: var(--tinta); box-shadow: 0 10px 40px rgb(21 25 29 / .15); font-size: 9.5pt; line-height: 1.4; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.a4 p { margin: 0 0 .1rem; }
+.a4-etiqueta, .a4-tipo, .a4-lineas th, .a4-fechas dt { font: 500 8pt var(--condensada); text-transform: uppercase; letter-spacing: .1em; color: var(--apagado); }
+.a4-etiqueta { margin-bottom: 1.5mm !important; }
+
+.a4-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 10mm; padding-bottom: 5mm; border-bottom: 2px solid var(--tinta); }
+.a4-empresa { color: var(--apagado); }
+.a4-logo { display: block; max-width: 70mm; max-height: 24mm; object-fit: contain; object-position: left center; margin-bottom: 3mm; }
+.a4-marca { font: 600 20pt/1.1 var(--condensada); color: var(--tinta); letter-spacing: -.01em; margin-bottom: 2mm !important; }
+.a4-razon { color: var(--tinta); font-weight: 500; }
+.a4-documento { text-align: right; flex: none; }
+.a4-tipo { margin-bottom: 1mm !important; }
+.a4-codigo { font-size: 17pt; font-weight: 500; line-height: 1.1; margin-bottom: 2mm !important; }
+.a4-fechas { margin: 0; display: grid; gap: .5mm; }
+.a4-fechas div { display: flex; justify-content: flex-end; gap: 3mm; align-items: baseline; }
+.a4-fechas dd { margin: 0; }
+.a4-provisional { margin-top: 2mm !important; color: var(--aviso); font-weight: 600; }
+
+.a4-partes { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; padding: 6mm 0; }
+.a4-caja { padding: 3.5mm 4mm; border: 1px solid var(--linea); border-radius: 2mm; }
+.a4-cliente-nombre { font-weight: 600; font-size: 10.5pt; }
+
+.a4-lineas { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.a4-col-n { width: 10mm; }
+.a4-col-cantidad { width: 16mm; }
+.a4-col-importe { width: 28mm; }
+.a4-lineas th { text-align: left; padding: 2mm 1.5mm; border-bottom: 1px solid var(--tinta); }
+.a4-lineas td { padding: 3.5mm 1.5mm; border-bottom: 1px solid var(--linea); vertical-align: top; }
+.a4-lineas .numero { text-align: right; white-space: nowrap; }
+.a4-orden { color: var(--apagado); }
+.a4-linea { break-inside: avoid; }
+.a4-concepto.con-dibujo { display: grid; grid-template-columns: 46mm 1fr; gap: 5mm; align-items: center; }
+.a4-dibujo .capa-piezas { display: none; }
+.a4-titulo-linea { font-weight: 600; font-size: 10pt; }
+.a4-detalles { list-style: none; margin: 1mm 0 0; padding: 0; color: var(--apagado); }
+.a4-detalles li { padding: .2mm 0; }
+
+.a4-cierre { display: grid; grid-template-columns: 1fr 82mm; gap: 8mm; padding-top: 5mm; break-inside: avoid; }
+.a4-pago p + .a4-etiqueta { margin-top: 3mm !important; }
+.a4-totales { margin: 0; }
+.a4-totales div { display: flex; justify-content: space-between; gap: 6mm; padding: 1mm 0; }
+.a4-totales dd { margin: 0; }
+.a4-total { border-top: 2px solid var(--tinta); margin-top: 1.5mm; padding-top: 2mm !important; font-size: 13pt; font-weight: 600; }
+
+.a4-firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; margin-top: auto; padding-top: 12mm; break-inside: avoid; }
+.a4-hueco { height: 22mm; border-bottom: 1px solid var(--tinta); display: flex; align-items: flex-end; padding-bottom: 1mm; color: var(--apagado); font-size: 8pt; }
+.a4-pie { margin-top: 6mm; padding-top: 3mm; border-top: 1px solid var(--linea); color: var(--apagado); font-size: 7.5pt; text-align: center; }
+
+@page { size: A4; margin: 0; }
+@media print {
+  body.hoja-impresa { background: #fff; }
+  .no-imprimir { display: none !important; }
+  .a4 { margin: 0; box-shadow: none; width: auto; min-height: 297mm; }
+}

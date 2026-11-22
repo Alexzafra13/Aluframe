@@ -180,38 +180,6 @@ span.silueta { background: transparent; }
 }
 @media (max-width: 900px) { .pie-fijo { position: sticky; } }
 
-/* Hoja A4 imprimible. */
-body.hoja-impresa { background: #D9D6CD; }
-.barra-impresion { display: flex; justify-content: center; gap: .75rem; padding: 1rem; }
-.a4 { width: 210mm; min-height: 297mm; margin: 0 auto 2rem; padding: 16mm 15mm; background: #fff; color: var(--tinta); box-shadow: 0 10px 40px rgb(21 25 29 / .15); font-size: 10.5pt; }
-.a4 p { margin: 0 0 .15rem; }
-.a4-cabecera { display: flex; justify-content: space-between; gap: 2rem; padding-bottom: 6mm; border-bottom: 2px solid var(--tinta); }
-.a4-empresa-nombre { font: 600 15pt var(--condensada); }
-.a4-documento { text-align: right; }
-.a4-codigo { font-size: 16pt; font-weight: 500; }
-.a4-provisional { color: var(--aviso); font-weight: 600; }
-.a4-cliente { display: flex; gap: 12mm; padding: 6mm 0; }
-.a4-lineas { width: 100%; border-collapse: collapse; }
-.a4-lineas th { font: 500 9pt var(--condensada); text-transform: uppercase; letter-spacing: .08em; color: var(--apagado); text-align: left; border-bottom: 1px solid var(--linea); padding: 2mm 1mm; }
-.a4-lineas td { border-bottom: 1px solid var(--linea); padding: 3mm 1mm; vertical-align: top; }
-.a4-lineas .numero { text-align: right; white-space: nowrap; width: 26mm; padding-left: 4mm; }
-.a4-linea { break-inside: avoid; }
-.a4-ventana { display: flex; gap: 5mm; align-items: center; }
-.a4-dibujo { width: 58mm; flex: none; }
-.a4-dibujo .capa-piezas { display: none; }
-.a4-totales { display: flex; justify-content: flex-end; padding-top: 5mm; break-inside: avoid; }
-.a4-totales dl { margin: 0; min-width: 85mm; }
-.a4-totales dl div { display: flex; justify-content: space-between; gap: 6mm; padding: 1mm 0; }
-.a4-totales dd { margin: 0; }
-.a4-total { border-top: 2px solid var(--tinta); margin-top: 2mm; font-size: 13pt; font-weight: 600; }
-.a4-condiciones { margin-top: 8mm; break-inside: avoid; }
-@page { size: A4; margin: 0; }
-@media print {
-  body.hoja-impresa { background: #fff; }
-  .no-imprimir { display: none !important; }
-  .a4 { margin: 0; box-shadow: none; width: auto; min-height: 0; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .aviso-efimero { animation: none; position: static; transform: none; margin: 0 auto 1rem; display: table; }
   dialog.hoja[open], dialog.hoja.cerrando, dialog.hoja::backdrop { animation: none; }

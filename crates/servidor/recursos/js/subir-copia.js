@@ -1,8 +1,9 @@
-// Envía la copia tal cual (binaria, puede pesar varios MB) con el token CSRF en la cabecera y
-// abre la revisión; un formulario normal tendría que codificarla y no cabría (ADR-0016).
+// Envía un archivo tal cual (la copia de datos, que puede pesar varios MB, o el logotipo) con el
+// token CSRF en la cabecera; un formulario normal tendría que codificarlo y no cabría (ADR-0016).
 document.addEventListener("submit", function (evento) {
   const formulario = evento.target;
-  if (!formulario.matches("form[data-subir-copia]")) return;
+  if (!formulario.matches("form[data-subir-copia], form[data-subir-archivo]")) return;
+  const que = formulario.matches("[data-subir-copia]") ? "la copia" : "el archivo";
   evento.preventDefault();
   const archivo = formulario.querySelector("input[type=file]").files[0];
   const aviso = formulario.querySelector("[data-aviso]");
@@ -10,7 +11,7 @@ document.addEventListener("submit", function (evento) {
   if (!archivo) return;
   const mostrar = function (texto) {
     const esPagina = texto.trim().startsWith("<");
-    aviso.textContent = esPagina ? "No se pudo revisar la copia. Vuelve a probar." : texto;
+    aviso.textContent = esPagina ? "No se pudo guardar " + que + ". Vuelve a probar." : texto;
     aviso.hidden = false;
     boton.disabled = false;
   };
@@ -29,6 +30,6 @@ document.addEventListener("submit", function (evento) {
       return respuesta.text().then(mostrar);
     })
     .catch(function () {
-      mostrar("No se pudo enviar la copia. Comprueba la conexión y vuelve a probar.");
+      mostrar("No se pudo enviar " + que + ". Comprueba la conexión y vuelve a probar.");
     });
 });

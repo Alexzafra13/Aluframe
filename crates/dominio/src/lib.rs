@@ -8,6 +8,8 @@ pub mod corte;
 pub mod csv;
 pub mod dibujo;
 pub mod formula;
+pub mod iban;
+pub mod imagen;
 pub mod informe;
 pub mod nif;
 pub mod precio;

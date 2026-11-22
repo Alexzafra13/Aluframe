@@ -19,6 +19,8 @@ use crate::estado::EstadoApp;
 
 /// Las importaciones CSV (hasta 2 MB de texto) llegan codificadas como formulario.
 const LIMITE_DE_CUERPO: usize = 8 * 1024 * 1024;
+/// Algo más que el máximo de la imagen, para que el mensaje lo dé el dominio y no el servidor.
+const LIMITE_DE_LOGO: usize = 2 * 1024 * 1024;
 /// Una copia completa de los datos llega como archivo binario (ADR-0016).
 const LIMITE_DE_COPIA: usize = 512 * 1024 * 1024;
 
@@ -82,6 +84,14 @@ fn rutas_de_ajustes() -> Router<EstadoApp> {
         .route(
             "/ajustes/presupuestos",
             get(ajustes_presupuestos::mostrar).post(ajustes_presupuestos::guardar),
+        )
+        .route(
+            "/ajustes/presupuestos/logo",
+            post(ajustes_presupuestos::subir_logo).layer(DefaultBodyLimit::max(LIMITE_DE_LOGO)),
+        )
+        .route(
+            "/ajustes/presupuestos/logo/quitar",
+            post(ajustes_presupuestos::quitar_logo),
         )
         .route(
             "/ajustes/taller",
