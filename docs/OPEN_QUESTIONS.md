@@ -3,7 +3,7 @@
 Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 
 ## Ventanas y fabricación
-- [ ] Fórmulas de ancho y alto del cristal (descuento) y tipo de vidrio habitual, en cada serie.
+- [ ] Fórmulas de ancho y alto del cristal (descuento) y tipo de vidrio habitual, en cada serie. Aluprom 21, corredera de 2 hojas: **ancho = ancho / 2 − 9,8 cm** (propietario, 2026-11-22, provisional hasta que lo confirme); faltan el alto, la de 4 hojas y si son 2 cristales (uno por hoja).
 - [x] `ancho` y `alto` son la **medida de la ventana** (plan de H3 aprobado, 2026-11-21); se valida con las 5 ventanas reales tras H3. Aluprom 21: medidas de corte de la 2 y la 4 hojas validadas por el propietario (2026-11-22).
 - [ ] ¿Marco superior, lateral e inferior salen del mismo perfil o de perfiles distintos?
 - [ ] ¿Se optimizan los cortes por ventana o por trabajo? ¿Qué se hace con los retales?

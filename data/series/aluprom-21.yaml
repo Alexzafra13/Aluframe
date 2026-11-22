@@ -53,7 +53,7 @@ tipologias:
       - { perfil: HOJA_CIERRE,     perfil_segun: { acristalamiento: { climalit: HOJA_CIERRE_CLIMALIT } }, cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }
       - { perfil: HOJA_RODAMIENTO, perfil_segun: { acristalamiento: { climalit: HOJA_RODAMIENTO_CLIMALIT } }, cantidad: 4, longitud: "ancho / 2 - descuento_hoja_horizontal",   corte: 90 }
     vidrio:
-      estado: CONFIRMAR            # faltan las fórmulas de ancho y alto del cristal (el usuario las dará cuando sepa el descuento)
+      estado: CONFIRMAR            # ancho del cristal = ancho / 2 - 9,8 (propietario, 2026-11-22, provisional); falta el alto
     accesorios:
       - { articulo: KIT_CORREDERA,   cantidad: 1 }                  # kit de accesorios de montaje; un único artículo
       - { articulo: RUEDA_CORREDERA, cantidad: 4 }
