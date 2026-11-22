@@ -60,3 +60,19 @@ Objetivo: que la interfaz se sienta fluida y responda al tacto, sin adornos ni e
 Curvas: `--curva-suave` `cubic-bezier(.2, .8, .2, 1)` y `--curva-muelle` `cubic-bezier(.34, 1.4, .64, 1)`. Duraciones: 160 ms (respuesta) y 260 ms (aparición).
 **Accesibilidad:** con «reducir movimiento» activado en el sistema, se desactivan todas las animaciones.
 **Lo que no se hace:** degradados decorativos, sombras grandes, cristal esmerilado por todas partes, emojis o animaciones que no comuniquen nada.
+
+## Móvil y tablet (0.5.1, petición del propietario: «estética iPhone»)
+Implementación: `crates/servidor/recursos/movil.css` e iconos en `plantillas/iconos.html`. Mismos tokens, tipografía y acentos; por debajo de 900 px solo cambia la disposición.
+
+| Elemento | Comportamiento |
+|---|---|
+| Iconos | Juego propio de trazo fino (1,7 px, extremos redondeados) pensado para el taller: Trabajos es la ventana del logotipo, Stock son barras de perfil apiladas. También en el menú lateral del ordenador |
+| Barra de pestañas | Fija abajo y translúcida (desenfoque), con Inicio, Clientes, Presupuestos, Trabajos y **Más**. Activa en acero con trazo más grueso; la barra naranja del indicador se desliza entre pestañas con la misma transición que en el menú lateral. Respeta la zona inferior del iPhone (`safe-area`) |
+| «Más» | Hoja que sube desde abajo con el asa de iOS y una lista agrupada (Stock, Catálogo, Facturas, Ajustes) y Salir aparte, en el color de aviso |
+| Barra superior | Logotipo, buscador con lupa como el campo de búsqueda de iOS y la inicial del usuario |
+| Tablas | Por debajo de 700 px cada fila es una celda: el primer dato es el título con «›», el resto debajo en texto apagado y, si hace falta, con su etiqueta (`data-etiqueta`) |
+| Filtros y pestañas | Si no caben, se deslizan de lado sin barra de desplazamiento |
+| Pie del total | En el editor y el presupuesto ocupa el sitio de la barra de pestañas, de borde a borde |
+| Hojas | Tan altas como su contenido y de borde a borde |
+
+**Prueba:** `e2e/pruebas/movil.spec.js` recorre todas las pantallas en iPhone y iPad y falla si alguna se sale por los lados.

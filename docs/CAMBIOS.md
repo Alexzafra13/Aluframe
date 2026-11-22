@@ -66,3 +66,4 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - **Aplicación de escritorio para Windows** (ADR-0015, decisión del propietario): instalador con icono, ventana propia sin consola que se cierra con la ventana, y al abrirla se elige trabajar **en este equipo** o **contra el servidor del taller**. Sustituye al `.zip` con `alumframe.exe` y al script del acceso directo.
 - **Exportar e importar datos** en Ajustes → Datos (ADR-0016): importar sustituye todo tras revisar la copia y guardar lo anterior. Adelanta parte de H7.
 - El instalador de Linux espera a que el programa responda y muestra el motivo si no arranca. **Versión 0.5.0.**
+- **Versión móvil con estética de iPhone (0.5.1):** barra de pestañas abajo con «Más», iconos propios (también en el menú del ordenador), buscador como el de iOS, tablas como celdas, filtros deslizables y hojas de borde a borde. Ninguna pantalla se sale por los lados en iPhone ni iPad (E2E nuevo).
