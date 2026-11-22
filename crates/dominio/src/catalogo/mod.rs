@@ -1,6 +1,7 @@
 //! Fichas del catálogo escritas a mano: proveedores, acabados (colores) y artículos.
 
 mod acabado;
+mod acabados_incluidos;
 mod articulo;
 mod proveedor;
 
@@ -8,6 +9,7 @@ mod proveedor;
 mod pruebas;
 
 pub use acabado::{DatosDeAcabado, EntradaDeAcabado, validar_acabado};
+pub use acabados_incluidos::{AcabadoIncluido, leer_acabados_incluidos};
 pub use articulo::{DatosDeArticulo, EntradaDeArticulo, validar_articulo};
 pub use proveedor::{DatosDeProveedor, EntradaDeProveedor, validar_proveedor};
 

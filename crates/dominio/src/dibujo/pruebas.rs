@@ -29,6 +29,7 @@ fn datos(tipo: TipoDibujo, hojas: u8) -> DatosDeDibujo {
         bisagras_por_hoja: 0,
         hoja_cremona: None,
         titulo: "Corredera 2 hojas <prueba>".into(),
+        color: ColorDeDibujo::default(),
     }
 }
 
@@ -136,6 +137,14 @@ fn los_numeros_no_se_pisan_y_los_desconocidos_no_se_pierden() {
     }
 }
 
+/// Un número con dos signos menos (`--5`) delata una cuenta mal hecha; las variables CSS
+/// (`--perfil`) no cuentan.
+fn tiene_doble_signo(svg: &str) -> bool {
+    svg.as_bytes()
+        .windows(3)
+        .any(|w| w[0] == b'-' && w[1] == b'-' && w[2].is_ascii_digit())
+}
+
 proptest! {
     #[test]
     fn cualquier_medida_da_un_dibujo_completo(ancho in 1i64..2_000, alto in 1i64..2_000, hojas in 1u8..5) {
@@ -146,7 +155,41 @@ proptest! {
             let svg = dibujar_ventana(&d);
             prop_assert!(svg.ends_with("</svg>"));
             prop_assert_eq!(contar(&svg, "data-pieza="), 5);
-            prop_assert!(!svg.contains("NaN") && !svg.contains("--"));
+            prop_assert!(!svg.contains("NaN") && !tiene_doble_signo(&svg));
         }
     }
+}
+
+#[test]
+fn sin_acabado_la_ventana_es_blanca_con_cierres_blancos() {
+    let svg = dibujar_ventana(&datos(TipoDibujo::Corredera, 2));
+    assert!(svg.contains(r#"class="marco" "#) && svg.contains(r##"fill="#f1f0ea""##));
+    assert!(svg.contains(r##"<g class="herrajes" fill="#f4f4f2">"##));
+    assert!(
+        !svg.contains("style="),
+        "la CSP no deja aplicar estilos en línea"
+    );
+}
+
+#[test]
+fn con_un_color_se_pinta_de_ese_color_y_los_cierres_negros() {
+    let mut verde = datos(TipoDibujo::Corredera, 2);
+    verde.color = ColorDeDibujo::nuevo("#0F4336", false, Herrajes::Negro).unwrap();
+    let svg = dibujar_ventana(&verde);
+    assert!(svg.contains(r##"fill="#0f4336""##));
+    assert!(svg.contains(r##"<g class="herrajes" fill="#15191d">"##));
+    assert!(!svg.contains("url(#veta"));
+}
+
+#[test]
+fn la_imitacion_madera_lleva_veta_en_marco_y_hojas() {
+    let mut nogal = datos(TipoDibujo::Corredera, 2);
+    nogal.color = ColorDeDibujo::nuevo("#5e3a23", true, Herrajes::Negro).unwrap();
+    let svg = dibujar_ventana(&nogal);
+    assert!(svg.contains(r#"<pattern id="veta-5e3a23""#));
+    assert_eq!(
+        contar(&svg, r#"fill="url(#veta-5e3a23)""#),
+        3,
+        "marco y dos hojas"
+    );
 }

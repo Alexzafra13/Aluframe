@@ -1,6 +1,8 @@
 //! Dibujo esquemático de una ventana en SVG, calculado con las mismas piezas que la hoja de
 //! corte (FORMATO_SERIES, apartado 9). Se usa en pantalla y en las hojas impresas.
 
+mod acabado;
+mod color;
 mod geometria;
 mod marcadores;
 mod svg;
@@ -13,6 +15,7 @@ use std::collections::BTreeMap;
 use crate::series::{Dibujo, ResultadoVentana, Tipologia};
 use crate::unidades::Longitud;
 
+pub use color::{BLANCO_9016, ColorDeDibujo, Herrajes, leer_color_hex};
 pub use geometria::Lado;
 
 /// Lo que necesita el dibujo, ya resuelto a partir de la serie, la línea y el cálculo.
@@ -26,6 +29,8 @@ pub struct DatosDeDibujo {
     pub bisagras_por_hoja: u32,
     pub hoja_cremona: Option<Lado>,
     pub titulo: String,
+    /// El del acabado de la línea; blanco si no se eligió.
+    pub color: ColorDeDibujo,
 }
 
 impl DatosDeDibujo {
@@ -71,6 +76,7 @@ impl DatosDeDibujo {
             alto,
             bisagras_por_hoja: bisagras,
             hoja_cremona,
+            color: ColorDeDibujo::default(),
         }
     }
 }

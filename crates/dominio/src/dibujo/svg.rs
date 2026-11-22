@@ -1,33 +1,44 @@
 use std::fmt::Write;
 
 use super::DatosDeDibujo;
+use super::acabado::{atributos_de_hoja, atributos_de_marco, definiciones, grupo_de_herrajes};
 use super::geometria::{Lado, Plano, Rect};
 use super::marcadores::{colocar, radio};
 use crate::series::TipoDibujo;
 
-/// Los colores van en la hoja de estilos (clases), no aquí: así sirven en pantalla y al imprimir.
+/// Los colores fijos van en la hoja de estilos (clases); los del acabado, en atributos del
+/// propio dibujo (`acabado.rs`). Así sirven en pantalla y al imprimir.
 pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
     let m = plano.margen;
     let (ancho, alto) = (plano.marco.ancho, plano.marco.alto);
     let mut s = String::with_capacity(4_096);
     let _ = write!(
         s,
-        r#"<svg class="dibujo-ventana" viewBox="{} {} {} {}" role="img" aria-labelledby="titulo-dibujo" xmlns="http://www.w3.org/2000/svg"><title id="titulo-dibujo">{}</title>"#,
+        r#"<svg class="dibujo-ventana" viewBox="{} {} {} {}" role="img" aria-labelledby="titulo-dibujo" xmlns="http://www.w3.org/2000/svg"><title id="titulo-dibujo">{}</title>{}"#,
         -m,
         -m / 2,
         ancho + 2 * m,
         alto + m + m / 2,
-        escapar(&datos.titulo)
+        escapar(&datos.titulo),
+        definiciones(&datos.color)
     );
-    rect(&mut s, "marco", plano.marco);
-    for (indice, hoja) in plano.hojas.iter().enumerate() {
-        dibujar_hoja(&mut s, plano, *hoja, indice);
+    rect_con(
+        &mut s,
+        "marco",
+        plano.marco,
+        &atributos_de_marco(&datos.color),
+    );
+    let hoja = atributos_de_hoja(&datos.color);
+    for (indice, rectangulo) in plano.hojas.iter().enumerate() {
+        dibujar_hoja(&mut s, plano, (*rectangulo, indice), &hoja);
     }
+    s.push_str(&grupo_de_herrajes(&datos.color));
     match plano.tipo {
         TipoDibujo::Corredera => flechas_de_corredera(&mut s, plano, datos),
         TipoDibujo::Abatible => herrajes_de_abatible(&mut s, plano, datos),
         TipoDibujo::Fija => {}
     }
+    s.push_str("</g>");
     cotas(&mut s, plano, datos);
     numeros_de_pieza(&mut s, plano, datos);
     s.push_str("</svg>");
@@ -35,16 +46,20 @@ pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
 }
 
 fn rect(s: &mut String, clase: &str, r: Rect) {
+    rect_con(s, clase, r, "");
+}
+
+fn rect_con(s: &mut String, clase: &str, r: Rect, extra: &str) {
     let _ = write!(
         s,
-        r#"<rect class="{clase}" x="{}" y="{}" width="{}" height="{}"/>"#,
+        r#"<rect class="{clase}" x="{}" y="{}" width="{}" height="{}"{extra}/>"#,
         r.x, r.y, r.ancho, r.alto
     );
 }
 
-fn dibujar_hoja(s: &mut String, plano: &Plano, hoja: Rect, indice: usize) {
+fn dibujar_hoja(s: &mut String, plano: &Plano, (hoja, indice): (Rect, usize), relleno: &str) {
     if plano.tipo != TipoDibujo::Fija {
-        rect(s, "hoja", hoja);
+        rect_con(s, "hoja", hoja, relleno);
     }
     let cristal = if plano.tipo == TipoDibujo::Fija {
         hoja
