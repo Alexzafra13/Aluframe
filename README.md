@@ -2,7 +2,7 @@
 
 Programa de gestión para un taller de carpintería de aluminio y cerrajería: presupuestos con dibujo, orden de taller con medidas de corte, trabajos asignados a operarios, stock y facturación.
 
-Estado: **H0 a H3 terminados** (v0.5.0): clientes, catálogo con tarifas y presupuestos con dibujo, precio e impresión, aplicación de escritorio para Windows y exportar e importar datos; siguiente, H4 (trabajos y orden de taller). Se construye con Claude Code, hito a hito (H0 a H7). Para retomar el trabajo: `docs/PROGRESS.md`, apartado «Cómo retomar».
+Estado: **H0 a H3 terminados** (v0.6.1): clientes, catálogo y tarifas, presupuestos con dibujo en el color del acabado y siluetas de perfiles, aplicación de Windows, versión móvil y exportar e importar datos; siguiente, H4 (trabajos y orden de taller). Se construye con Claude Code, hito a hito (H0 a H7). Para retomar el trabajo: `docs/PROGRESS.md`, apartado «Cómo retomar».
 
 ## Cómo funciona
 - **Servidor del taller (Linux):** un único ejecutable `alumframe` y su base de datos SQLite `alumframe.db`, como servicio systemd en el **puerto 9090**.

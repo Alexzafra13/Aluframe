@@ -1,34 +1,49 @@
 # Progreso
 
-Estado: **H3 terminado** (2026-11-21) y publicado como **v0.4.0** en `main` (con H2). Siguiente: **H4, trabajos y orden de taller**.
-
-**Validación con el taller aplazada (decisión del propietario, 2026-11-21).** SPEC pide probar H1–H3 con 5 ventanas reales antes de seguir, pero aún no hay datos para hacerlo (ver «Datos que faltan»). Se sigue con H4, que no depende de ellos, y la validación se hará en cuanto lleguen; si descubre fallos, se corrigen antes de cerrar el hito en curso.
+Estado (2026-11-22): **H0–H3 terminados**, publicada la **v0.6.1** en `main`. Siguiente: **H4, trabajos y orden de taller** (plan propuesto, falta el visto bueno del propietario; ver abajo).
 
 ## Cómo retomar en una sesión nueva
-1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`; para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
-2. Parte de `main` actualizada y trabaja en una rama nueva para H4.
-3. Comprueba que todo está en verde: `just instalar-hooks`, `just check`, `just e2e`. En la nube `just` no está instalado: `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, `cargo test --workspace --locked`, y para los E2E `cargo build --release --locked -p servidor` y luego, en `e2e/`, `npm ci` y `ALUMFRAME_BIN=../target/release/alumframe npx playwright test --trace off`.
-4. Propón el plan de H4 y **espera la aprobación** del propietario antes de escribir código.
+1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
+2. Trabaja en una rama; al terminar algo que el propietario quiera probar, sube `version` en `Cargo.toml` y llévalo a `main` (ya ha dado permiso para publicar así): GitHub Actions prueba, compila y publica el `.tar.gz` de Linux y el instalador de Windows.
+3. Comprueba que todo está en verde. En la nube no hay `just`: `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, `cargo test --workspace --locked`; E2E: `cargo build --release --locked -p servidor` y en `e2e/` `npm ci` y `ALUMFRAME_BIN=../target/release/alumframe npx playwright test --trace off`.
+4. Para un hito, propón el plan y **espera la aprobación** antes de escribir código.
 
-**Reglas que no están en SPEC y conviene no olvidar**
-- **Sin migraciones** hasta el primer despliegue real: se amplía `crates/servidor/src/bd/esquema.sql` (ADR-0011). Si cambia, borra `datos-dev/`.
-- Toda dependencia nueva: ADR corto y versión con **más de 14 días** (`just antiguedad`; bajar con `cargo update -p nombre@version --precise anterior`).
-- Commits pequeños con Conventional Commits; comentarios solo para el porqué; archivos ≤ 300 líneas y funciones ≤ 40 (clippy y `just lint-size` lo vigilan).
-- Diseño: tokens y reglas de movimiento en `docs/design.md`. Nada de efectos decorativos; animar solo `transform` y `opacity`.
-- El cálculo vive en `crates/dominio`; el servidor solo guarda, sirve y llama. Las pantallas nuevas llevan prueba de integración y, los flujos principales, E2E.
-- **Publicar una versión:** subir `version` en `Cargo.toml` y llevarlo a `main`; GitHub Actions prueba, compila y publica (`docs/MAINTENANCE.md`, apartado 3). Desde las sesiones en la nube no se pueden subir etiquetas.
-- Se trabaja en una rama y se lleva a `main` al cerrar cada hito, con permiso del propietario.
-- **Estilo iOS** (petición del propietario): hojas con `<dialog>` y `recursos/js/hojas.js`, control segmentado, avisos efímeros (`aviso-efimero`), pie fijo oscuro; todo en `docs/design.md`. Las pantallas nuevas siguen ese patrón y respetan «reducir movimiento».
-- **Datos de prueba:** la serie y la tarifa ficticias de `fixtures/demo/` (E2E con `ALUMFRAME_DATOS_DEMO=si`); una serie demo nunca da precio final, así que lo que exige «completo» se prueba con `crates/servidor/tests/datos/serie-prueba-completa.yaml`.
-- **Precio:** nada se inventa. Margen, cobro de perfiles y mano de obra los elige el propietario en Ajustes > Empresa y precios (aún sin decidir); mientras tanto los presupuestos salen «Provisional». IVA 21 % por defecto, importes sin IVA y el IVA sumado al final (confirmado).
+## Reglas que conviene no olvidar
+- **Sin migraciones** hasta el primer despliegue real (ADR-0011): se amplía `crates/servidor/src/bd/esquema.sql`. Si cambia, en el servidor de pruebas hay que borrar los datos (`docs/MAINTENANCE.md`, apartado 4) y avisar al propietario.
+- **Datos de serie que vienen con el programa** y se cargan al arrancar: series (`data/series/`, ADR-0014), colores (`data/acabados.yaml`, ADR-0019) y siluetas de perfiles (`data/perfiles/`, ADR-0017). Se corrigen en el repositorio, no en pantalla.
+- **Nada se inventa:** lo no confirmado va como `CONFIRMAR` o queda anotado en `OPEN_QUESTIONS.md`. Sin margen ni modo de cobro elegidos, los presupuestos salen «Provisional».
+- Dependencia nueva: ADR corto y versión con más de 14 días. Archivos ≤ 300 líneas, funciones ≤ 40 (clippy lo vigila). Comentarios solo para el porqué.
+- **Interfaz:** estilo iOS (`docs/design.md`), adaptada a móvil (barra de pestañas, tablas como celdas; E2E `movil.spec.js`). La CSP no deja estilos en línea: los colores del dibujo van en atributos SVG. Los estilos y scripts llevan `?v=` con la versión.
+- **Datos de prueba:** serie y tarifa ficticias en `fixtures/demo/` (E2E con `ALUMFRAME_DATOS_DEMO=si`).
 
-**Datos que aún faltan del taller** (lista completa en `docs/OPEN_QUESTIONS.md`):
-- Para validar H1–H3 con 5 ventanas reales: descuentos del cristal de cada serie, la referencia de Aluval de cada código de las series (`MARCO_LATERAL`…), una tarifa real de Aluval, 5 ventanas con su hoja de corte y precio cobrado, y elegir margen y mano de obra.
-- Otros: pletinas de falleba, recorte de extremos, confirmar la sierra de 2 mm, posición de las bisagras y logotipo.
+## Instalación del propietario (para pruebas, sin datos reales)
+Servidor Ubuntu en casa (`192.168.1.100`, servicio `alumframe`, datos en `/var/lib/alumframe`), acceso desde fuera con Tailscale (`100.104.229.16:9090`). Pasos en `docs/MAINTENANCE.md`, apartado 4. **Pendiente de probar por él:** el instalador de Windows (que no salga consola y que se cierre al cerrar la ventana).
 
-**Después de H3 (2026-11-21):** las series de `data/series/` vienen incluidas en el ejecutable y se cargan solas al arrancar (ADR-0014, versión 0.4.1). El propietario tiene el programa instalado para pruebas en su servidor Ubuntu con acceso por Tailscale (`docs/MAINTENANCE.md`, apartado 4).
+## H4: plan propuesto, a la espera del propietario
+Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de taller A4, asignar operarios, «Mi día» y pasos del operario, modificar medidas con revisiones. Seis decisiones propuestas:
+1. Hoja de taller en mm; el resto de pantallas en cm.
+2. Plan de corte por trabajo (todas sus ventanas, por perfil y color).
+3. Una línea con cantidad 3 son 3 ventanas de trabajo, cada una con sus pasos.
+4. Al modificar medidas, el propietario decide con una casilla si se reinician los pasos.
+5. Pasos por defecto iguales para todas las ventanas, editables en Ajustes.
+6. «Falta material» llega en H5; «Entregado» se marca a mano hasta H6.
 
-**Versión 0.5.0 (2026-11-22):** aplicación de escritorio para Windows con instalador, que trabaja en el propio PC o contra el servidor (ADR-0015), y exportar e importar datos en Ajustes → Datos (ADR-0016). **Versión 0.5.1:** pantallas del propietario adaptadas al móvil con estética de iPhone (`docs/design.md`, «Móvil y tablet»). **Versión 0.5.2:** siluetas de los perfiles junto a cada pieza (ADR-0017) y nombres del catálogo de Aluval en Aluprom 21. **Versión 0.5.3:** acristalamiento sencillo o Climalit en la línea, con sus hojas (ADR-0018). **Versión 0.6.0:** la ventana se dibuja en el color del acabado, con los colores de serie de `data/acabados.yaml` (ADR-0019). **Pendiente:** que el propietario pruebe en Windows que la ventana se abre sin consola y que el programa se cierra al cerrarla (aquí solo se prueba con un navegador falso).
+## Datos que faltan del taller (lista completa en `OPEN_QUESTIONS.md`)
+- **Aluprom 21:** descuento del cristal, referencias de accesorios (kit, ruedas, tornillos), si la de 4 hojas lleva el «cierre 4 hojas» 21344, y si el Climalit cambia descuentos. Los perfiles ya tienen referencia (21210, 21220, 21230; hojas 21310/21340/21350 y Climalit 21312/21341/21351).
+- **Precio:** una tarifa real de Aluval, margen (sobre coste o venta) y mano de obra.
+- **Colores:** confirmar RAL y superficies de `data/acabados.yaml` y el nombre «Embero».
+- **Validación:** 5 ventanas reales con su hoja de corte y precio. Catálogo PDF de la Sopena V-94. Datos fiscales y logotipo.
+
+## Hecho después de H3 (resumen; detalle en `docs/CAMBIOS.md`)
+| Versión | Qué |
+|---|---|
+| 0.4.1 | Series incluidas en el programa (ADR-0014) |
+| 0.5.0 | Aplicación de Windows con instalador, en este equipo o contra el servidor (ADR-0015); exportar e importar datos (ADR-0016) |
+| 0.5.1 | Versión móvil con estética iOS |
+| 0.5.2–0.5.4 | Siluetas de perfiles junto a cada pieza (ADR-0017); hojas con los nombres del catálogo; referencias de Aluprom 21 |
+| 0.5.3 | Acristalamiento «Cristal normal» o «Climalit» que cambia las hojas (`perfil_segun`, ADR-0018) |
+| 0.5.5–0.5.6 | Arreglos del móvil; corredera de 2 hojas como Aluval (abren las dos, cierre en los laterales) |
+| 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
 
 | Hito | Estado |
 |---|---|
@@ -43,7 +58,6 @@ Estado: **H3 terminado** (2026-11-21) y publicado como **v0.4.0** en `main` (con
 
 ## ADR pendientes
 - Antes del primer despliegue real: congelar el esquema como migración 0001 (ADR-0011).
-- Antes de H3: ADR-0003, PDF automático en el servidor.
 
 ## Registro de decisiones y cambios
 ### H0. Cimientos (2026-11-21)

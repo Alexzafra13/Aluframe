@@ -4,7 +4,7 @@ Abre Claude Code en la raíz del repositorio. No hace falta ejecutar `/init`. Tr
 
 ## Siguiente sesión (H4), en modo plan
 ```
-Lee CLAUDE.md y docs/PROGRESS.md (apartado «Cómo retomar»), y después docs/CONTEXTO.md, docs/OPEN_QUESTIONS.md, el apartado H4 de SPEC.md, docs/DATOS.md (3.6, 4 y 7.7), docs/PANTALLAS.md (8 y 13), docs/design.md y design/03-hoja-taller.png. Comprueba que todo está en verde. Después, sin escribir código, propón el plan de H4: tablas que añadirás a esquema.sql, casos de uso, pantallas (con el estilo iOS ya acordado), pruebas y cómo comprobarás los criterios de aceptación. Señala huecos o contradicciones y espera mi aprobación.
+Lee CLAUDE.md y docs/PROGRESS.md (apartado «Cómo retomar»), y después docs/CONTEXTO.md, docs/OPEN_QUESTIONS.md, el apartado H4 de SPEC.md, docs/DATOS.md (3.6, 4 y 7.7), docs/PANTALLAS.md (8 y 13), docs/design.md y design/03-hoja-taller.png. Comprueba que todo está en verde. En docs/PROGRESS.md están las seis decisiones de H4 que propuse; recuérdamelas para que las apruebe o cambie. Después, sin escribir código, propón el plan de H4: tablas que añadirás a esquema.sql, casos de uso, pantallas (con el estilo iOS ya acordado), pruebas y cómo comprobarás los criterios de aceptación. Señala huecos o contradicciones y espera mi aprobación.
 ```
 
 ## Empezar un hito
