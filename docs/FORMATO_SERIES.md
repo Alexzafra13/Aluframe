@@ -152,7 +152,7 @@ El dibujo se **calcula a partir de las mismas piezas y medidas** que la hoja de 
 
 | `tipo` | Campos | Cómo se dibuja |
 |---|---|---|
-| `corredera` | `hojas` (2 o 4), `hoja_movil` (opcional) | Marco, hojas con cristal y flecha de desplazamiento |
+| `corredera` | `hojas` (2 o 4), `hoja_movil` (opcional: `izquierda`, `derecha` o `ambas`; por defecto `derecha`) | Marco, hojas con cristal, flecha hacia el centro en cada hoja que se abre y su cierre en el lateral, contra el marco (como el catálogo de Aluval) |
 | `abatible` | `hojas`, `bisagras` (código de accesorio), `cremona` (código de opción) | Marco, hojas con cristal, líneas de apertura que apuntan al lado de las bisagras, bisagras repartidas y manilla de la cremona en la hoja elegida |
 | `fija` | `hojas` | Marco y cristal (llegará con la primera serie real) |
 

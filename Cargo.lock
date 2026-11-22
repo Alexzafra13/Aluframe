@@ -329,7 +329,7 @@ dependencies = [
 
 [[package]]
 name = "dominio"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "proptest",
  "serde",
@@ -982,7 +982,7 @@ dependencies = [
 
 [[package]]
 name = "servidor"
-version = "0.5.5"
+version = "0.5.6"
 dependencies = [
  "anyhow",
  "argon2",

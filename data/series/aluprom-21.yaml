@@ -40,7 +40,7 @@ referencias:
 tipologias:
   corredera_2_hojas:
     nombre: "Ventana corredera 2 hojas"
-    dibujo: { tipo: corredera, hojas: 2, hoja_movil: derecha }   # hoja móvil: dato por confirmar
+    dibujo: { tipo: corredera, hojas: 2, hoja_movil: ambas }     # se abren las dos; cierre en cada lateral, como Aluval (propietario)
     opciones:                      # el tipo y la cámara del Climalit se concretarán más adelante
       - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [cristal_normal, climalit], por_defecto: cristal_normal }
     piezas:
