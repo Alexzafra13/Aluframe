@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use thiserror::Error;
 
 use super::resultado::MAXIMO_POR_PIEZA;
@@ -22,15 +24,28 @@ pub enum ErrorCalculo {
     MedidaNoValida { donde: String, valor: String },
 }
 
+/// Con los valores por defecto de las opciones de la línea.
 pub fn calcular_ventana(
     serie: &Serie,
     codigo_tipologia: &str,
     ancho: Decimal,
     alto: Decimal,
 ) -> Result<ResultadoVentana, ErrorCalculo> {
+    calcular_ventana_con_opciones(serie, codigo_tipologia, (ancho, alto), &BTreeMap::new())
+}
+
+/// Las opciones elegidas pueden cambiar el perfil de alguna pieza (`perfil_segun`).
+pub fn calcular_ventana_con_opciones(
+    serie: &Serie,
+    codigo_tipologia: &str,
+    (ancho, alto): (Decimal, Decimal),
+    opciones: &BTreeMap<String, String>,
+) -> Result<ResultadoVentana, ErrorCalculo> {
     let tipologia = serie
         .tipologia(codigo_tipologia)
-        .ok_or_else(|| ErrorCalculo::TipologiaDesconocida(codigo_tipologia.to_owned()))?;
+        .ok_or_else(|| ErrorCalculo::TipologiaDesconocida(codigo_tipologia.to_owned()))?
+        .con_opciones(opciones);
+    let tipologia = &tipologia;
     for (nombre, medida) in [("ancho", ancho), ("alto", alto)] {
         if !medida.es_positivo() {
             return Err(ErrorCalculo::MedidaNoPositiva(nombre));

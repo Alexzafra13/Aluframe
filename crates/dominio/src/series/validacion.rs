@@ -17,6 +17,7 @@ pub fn validar_serie(serie: &Serie, informe: &mut Informe) {
         }
         validar_dibujo(tipologia, &ruta, informe);
         validar_opciones(tipologia, &ruta, informe);
+        validar_variantes(tipologia, &ruta, informe);
         if tipologia.limites.is_none() {
             informe.aviso(
                 &ruta,
@@ -38,6 +39,8 @@ pub fn validar_serie(serie: &Serie, informe: &mut Informe) {
 
 fn codigos_usados(tipologia: &Tipologia) -> Vec<String> {
     let mut codigos: Vec<String> = tipologia.piezas.iter().map(|p| p.perfil.clone()).collect();
+    let variantes = tipologia.piezas.iter().flat_map(|p| &p.perfil_segun);
+    codigos.extend(variantes.map(|v| v.perfil.clone()));
     codigos.extend(tipologia.accesorios.iter().map(|a| a.articulo.clone()));
     if let Dato::Valor(vidrio) = &tipologia.vidrio {
         codigos.push(vidrio.tipo.clone());
@@ -85,6 +88,27 @@ fn validar_dibujo(tipologia: &Tipologia, ruta: &str, informe: &mut Informe) {
             &ruta,
             "una abatible necesita «cremona» (código de la opción)",
         ),
+    }
+}
+
+fn validar_variantes(tipologia: &Tipologia, ruta: &str, informe: &mut Informe) {
+    let ruta = ruta_hija(ruta, "piezas");
+    for variante in tipologia.piezas.iter().flat_map(|p| &p.perfil_segun) {
+        match tipologia
+            .opciones
+            .iter()
+            .find(|o| o.codigo == variante.opcion)
+        {
+            None => informe.error(
+                &ruta,
+                format!("«{}» no es una opción de esta tipología", variante.opcion),
+            ),
+            Some(opcion) if !opcion.valores.contains(&variante.valor) => informe.error(
+                &ruta,
+                format!("«{}» no es un valor de «{}»", variante.valor, opcion.codigo),
+            ),
+            Some(_) => {}
+        }
     }
 }
 

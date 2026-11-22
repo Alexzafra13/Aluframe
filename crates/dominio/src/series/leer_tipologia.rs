@@ -1,9 +1,9 @@
-use super::lector::{Lector, leer_lista, opcional, ruta_hija};
-use super::leer_partes::{leer_dibujo, leer_limites, leer_opciones};
+use super::lector::{Campos, Lector, leer_lista, opcional, ruta_hija};
+use super::leer_partes::{leer_dibujo, leer_limites, leer_opciones, leer_perfil_segun};
 use super::leer_serie::{es_codigo_valido, leer_estado};
 use super::{
     AccesorioDeSerie, AplicaA, Dato, EstadoSerie, PiezaDeSerie, PiezaDeVidrio, Tipologia,
-    UnidadCantidad, Valor, Vidrio,
+    UnidadCantidad, Valor, VarianteDePerfil, Vidrio,
 };
 
 const CAMPOS_DE_TIPOLOGIA: [&str; 8] = [
@@ -96,7 +96,14 @@ fn leer_pieza(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<Pieza
     let campos = lector.mapa(elemento, ruta)?;
     lector.solo_campos(
         campos,
-        &["perfil", "cantidad", "longitud", "corte", "posicion"],
+        &[
+            "perfil",
+            "perfil_segun",
+            "cantidad",
+            "longitud",
+            "corte",
+            "posicion",
+        ],
         ruta,
     );
     let r = |campo: &str| ruta_hija(ruta, campo);
@@ -112,17 +119,31 @@ fn leer_pieza(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<Pieza
     let corte = lector
         .obligatorio(campos, "corte", ruta)
         .and_then(|v| leer_corte(lector, v, &r("corte")));
-    let posicion = match opcional(campos, "posicion") {
-        Some(v) => Some(leer_posicion(lector, v, &r("posicion"))?),
-        None => None,
-    };
+    let (posicion, perfil_segun) = leer_extras_de_pieza(lector, campos, ruta)?;
     Some(PiezaDeSerie {
         perfil: perfil?,
+        perfil_segun,
         cantidad: cantidad?,
         longitud: longitud?,
         corte: corte?,
         posicion,
     })
+}
+
+type ExtrasDePieza = (Option<String>, Vec<VarianteDePerfil>);
+
+/// Los campos opcionales de una pieza: `posicion` (ADR-0017) y `perfil_segun` (ADR-0018).
+fn leer_extras_de_pieza(lector: &mut Lector, campos: &Campos, ruta: &str) -> Option<ExtrasDePieza> {
+    let r = |campo: &str| ruta_hija(ruta, campo);
+    let posicion = match opcional(campos, "posicion") {
+        Some(v) => Some(leer_posicion(lector, v, &r("posicion"))?),
+        None => None,
+    };
+    let perfil_segun = match opcional(campos, "perfil_segun") {
+        Some(v) => leer_perfil_segun(lector, v, &r("perfil_segun"))?,
+        None => Vec::new(),
+    };
+    Some((posicion, perfil_segun))
 }
 
 /// Sitios del dibujo donde puede ir el número de una pieza (`dibujo::marcadores`).

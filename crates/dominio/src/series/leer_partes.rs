@@ -1,5 +1,6 @@
 use super::lector::{Lector, leer_lista, opcional, ruta_hija};
-use super::{Dibujo, Limites, OpcionDeLinea, Rango, TipoDibujo, Valor};
+use super::leer_serie::es_codigo_valido;
+use super::{Dibujo, Limites, OpcionDeLinea, Rango, TipoDibujo, Valor, VarianteDePerfil};
 
 pub fn leer_limites(
     lector: &mut Lector,
@@ -129,4 +130,34 @@ fn leer_tipo_de_dibujo(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option
             None
         }
     }
+}
+
+/// `perfil_segun: { opcion: { valor: CODIGO } }`. Que la opción y el valor existan se comprueba
+/// después, con la tipología entera (`validacion`).
+pub fn leer_perfil_segun(
+    lector: &mut Lector,
+    valor: &Valor,
+    ruta: &str,
+) -> Option<Vec<VarianteDePerfil>> {
+    let opciones = lector.mapa(valor, ruta)?;
+    let mut variantes = Vec::new();
+    for (opcion, por_valor) in opciones {
+        let ruta_opcion = ruta_hija(ruta, opcion);
+        for (valor, perfil) in lector.mapa(por_valor, &ruta_opcion)? {
+            let ruta_valor = ruta_hija(&ruta_opcion, valor);
+            let perfil = lector.texto(perfil, &ruta_valor)?;
+            if !es_codigo_valido(&perfil) {
+                lector
+                    .informe
+                    .error(&ruta_valor, "código no válido: letras, cifras y guion bajo");
+                return None;
+            }
+            variantes.push(VarianteDePerfil {
+                opcion: opcion.clone(),
+                valor: valor.clone(),
+                perfil,
+            });
+        }
+    }
+    Some(variantes)
 }

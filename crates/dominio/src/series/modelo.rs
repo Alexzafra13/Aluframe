@@ -46,6 +46,31 @@ impl Serie {
     }
 }
 
+impl Tipologia {
+    /// La tipología con cada pieza ya en el perfil que corresponde a las opciones elegidas; lo
+    /// que no se elige toma el valor por defecto de la opción.
+    pub fn con_opciones(&self, elegidas: &BTreeMap<String, String>) -> Tipologia {
+        let valor_de = |codigo: &str| {
+            elegidas.get(codigo).cloned().or_else(|| {
+                let opcion = self.opciones.iter().find(|o| o.codigo == codigo)?;
+                Some(opcion.por_defecto.clone())
+            })
+        };
+        let mut resuelta = self.clone();
+        for pieza in &mut resuelta.piezas {
+            let elegida = pieza
+                .perfil_segun
+                .iter()
+                .find(|v| valor_de(&v.opcion).as_deref() == Some(v.valor.as_str()));
+            if let Some(variante) = elegida {
+                pieza.perfil = variante.perfil.clone();
+            }
+            pieza.perfil_segun.clear();
+        }
+        resuelta
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Tipologia {
     pub codigo: String,
@@ -67,6 +92,15 @@ pub struct PiezaDeSerie {
     pub corte: Dato<u16>,
     /// Dónde va su número en el dibujo cuando el nombre no lo deja claro (`HOJA_CENTRAL`…).
     pub posicion: Option<String>,
+    /// Otro perfil cuando una opción de la línea toma un valor (hojas Climalit, ADR-0018).
+    pub perfil_segun: Vec<VarianteDePerfil>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VarianteDePerfil {
+    pub opcion: String,
+    pub valor: String,
+    pub perfil: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

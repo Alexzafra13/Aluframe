@@ -1,6 +1,7 @@
 mod calculo;
 mod importacion;
 mod siluetas;
+mod variantes;
 
 use super::*;
 use crate::unidades::Decimal;

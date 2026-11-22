@@ -12,7 +12,7 @@ mod valor;
 mod pruebas;
 
 pub use crate::informe::{Informe, Problema};
-pub use calculo::{ErrorCalculo, calcular_ventana};
+pub use calculo::{ErrorCalculo, calcular_ventana, calcular_ventana_con_opciones};
 pub use modelo::*;
 pub use resultado::{AccesorioCalculado, PiezaCalculada, ResultadoVentana, VidrioCalculado};
 pub use valor::{CONFIRMAR, Dato, Valor};
