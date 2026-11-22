@@ -97,6 +97,23 @@ fn rechaza_datos_imposibles() {
     );
 }
 
+/// Fallo encontrado por proptest: con dos piezas demasiado largas, el error señalaba la primera
+/// que llegaba, así que el resultado dependía del orden de entrada.
+#[test]
+fn con_varias_piezas_demasiado_largas_el_error_senala_siempre_la_misma() {
+    let larga = |id| PiezaACortar {
+        id,
+        longitud: Longitud::desde_decimas_de_mm(63_971),
+    };
+    let a = optimizar_cortes(&[larga(16), larga(15)], &parametros(640, 30));
+    let b = optimizar_cortes(&[larga(15), larga(16)], &parametros(640, 30));
+    assert_eq!(a, b);
+    assert!(matches!(
+        a,
+        Err(ErrorCorte::PiezaDemasiadoLarga { id: 15, .. })
+    ));
+}
+
 #[test]
 fn sin_piezas_no_hay_barras() {
     assert_eq!(

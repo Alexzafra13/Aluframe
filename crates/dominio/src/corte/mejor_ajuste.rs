@@ -48,8 +48,11 @@ fn comprobar_piezas(
     parametros: &ParametrosDeCorte,
     util: Longitud,
 ) -> Result<(), ErrorCorte> {
+    // Por número de pieza: con varios fallos, el aviso señala siempre la misma, venga como venga.
+    let mut por_numero: Vec<&PiezaACortar> = piezas.iter().collect();
+    por_numero.sort_by_key(|pieza| pieza.id);
     let mut vistas = BTreeSet::new();
-    for pieza in piezas {
+    for pieza in por_numero {
         if !vistas.insert(pieza.id) {
             return Err(ErrorCorte::PiezaRepetida(pieza.id));
         }
