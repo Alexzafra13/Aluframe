@@ -27,6 +27,7 @@ pub mod series_incluidas;
 pub mod sesion;
 pub mod taller;
 pub mod tarifas;
+pub mod trabajos;
 pub mod usuarios;
 
 pub use actor::{Actor, autorizar};

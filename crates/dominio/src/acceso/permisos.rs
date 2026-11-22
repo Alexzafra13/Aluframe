@@ -8,7 +8,11 @@ pub enum Accion {
     GestionarClientes,
     /// Exportar e importar todos los datos (ADR-0016).
     GestionarDatos,
+    /// Asignar, modificar medidas, entregar o anular un trabajo; ver precios del trabajo.
+    GestionarTrabajos,
     VerMiDia,
+    /// Marcar los pasos de las ventanas que tiene asignadas (el propietario, de cualquiera).
+    MarcarPasos,
 }
 
 pub fn puede_realizar(rol: Rol, accion: Accion) -> bool {
@@ -17,8 +21,9 @@ pub fn puede_realizar(rol: Rol, accion: Accion) -> bool {
         | Accion::GestionarUsuarios
         | Accion::GestionarCatalogo
         | Accion::GestionarClientes
-        | Accion::GestionarDatos => rol.es_propietario(),
-        Accion::VerMiDia => true,
+        | Accion::GestionarDatos
+        | Accion::GestionarTrabajos => rol.es_propietario(),
+        Accion::VerMiDia | Accion::MarcarPasos => true,
     }
 }
 
@@ -34,7 +39,9 @@ mod tests {
             Accion::GestionarCatalogo,
             Accion::GestionarClientes,
             Accion::GestionarDatos,
+            Accion::GestionarTrabajos,
             Accion::VerMiDia,
+            Accion::MarcarPasos,
         ] {
             assert!(puede_realizar(Rol::Propietario, accion));
         }
@@ -51,5 +58,7 @@ mod tests {
         assert!(!puede_realizar(Rol::Operario, Accion::GestionarCatalogo));
         assert!(!puede_realizar(Rol::Operario, Accion::GestionarClientes));
         assert!(!puede_realizar(Rol::Operario, Accion::GestionarDatos));
+        assert!(!puede_realizar(Rol::Operario, Accion::GestionarTrabajos));
+        assert!(puede_realizar(Rol::Operario, Accion::MarcarPasos));
     }
 }

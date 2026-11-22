@@ -8,12 +8,15 @@ pub mod configuracion;
 pub mod direcciones;
 pub mod importaciones;
 pub mod lineas_presupuesto;
+pub mod pasos;
 pub mod presupuestos;
 pub mod proveedores;
 pub mod series;
 pub mod sesiones;
 pub mod tarifas;
+pub mod trabajos;
 pub mod usuarios;
+pub mod ventanas_trabajo;
 pub mod versiones_presupuesto;
 
 /// Escapa los comodines de LIKE para que «%» o «_» se busquen como texto.

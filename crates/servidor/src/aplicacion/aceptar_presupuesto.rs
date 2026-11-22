@@ -1,5 +1,6 @@
 //! Aceptar congela el presupuesto: se guarda una copia con todo lo que contaba (cliente, líneas,
-//! cálculos, precios, versiones de serie y de tarifa) y su SHA-256 (DATOS, apartado 4).
+//! cálculos, precios, versiones de serie y de tarifa) y su SHA-256 (DATOS, apartado 4). En la
+//! misma transacción nace el trabajo del taller (H4).
 
 use serde::Serialize;
 
@@ -193,6 +194,7 @@ pub async fn aceptar_presupuesto(
             .collect();
         presupuestos::aceptar(tx, id, (&texto, &sha, ahora))?;
         presupuestos::anotar_tarifas(tx, id, &tarifas)?;
+        super::trabajos::crear::crear_trabajo(tx, &ficha, ahora)?;
         Ok(((), id))
     })
     .await

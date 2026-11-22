@@ -324,3 +324,233 @@ CREATE TABLE presupuesto_tarifa (
     tarifa_id INTEGER NOT NULL REFERENCES tarifa (id) ON DELETE RESTRICT,
     PRIMARY KEY (presupuesto_id, tarifa_id)
 ) STRICT;
+
+-- H4: trabajos y orden de taller (DATOS 7.7). Nacen al aceptar un presupuesto, con una copia
+-- congelada de cada ventana: cambiar después una serie o una tarifa no los altera.
+CREATE TABLE trabajo (
+    id INTEGER PRIMARY KEY,
+    anio INTEGER NOT NULL,
+    numero INTEGER NOT NULL CHECK (numero >= 1),
+    presupuesto_id INTEGER NOT NULL UNIQUE REFERENCES presupuesto (id) ON DELETE RESTRICT,
+    cliente_id INTEGER NOT NULL REFERENCES cliente (id) ON DELETE RESTRICT,
+    cliente_nombre TEXT NOT NULL,
+    direccion_montaje TEXT,
+    estado TEXT NOT NULL DEFAULT 'pendiente'
+        CHECK (estado IN ('pendiente', 'en_curso', 'terminado', 'entregado', 'anulado')),
+    asignado_a INTEGER REFERENCES usuario (id) ON DELETE RESTRICT,
+    fecha_prevista TEXT,
+    importe_cent INTEGER NOT NULL DEFAULT 0,
+    creado_en TEXT NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    UNIQUE (anio, numero)
+) STRICT;
+
+CREATE INDEX trabajo_por_cliente ON trabajo (cliente_id);
+
+-- Una ventana por unidad: una línea con cantidad 3 son 3 ventanas, cada una con sus pasos.
+CREATE TABLE ventana_trabajo (
+    id INTEGER PRIMARY KEY,
+    trabajo_id INTEGER NOT NULL REFERENCES trabajo (id) ON DELETE RESTRICT,
+    orden INTEGER NOT NULL CHECK (orden >= 1),
+    linea_orden INTEGER NOT NULL CHECK (linea_orden >= 1),
+    descripcion TEXT NOT NULL,
+    asignado_a INTEGER REFERENCES usuario (id) ON DELETE RESTRICT,
+    cristal_recibido INTEGER NOT NULL DEFAULT 0 CHECK (cristal_recibido IN (0, 1)),
+    revision INTEGER NOT NULL DEFAULT 1 CHECK (revision >= 1),
+    revisada_en TEXT,
+    medida_cambiada INTEGER NOT NULL DEFAULT 0 CHECK (medida_cambiada IN (0, 1)),
+    falta_algo TEXT,
+    congelado_json TEXT NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    UNIQUE (trabajo_id, orden)
+) STRICT;
+
+CREATE TABLE paso_ventana (
+    id INTEGER PRIMARY KEY,
+    ventana_id INTEGER NOT NULL REFERENCES ventana_trabajo (id) ON DELETE RESTRICT,
+    orden INTEGER NOT NULL CHECK (orden >= 1),
+    nombre TEXT NOT NULL,
+    estado TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'en_curso', 'hecho')),
+    usuario_id INTEGER REFERENCES usuario (id) ON DELETE RESTRICT,
+    cambiado_en TEXT,
+    version INTEGER NOT NULL DEFAULT 1,
+    UNIQUE (ventana_id, orden)
+) STRICT;
+
+-- Quién cambió cada paso y cuándo; solo se añade.
+CREATE TABLE paso_historial (
+    id INTEGER PRIMARY KEY,
+    paso_id INTEGER NOT NULL REFERENCES paso_ventana (id) ON DELETE RESTRICT,
+    estado_anterior TEXT NOT NULL,
+    estado_nuevo TEXT NOT NULL,
+    nota TEXT,
+    usuario_id INTEGER NOT NULL REFERENCES usuario (id) ON DELETE RESTRICT,
+    cuando_en TEXT NOT NULL
+) STRICT;
+
+CREATE TRIGGER paso_historial_solo_anadir_u BEFORE UPDATE ON paso_historial
+BEGIN SELECT RAISE(ABORT, 'El historial de pasos solo admite añadir'); END;
+CREATE TRIGGER paso_historial_solo_anadir_d BEFORE DELETE ON paso_historial
+BEGIN SELECT RAISE(ABORT, 'El historial de pasos solo admite añadir'); END;
+
+-- Cada «Modificar medidas» del propietario: revisión con motivo; solo se añade.
+CREATE TABLE cambio_ventana_trabajo (
+    id INTEGER PRIMARY KEY,
+    ventana_id INTEGER NOT NULL REFERENCES ventana_trabajo (id) ON DELETE RESTRICT,
+    revision INTEGER NOT NULL CHECK (revision >= 2),
+    congelado_anterior_json TEXT NOT NULL,
+    congelado_nuevo_json TEXT NOT NULL,
+    motivo TEXT NOT NULL CHECK (length(trim(motivo)) >= 1),
+    pasos_reiniciados INTEGER NOT NULL CHECK (pasos_reiniciados IN (0, 1)),
+    usuario_id INTEGER NOT NULL REFERENCES usuario (id) ON DELETE RESTRICT,
+    cuando_en TEXT NOT NULL,
+    UNIQUE (ventana_id, revision)
+) STRICT;
+
+CREATE TRIGGER cambio_ventana_solo_anadir_u BEFORE UPDATE ON cambio_ventana_trabajo
+BEGIN SELECT RAISE(ABORT, 'Las revisiones de una ventana solo admiten añadir'); END;
+CREATE TRIGGER cambio_ventana_solo_anadir_d BEFORE DELETE ON cambio_ventana_trabajo
+BEGIN SELECT RAISE(ABORT, 'Las revisiones de una ventana solo admiten añadir'); END;
+
+-- La orden se termina una vez: entonces se congela el plan de corte y se descuenta el stock (H5).
+CREATE TABLE orden_taller (
+    id INTEGER PRIMARY KEY,
+    trabajo_id INTEGER NOT NULL UNIQUE REFERENCES trabajo (id) ON DELETE RESTRICT,
+    estado TEXT NOT NULL DEFAULT 'abierta' CHECK (estado IN ('abierta', 'terminada')),
+    plan_de_corte_json TEXT,
+    terminada_en TEXT,
+    terminada_por INTEGER REFERENCES usuario (id) ON DELETE RESTRICT,
+    CHECK ((estado = 'terminada') = (plan_de_corte_json IS NOT NULL))
+) STRICT;
+
+CREATE TRIGGER orden_terminada_no_se_modifica BEFORE UPDATE ON orden_taller
+WHEN OLD.estado = 'terminada'
+BEGIN SELECT RAISE(ABORT, 'Una orden terminada no se modifica'); END;
+
+-- H5: libro de stock (DATOS 7.8). El saldo es la suma de los movimientos; no hay saldo guardado.
+CREATE TABLE movimiento_stock (
+    id INTEGER PRIMARY KEY,
+    articulo_id INTEGER NOT NULL REFERENCES articulo (id) ON DELETE RESTRICT,
+    acabado_id INTEGER REFERENCES acabado (id) ON DELETE RESTRICT,
+    longitud_dmm INTEGER CHECK (longitud_dmm IS NULL OR longitud_dmm > 0),
+    tipo TEXT NOT NULL CHECK (tipo IN ('entrada', 'salida', 'ajuste')),
+    cantidad_mil INTEGER NOT NULL CHECK (cantidad_mil <> 0),
+    motivo TEXT NOT NULL CHECK (length(trim(motivo)) >= 1),
+    orden_taller_id INTEGER REFERENCES orden_taller (id) ON DELETE RESTRICT,
+    usuario_id INTEGER NOT NULL REFERENCES usuario (id) ON DELETE RESTRICT,
+    cuando_en TEXT NOT NULL,
+    CHECK (tipo <> 'entrada' OR cantidad_mil > 0),
+    CHECK (tipo <> 'salida' OR cantidad_mil < 0)
+) STRICT;
+
+CREATE INDEX movimiento_por_articulo ON movimiento_stock (articulo_id, acabado_id, longitud_dmm);
+CREATE UNIQUE INDEX movimiento_una_salida_por_orden ON movimiento_stock
+    (orden_taller_id, articulo_id, ifnull(acabado_id, 0), ifnull(longitud_dmm, 0))
+    WHERE orden_taller_id IS NOT NULL;
+
+CREATE TRIGGER movimiento_solo_anadir_u BEFORE UPDATE ON movimiento_stock
+BEGIN SELECT RAISE(ABORT, 'El stock no se edita: se corrige con un ajuste'); END;
+CREATE TRIGGER movimiento_solo_anadir_d BEFORE DELETE ON movimiento_stock
+BEGIN SELECT RAISE(ABORT, 'El stock no se edita: se corrige con un ajuste'); END;
+
+-- H6: albaranes, facturas y cobros (DATOS 7.9). Lo emitido no se toca.
+CREATE TABLE albaran (
+    id INTEGER PRIMARY KEY,
+    anio INTEGER NOT NULL,
+    numero INTEGER NOT NULL CHECK (numero >= 1),
+    trabajo_id INTEGER NOT NULL REFERENCES trabajo (id) ON DELETE RESTRICT,
+    fecha TEXT NOT NULL,
+    snapshot_json TEXT NOT NULL,
+    snapshot_sha256 TEXT NOT NULL CHECK (length(snapshot_sha256) = 64),
+    UNIQUE (anio, numero)
+) STRICT;
+
+CREATE TRIGGER albaran_no_se_modifica_u BEFORE UPDATE ON albaran
+BEGIN SELECT RAISE(ABORT, 'Un albarán emitido no se modifica'); END;
+CREATE TRIGGER albaran_no_se_modifica_d BEFORE DELETE ON albaran
+BEGIN SELECT RAISE(ABORT, 'Un albarán emitido no se modifica'); END;
+
+CREATE TABLE factura (
+    id INTEGER PRIMARY KEY,
+    serie TEXT NOT NULL CHECK (serie IN ('F', 'R')),
+    anio INTEGER NOT NULL,
+    numero INTEGER CHECK (numero IS NULL OR numero >= 1),
+    tipo TEXT NOT NULL DEFAULT 'ordinaria' CHECK (tipo IN ('ordinaria', 'rectificativa')),
+    rectifica_factura_id INTEGER REFERENCES factura (id) ON DELETE RESTRICT,
+    motivo_rectificacion TEXT,
+    cliente_id INTEGER NOT NULL REFERENCES cliente (id) ON DELETE RESTRICT,
+    trabajo_id INTEGER REFERENCES trabajo (id) ON DELETE RESTRICT,
+    estado TEXT NOT NULL DEFAULT 'borrador' CHECK (estado IN ('borrador', 'emitida')),
+    fecha_emision TEXT,
+    fecha_operacion TEXT,
+    vencimiento TEXT,
+    notas TEXT,
+    descuento_bp INTEGER NOT NULL DEFAULT 0 CHECK (descuento_bp BETWEEN 0 AND 10000),
+    base_cent INTEGER NOT NULL DEFAULT 0,
+    iva_cent INTEGER NOT NULL DEFAULT 0,
+    total_cent INTEGER NOT NULL DEFAULT 0,
+    snapshot_json TEXT,
+    snapshot_sha256 TEXT CHECK (snapshot_sha256 IS NULL OR length(snapshot_sha256) = 64),
+    -- Reservados para Verifactu y la factura electrónica (SPEC, H6): vacíos por ahora.
+    huella_anterior TEXT,
+    huella TEXT,
+    estado_envio TEXT,
+    creado_en TEXT NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    UNIQUE (serie, anio, numero),
+    CHECK ((estado = 'emitida') = (numero IS NOT NULL AND snapshot_json IS NOT NULL)),
+    CHECK ((tipo = 'rectificativa') = (rectifica_factura_id IS NOT NULL))
+) STRICT;
+
+CREATE INDEX factura_por_cliente ON factura (cliente_id);
+CREATE INDEX factura_por_trabajo ON factura (trabajo_id) WHERE trabajo_id IS NOT NULL;
+
+CREATE TRIGGER factura_emitida_no_se_modifica BEFORE UPDATE ON factura
+WHEN OLD.estado = 'emitida'
+BEGIN SELECT RAISE(ABORT, 'Una factura emitida no se modifica: se hace una rectificativa'); END;
+CREATE TRIGGER factura_emitida_no_se_borra BEFORE DELETE ON factura
+WHEN OLD.estado = 'emitida'
+BEGIN SELECT RAISE(ABORT, 'Una factura emitida no se borra: se hace una rectificativa'); END;
+
+CREATE TABLE linea_factura (
+    id INTEGER PRIMARY KEY,
+    factura_id INTEGER NOT NULL REFERENCES factura (id) ON DELETE CASCADE,
+    orden INTEGER NOT NULL CHECK (orden >= 1),
+    descripcion TEXT NOT NULL CHECK (length(trim(descripcion)) >= 1),
+    cantidad_mil INTEGER NOT NULL CHECK (cantidad_mil <> 0),
+    precio_unitario_pu INTEGER NOT NULL,
+    descuento_bp INTEGER NOT NULL DEFAULT 0 CHECK (descuento_bp BETWEEN 0 AND 10000),
+    tipo_iva_bp INTEGER NOT NULL CHECK (tipo_iva_bp BETWEEN 0 AND 10000),
+    base_cent INTEGER NOT NULL,
+    UNIQUE (factura_id, orden)
+) STRICT;
+
+CREATE TRIGGER linea_de_factura_emitida_u BEFORE UPDATE ON linea_factura
+WHEN (SELECT estado FROM factura WHERE id = OLD.factura_id) = 'emitida'
+BEGIN SELECT RAISE(ABORT, 'Una factura emitida no se modifica'); END;
+CREATE TRIGGER linea_de_factura_emitida_d BEFORE DELETE ON linea_factura
+WHEN (SELECT estado FROM factura WHERE id = OLD.factura_id) = 'emitida'
+BEGIN SELECT RAISE(ABORT, 'Una factura emitida no se modifica'); END;
+CREATE TRIGGER linea_de_factura_emitida_i BEFORE INSERT ON linea_factura
+WHEN (SELECT estado FROM factura WHERE id = NEW.factura_id) = 'emitida'
+BEGIN SELECT RAISE(ABORT, 'Una factura emitida no se modifica'); END;
+
+-- Una señal se cobra en el trabajo antes de la factura; al emitirla cuenta como pagado a cuenta.
+CREATE TABLE cobro (
+    id INTEGER PRIMARY KEY,
+    factura_id INTEGER REFERENCES factura (id) ON DELETE RESTRICT,
+    trabajo_id INTEGER REFERENCES trabajo (id) ON DELETE RESTRICT,
+    fecha TEXT NOT NULL,
+    importe_cent INTEGER NOT NULL CHECK (importe_cent > 0),
+    medio TEXT NOT NULL CHECK (medio IN ('efectivo', 'bizum', 'tarjeta', 'transferencia', 'otro')),
+    nota TEXT,
+    anulado INTEGER NOT NULL DEFAULT 0 CHECK (anulado IN (0, 1)),
+    motivo_anulacion TEXT,
+    usuario_id INTEGER NOT NULL REFERENCES usuario (id) ON DELETE RESTRICT,
+    creado_en TEXT NOT NULL,
+    CHECK (factura_id IS NOT NULL OR trabajo_id IS NOT NULL),
+    CHECK (anulado = 0 OR motivo_anulacion IS NOT NULL)
+) STRICT;
+
+CREATE INDEX cobro_por_factura ON cobro (factura_id) WHERE factura_id IS NOT NULL;
+CREATE INDEX cobro_por_trabajo ON cobro (trabajo_id) WHERE trabajo_id IS NOT NULL;
