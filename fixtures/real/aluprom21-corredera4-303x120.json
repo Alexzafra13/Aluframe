@@ -11,8 +11,8 @@
       { "perfil": "MARCO_LATERAL",   "cantidad": 2, "longitud": 120,   "corte": 90 },
       { "perfil": "MARCO_SUPERIOR",  "cantidad": 1, "longitud": 298.9, "corte": 90 },
       { "perfil": "MARCO_INFERIOR",  "cantidad": 1, "longitud": 298.9, "corte": 90 },
+      { "perfil": "HOJA_LATERAL",    "cantidad": 4, "longitud": 114.7, "corte": 90 },
       { "perfil": "HOJA_CIERRE",     "cantidad": 4, "longitud": 114.7, "corte": 90 },
-      { "perfil": "HOJA_CENTRAL",    "cantidad": 4, "longitud": 114.7, "corte": 90 },
       { "perfil": "HOJA_RODAMIENTO", "cantidad": 8, "longitud": 75,    "corte": 90 }
     ],
     "accesorios": [

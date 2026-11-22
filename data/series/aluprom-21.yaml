@@ -13,19 +13,23 @@ longitud_barra: 640                            # barras nuevas de 6,40 m (confir
 
 parametros:
   descuento_marco_horizontal: 4.1  # marco superior e inferior = ancho - 4,1
-  descuento_hoja_vertical: 5.3     # hoja de cierre y hoja central = alto - 5,3
+  descuento_hoja_vertical: 5.3     # hoja lateral y hoja cierre = alto - 5,3
   descuento_hoja_horizontal: 2     # corredera de 2 hojas: hoja de rodamiento = ancho / 2 - 2
   descuento_hoja_4_hojas: 3        # corredera de 4 hojas: hoja de rodamiento = (ancho - 3) / 4
 
 # Qué referencia del proveedor corresponde a cada código de este archivo. Mientras una referencia esté en CONFIRMAR,
 # las piezas se calculan igualmente pero la línea no tiene precio final. Se rellenan al importar la tarifa real.
+# Los nombres de las hojas son los del catálogo de Aluval (decisión del propietario, 2026-11-22).
+# `silueta`: dibujo de la sección (data/perfiles/aluval), solo para reconocer la pieza; no fija el precio.
+# Hojas según el cristal (confirmado por el propietario): sencillo -> 21310, 21340, 21350; doble (Climalit) ->
+# 21312, 21341, 21351. Hasta modelar el cristal en la línea, la referencia de precio queda en CONFIRMAR.
 referencias:
-  MARCO_LATERAL:    { referencia: CONFIRMAR }
-  MARCO_SUPERIOR:   { referencia: CONFIRMAR }
-  MARCO_INFERIOR:   { referencia: CONFIRMAR }
-  HOJA_CIERRE:      { referencia: CONFIRMAR }
-  HOJA_CENTRAL:     { referencia: CONFIRMAR }
-  HOJA_RODAMIENTO:  { referencia: CONFIRMAR }
+  MARCO_LATERAL:    { referencia: CONFIRMAR, silueta: aluval/21210 }  # el propietario cree que siempre es 21210
+  MARCO_SUPERIOR:   { referencia: CONFIRMAR, silueta: aluval/21220 }  # el propietario cree que siempre es 21220
+  MARCO_INFERIOR:   { referencia: CONFIRMAR }                         # siempre el mismo: 21230 (con cámara) o 21231 (sin), por confirmar
+  HOJA_LATERAL:     { referencia: CONFIRMAR, silueta: aluval/21310 }  # contra el marco
+  HOJA_CIERRE:      { referencia: CONFIRMAR, silueta: aluval/21340 }  # la del gancho, en el centro
+  HOJA_RODAMIENTO:  { referencia: CONFIRMAR, silueta: aluval/21350 }
   KIT_CORREDERA:    { referencia: CONFIRMAR }
   RUEDA_CORREDERA:  { referencia: CONFIRMAR }
   TORNILLO_4_8x25:  { referencia: CONFIRMAR }
@@ -38,8 +42,8 @@ tipologias:
       - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
       - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
       - { perfil: MARCO_INFERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
-      - { perfil: HOJA_CIERRE,     cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90 }
-      - { perfil: HOJA_CENTRAL,    cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90 }
+      - { perfil: HOJA_LATERAL,    cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90 }
+      - { perfil: HOJA_CIERRE,     cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }
       - { perfil: HOJA_RODAMIENTO, cantidad: 4, longitud: "ancho / 2 - descuento_hoja_horizontal",   corte: 90 }
     vidrio:
       estado: CONFIRMAR            # faltan las fórmulas de ancho y alto del cristal (el usuario las dará cuando sepa el descuento)
@@ -57,8 +61,8 @@ tipologias:
       - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
       - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
       - { perfil: MARCO_INFERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
-      - { perfil: HOJA_CIERRE,     cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90 }  # el doble que en la de 2 hojas
-      - { perfil: HOJA_CENTRAL,    cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90 }  # el doble que en la de 2 hojas
+      - { perfil: HOJA_LATERAL,    cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90 }  # el doble que en la de 2 hojas
+      - { perfil: HOJA_CIERRE,     cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }  # el doble; ¿lleva el «cierre 4 hojas» 21344? por confirmar
       - { perfil: HOJA_RODAMIENTO, cantidad: 8, longitud: "(ancho - descuento_hoja_4_hojas) / 4",    corte: 90 }  # el doble; primero se resta y luego se divide
     vidrio:
       estado: CONFIRMAR            # el usuario dará la medida cuando sepa el descuento
