@@ -177,7 +177,7 @@ El saldo de un artículo es `SUM(cantidad_mil)` por artículo y color, con índi
 |---|---|
 | `factura` | id, serie_numeracion, anio, numero (NULL hasta emitir), tipo (`ordinaria`/`rectificativa`), rectifica_factura_id, cliente_id, trabajo_id, estado (`borrador`/`emitida`), fecha_emision, fecha_operacion, vencimiento, forma_de_pago, base_cent, iva_cent, total_cent, snapshot_json, snapshot_sha256, huella_anterior, huella, estado_envio (las tres últimas, reservadas y vacías), version |
 | `linea_factura` | id, factura_id, orden, descripcion, cantidad_mil, precio_unitario_pu, descuento_bp, tipo_iva_bp, base_cent |
-| `cobro` | id, factura_id, fecha, importe_cent, medio (`efectivo`/`bizum`/`tarjeta`/`transferencia`/`otro`), nota, anulado, motivo_anulacion, usuario_id, creado_en |
+| `cobro` | id, factura_id (NULL mientras sea una **señal** a cuenta), trabajo_id (la señal se cobra al aceptar, antes de la factura; al emitirla, sus señales cuentan como ya pagado), fecha, importe_cent, medio (`efectivo`/`bizum`/`tarjeta`/`transferencia`/`otro`), nota, anulado, motivo_anulacion, usuario_id, creado_en |
 
 Triggers: `BEFORE UPDATE` y `BEFORE DELETE` en `factura`, `linea_factura`, `albaran`, `serie_version` y `tarifa_precio` con `RAISE(ABORT)` cuando el documento ya está emitido o usado. Al emitir, el número se asigna en la misma transacción que el cambio de estado.
 

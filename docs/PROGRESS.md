@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H3 terminados**, publicada la **v0.6.1** en `main`; la **v0.7.0** (clientes, código postal y hoja del presupuesto) está en la rama `claude/busy-volta-58483a`, pendiente de llevar a `main`. Siguiente: **H4, trabajos y orden de taller** (plan propuesto, falta el visto bueno del propietario; ver abajo).
+Estado (2026-11-22): **H0–H3 terminados**; publicada la **v0.7.0** (clientes, código postal y hoja del presupuesto). Siguiente: **H4, trabajos y orden de taller** (plan propuesto, falta el visto bueno del propietario; ver abajo).
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
@@ -28,9 +28,9 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 5. Pasos por defecto iguales para todas las ventanas, editables en Ajustes.
 6. «Falta material» llega en H5; «Entregado» se marca a mano hasta H6.
 
-## Decisiones del propietario pendientes (2026-11-22)
-- ¿Cobráis señal al aceptar el presupuesto? Si es así, los cobros (H6) deben poder colgar del trabajo y no solo de la factura.
-- ¿H4 (taller) o H6 (facturas y cobros) primero? Los cobros ya están diseñados: medio (efectivo, Bizum, tarjeta, transferencia u otro), pagos parciales y estado calculado.
+## Decisiones del propietario (2026-11-22)
+- **Señales:** sí. Un cobro puede colgar del trabajo antes de que exista la factura; al emitirla, cuenta como pagado a cuenta (DATOS 7.9).
+- **Orden:** el propietario lo deja a nuestro criterio. Primero **H4** (el trabajo nace al aceptar y es donde se apunta la señal), después **H6** (facturas y cobros: medio efectivo, Bizum, tarjeta, transferencia u otro; pagos parciales y estado calculado).
 
 ## Datos que faltan del taller (lista completa en `OPEN_QUESTIONS.md`)
 - **Aluprom 21:** descuento del cristal, referencias de accesorios (kit, ruedas, tornillos), si la de 4 hojas lleva el «cierre 4 hojas» 21344, y si el Climalit cambia descuentos. Los perfiles ya tienen referencia (21210, 21220, 21230; hojas 21310/21340/21350 y Climalit 21312/21341/21351).
