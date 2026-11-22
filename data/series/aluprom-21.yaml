@@ -33,9 +33,11 @@ referencias:
   HOJA_LATERAL_CLIMALIT:    { referencia: "21312", silueta: aluval/21312 }
   HOJA_CIERRE_CLIMALIT:     { referencia: "21341", silueta: aluval/21341 }
   HOJA_RODAMIENTO_CLIMALIT: { referencia: "21351", silueta: aluval/21351 }
-  KIT_CORREDERA:    { referencia: CONFIRMAR }
-  RUEDA_CORREDERA:  { referencia: CONFIRMAR }
-  TORNILLO_4_8x25:  { referencia: CONFIRMAR }
+  # Referencias genéricas del taller, no del proveedor (propietario, 2026-11-22: «de momento, un kit de corredera
+  # y ruedas»). Se da de alta el artículo con esta referencia en Catálogo > Artículos y la ventana toma su precio.
+  KIT_CORREDERA:    { referencia: "KIT-CORREDERA" }
+  RUEDA_CORREDERA:  { referencia: "RUEDA-CORREDERA" }
+  TORNILLO_4_8x25:  { referencia: "TORNILLO-4,8X25" }
 
 tipologias:
   corredera_2_hojas:
