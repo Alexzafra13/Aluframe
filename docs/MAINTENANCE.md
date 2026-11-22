@@ -55,6 +55,8 @@ Hoy: antes de cada migración se guarda una copia con `VACUUM INTO` en `copias/`
 - Antes de tocar una serie real, comprueba sus ventanas con «Probar una ventana» y que `just test` sigue en verde: los tests dorados comparan `data/series/` con `fixtures/real/`.
 - **Actualizar una tarifa:** Catálogo > Tarifas > Importar tarifa. Elige el proveedor y el CSV con las columnas `referencia;descripcion;unidad;precio_tarifa;longitud_barra` (y `tipo` opcional). Desde Excel, «Guardar como» → CSV. Revisa la vista previa (los saltos de más del 30 % salen marcados) y confirma. Si algo no cuadra, «Deshacer» en la versión vigente.
 - **Cambiar unos pocos precios:** Catálogo > Artículos, filtra por proveedor y escribe el precio en la tabla, o marca artículos y aplica un porcentaje. Cada cambio queda como una versión de la tarifa.
+- **Actualizar los códigos postales** (ADR-0020): `curl -o /tmp/ES.zip https://download.geonames.org/export/zip/ES.zip` y `python3 scripts/generar_codigos_postales.py /tmp/ES.zip data/codigos_postales.tsv`; revisa la diferencia con `git diff --stat`, pasa las pruebas y publica una versión.
+- **Logotipo y datos de la empresa** para los documentos: Ajustes > Empresa y precios (PNG o JPG de hasta 1 MB; sin logotipo sale el nombre en grande).
 - **Importar clientes** de una hoja de cálculo: Clientes > Importar clientes (columnas en ADR-0012, todas opcionales).
 - **Petición RGPD de un cliente:** en su ficha, «Exportar datos» (acceso) o «Borrar definitivamente» (supresión).
 - **Margen, cobro de perfiles, mano de obra, IVA y datos de la empresa:** Ajustes > Empresa y precios. Lo que se deje sin elegir hace que las ventanas salgan «incompletas» y lo dicen.

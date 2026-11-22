@@ -4,6 +4,7 @@
 pub mod acceso;
 pub mod catalogo;
 pub mod clientes;
+pub mod codigos_postales;
 pub mod corte;
 pub mod csv;
 pub mod dibujo;

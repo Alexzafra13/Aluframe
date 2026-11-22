@@ -16,6 +16,7 @@ pub fn rutas_de_clientes() -> Router<EstadoApp> {
             "/clientes/comprobar-nif",
             get(clientes_fragmentos::comprobar_nif),
         )
+        .route("/poblaciones", get(clientes_fragmentos::buscar_poblacion))
         .route(
             "/clientes/direccion-en-blanco",
             get(clientes_fragmentos::direccion_en_blanco),

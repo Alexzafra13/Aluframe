@@ -19,6 +19,26 @@ test("exige nombre y teléfono y guarda el móvil sin prefijo", async ({ page })
   await expect(page.getByRole("status")).toHaveText("Cliente guardado.");
 });
 
+test("el código postal rellena la localidad y la provincia sin adivinar", async ({ page }) => {
+  await entrarComoPropietario(page);
+  await page.goto("/clientes/nuevo");
+  await page.locator("#fiscal_cp").pressSequentially("06300");
+  await expect(page.locator("#fiscal_localidad")).toHaveValue("Zafra");
+  await expect(page.locator("#fiscal_provincia")).toHaveValue("Badajoz");
+  await expect(page.locator("#fiscal_pais")).toHaveValue("España");
+  // Con varias localidades no elige: las ofrece en la lista.
+  await page.locator("#fiscal_cp").fill("");
+  await page.locator("#fiscal_cp").pressSequentially("04002");
+  await expect(page.locator("#fiscal_provincia")).toHaveValue("Almería");
+  await expect(page.locator("#fiscal_localidad")).toHaveValue("");
+  await expect(page.locator("#fiscal_localidad-opciones option")).toHaveCount(2);
+  // Lo escrito a mano no se sustituye.
+  await page.locator("#d0_provincia").fill("Mi provincia");
+  await page.locator("#d0_cp").pressSequentially("28001");
+  await expect(page.locator("#d0_localidad")).toHaveValue("Madrid");
+  await expect(page.locator("#d0_provincia")).toHaveValue("Mi provincia");
+});
+
 test("comprueba el NIF al escribirlo y guarda varias direcciones", async ({ page }) => {
   await entrarComoPropietario(page);
   await page.goto("/clientes/nuevo");

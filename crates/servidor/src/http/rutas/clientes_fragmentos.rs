@@ -1,3 +1,4 @@
+use axum::Json;
 use axum::extract::Query;
 use axum::response::{IntoResponse, Response};
 use dominio::acceso::Accion;
@@ -6,6 +7,7 @@ use dominio::nif::Nif;
 use serde::Deserialize;
 
 use crate::aplicacion::autorizar;
+use crate::aplicacion::poblaciones::{Poblacion, buscar_por_codigo_postal, buscar_por_localidad};
 use crate::errores::ErrorApp;
 use crate::http::extractores::ActorActual;
 use crate::vistas::{
@@ -55,4 +57,24 @@ pub async fn direccion_en_blanco(
     let n = numero.n.unwrap_or(1).min(19);
     let direccion = bloque_vacio(n);
     Ok(renderizar(&FragmentoDireccion { direccion })?.into_response())
+}
+
+#[derive(Deserialize)]
+pub struct ConsultaDePoblacion {
+    cp: Option<String>,
+    localidad: Option<String>,
+}
+
+/// Para los formularios con dirección: lo que se puede rellenar a partir de lo escrito.
+pub async fn buscar_poblacion(
+    ActorActual(_actor): ActorActual,
+    Query(consulta): Query<ConsultaDePoblacion>,
+) -> Json<Poblacion> {
+    let cp = consulta.cp.unwrap_or_default();
+    let poblacion = if cp.trim().is_empty() {
+        buscar_por_localidad(consulta.localidad.as_deref().unwrap_or_default())
+    } else {
+        buscar_por_codigo_postal(&cp)
+    };
+    Json(poblacion)
 }
