@@ -25,7 +25,8 @@ pub struct PestanaDeLinea {
 pub struct OpcionEnPantalla {
     pub codigo: String,
     pub nombre: String,
-    pub valores: Vec<String>,
+    /// (valor, texto en pantalla): «climalit» se lee «Climalit».
+    pub valores: Vec<(String, String)>,
     pub elegido: String,
 }
 
@@ -34,7 +35,11 @@ impl OpcionEnPantalla {
         OpcionEnPantalla {
             codigo: opcion.codigo.clone(),
             nombre: opcion.nombre.clone(),
-            valores: opcion.valores.clone(),
+            valores: opcion
+                .valores
+                .iter()
+                .map(|v| (v.clone(), nombre_legible(v)))
+                .collect(),
             elegido: elegido
                 .cloned()
                 .unwrap_or_else(|| opcion.por_defecto.clone()),

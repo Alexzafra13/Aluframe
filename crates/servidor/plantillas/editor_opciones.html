@@ -2,7 +2,7 @@
 <div class="campo">
   <label for="opcion-{{ o.codigo }}">{{ o.nombre }}</label>
   <select id="opcion-{{ o.codigo }}" name="opcion.{{ o.codigo }}">
-    {% for v in o.valores %}<option value="{{ v }}"{% if *v == o.elegido %} selected{% endif %}>{{ v }}</option>{% endfor %}
+    {% for (valor, texto) in o.valores %}<option value="{{ valor }}"{% if *valor == o.elegido %} selected{% endif %}>{{ texto }}</option>{% endfor %}
   </select>
 </div>
 {% endfor %}

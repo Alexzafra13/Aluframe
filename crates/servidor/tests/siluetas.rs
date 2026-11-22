@@ -27,9 +27,8 @@ async fn sirve_las_siluetas_y_nada_fuera_de_su_carpeta() {
     }
 }
 
-/// Lo que pidió el propietario: junto al número de cada pieza, el dibujo de su perfil.
-#[tokio::test]
-async fn las_piezas_de_aluprom_21_llevan_el_dibujo_de_su_perfil() {
+/// Calcula en vivo una corredera Aluprom 21 de 150 × 120 con las opciones dadas.
+async fn calcular_aluprom(opciones: &[(&str, &str)]) -> String {
     let contexto = Contexto::nuevo().await;
     let (token, actor) = contexto.con_propietario().await;
     cargar_series_incluidas(&contexto.estado).await.unwrap();
@@ -45,28 +44,50 @@ async fn las_piezas_de_aluprom_21_llevan_el_dibujo_de_su_perfil() {
             &formulario(&[("_csrf", csrf), ("cliente", "1")]),
         ))
         .await;
-    let ventana = [
+    let mut ventana = vec![
         ("_csrf", csrf),
         ("seleccion", "1|corredera_2_hojas"),
         ("ancho", "150"),
         ("alto", "120"),
         ("iva", "2100"),
     ];
-    let html = texto(
-        contexto
-            .pedir(post(
-                "/presupuestos/1/lineas/calcular",
-                Some(&token),
-                &formulario(&ventana),
-            ))
-            .await,
-    )
-    .await;
+    ventana.extend_from_slice(opciones);
+    let respuesta = contexto
+        .pedir(post(
+            "/presupuestos/1/lineas/calcular",
+            Some(&token),
+            &formulario(&ventana),
+        ))
+        .await;
+    texto(respuesta).await
+}
+
+fn tiene_silueta(html: &str, referencia: &str) -> bool {
+    html.contains(&format!("src=\"/perfiles/aluval/{referencia}.svg\""))
+}
+
+/// Lo que pidió el propietario: junto al número de cada pieza, el dibujo de su perfil.
+#[tokio::test]
+async fn las_piezas_de_aluprom_21_llevan_el_dibujo_de_su_perfil() {
+    let html = calcular_aluprom(&[]).await;
     for referencia in ["21210", "21220", "21310", "21340", "21350"] {
         assert!(
-            html.contains(&format!("src=\"/perfiles/aluval/{referencia}.svg\"")),
+            tiene_silueta(&html, referencia),
             "falta la silueta {referencia}"
         );
     }
     assert!(html.contains("Hoja lateral") && html.contains("Hoja cierre"));
+}
+
+#[tokio::test]
+async fn con_climalit_salen_las_hojas_climalit_y_su_dibujo() {
+    let html = calcular_aluprom(&[("opcion.acristalamiento", "climalit")]).await;
+    for referencia in ["21312", "21341", "21351"] {
+        assert!(
+            tiene_silueta(&html, referencia),
+            "falta la silueta {referencia}"
+        );
+    }
+    assert!(html.contains("Hoja lateral climalit"));
+    assert!(!tiene_silueta(&html, "21310"));
 }

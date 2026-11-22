@@ -6,7 +6,7 @@ use dominio::precio::{
     CosteDeMateriales, DatosDeLinea, PerfilUsado, PrecioDeLinea, calcular_coste_de_materiales,
     calcular_precio_de_linea,
 };
-use dominio::series::{Dato, ResultadoVentana, Serie, calcular_ventana};
+use dominio::series::{Dato, ResultadoVentana, Serie, calcular_ventana_con_opciones};
 use dominio::unidades::{Decimal, Dinero, Longitud, Porcentaje, Unidad};
 use rusqlite::Connection;
 
@@ -49,8 +49,10 @@ pub fn calcular(
     (taller, ajustes): (&AjustesDeTaller, &AjustesDePresupuesto),
 ) -> Result<CalculoDeVentana, ErrorApp> {
     let (serie, tipologia) = cargar_serie(con, entrada)?;
-    let resultado = calcular_ventana(&serie, &entrada.tipologia, entrada.ancho, entrada.alto)
-        .map_err(|e| ErrorApp::Validacion(e.to_string()))?;
+    let medidas = (entrada.ancho, entrada.alto);
+    let resultado =
+        calcular_ventana_con_opciones(&serie, &entrada.tipologia, medidas, &entrada.opciones)
+            .map_err(|e| ErrorApp::Validacion(e.to_string()))?;
     let (perfiles, faltan) = perfiles_usados(&serie, &resultado, taller);
     let enlace = enlazar(con, &serie, &resultado, entrada.vidrio_articulo_id)?;
     let acabado = entrada
