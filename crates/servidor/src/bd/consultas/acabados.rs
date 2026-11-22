@@ -1,4 +1,4 @@
-use dominio::catalogo::DatosDeAcabado;
+use dominio::catalogo::{AcabadoIncluido, DatosDeAcabado};
 use rusqlite::{Connection, OptionalExtension, Row, params};
 
 use super::proveedores::comprobar;
@@ -12,9 +12,14 @@ pub struct FilaAcabado {
     pub recargo_bp: i64,
     pub archivado: bool,
     pub version: i64,
+    pub ral: Option<String>,
+    pub color_dibujo: String,
+    pub madera: bool,
+    pub cierres: String,
 }
 
-const SELECCION: &str = "SELECT id, nombre, es_base, recargo_bp, archivado, version FROM acabado";
+const SELECCION: &str = "SELECT id, nombre, es_base, recargo_bp, archivado, version, ral, \
+     color_dibujo, madera, cierres FROM acabado";
 
 fn leer_fila(f: &Row) -> rusqlite::Result<FilaAcabado> {
     Ok(FilaAcabado {
@@ -24,6 +29,10 @@ fn leer_fila(f: &Row) -> rusqlite::Result<FilaAcabado> {
         recargo_bp: f.get(3)?,
         archivado: f.get(4)?,
         version: f.get(5)?,
+        ral: f.get(6)?,
+        color_dibujo: f.get(7)?,
+        madera: f.get(8)?,
+        cierres: f.get(9)?,
     })
 }
 
@@ -92,4 +101,41 @@ pub fn actualizar(
         params![d.nombre, d.es_base, d.recargo.puntos_basicos(), id, version],
     )?;
     comprobar(con, "acabado", cambiadas, id)
+}
+
+/// Acabado que viene con el programa (ADR-0019): se crea si falta; si existe se le ponen el RAL,
+/// el color y los cierres del archivo. El recargo y el archivado son del propietario: no se tocan.
+/// Devuelve si lo ha creado.
+pub fn guardar_incluido(con: &Connection, a: &AcabadoIncluido) -> Result<bool, ErrorApp> {
+    let color = (
+        a.color.perfil(),
+        a.color.madera,
+        a.color.herrajes.como_texto(),
+    );
+    let cambiadas = con.execute(
+        "UPDATE acabado SET ral = ?2, color_dibujo = ?3, madera = ?4, cierres = ?5 \
+         WHERE nombre = ?1",
+        params![a.nombre, a.ral, color.0, color.1, color.2],
+    )?;
+    if cambiadas > 0 {
+        return Ok(false);
+    }
+    let hay_base: bool = con.query_row(
+        "SELECT EXISTS (SELECT 1 FROM acabado WHERE es_base = 1)",
+        [],
+        |f| f.get(0),
+    )?;
+    con.execute(
+        "INSERT INTO acabado (nombre, es_base, ral, color_dibujo, madera, cierres) \
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        params![
+            a.nombre,
+            a.base && !hay_base,
+            a.ral,
+            color.0,
+            color.1,
+            color.2
+        ],
+    )?;
+    Ok(true)
 }

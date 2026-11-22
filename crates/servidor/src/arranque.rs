@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use thiserror::Error;
 
+use crate::aplicacion::acabados_incluidos::cargar_acabados_incluidos;
 use crate::aplicacion::series_incluidas::{CargaDeSerie, cargar_series_incluidas};
 use crate::bd::{BaseDeDatos, ErrorEsquema, preparar_esquema};
 use crate::config::{Configuracion, ErrorConfiguracion, NOMBRE_ARCHIVO_CONFIGURACION};
@@ -65,6 +66,7 @@ pub async fn preparar_estado(config: &Configuracion) -> Result<EstadoApp, ErrorA
         .con_datos_demo(config.permitir_datos_demo)
         .con_carpeta_copias(config.carpeta_copias());
     anotar_series_incluidas(&cargar_series_incluidas(&estado).await?);
+    cargar_acabados_incluidos(&estado).await?;
     Ok(estado)
 }
 

@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use dominio::corte::optimizar_cortes;
-use dominio::dibujo::{DatosDeDibujo, dibujar_ventana};
+use dominio::dibujo::{ColorDeDibujo, DatosDeDibujo, Herrajes, dibujar_ventana};
 use dominio::precio::{
     CosteDeMateriales, DatosDeLinea, PerfilUsado, PrecioDeLinea, calcular_coste_de_materiales,
     calcular_precio_de_linea,
@@ -71,7 +71,7 @@ pub fn calcular(
         (entrada, recargo),
         ajustes,
     );
-    let color = acabado.map(|a| a.nombre);
+    let color = acabado.map(|a| (color_de_dibujo(&a), a.nombre));
     let (descripcion, dibujo) = presentar(&tipologia, &resultado, (entrada, serie.unidad), color);
     Ok(CalculoDeVentana {
         descripcion,
@@ -107,12 +107,14 @@ fn presentar(
     tipologia: &dominio::series::Tipologia,
     resultado: &ResultadoVentana,
     (entrada, unidad): (&EntradaDeVentana, Unidad),
-    color: Option<String>,
+    color: Option<(ColorDeDibujo, String)>,
 ) -> (String, String) {
     let (ancho, alto) = (medida(entrada.ancho, unidad), medida(entrada.alto, unidad));
-    let datos =
+    let mut datos =
         DatosDeDibujo::desde_calculo(tipologia, resultado, &entrada.opciones, (ancho, alto));
-    let color = color.map(|c| format!(" · {c}")).unwrap_or_default();
+    let (color_dibujo, nombre) = color.unzip();
+    datos.color = color_dibujo.unwrap_or_default();
+    let color = nombre.map(|c| format!(" · {c}")).unwrap_or_default();
     let descripcion = format!(
         "{} · {} × {} cm{color}",
         tipologia.nombre,
@@ -120,6 +122,12 @@ fn presentar(
         alto.formatear_cm()
     );
     (descripcion, dibujar_ventana(&datos))
+}
+
+/// El color con que se dibuja el acabado; si sus datos no valen, blanco (nunca falla el cálculo).
+fn color_de_dibujo(acabado: &acabados::FilaAcabado) -> ColorDeDibujo {
+    let cierres = Herrajes::desde_texto(&acabado.cierres).unwrap_or(Herrajes::Negro);
+    ColorDeDibujo::nuevo(&acabado.color_dibujo, acabado.madera, cierres).unwrap_or_default()
 }
 
 fn medida(valor: Decimal, unidad: Unidad) -> Longitud {

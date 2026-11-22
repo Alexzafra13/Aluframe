@@ -1,0 +1,22 @@
+# Acabados (colores) que vienen con el programa (ADR-0019). Se cargan al arrancar: si un acabado
+# no existe se crea; si existe, se le ponen el RAL, el color del dibujo, la veta y los cierres de
+# este archivo. El recargo sobre el blanco lo pone el propietario en Catálogo > Acabados y nunca
+# se toca desde aquí.
+#
+# RAL de los colores lisos: los estándar del sector, PROVISIONALES hasta que el propietario los
+# confirme (2026-11-22). Las imitaciones de madera no tienen RAL: su color es solo para el dibujo
+# y aproximado.
+#
+# Campos: nombre, ral (opcional), color (#rrggbb, para el dibujo), madera (sí/no: veta en el
+# dibujo), cierres (blanco | negro), base (solo uno: el precio de tarifa, sin recargo).
+
+acabados:
+  - { nombre: "Blanco",          ral: "9016", color: "#f1f0ea", madera: false, cierres: blanco, base: true }
+  - { nombre: "Negro",           ral: "9005", color: "#0e0e10", madera: false, cierres: negro }
+  - { nombre: "Verde",           ral: "6005", color: "#114232", madera: false, cierres: negro }   # verde musgo
+  - { nombre: "Gris antracita",  ral: "7016", color: "#383e42", madera: false, cierres: negro }
+  - { nombre: "Marrón",          ral: "8014", color: "#4a3526", madera: false, cierres: negro }   # marrón sepia
+  - { nombre: "Pino nudo",                    color: "#c8955a", madera: true,  cierres: negro }   # imitación madera
+  - { nombre: "Nogal",                        color: "#5e3a23", madera: true,  cierres: negro }   # imitación madera
+  - { nombre: "Embero",                       color: "#8a5a3c", madera: true,  cierres: negro }   # imitación madera; nombre por confirmar
+  - { nombre: "Roble",                        color: "#a87442", madera: true,  cierres: negro }   # imitación madera

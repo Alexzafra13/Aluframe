@@ -141,12 +141,17 @@ span.silueta { background: transparent; }
 /* El dibujo: colores en CSS para pantalla e impresión. */
 .dibujo-ventana { display: block; width: 100%; height: auto; max-height: 64vh; overflow: visible; }
 .dibujo-ventana * { vector-effect: non-scaling-stroke; }
-.dibujo-ventana .marco { fill: #D3D7DB; stroke: #8B939B; stroke-width: 1.5; }
-.dibujo-ventana .hoja { fill: #E7E9EC; stroke: #8B939B; stroke-width: 1.2; }
+/* Color del acabado (ADR-0019): el dibujo lo trae en atributos fill y stroke (la CSP no deja usar
+   style). La hoja de estilos solo pinta los dibujos guardados antes, que no los llevan. */
+.dibujo-ventana .marco { stroke-width: 1.5; }
+.dibujo-ventana .marco:not([fill]) { fill: #D3D7DB; stroke: #8B939B; }
+.dibujo-ventana .hoja { stroke-width: 1.2; }
+.dibujo-ventana .hoja:not([fill]) { fill: #E7E9EC; stroke: #8B939B; }
 .dibujo-ventana .cristal { fill: #D9E6F2; stroke: #8B939B; stroke-width: 1; transition: fill var(--normal) ease; }
 .dibujo-ventana .reflejo { fill: #fff; opacity: .45; }
 .dibujo-ventana .flecha { fill: none; stroke: var(--acero); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.dibujo-ventana .manilla, .dibujo-ventana .bisagra { fill: var(--tinta); }
+.dibujo-ventana .manilla, .dibujo-ventana .bisagra { stroke: #8B939B; stroke-width: 1; }
+.dibujo-ventana > .manilla, .dibujo-ventana > .bisagra { fill: var(--tinta); }
 .dibujo-ventana .apertura { fill: none; stroke: var(--acero); stroke-width: 1.2; stroke-dasharray: 6 5; }
 .dibujo-ventana .cota { fill: none; stroke: var(--apagado); stroke-width: 1; }
 .dibujo-ventana .texto-cota { fill: var(--apagado); font-family: var(--mono); }

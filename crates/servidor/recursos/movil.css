@@ -32,6 +32,11 @@ dialog.hoja { max-width: 100vw; }
 /* Listas largas de columnas o referencias sin espacios: que partan antes que desbordar. */
 code, .mono { overflow-wrap: anywhere; }
 
+/* Muestra del color de un acabado (ADR-0019). */
+.con-muestra { display: inline-flex; align-items: center; gap: .6rem; }
+.muestra-color { width: 22px; height: 22px; flex: none; }
+.muestra-color rect { stroke: rgb(21 25 29 / .2); stroke-width: 1; }
+
 /* Listas agrupadas de iOS (hoja «Más»). */
 .grupo-ios { list-style: none; margin: .5rem 0 1rem; padding: 0; background: #fff; border: 1px solid var(--linea); border-radius: 13px; overflow: hidden; }
 .grupo-ios li { position: relative; }
