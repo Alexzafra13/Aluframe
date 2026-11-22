@@ -56,3 +56,21 @@ body.hoja-impresa { background: #D9D6CD; }
   .no-imprimir { display: none !important; }
   .a4 { margin: 0; box-shadow: none; width: auto; min-height: 297mm; }
 }
+
+/* Orden de taller (design/03-hoja-taller.png): una hoja por ventana, medidas en mm. */
+.hoja-taller { font-size: 11pt; break-after: page; }
+.hoja-taller:last-child { break-after: auto; }
+.taller-cabecera { display: flex; justify-content: space-between; align-items: baseline; gap: 8mm; padding-bottom: 3mm; margin-bottom: 6mm; border-bottom: 2.5px solid var(--tinta); }
+.taller-cabecera h1 { margin: 0; font: 600 21pt/1.15 var(--condensada); }
+.taller-medida { font-size: 21pt; white-space: nowrap; }
+.a4-revision { color: var(--aviso); }
+.taller-arriba { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; margin-bottom: 6mm; }
+.taller-dibujo .dibujo-ventana { max-height: 95mm; }
+.taller-piezas { width: 100%; border-collapse: collapse; }
+.taller-piezas td { padding: 3mm 2mm; border-bottom: 1px solid var(--linea); font-size: 12pt; }
+.taller-piezas .numero { text-align: right; }
+.numero-circulo { display: inline-grid; place-items: center; width: 9mm; height: 9mm; border-radius: 50%; border: 1.5px solid var(--tinta); font: 600 11pt var(--condensada); }
+.casilla-papel { display: inline-block; width: 7mm; height: 7mm; border: 1.5px solid var(--tinta); }
+.taller-grupo { margin-bottom: 7mm; break-inside: avoid; }
+.taller-barra { margin-bottom: 3mm; }
+.barra-corte { display: block; width: 100%; height: auto; }

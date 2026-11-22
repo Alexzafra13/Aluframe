@@ -14,6 +14,7 @@ pub fn rutas_de_trabajos() -> Router<EstadoApp> {
         .route("/trabajos", get(trabajos::mostrar_trabajos))
         .route("/trabajos/{id}", get(trabajos::mostrar_trabajo))
         .route("/trabajos/{id}/datos", post(trabajos::guardar_datos))
+        .route("/trabajos/{id}/orden", get(trabajos::mostrar_orden))
         .route("/trabajos/{id}/entregar", post(trabajos::entregar))
         .route("/trabajos/{id}/anular", post(trabajos::anular))
         .route(

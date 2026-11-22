@@ -12,6 +12,7 @@ use crate::aplicacion::trabajos::acciones::{
     anotar_falta, asignar_trabajo, asignar_ventana, cerrar_trabajo, marcar_cristal,
 };
 use crate::aplicacion::trabajos::consultar::{cargar_trabajo, listar_trabajos};
+use crate::aplicacion::trabajos::orden::cargar_orden;
 use crate::aplicacion::usuarios::listar_usuarios;
 use crate::aplicacion::{Actor, autorizar};
 use crate::errores::ErrorApp;
@@ -19,7 +20,8 @@ use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
 use crate::http::formulario::Campos;
 use crate::vistas::{
-    MENU, Opcion, PaginaInicio, PaginaTrabajo, PaginaTrabajos, TarjetaTrabajo, renderizar, tablero,
+    MENU, Opcion, PaginaInicio, PaginaOrden, PaginaTrabajo, PaginaTrabajos, TarjetaTrabajo,
+    renderizar, tablero,
 };
 
 pub async fn mostrar_inicio(
@@ -207,4 +209,13 @@ pub async fn anular(
         ))
     };
     tras(&estado, &actor, id, (resultado, "anulado")).await
+}
+
+pub async fn mostrar_orden(
+    State(estado): State<EstadoApp>,
+    ActorActual(actor): ActorActual,
+    Path(id): Path<i64>,
+) -> Result<Response, ErrorApp> {
+    let orden = cargar_orden(&estado, &actor, id).await?;
+    Ok(renderizar(&PaginaOrden::de(&orden))?.into_response())
 }

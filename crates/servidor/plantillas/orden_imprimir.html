@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titulo %}Orden {{ codigo }}{% endblock %}
+{% block clase_body %}hoja-impresa{% endblock %}
+{% block scripts %}<link rel="stylesheet" href="/recursos/hoja-a4.css?v={{ crate::vistas::VERSION }}"><script src="/recursos/js/imprimir.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
+{% block cuerpo %}
+<div class="barra-impresion no-imprimir">
+  <a class="boton" href="/trabajos/{{ id }}">Volver al trabajo</a>
+  <button class="boton primario" type="button" data-imprimir>Imprimir la orden</button>
+</div>
+{% if hojas.is_empty() %}<p class="aviso no-imprimir a4-falta-empresa">Este trabajo no tiene ventanas que fabricar.</p>{% endif %}
+{% for h in hojas %}
+<article class="a4 hoja-taller">
+  <p class="a4-etiqueta">Orden de taller {{ codigo }} · ventana {{ h.orden }} de {{ total() }} · {{ cliente }}{% if h.revision > 1 %} · <strong class="a4-revision">Revisión {{ h.revision }}{% if !h.revisada.is_empty() %} del {{ h.revisada }}{% endif %}</strong>{% endif %}</p>
+  <header class="taller-cabecera">
+    <h1>{{ h.hoja.titulo }} · {{ h.hoja.serie }}</h1>
+    <p class="mono taller-medida">{{ h.hoja.medidas }}</p>
+  </header>
+  <div class="taller-arriba">
+    <div class="taller-dibujo">{{ h.hoja.dibujo|safe }}</div>
+    <div>
+      <p class="a4-etiqueta">Color</p><p>{{ h.hoja.acabado }}</p>
+      {% for o in h.hoja.opciones %}<p>{{ o }}</p>{% endfor %}
+      <p class="a4-etiqueta">Cristal</p>
+      {% if h.hoja.cristal.is_empty() %}<p><strong>PENDIENTE de medir</strong></p>{% endif %}
+      {% for c in h.hoja.cristal %}<p class="mono">{{ c }}</p>{% endfor %}
+      <p class="a4-etiqueta">Accesorios</p>
+      {% for (a, n) in h.hoja.accesorios %}<p class="mono">{{ a }} ×{{ n }}</p>{% endfor %}
+    </div>
+  </div>
+  <p class="a4-etiqueta">Piezas a cortar (mm)</p>
+  <table class="taller-piezas">
+    <tbody>
+      {% for p in h.hoja.piezas %}<tr><td><span class="numero-circulo">{{ p.numero }}</span></td><td>{{ p.nombre }}</td><td class="mono numero">×{{ p.cantidad }}</td><td class="mono numero">{{ p.medida }}</td><td class="mono numero">{{ p.corte }}</td><td class="numero"><span class="casilla-papel" aria-hidden="true"></span></td></tr>{% endfor %}
+    </tbody>
+  </table>
+</article>
+{% endfor %}
+{% if !grupos.is_empty() %}
+<article class="a4 hoja-taller">
+  <p class="a4-etiqueta">Orden de taller {{ codigo }} · {{ cliente }}</p>
+  <header class="taller-cabecera"><h1>Plan de corte del trabajo</h1></header>
+  <p class="texto-apagado">Todas las ventanas juntas, por perfil y color. «V2·5» es la pieza 5 del dibujo de la ventana 2. {{ ajustes }}.</p>
+  {% for g in grupos %}
+  <section class="taller-grupo">
+    <p class="a4-etiqueta">{{ g.titulo }}</p>
+    {% if let Some(e) = g.error %}<p class="a4-provisional">{{ e }}</p>{% endif %}
+    {% for b in g.barras %}<div class="taller-barra">{{ b.svg|safe }}<p class="mono pequeno">{{ b.texto }}</p></div>{% endfor %}
+  </section>
+  {% endfor %}
+</article>
+{% endif %}
+{% endblock %}
