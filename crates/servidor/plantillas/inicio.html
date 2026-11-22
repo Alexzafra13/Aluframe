@@ -28,6 +28,12 @@
     <h2 class="antetitulo">Stock bajo</h2>
     {% if stock_bajo.is_empty() %}<p class="vacio">Nada bajo mínimo.</p>{% endif %}
     <ul class="lista-simple">{% for a in stock_bajo %}<li><a href="{{ a.enlace }}">{{ a.texto }}</a></li>{% endfor %}</ul>
+    <h2 class="antetitulo">Cobros vencidos</h2>
+    {% if cobros_vencidos.is_empty() %}<p class="vacio">Ninguno.</p>{% endif %}
+    <ul class="lista-simple">{% for a in cobros_vencidos %}<li><a href="{{ a.enlace }}">{{ a.texto }}</a></li>{% endfor %}</ul>
+    <h2 class="antetitulo">Presupuestos sin respuesta</h2>
+    {% if sin_respuesta.is_empty() %}<p class="vacio">Ninguno enviado pendiente.</p>{% endif %}
+    <ul class="lista-simple">{% for a in sin_respuesta %}<li><a href="{{ a.enlace }}">{{ a.texto }}</a></li>{% endfor %}</ul>
   </aside>
 </div>
 {% endblock %}

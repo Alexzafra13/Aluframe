@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block titulo %}{{ codigo }}{% endblock %}
+{% block clase_body %}hoja-impresa{% endblock %}
+{% block scripts %}<link rel="stylesheet" href="/recursos/hoja-a4.css?v={{ crate::vistas::VERSION }}"><script src="/recursos/js/imprimir.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
+{% block cuerpo %}
+<div class="barra-impresion no-imprimir">
+  <a class="boton" href="/trabajos/{{ trabajo_id }}">Volver al trabajo</a>
+  <button class="boton primario" type="button" data-imprimir>Imprimir o guardar como PDF</button>
+</div>
+<article class="a4">
+  <header class="a4-cabecera">
+    <div class="a4-empresa">
+      {% if let Some(logo) = empresa.logo %}<img class="a4-logo" src="{{ logo }}" alt="{{ empresa.titulo }}">{% else %}<p class="a4-marca">{{ empresa.titulo }}</p>{% endif %}
+      {% for e in empresa.lineas %}<p>{{ e }}</p>{% endfor %}
+    </div>
+    <div class="a4-documento">
+      <p class="a4-tipo">Albarán de entrega</p>
+      <p class="a4-codigo mono">{{ codigo }}</p>
+      <dl class="a4-fechas"><div><dt>Fecha</dt><dd>{{ fecha }}</dd></div><div><dt>Trabajo</dt><dd class="mono">{{ trabajo }}</dd></div></dl>
+    </div>
+  </header>
+  <section class="a4-partes">
+    <div class="a4-caja"><p class="a4-etiqueta">Cliente</p><p class="a4-cliente-nombre">{{ cliente }}</p></div>
+    {% if !direccion.is_empty() %}<div class="a4-caja"><p class="a4-etiqueta">Dirección de montaje</p><p>{{ direccion }}</p></div>{% endif %}
+  </section>
+  <table class="a4-lineas">
+    <colgroup><col class="a4-col-n"><col></colgroup>
+    <thead><tr><th>N.º</th><th>Entregado</th></tr></thead>
+    <tbody>{% for v in ventanas %}<tr class="a4-linea"><td class="mono a4-orden">{{ loop.index }}</td><td>{{ v }}</td></tr>{% endfor %}</tbody>
+  </table>
+  <section class="a4-firmas">
+    <div><p class="a4-etiqueta">Recibí conforme, el cliente</p><p class="a4-hueco">Fecha, nombre y firma</p></div>
+    <div><p class="a4-etiqueta">Entregado por</p><p class="a4-hueco">Fecha y firma</p></div>
+  </section>
+</article>
+{% endblock %}

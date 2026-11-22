@@ -54,7 +54,7 @@ fn totales_en_json(ficha: &FichaDeFactura) -> Value {
 }
 
 /// Lo que se congela: empresa, cliente, líneas, IVA por tipo y totales.
-fn fotografia(
+pub(crate) fn fotografia(
     ficha: &FichaDeFactura,
     empresa: &CabeceraDeEmpresa,
     (codigo, fecha): (&str, &str),

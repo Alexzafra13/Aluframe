@@ -1,0 +1,32 @@
+{% extends "marco.html" %}
+{% block titulo %}Facturas{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-documento">
+  <div>
+    <p class="antetitulo">Cobrar</p>
+    <h1>Facturas</h1>
+    <p class="texto-apagado">La factura de un trabajo se crea desde su ficha. Aquí también puedes hacer una factura libre.</p>
+  </div>
+  <form method="post" action="/facturas/libre" class="formulario-en-linea">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <label>Cliente <select name="cliente" required><option value="">Elige…</option>{% for c in clientes %}<option value="{{ c.valor }}">{{ c.texto }}</option>{% endfor %}</select></label>
+    <button class="boton primario" type="submit">Nueva factura libre</button>
+  </form>
+</header>
+<nav class="segmentado" aria-label="Qué ver">
+  <a class="segmento{% if !pendientes %} activo{% endif %}" href="/facturas">Todas</a>
+  <a class="segmento{% if pendientes %} activo{% endif %}" href="/facturas?pendientes=si">Cobros pendientes</a>
+</nav>
+{% if filas.is_empty() %}
+<p class="vacio tarjeta">{% if pendientes %}No hay nada pendiente de cobro.{% else %}Aún no hay facturas. Crea la de un trabajo desde su ficha.{% endif %}</p>
+{% else %}
+<div class="tarjeta tabla-desplazable"><table class="tabla">
+  <thead><tr><th scope="col">Número</th><th scope="col">Cliente</th><th scope="col">Fecha</th><th scope="col" class="numero">Total</th><th scope="col" class="numero">Pendiente</th><th scope="col">Estado</th></tr></thead>
+  <tbody>{% for f in filas %}<tr>
+    <td><a class="mono" href="/facturas/{{ f.id }}">{{ f.codigo }}</a></td><td>{{ f.cliente }}</td><td>{{ f.fecha }}</td>
+    <td class="numero mono">{{ f.total }}</td><td class="numero mono">{% if f.estado != "Borrador" && f.estado != "Rectificativa" %}{{ f.pendiente }}{% endif %}</td>
+    <td><span class="etiqueta etiqueta-cobro-{{ f.estado|lower }}">{{ f.estado }}</span></td>
+  </tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% endblock %}

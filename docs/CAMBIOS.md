@@ -102,3 +102,14 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - «Repetir pieza» durante la fabricación (corte mal, rayón, golpe…), desde Mi día o desde el trabajo.
 - «Terminar orden y descontar stock» con revisión de los retales que propone el plan. Una sola vez y en una transacción.
 - Nueva tabla `pieza_repetida`: **hay que borrar los datos de prueba al actualizar**. **Versión 0.9.0.**
+
+## 2026-11-22 (mañana): H6 facturas y cobros
+- **Facturas** desde el trabajo (con las líneas del presupuesto aceptado) o libres; borrador editable con «Otro concepto», fechas, vencimiento, notas y descuento.
+- **Emitir** asigna el número F-AAAA-NNNN sin huecos y guarda una fotografía con huella: lo emitido no cambia aunque cambie el cliente o el catálogo. Sin NIF del cliente, pide confirmación.
+- **Rectificativas** (R-AAAA-NNNN) con motivo, que referencian a la original.
+- **Cobros** parciales en efectivo, Bizum, tarjeta, transferencia u otro, anulables con motivo; **señales** en el trabajo que cuentan como pagado al emitir.
+- **Albarán de entrega** imprimible que marca el trabajo como entregado.
+- Inicio: cobros vencidos y presupuestos sin respuesta. Se retira la pantalla provisional «En preparación».
+- Sin cambio de esquema: **no hace falta borrar los datos de prueba**. **Versión 0.10.0.**
+- `MAINTENANCE.md`: al actualizar con borrado de datos, primero se instala la versión nueva y después se borran los datos (al revés, la versión vieja vuelve a crear la base).
+

@@ -29,6 +29,7 @@ pub fn nombre_de_unidad(unidad: &str) -> &'static str {
     UnidadDeVenta::desde_texto(unidad).map_or("", UnidadDeVenta::nombre)
 }
 
+#[derive(Debug, Clone)]
 pub struct Opcion {
     pub valor: String,
     pub texto: String,

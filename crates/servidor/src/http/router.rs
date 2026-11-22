@@ -1,19 +1,15 @@
 use axum::Router;
 use axum::extract::DefaultBodyLimit;
 use axum::middleware::{from_fn, from_fn_with_state};
-use axum::response::Response;
 use axum::routing::{get, post};
 
-use super::extractores::ActorActual;
 use super::middleware::{
     anadir_cabeceras_de_seguridad, cargar_sesion, exigir_configuracion, proteger_csrf,
 };
 use super::recursos::{servir_recurso, servir_silueta};
-use super::rutas::paginas::{SECCIONES_PENDIENTES, mostrar_pendiente};
 use super::rutas::{
     acceso, ajustes, ajustes_presupuestos, datos, escritorio, primer_arranque, salud, taller,
 };
-use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 
 /// Las importaciones CSV (hasta 2 MB de texto) llegan codificadas como formulario.
@@ -24,20 +20,13 @@ const LIMITE_DE_LOGO: usize = 2 * 1024 * 1024;
 const LIMITE_DE_COPIA: usize = 512 * 1024 * 1024;
 
 pub fn crear_router(estado: EstadoApp) -> Router {
-    let mut router = rutas_de_acceso()
+    rutas_de_acceso()
         .merge(rutas_de_ajustes())
         .merge(super::router_catalogo::rutas_de_catalogo())
         .merge(super::router_clientes::rutas_de_clientes())
         .merge(super::router_presupuestos::rutas_de_presupuestos())
-        .merge(super::router_trabajos::rutas_de_trabajos());
-    for seccion in &SECCIONES_PENDIENTES {
-        let manejador = move |ActorActual(actor): ActorActual| async move {
-            let respuesta: Result<Response, ErrorApp> = mostrar_pendiente(&actor, seccion);
-            respuesta
-        };
-        router = router.route(seccion.ruta, get(manejador));
-    }
-    router
+        .merge(super::router_trabajos::rutas_de_trabajos())
+        .merge(super::router_facturas::rutas_de_facturas())
         .layer(DefaultBodyLimit::max(LIMITE_DE_CUERPO))
         .layer(from_fn(proteger_csrf))
         .layer(from_fn_with_state(estado.clone(), cargar_sesion))

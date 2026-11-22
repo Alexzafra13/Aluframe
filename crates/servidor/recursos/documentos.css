@@ -168,7 +168,8 @@ span.silueta { background: transparent; }
 
 /* Ajustes largos: botón de guardar siempre a mano. */
 .pila { display: grid; gap: 0; }
-.opciones-en-fila { display: flex; gap: 1.25rem; flex-wrap: wrap; margin: .75rem 0; }
+.opciones-en-fila { display: flex; gap: 0 1.25rem; flex-wrap: wrap; margin: .75rem 0; }
+.opciones-en-fila .casilla { margin: 0; }
 .opciones-en-fila legend { width: 100%; }
 .barra-guardar { position: sticky; bottom: 0; display: flex; justify-content: flex-end; padding: 1rem 0; background: linear-gradient(transparent, var(--papel) 35%); }
 

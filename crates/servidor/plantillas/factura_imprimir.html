@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block titulo %}{{ codigo }}{% endblock %}
+{% block clase_body %}hoja-impresa{% endblock %}
+{% block scripts %}<link rel="stylesheet" href="/recursos/hoja-a4.css?v={{ crate::vistas::VERSION }}"><script src="/recursos/js/imprimir.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
+{% block cuerpo %}
+<div class="barra-impresion no-imprimir">
+  <a class="boton" href="/facturas/{{ id }}">Volver a la factura</a>
+  <button class="boton primario" type="button" data-imprimir>Imprimir o guardar como PDF</button>
+</div>
+<article class="a4">
+  <header class="a4-cabecera">
+    <div class="a4-empresa">
+      {% if let Some(logo) = empresa.logo %}<img class="a4-logo" src="{{ logo }}" alt="{{ empresa.titulo }}">{% else %}<p class="a4-marca">{{ empresa.titulo }}</p>{% endif %}
+      {% if let Some(razon) = empresa.razon_social %}<p class="a4-razon">{{ razon }}</p>{% endif %}
+      {% for e in empresa.lineas %}<p>{{ e }}</p>{% endfor %}
+    </div>
+    <div class="a4-documento">
+      <p class="a4-tipo">{{ tipo }}</p>
+      <p class="a4-codigo mono">{{ codigo }}</p>
+      <dl class="a4-fechas">
+        <div><dt>Fecha</dt><dd>{{ fecha }}</dd></div>
+        {% if !vencimiento.is_empty() %}<div><dt>Vencimiento</dt><dd>{{ vencimiento }}</dd></div>{% endif %}
+      </dl>
+      {% if borrador %}<p class="a4-provisional">Borrador: sin validez hasta que se emita</p>{% endif %}
+      {% if !rectifica.is_empty() %}<p>Rectifica a <strong class="mono">{{ rectifica }}</strong></p><p class="pequeno">{{ motivo }}</p>{% endif %}
+    </div>
+  </header>
+  <section class="a4-partes">
+    <div class="a4-caja">
+      <p class="a4-etiqueta">Cliente</p>
+      {% for c in cliente %}<p{% if loop.first %} class="a4-cliente-nombre"{% endif %}>{{ c }}</p>{% endfor %}
+    </div>
+  </section>
+  <table class="a4-lineas">
+    <colgroup><col><col class="a4-col-cantidad"><col class="a4-col-importe"><col class="a4-col-cantidad"><col class="a4-col-importe"></colgroup>
+    <thead><tr><th>Descripción</th><th class="numero">Cant.</th><th class="numero">Precio</th><th class="numero">Dto.</th><th class="numero">Importe</th></tr></thead>
+    <tbody>
+      {% for l in lineas %}<tr class="a4-linea">
+        <td><p class="a4-titulo-linea">{{ l.titulo }}</p>{% if !l.detalles.is_empty() %}<ul class="a4-detalles">{% for d in l.detalles %}<li>{{ d }}</li>{% endfor %}</ul>{% endif %}</td>
+        <td class="numero mono">{{ l.cantidad }}</td><td class="numero mono">{{ l.precio }}</td><td class="numero mono">{{ l.descuento }}</td><td class="numero mono">{{ l.importe }}</td>
+      </tr>{% endfor %}
+    </tbody>
+  </table>
+  <section class="a4-cierre">
+    <div class="a4-pago">
+      {% if !notas.is_empty() %}<p class="a4-etiqueta">Notas</p><p class="con-saltos">{{ notas }}</p>{% endif %}
+      {% if let Some(iban) = empresa.iban %}<p class="a4-etiqueta">Pago por transferencia</p><p class="mono">IBAN {{ iban }}</p>{% endif %}
+    </div>
+    <dl class="a4-totales">
+      {% if !descuento.is_empty() %}<div><dt>Descuento</dt><dd class="mono">{{ descuento }}</dd></div>{% endif %}
+      <div><dt>Base imponible</dt><dd class="mono">{{ base }}</dd></div>
+      {% for (tipo, base, cuota) in bases %}<div><dt>IVA {{ tipo }} sobre {{ base }}</dt><dd class="mono">{{ cuota }}</dd></div>{% endfor %}
+      <div class="a4-total"><dt>Total</dt><dd class="mono">{{ total }}</dd></div>
+    </dl>
+  </section>
+  {% if let Some(pie) = empresa.pie %}<footer class="a4-pie con-saltos">{{ pie }}</footer>{% endif %}
+</article>
+{% endblock %}

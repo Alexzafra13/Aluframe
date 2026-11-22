@@ -79,6 +79,8 @@ pub struct PaginaInicio {
     pub columnas: Vec<(&'static str, Vec<TarjetaTrabajo>)>,
     pub avisos: Vec<AvisoDelTaller>,
     pub stock_bajo: Vec<AvisoDelTaller>,
+    pub cobros_vencidos: Vec<AvisoDelTaller>,
+    pub sin_respuesta: Vec<AvisoDelTaller>,
 }
 
 /// Las tres columnas del tablero y los avisos «falta algo» de los operarios.
@@ -232,6 +234,19 @@ pub struct PaginaTrabajo {
     pub ventanas: Vec<VentanaEnPantalla>,
     pub aviso: Option<String>,
     pub confirmacion: Option<String>,
+    pub documentos: DocumentosEnPantalla,
+}
+
+/// Señales, facturas y albaranes del trabajo (H6).
+#[derive(Default)]
+pub struct DocumentosEnPantalla {
+    pub senales: Vec<super::CobroEnPantalla>,
+    pub cobrado: String,
+    pub facturas: Vec<(i64, String, &'static str)>,
+    pub albaranes: Vec<(i64, String)>,
+    pub facturada: bool,
+    pub medios: Vec<Opcion>,
+    pub hoy: String,
 }
 
 impl PaginaTrabajo {
@@ -267,6 +282,7 @@ impl PaginaTrabajo {
             ventanas: ficha.ventanas.iter().map(VentanaEnPantalla::from).collect(),
             aviso,
             confirmacion,
+            documentos: DocumentosEnPantalla::default(),
         }
     }
 

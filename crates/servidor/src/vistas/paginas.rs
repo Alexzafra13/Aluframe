@@ -52,16 +52,6 @@ impl From<UsuarioVisible> for OpcionUsuario {
 }
 
 #[derive(Template)]
-#[template(path = "pendiente.html")]
-pub struct PaginaPendiente {
-    pub usuario: UsuarioEnPantalla,
-    pub menu: &'static [GrupoMenu],
-    pub seccion: &'static str,
-    pub titulo: &'static str,
-    pub hito: &'static str,
-}
-
-#[derive(Template)]
 #[template(path = "usuarios.html")]
 pub struct PaginaUsuarios {
     pub usuario: UsuarioEnPantalla,

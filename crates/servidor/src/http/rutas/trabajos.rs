@@ -4,58 +4,27 @@ use axum::Form;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Redirect, Response};
-use dominio::acceso::{Accion, Rol};
 use dominio::taller::EstadoDeTrabajo;
 use serde::Deserialize;
 
-use crate::aplicacion::stock::saldos;
+use crate::aplicacion::Actor;
+use crate::aplicacion::facturas::cobros::MEDIOS;
+use crate::aplicacion::facturas::documentos_de_trabajo;
 use crate::aplicacion::trabajos::acciones::{
     anotar_falta, asignar_trabajo, asignar_ventana, cerrar_trabajo, marcar_cristal,
 };
 use crate::aplicacion::trabajos::consultar::{cargar_trabajo, listar_trabajos};
 use crate::aplicacion::trabajos::orden::cargar_orden;
 use crate::aplicacion::usuarios::listar_usuarios;
-use crate::aplicacion::{Actor, autorizar};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
+use crate::fecha::fecha_de_madrid;
 use crate::http::extractores::ActorActual;
 use crate::http::formulario::Campos;
 use crate::vistas::{
-    AvisoDelTaller, MENU, Opcion, PaginaInicio, PaginaOrden, PaginaTrabajo, PaginaTrabajos,
-    TarjetaTrabajo, filas_de_stock, renderizar, tablero,
+    CobroEnPantalla, DocumentosEnPantalla, MENU, Opcion, PaginaOrden, PaginaTrabajo,
+    PaginaTrabajos, TarjetaTrabajo, estado_de_factura, euros, renderizar,
 };
-
-pub async fn mostrar_inicio(
-    State(estado): State<EstadoApp>,
-    ActorActual(actor): ActorActual,
-) -> Result<Response, ErrorApp> {
-    if actor.rol == Rol::Operario {
-        return Ok(Redirect::to("/mi-dia").into_response());
-    }
-    autorizar(&actor, Accion::VerPanelDelPropietario)?;
-    let fichas = listar_trabajos(&estado, &actor, false).await?;
-    let (columnas, avisos) = tablero(&fichas);
-    let stock_bajo = filas_de_stock(&saldos(&estado, &actor).await?)
-        .into_iter()
-        .filter(|f| f.bajo_minimo)
-        .map(|f| AvisoDelTaller {
-            texto: format!(
-                "{} · {}: quedan {} (mínimo {})",
-                f.referencia, f.descripcion, f.enteras, f.minimo
-            ),
-            enlace: format!("/stock/{}", f.articulo),
-        })
-        .collect();
-    let pagina = PaginaInicio {
-        usuario: (&actor).into(),
-        menu: MENU,
-        seccion: "inicio",
-        columnas,
-        avisos,
-        stock_bajo,
-    };
-    Ok(renderizar(&pagina)?.into_response())
-}
 
 #[derive(Deserialize)]
 pub struct FiltroTrabajos {
@@ -95,6 +64,7 @@ fn texto_de_confirmacion(clave: &str) -> Option<String> {
         "anulado" => "Trabajo anulado.",
         "medidas" => "Medidas cambiadas: la orden de taller lleva la revisión nueva.",
         "terminada" => "Orden terminada: el stock está descontado.",
+        "senal" => "Señal registrada: contará como pagado al emitir la factura.",
         "repetida" => "Pieza repetida anotada: entra en el plan y se descontará al terminar.",
         _ => return None,
     };
@@ -113,7 +83,44 @@ async fn operarios(estado: &EstadoApp, actor: &Actor) -> Result<Vec<Opcion>, Err
         .collect())
 }
 
-async fn pagina_del_trabajo(
+async fn documentos_en_pantalla(
+    estado: &EstadoApp,
+    actor: &Actor,
+    id: i64,
+) -> Result<DocumentosEnPantalla, ErrorApp> {
+    let d = documentos_de_trabajo(estado, actor, id).await?;
+    let hoy = fecha_de_madrid(estado.ahora(), 0);
+    let cobrado: i64 = d
+        .senales
+        .iter()
+        .filter(|c| !c.anulado)
+        .map(|c| c.importe_cent)
+        .sum();
+    Ok(DocumentosEnPantalla {
+        senales: d.senales.iter().map(CobroEnPantalla::from).collect(),
+        cobrado: euros(cobrado),
+        facturas: d
+            .facturas
+            .iter()
+            .map(|f| (f.id, f.codigo(), estado_de_factura(f, &hoy)))
+            .collect(),
+        albaranes: d.albaranes.iter().map(|a| (a.id, a.codigo())).collect(),
+        facturada: d
+            .facturas
+            .iter()
+            .any(|f| f.estado == "emitida" && f.tipo == "ordinaria"),
+        medios: MEDIOS
+            .iter()
+            .map(|(v, t)| Opcion {
+                valor: (*v).to_owned(),
+                texto: (*t).to_owned(),
+            })
+            .collect(),
+        hoy,
+    })
+}
+
+pub(crate) async fn pagina_del_trabajo(
     estado: &EstadoApp,
     actor: &Actor,
     id: i64,
@@ -126,7 +133,8 @@ async fn pagina_del_trabajo(
     } else {
         StatusCode::OK
     };
-    let pagina = PaginaTrabajo::nueva(actor.into(), (&ficha, lista), (aviso, confirmacion));
+    let mut pagina = PaginaTrabajo::nueva(actor.into(), (&ficha, lista), (aviso, confirmacion));
+    pagina.documentos = documentos_en_pantalla(estado, actor, id).await?;
     Ok((codigo, renderizar(&pagina)?).into_response())
 }
 

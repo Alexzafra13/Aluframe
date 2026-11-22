@@ -1,0 +1,93 @@
+{% extends "marco.html" %}
+{% block titulo %}{{ codigo }}{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-documento">
+  <div>
+    <p class="antetitulo"><a href="/facturas">Facturas</a>{% if let Some(t) = trabajo_id %} · <a href="/trabajos/{{ t }}">Trabajo</a>{% endif %}</p>
+    <h1>{% if rectificativa %}Rectificativa {% else %}Factura {% endif %}<span class="mono">{{ codigo }}</span> <span class="etiqueta etiqueta-cobro-{{ estado|lower }}">{{ estado }}</span></h1>
+    <p><a href="/clientes/{{ cliente_id }}">{{ cliente }}</a>{% if let Some((r, c)) = rectifica %} · rectifica a <a href="/facturas/{{ r }}">{{ c }}</a>: {{ motivo }}{% endif %}</p>
+  </div>
+  <a class="boton" href="/facturas/{{ id }}/imprimir">{% if borrador %}Ver la hoja (borrador){% else %}Imprimir o guardar PDF{% endif %}</a>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+<div class="documento">
+  <section class="tarjeta" aria-labelledby="titulo-lineas">
+    <h2 id="titulo-lineas">Líneas</h2>
+    {% if lineas.is_empty() %}<p class="vacio">Sin líneas todavía.</p>{% endif %}
+    <div class="tabla-desplazable"><table class="tabla">
+      <thead><tr><th scope="col">Descripción</th><th scope="col" class="numero">Cant.</th><th scope="col" class="numero">Precio</th><th scope="col" class="numero">Dto.</th><th scope="col" class="numero">IVA</th><th scope="col" class="numero">Importe</th>{% if borrador %}<th></th>{% endif %}</tr></thead>
+      <tbody>{% for l in lineas %}<tr>
+        <td>{{ l.descripcion }}</td><td class="numero mono">{{ l.cantidad }}</td><td class="numero mono">{{ l.precio }}</td><td class="numero mono">{{ l.descuento }}</td><td class="numero mono">{{ l.iva }}</td><td class="numero mono">{{ l.importe }}</td>
+        {% if borrador %}<td><form method="post" action="/facturas/{{ id }}/lineas/{{ l.id }}/quitar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton-icono" type="submit" aria-label="Quitar la línea {{ l.descripcion }}">✕</button></form></td>{% endif %}
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    <dl class="lista-datos totales-factura">
+      <div><dt>Base imponible</dt><dd class="mono">{{ base }}</dd></div>
+      <div><dt>IVA</dt><dd class="mono">{{ iva }}</dd></div>
+      <div class="total-factura"><dt>Total</dt><dd class="mono">{{ total }}</dd></div>
+    </dl>
+    {% if borrador %}
+    <form method="post" action="/facturas/{{ id }}/lineas" class="tarjeta-interior">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <h3>Añadir línea</h3>
+      <div class="rejilla-campos">
+        <div class="campo campo-ancho"><label for="desc">Descripción</label><input id="desc" name="descripcion" required maxlength="300" placeholder="Mosquitera, portes, ajuste de medidas…"></div>
+        <div class="campo"><label for="cant">Cantidad</label><input id="cant" name="cantidad" value="1" inputmode="decimal" required></div>
+        <div class="campo"><label for="precio">Precio unitario (€)</label><input id="precio" name="precio" inputmode="decimal" required></div>
+        <div class="campo"><label for="dto">Descuento (%)</label><input id="dto" name="descuento" inputmode="decimal" placeholder="0"></div>
+        <div class="campo"><label for="iva">IVA</label><select id="iva" name="iva">{% for o in ivas %}<option value="{{ o.valor }}">{{ o.texto }}</option>{% endfor %}</select></div>
+      </div>
+      <button class="boton" type="submit">Añadir</button>
+    </form>
+    {% endif %}
+  </section>
+  <aside class="columna-datos">
+    {% if borrador %}
+    <form class="tarjeta" method="post" action="/facturas/{{ id }}/datos">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="version" value="{{ version }}">
+      <h2>Datos</h2>
+      <label for="fecha-op">Fecha de la operación (si no es la de emisión)</label><input id="fecha-op" name="fecha_operacion" type="date" value="{{ fecha_operacion }}">
+      <label for="vence">Vencimiento</label><input id="vence" name="vencimiento" type="date" value="{{ vencimiento }}">
+      <label for="dto-doc">Descuento de la factura (%)</label><input id="dto-doc" name="descuento" value="{{ descuento }}" inputmode="decimal" placeholder="0">
+      <label for="notas">Notas</label><textarea id="notas" name="notas" rows="2">{{ notas }}</textarea>
+      <button class="boton" type="submit">Guardar datos</button>
+    </form>
+    <form class="tarjeta" method="post" action="/facturas/{{ id }}/emitir">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <h2>Emitir</h2>
+      <p class="texto-apagado pequeno">Recibirá su número correlativo y ya no se podrá modificar. Una corrección se hará con una rectificativa.</p>
+      {% if falta_nif %}<label class="casilla"><input type="checkbox" name="confirmar" value="si"> El cliente no tiene NIF: emitir igualmente</label>{% endif %}
+      <button class="boton primario ancho" type="submit">Emitir factura</button>
+    </form>
+    <form method="post" action="/facturas/{{ id }}/descartar">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <button class="boton ancho" type="submit">Descartar el borrador</button>
+    </form>
+    {% else %}
+    <section class="tarjeta" aria-labelledby="titulo-cobros">
+      <h2 id="titulo-cobros">Cobros</h2>
+      <dl class="lista-datos"><div><dt>Cobrado</dt><dd class="mono">{{ cobrado }}</dd></div><div><dt>Pendiente</dt><dd class="mono">{{ pendiente }}</dd></div></dl>
+      {% include "lista_cobros.html" %}
+      {% if !rectificativa %}
+      <form method="post" action="/facturas/{{ id }}/cobros" class="pila">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        {% let importe = pendiente_en_campo.clone() %}{% include "campos_cobro.html" %}
+        <button class="boton primario" type="submit">Registrar cobro</button>
+      </form>
+      {% endif %}
+    </section>
+    {% if !rectificativa %}
+    <form class="tarjeta" method="post" action="/facturas/{{ id }}/rectificar">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <h2>Corregir</h2>
+      <label for="motivo-r">Motivo de la rectificativa</label>
+      <input id="motivo-r" name="motivo" required maxlength="300" placeholder="Precio mal, devolución…">
+      <button class="boton" type="submit">Crear rectificativa</button>
+    </form>
+    {% endif %}
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

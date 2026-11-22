@@ -57,6 +57,7 @@ El diseño tiene 10 entradas. Propongo **8 para el MVP** y se decide al construi
 | Facturas | `/facturas` | H6 | Lista; pestañas Facturas y Cobros pendientes |
 | Factura | `/facturas/{id}` | H6 | Borrador editable, emisión, cobros, rectificativa (apartado 11) |
 | Factura imprimible | `/facturas/{id}/imprimir` | H6 | A4 |
+| Albarán imprimible | `/albaranes/{id}/imprimir` | H6 | A4; se crea desde el trabajo y lo marca entregado |
 | Ajustes | `/ajustes` | H0 a H7 | Empresa, usuarios, taller, copias, registro de actividad (apartado 12) |
 | Estado | `/health` | H0 | Comprobación técnica |
 

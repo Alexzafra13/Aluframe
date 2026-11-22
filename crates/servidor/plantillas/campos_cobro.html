@@ -1,0 +1,6 @@
+<div class="rejilla-dos">
+  <div class="campo"><label for="cobro-importe">Importe (€)</label><input id="cobro-importe" name="importe" value="{{ importe }}" inputmode="decimal" required></div>
+  <div class="campo"><label for="cobro-fecha">Fecha</label><input id="cobro-fecha" name="fecha" type="date" value="{{ hoy }}" required></div>
+</div>
+<fieldset class="opciones-en-fila"><legend>Cómo</legend>{% for m in medios %}<label class="casilla"><input type="radio" name="medio" value="{{ m.valor }}"{% if loop.first %} checked{% endif %}> {{ m.texto }}</label>{% endfor %}</fieldset>
+<label for="cobro-nota">Nota (opcional)</label><input id="cobro-nota" name="nota" maxlength="200">

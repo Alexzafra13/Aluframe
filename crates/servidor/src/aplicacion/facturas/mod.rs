@@ -97,3 +97,70 @@ pub(crate) fn exigir_borrador(factura: &FilaFactura) -> Result<(), ErrorApp> {
         ))
     }
 }
+
+/// Lo que se imprime: la fotografía congelada de una emitida o, en un borrador, la que tendría
+/// ahora (con «Borrador» en lugar del número).
+pub struct HojaDeFactura {
+    pub foto: serde_json::Value,
+    pub borrador: bool,
+    pub logo: Option<String>,
+    pub vencimiento: String,
+    pub notas: String,
+}
+
+pub async fn hoja_de_factura(
+    estado: &EstadoApp,
+    actor: &Actor,
+    id: i64,
+) -> Result<HojaDeFactura, ErrorApp> {
+    autorizar(actor, Accion::GestionarFacturas)?;
+    let hoy = crate::fecha::fecha_de_madrid(estado.ahora(), 0);
+    estado
+        .bd
+        .leer(move |con| {
+            let ficha = cargar(con, id)?;
+            let logo = super::logo_empresa::leer_logo(con)?;
+            let f = &ficha.factura;
+            let texto = match &f.snapshot_json {
+                Some(foto) => foto.clone(),
+                None => {
+                    let textos = super::ajustes_presupuesto::leer_de_la_base(con)?.textos;
+                    let empresa = super::datos_de_empresa::CabeceraDeEmpresa::desde(&textos, None);
+                    emitir::fotografia(&ficha, &empresa, ("Borrador", &hoy))
+                }
+            };
+            Ok(HojaDeFactura {
+                foto: serde_json::from_str(&texto).unwrap_or_default(),
+                borrador: f.estado == "borrador",
+                logo,
+                vencimiento: f.vencimiento.clone().unwrap_or_default(),
+                notas: f.notas.clone().unwrap_or_default(),
+            })
+        })
+        .await
+}
+
+/// Lo que el trabajo tiene de cobro: señales, facturas y albaranes.
+pub struct DocumentosDeTrabajo {
+    pub senales: Vec<FilaCobro>,
+    pub facturas: Vec<FilaFactura>,
+    pub albaranes: Vec<albaranes::FilaAlbaran>,
+}
+
+pub async fn documentos_de_trabajo(
+    estado: &EstadoApp,
+    actor: &Actor,
+    trabajo: i64,
+) -> Result<DocumentosDeTrabajo, ErrorApp> {
+    autorizar(actor, Accion::GestionarFacturas)?;
+    estado
+        .bd
+        .leer(move |con| {
+            Ok(DocumentosDeTrabajo {
+                senales: crate::bd::consultas::cobros::de_trabajo(con, trabajo)?,
+                facturas: facturas::de_trabajo(con, trabajo)?,
+                albaranes: albaranes::de_trabajo(con, trabajo)?,
+            })
+        })
+        .await
+}

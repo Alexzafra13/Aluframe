@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H5 terminados**; publicada la **v0.9.0**. Siguiente: **H6, facturas y cobros** (con señal y Bizum), después H7 (copias y migraciones).
+Estado (2026-11-22): **H0–H6 terminados**; publicada la **v0.10.0**. Siguiente: **H7, copias y esquema fijado** (decisiones del propietario más abajo); después, importar tarifas desde Excel (.xlsx, .xls, .ods) y PDF (asistido).
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
@@ -55,6 +55,7 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
 | 0.7.1 | Arreglo de la aplicación de Windows: no se apaga mientras la ventana siga abierta |
 | 0.7.2 | Editor: «Guardar ventana» vuelve al presupuesto; «+ Otro concepto» (antes línea libre); aviso de medida fuera de la serie solo cuando ocurre; menú lateral fijo y plegable; Aluprom 21 validada por el propietario |
+| 0.10.0 | **H6:** facturas desde el trabajo o libres, número sin huecos al emitir, hoja A4, rectificativas, cobros parciales (efectivo, Bizum, tarjeta, transferencia u otro), señales a cuenta, albarán de entrega; cobros vencidos y presupuestos sin respuesta en el Inicio. Sin cambio de esquema |
 | 0.9.0 | **H5:** stock con entradas, ajustes, retales y mínimos; el plan de corte usa los retales del stock y la hoja dice cuál coger; repetir pieza; terminar orden descontando el plan con retales revisados; lista de la compra; stock bajo en el Inicio |
 | 0.8.0 | **H4:** trabajos al aceptar, tablero, ficha, orden de taller A4 en mm con plan de corte del trabajo, Mi día del operario con pasos, modificar medidas con revisión; tablas de H5 y H6 ya creadas |
 | 0.7.0 | Alta de cliente con nombre y teléfono obligatorios (sin prefijo, +34 por defecto); código postal que rellena localidad, provincia y país (ADR-0020); hoja del presupuesto con logotipo o nombre de empresa, datos completos, firma y pie; descripción de la ventana con serie, medidas, color, opciones y cristal |
@@ -67,7 +68,7 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | H3 Presupuestos | **hecho** (2026-11-21) |
 | H4 Trabajos y orden de taller | **hecho** (2026-11-22) |
 | H5 Stock | **hecho** (2026-11-22) |
-| H6 Facturación | pendiente |
+| H6 Facturación | **hecho** (2026-11-22) |
 | H7 Copias y despliegue | pendiente |
 
 ## ADR pendientes
@@ -175,3 +176,17 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 
 **Decisiones:** el cristal no se lleva en stock (se pide a medida). Los accesorios se cuentan en unidades de uso (piezas o metros), no en cajas. Una orden puede dejar un artículo en negativo si no se hizo el inventario: se ve en el stock y se corrige con un ajuste. Las reservas de stock al aceptar (decisión 9 de DATOS) no entran en el MVP. Nueva tabla `pieza_repetida`: **hay que borrar los datos de prueba al actualizar**.
 
+### H6. Facturación (2026-11-22)
+**Hecho**
+- Dominio `dominio::factura`: importe de línea, estado de cobro calculado (pendiente, parcial, pagada, vencida), avisos antes de emitir (sin NIF) y código `F-AAAA-NNNN` (rectificativas, serie `R`).
+- **Factura del trabajo** (una ordinaria por trabajo) con las líneas del presupuesto aceptado, o **libre** para un cliente; en borrador se añaden y quitan líneas («Otro concepto») y se cambian fechas, vencimiento, notas y descuento.
+- **Emitir:** el número se asigna en la misma transacción que pasa a emitida (sin huecos aunque se descarten borradores), con fotografía JSON y su huella SHA-256; la hoja impresa sale de esa fotografía. Las señales del trabajo pasan a la factura como cobradas a cuenta.
+- **Rectificativa** desde una emitida, con motivo y las líneas en negativo, que referencia a la original.
+- **Cobros** con fecha, importe, medio y nota; parciales; se anulan con motivo (no se borran). **Señales** en la ficha del trabajo antes de la factura.
+- **Albarán** de entrega A-AAAA-NNNN imprimible, que marca el trabajo como entregado.
+- Pantallas: Facturas (con filtro de pendientes), ficha de la factura, hojas A4 de factura y albarán, bloque «Cobrar» en el trabajo. El Inicio añade cobros vencidos y presupuestos sin respuesta. Permiso `GestionarFacturas` (solo el propietario).
+- **Criterios de aceptación:** no se edita una emitida (`tests/facturas.rs::una_emitida_no_se_edita_y_se_corrige_con_una_rectificativa`, además del disparador del esquema); la numeración no tiene huecos (`la_numeracion_no_tiene_huecos`); la rectificativa referencia a la original (mismo test); E2E `h6-facturas`: **cumplidos**.
+
+**Decisiones:** el año de la factura es el de emisión, no el de creación del borrador. Emitir sin NIF del cliente pide confirmación (factura simplificada a un particular). Una factura cobrada de más no se bloquea: se ve en la ficha. El PDF automático en el servidor sigue aplazado (ADR-0003): se imprime o guarda como PDF desde el navegador. Sin cambio de esquema: las tablas se crearon en la 0.8.0.
+
+**Pendiente:** Verifactu y factura electrónica entre empresas (fuera del MVP); el IVA y las menciones legales, a revisar con el gestor.

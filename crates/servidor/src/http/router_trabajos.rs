@@ -1,12 +1,12 @@
 use axum::Router;
 use axum::routing::{get, post};
 
-use super::rutas::{medidas_trabajo, mi_dia, stock, terminar_orden, trabajos};
+use super::rutas::{inicio, medidas_trabajo, mi_dia, stock, terminar_orden, trabajos};
 use crate::estado::EstadoApp;
 
 pub fn rutas_de_trabajos() -> Router<EstadoApp> {
     Router::new()
-        .route("/", get(trabajos::mostrar_inicio))
+        .route("/", get(inicio::mostrar_inicio))
         .route("/mi-dia", get(mi_dia::mostrar_mi_dia))
         .route("/mi-dia/{id}", get(mi_dia::mostrar_ventana))
         .route("/mi-dia/{id}/falta", post(mi_dia::avisar_falta))
