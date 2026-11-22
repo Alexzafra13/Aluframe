@@ -35,7 +35,12 @@ Si el repositorio vuelve a ser privado, `curl` baja un archivo de 9 bytes («Not
 - **Series:** las de `data/series/` vienen dentro del ejecutable y se cargan solas al arrancar (ADR-0014); no hay que importarlas.
 - **Acceso desde fuera del taller:** con **Tailscale**, sin abrir puertos en el router. En el servidor, `curl -fsSL https://tailscale.com/install.sh | sh`, `sudo tailscale up` y `sudo systemctl enable --now tailscaled`; en el móvil o portátil, la app Tailscale con la misma cuenta, y se abre `http://IP-TAILSCALE:9090` (`tailscale ip -4`). Con `ufw`: `sudo ufw allow in on tailscale0 to any port 9090 proto tcp` y `sudo ufw allow from 192.168.1.0/24 to any port 9090 proto tcp`. No se publica con un proxy inverso: el bloqueo por IP vería todas las peticiones con la IP del proxy.
 
-**PC de la oficina (Windows):** ejecuta `crear-acceso-directo.ps1` del `.zip` e indica la IP del servidor. `alumframe.exe` es el modo local (probar o emergencia).
+**PC con Windows:** descarga `AlumFrame-vX.Y.Z-windows-instalar.exe` de la página de versiones y ejecútalo (no pide administrador; la primera vez SmartScreen avisa porque no está firmado: «Más información» → «Ejecutar de todas formas»). Crea los iconos «AlumFrame» y «AlumFrame · cambiar conexión». Al abrirlo se elige **en este equipo** o **servidor del taller** (ADR-0015).
+- Datos, registro y preferencias: `%LOCALAPPDATA%\AlumFrame` (`datos\`, `alumframe.log`, `escritorio.toml`). Desinstalar no los borra.
+- Actualizar: ejecutar el instalador de la versión nueva con AlumFrame cerrado.
+- Contraseña olvidada en modo local: en PowerShell, `$env:ALUMFRAME_MODO="local"; $env:ALUMFRAME_CARPETA_DATOS="$env:LOCALAPPDATA\AlumFrame\datos"; & "$env:LOCALAPPDATA\Programs\AlumFrame\alumframe-consola.exe" restablecer-contrasena "Nombre"` (la carpeta de instalación puede variar: es la del icono).
+
+**Pasar datos entre equipos:** Ajustes → Datos → «Exportar datos» en el origen y «Importar» en el destino (ADR-0016). Importar **sustituye** los datos; antes guarda una copia de lo que había en la carpeta `copias` de los datos. Solo entre la misma versión del programa.
 
 ## 5. Copias de seguridad (H7)
 Hoy: antes de cada migración se guarda una copia con `VACUUM INTO` en `copias/`. La copia nocturna, la retención y la restauración guiada llegan en H7. **Nunca copies `alumframe.db` con el programa en marcha.**

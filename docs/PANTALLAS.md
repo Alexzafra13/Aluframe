@@ -153,6 +153,7 @@ La lista de **Series** muestra su estado (borrador, validada), sus versiones y c
 - **Empresa:** datos fiscales, logotipo, IVA por defecto, formato de numeración, condiciones y validez por defecto del presupuesto.
 - **Usuarios:** altas de operarios (nombre y PIN de 6 dígitos), restablecer PIN, desactivar.
 - **Taller:** grosor de sierra, merma, lista de pasos por defecto de una ventana.
+- **Datos** (desde 0.5.0, ADR-0016): exportar todos los datos a un archivo `.alumframe` e importar uno (sustituye los datos tras revisar qué contiene y guardar una copia de lo anterior). Base de la restauración guiada de H7.
 - **Copias de seguridad:** estado de la última, descarga manual, restauración guiada.
 - **Registro de actividad:** quién hizo qué y cuándo (solo lectura).
 

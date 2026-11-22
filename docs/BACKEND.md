@@ -155,7 +155,8 @@ Hay un solo código y un solo ejecutable `alumframe`. La diferencia es de config
 | Datos | carpeta del servidor, copia nocturna | carpeta del usuario |
 | Uso | oficina, tablet, varios usuarios | empezar, probar o un único puesto |
 
-- Las pantallas, la base de datos y las reglas son idénticas: pasar de un modo a otro es parar el programa y copiar el ejecutable y `alumframe.db`.
+- Las pantallas, la base de datos y las reglas son idénticas. Los datos pasan de un modo a otro con Ajustes → Datos, exportando e importando (ADR-0016).
+- En Windows el modo local lo usa la **aplicación de escritorio** (`alumframe-escritorio`, ADR-0015): ventana propia sin consola, que también puede conectarse al servidor del taller en lugar de arrancar el modo local.
 - La autenticación está siempre activa. HTTPS solo hace falta si hay acceso remoto.
 - **Un solo proceso dueño del archivo de datos.** Nunca se ejecuta el programa en varios PCs sobre un archivo compartido por carpeta de red: SQLite en modo WAL no es seguro por red y puede corromperse.
 - Configuración: dirección, puerto, carpeta de datos y si abre el navegador. El formato del archivo se decide en el ADR de H0.

@@ -61,3 +61,8 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - **Versión 0.4.0** (H2 y H3): se lleva a `main` con permiso del propietario para publicar los paquetes de Linux y Windows.
 - **Series incluidas en el programa** (ADR-0014, decisión del propietario): los YAML de `data/series/` van dentro del ejecutable y se cargan solos al arrancar si su archivo exacto no estaba ya; una instalación nueva trae Aluprom 21 y V-94 sin importar nada. La importación a mano se mantiene. El editor de ventana explica dónde importar una serie si no hay ninguna. **Versión 0.4.1.** Se quita la columna `serie_version.importada_por` (quién importó consta en la auditoría): el esquema cambia y la base de pruebas del servidor se borra al actualizar (ADR-0011).
 - Instalado en el servidor del propietario (Ubuntu 24.04, solo para pruebas y sin datos reales) con acceso remoto por **Tailscale**, como prevé `CLAUDE.md`. El repositorio pasa a público para descargar las versiones sin iniciar sesión. Adaptar las pantallas del propietario al móvil queda anotado sin prisa (`docs/PANTALLAS.md`, apartado 18).
+
+## 2026-11-22
+- **Aplicación de escritorio para Windows** (ADR-0015, decisión del propietario): instalador con icono, ventana propia sin consola que se cierra con la ventana, y al abrirla se elige trabajar **en este equipo** o **contra el servidor del taller**. Sustituye al `.zip` con `alumframe.exe` y al script del acceso directo.
+- **Exportar e importar datos** en Ajustes → Datos (ADR-0016): importar sustituye todo tras revisar la copia y guardar lo anterior. Adelanta parte de H7.
+- El instalador de Linux espera a que el programa responda y muestra el motivo si no arranca. **Versión 0.5.0.**

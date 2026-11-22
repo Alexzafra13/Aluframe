@@ -2,12 +2,12 @@
 
 Programa de gestión para un taller de carpintería de aluminio y cerrajería: presupuestos con dibujo, orden de taller con medidas de corte, trabajos asignados a operarios, stock y facturación.
 
-Estado: **H0 a H3 terminados** (v0.4.0): clientes, catálogo con tarifas y presupuestos con dibujo, precio e impresión; siguiente, H4 (trabajos y orden de taller). Se construye con Claude Code, hito a hito (H0 a H7). Para retomar el trabajo: `docs/PROGRESS.md`, apartado «Cómo retomar».
+Estado: **H0 a H3 terminados** (v0.5.0): clientes, catálogo con tarifas y presupuestos con dibujo, precio e impresión, aplicación de escritorio para Windows y exportar e importar datos; siguiente, H4 (trabajos y orden de taller). Se construye con Claude Code, hito a hito (H0 a H7). Para retomar el trabajo: `docs/PROGRESS.md`, apartado «Cómo retomar».
 
 ## Cómo funciona
 - **Servidor del taller (Linux):** un único ejecutable `alumframe` y su base de datos SQLite `alumframe.db`, como servicio systemd en el **puerto 9090**.
-- **PC de la oficina (Windows) y tablet:** entran con el navegador en `http://IP-DEL-SERVIDOR:9090`. En Windows se crea un acceso directo que lo abre como una aplicación.
-- **`alumframe.exe` en modo local:** para probarlo en un solo PC o como plan de emergencia.
+- **Aplicación de Windows** (instalador `AlumFrame-vX.Y.Z-windows-instalar.exe`): ventana propia sin consola que trabaja **en este equipo** (sin servidor) o **contra el servidor del taller**; se elige al abrirla (ADR-0015). Los datos pasan de un sitio a otro con Ajustes → Datos (ADR-0016).
+- **Tablet y móvil:** con el navegador en `http://IP-DEL-SERVIDOR:9090` (fuera del taller, con Tailscale).
 
 ## Desarrollo
 ```
