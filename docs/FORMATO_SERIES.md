@@ -81,11 +81,12 @@ tipologias:
 | `limites` | no | Medidas mínima y máxima de `ancho` y `alto`. Si falta, el programa avisa de que los límites no están definidos y no bloquea. |
 
 ## 4. Fórmulas y piezas
-Cada pieza es `{ perfil, cantidad, longitud, corte }`.
+Cada pieza es `{ perfil, cantidad, longitud, corte }` y, si hace falta, `posicion`.
 - `perfil`: código que debe existir en `referencias`.
 - `cantidad`: un entero o una fórmula que da un entero.
 - `longitud`: fórmula en la unidad de la serie.
 - `corte`: grados (`90`, `45`) o `CONFIRMAR`. Un corte distinto de 90 se dibuja y se imprime en la hoja de corte.
+- `posicion` (opcional, ADR-0017): dónde va el número de la pieza en el dibujo cuando su nombre no lo dice: `marco_lateral`, `marco_superior`, `marco_inferior`, `hoja_lateral`, `hoja_central`, `hoja_superior` o `hoja_inferior`. Sin ella se deduce del nombre (`MARCO_SUPERIOR`, `HOJA_RODAMIENTO`…). Ejemplo: la `HOJA_CIERRE` de Aluval va en el centro de la corredera, `posicion: hoja_central`.
 
 Las fórmulas usan solo lo que permite el evaluador (`docs/BACKEND.md`, apartado 5.1):
 - variables `ancho` y `alto` y los `parametros` de la serie;
@@ -112,6 +113,7 @@ referencias:
 - `referencia: CONFIRMAR` o una referencia que no aparece en la tarifa **no es un error**: la línea sale incompleta con el aviso "falta el precio de MARCO_LATERAL".
 - Una misma serie puede usar referencias de más de un proveedor: se añade `proveedor` dentro de la entrada (`{ referencia: "...", proveedor: OTRO }`).
 - El **color** no cambia la referencia: el acabado aplica su recargo sobre el precio del blanco (`docs/DATOS.md`, apartado 3.3).
+- `silueta` (opcional, ADR-0017): el dibujo de la sección del perfil, `fabricante/archivo` en minúsculas (`aluval/21210` es `data/perfiles/aluval/21210.svg`). Sale junto al número de la pieza para reconocerla. **No interviene en el precio**: se puede poner aunque la `referencia` siga en `CONFIRMAR`.
 
 ## 6. Vidrio
 ```yaml
