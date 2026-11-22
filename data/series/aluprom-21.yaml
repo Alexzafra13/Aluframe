@@ -21,15 +21,18 @@ parametros:
 # las piezas se calculan igualmente pero la línea no tiene precio final. Se rellenan al importar la tarifa real.
 # Los nombres de las hojas son los del catálogo de Aluval (decisión del propietario, 2026-11-22).
 # `silueta`: dibujo de la sección (data/perfiles/aluval), solo para reconocer la pieza; no fija el precio.
-# Hojas según el cristal (confirmado por el propietario): sencillo -> 21310, 21340, 21350; doble (Climalit) ->
-# 21312, 21341, 21351. Hasta modelar el cristal en la línea, la referencia de precio queda en CONFIRMAR.
+# Hojas según el acristalamiento (confirmado por el propietario, 2026-11-22): sencillo -> 21310, 21340, 21350;
+# Climalit (doble) -> 21312, 21341, 21351. Se elige en la línea con la opción «acristalamiento» (ADR-0018).
 referencias:
   MARCO_LATERAL:    { referencia: CONFIRMAR, silueta: aluval/21210 }  # el propietario cree que siempre es 21210
   MARCO_SUPERIOR:   { referencia: CONFIRMAR, silueta: aluval/21220 }  # el propietario cree que siempre es 21220
   MARCO_INFERIOR:   { referencia: CONFIRMAR }                         # siempre el mismo: 21230 (con cámara) o 21231 (sin), por confirmar
-  HOJA_LATERAL:     { referencia: CONFIRMAR, silueta: aluval/21310 }  # contra el marco
-  HOJA_CIERRE:      { referencia: CONFIRMAR, silueta: aluval/21340 }  # la del gancho, en el centro
-  HOJA_RODAMIENTO:  { referencia: CONFIRMAR, silueta: aluval/21350 }
+  HOJA_LATERAL:     { referencia: "21310", silueta: aluval/21310 }   # contra el marco
+  HOJA_CIERRE:      { referencia: "21340", silueta: aluval/21340 }   # la del gancho, en el centro
+  HOJA_RODAMIENTO:  { referencia: "21350", silueta: aluval/21350 }
+  HOJA_LATERAL_CLIMALIT:    { referencia: "21312", silueta: aluval/21312 }
+  HOJA_CIERRE_CLIMALIT:     { referencia: "21341", silueta: aluval/21341 }
+  HOJA_RODAMIENTO_CLIMALIT: { referencia: "21351", silueta: aluval/21351 }
   KIT_CORREDERA:    { referencia: CONFIRMAR }
   RUEDA_CORREDERA:  { referencia: CONFIRMAR }
   TORNILLO_4_8x25:  { referencia: CONFIRMAR }
@@ -38,13 +41,15 @@ tipologias:
   corredera_2_hojas:
     nombre: "Ventana corredera 2 hojas"
     dibujo: { tipo: corredera, hojas: 2, hoja_movil: derecha }   # hoja móvil: dato por confirmar
+    opciones:                      # el tipo y la cámara del Climalit se concretarán más adelante
+      - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [sencillo, climalit], por_defecto: sencillo }
     piezas:
       - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
       - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
       - { perfil: MARCO_INFERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
-      - { perfil: HOJA_LATERAL,    cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90 }
-      - { perfil: HOJA_CIERRE,     cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }
-      - { perfil: HOJA_RODAMIENTO, cantidad: 4, longitud: "ancho / 2 - descuento_hoja_horizontal",   corte: 90 }
+      - { perfil: HOJA_LATERAL,    perfil_segun: { acristalamiento: { climalit: HOJA_LATERAL_CLIMALIT } }, cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90 }
+      - { perfil: HOJA_CIERRE,     perfil_segun: { acristalamiento: { climalit: HOJA_CIERRE_CLIMALIT } }, cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }
+      - { perfil: HOJA_RODAMIENTO, perfil_segun: { acristalamiento: { climalit: HOJA_RODAMIENTO_CLIMALIT } }, cantidad: 4, longitud: "ancho / 2 - descuento_hoja_horizontal",   corte: 90 }
     vidrio:
       estado: CONFIRMAR            # faltan las fórmulas de ancho y alto del cristal (el usuario las dará cuando sepa el descuento)
     accesorios:
@@ -56,14 +61,16 @@ tipologias:
   corredera_4_hojas:
     nombre: "Ventana corredera 4 hojas"
     dibujo: { tipo: corredera, hojas: 4 }
+    opciones:                      # el tipo y la cámara del Climalit se concretarán más adelante
+      - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [sencillo, climalit], por_defecto: sencillo }
     estado: borrador               # igual que la de 2 hojas salvo la hoja de rodamiento y las cantidades (el doble de hojas)
     piezas:
       - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
       - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
       - { perfil: MARCO_INFERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
-      - { perfil: HOJA_LATERAL,    cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90 }  # el doble que en la de 2 hojas
-      - { perfil: HOJA_CIERRE,     cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }  # el doble; ¿lleva el «cierre 4 hojas» 21344? por confirmar
-      - { perfil: HOJA_RODAMIENTO, cantidad: 8, longitud: "(ancho - descuento_hoja_4_hojas) / 4",    corte: 90 }  # el doble; primero se resta y luego se divide
+      - { perfil: HOJA_LATERAL,    perfil_segun: { acristalamiento: { climalit: HOJA_LATERAL_CLIMALIT } }, cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90 }  # el doble que en la de 2 hojas
+      - { perfil: HOJA_CIERRE,     perfil_segun: { acristalamiento: { climalit: HOJA_CIERRE_CLIMALIT } }, cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }  # el doble; ¿lleva el «cierre 4 hojas» 21344? por confirmar
+      - { perfil: HOJA_RODAMIENTO, perfil_segun: { acristalamiento: { climalit: HOJA_RODAMIENTO_CLIMALIT } }, cantidad: 8, longitud: "(ancho - descuento_hoja_4_hojas) / 4",    corte: 90 }  # el doble; primero se resta y luego se divide
     vidrio:
       estado: CONFIRMAR            # el usuario dará la medida cuando sepa el descuento
     accesorios:
