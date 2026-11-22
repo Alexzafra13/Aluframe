@@ -14,6 +14,8 @@ test("las series reales vienen incluidas y se prueba una ventana sin importar na
   const resultado = page.locator("#resultado");
   await expect(resultado.getByRole("cell", { name: "145,9" }).first()).toBeVisible();
   await expect(resultado.getByRole("cell", { name: "73", exact: true })).toBeVisible();
-  await expect(resultado).toContainText("Incompleta: no admite precio final");
+  // Desde 0.8.1 lleva cristal: dos de (150 / 2 − 9,8) × (120 − 13,1) cm; ya no sale incompleta.
+  await expect(resultado.getByRole("row", { name: /CRISTAL/ })).toContainText("65,2");
+  await expect(resultado).not.toContainText("Incompleta: no admite precio final");
   await expect(resultado).toContainText("HOJA_RODAMIENTO: 1 barra");
 });

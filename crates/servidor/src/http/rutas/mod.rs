@@ -11,6 +11,7 @@ pub mod editor_formulario;
 pub mod editor_linea;
 pub mod escritorio;
 pub mod importar_clientes;
+pub mod medidas_trabajo;
 pub mod mi_dia;
 pub mod paginas;
 pub mod precios;

@@ -1,7 +1,7 @@
 use axum::Router;
 use axum::routing::{get, post};
 
-use super::rutas::{mi_dia, trabajos};
+use super::rutas::{medidas_trabajo, mi_dia, trabajos};
 use crate::estado::EstadoApp;
 
 pub fn rutas_de_trabajos() -> Router<EstadoApp> {
@@ -27,7 +27,7 @@ pub fn rutas_de_trabajos() -> Router<EstadoApp> {
         )
         .route(
             "/trabajos/{id}/ventanas/{ventana}/medidas",
-            get(trabajos::mostrar_medidas).post(trabajos::guardar_medidas),
+            get(medidas_trabajo::mostrar_medidas).post(medidas_trabajo::guardar_medidas),
         )
         .route(
             "/trabajos/{id}/ventanas/{ventana}/falta",
