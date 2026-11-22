@@ -7,6 +7,7 @@ use rusqlite::Connection;
 use super::congelado::VentanaCongelada;
 use crate::aplicacion::{Actor, autorizar};
 use crate::bd::consultas::pasos::{self, FilaPaso};
+use crate::bd::consultas::repetidas::{self, FilaRepetida};
 use crate::bd::consultas::trabajos::{self, FilaTrabajo};
 use crate::bd::consultas::ventanas_trabajo::{self, FilaVentana};
 use crate::errores::ErrorApp;
@@ -16,6 +17,8 @@ pub struct VentanaDeTrabajo {
     pub fila: FilaVentana,
     pub congelado: VentanaCongelada,
     pub pasos: Vec<FilaPaso>,
+    /// Piezas que se han vuelto a cortar (corte mal, rayón…): entran en el plan y en el stock.
+    pub repetidas: Vec<FilaRepetida>,
 }
 
 impl VentanaDeTrabajo {
@@ -61,6 +64,7 @@ pub fn ventana_completa(con: &Connection, fila: FilaVentana) -> Result<VentanaDe
     Ok(VentanaDeTrabajo {
         congelado: VentanaCongelada::leer(&fila.congelado_json),
         pasos: pasos::de_ventana(con, fila.id)?,
+        repetidas: repetidas::de_ventana(con, fila.id)?,
         fila,
     })
 }

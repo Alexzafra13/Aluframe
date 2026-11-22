@@ -15,6 +15,7 @@ pub mod informe;
 pub mod nif;
 pub mod precio;
 pub mod series;
+pub mod stock;
 pub mod taller;
 pub mod tarifa;
 pub mod texto;

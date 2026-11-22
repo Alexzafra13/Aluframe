@@ -11,6 +11,7 @@ use super::consultar::ventana_para;
 use crate::aplicacion::auditar::{Cambio, anotar};
 use crate::aplicacion::{Actor, autorizar};
 use crate::bd::consultas::pasos::{self, ApunteDePaso};
+use crate::bd::consultas::repetidas::{self, NuevaRepetida};
 use crate::bd::consultas::{trabajos, usuarios, ventanas_trabajo};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -202,6 +203,50 @@ pub async fn cerrar_trabajo(
         }
         trabajos::cambiar_estado(tx, id, nuevo.como_texto())?;
         Ok(((), id))
+    })
+    .await
+}
+
+/// «Repetir pieza» (corte mal, rayón, golpe…): el operario de la ventana o el propietario, mientras
+/// la orden no esté terminada. La pieza de más entra en el plan y se descuenta al terminar.
+pub async fn repetir_pieza(
+    estado: &EstadoApp,
+    actor: &Actor,
+    (ventana, numero, cantidad): (i64, i64, i64),
+    motivo: String,
+) -> Result<(), ErrorApp> {
+    let motivo: String = motivo.trim().chars().take(200).collect();
+    if motivo.is_empty() || !(1..=20).contains(&cantidad) {
+        return Err(ErrorApp::Validacion(
+            "Elige el motivo y cuántas piezas (de 1 a 20).".into(),
+        ));
+    }
+    let quien = actor.clone();
+    let permiso = (Accion::MarcarPasos, "repetir_pieza", "ventana_trabajo");
+    cambiar(estado, actor, permiso, move |tx, ahora| {
+        let (v, trabajo) = ventana_para(tx, &quien, ventana)?;
+        if trabajo.orden_terminada {
+            return Err(ErrorApp::Validacion("La orden ya está terminada.".into()));
+        }
+        let pieza = v
+            .congelado
+            .resumen
+            .piezas
+            .iter()
+            .find(|p| i64::from(p.numero) == numero)
+            .ok_or_else(|| ErrorApp::Validacion("Esa pieza no está en la ventana.".into()))?;
+        let nueva = NuevaRepetida {
+            ventana,
+            numero,
+            perfil: &pieza.perfil,
+            longitud_dmm: pieza.longitud_dmm,
+            cantidad,
+            motivo: &motivo,
+            usuario: quien.id,
+            cuando: ahora,
+        };
+        repetidas::insertar(tx, &nueva)?;
+        Ok(((), ventana))
     })
     .await
 }

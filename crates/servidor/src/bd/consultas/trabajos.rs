@@ -149,3 +149,19 @@ pub fn cambiar_estado(con: &Connection, id: i64, estado: &str) -> Result<(), Err
     )?;
     Ok(())
 }
+
+/// Cierra la orden una sola vez; devuelve su id para enlazar los movimientos de stock.
+pub fn terminar_orden(
+    con: &Connection,
+    trabajo: i64,
+    (plan_json, cuando, usuario): (&str, &str, i64),
+) -> Result<i64, ErrorApp> {
+    con.query_row(
+        "UPDATE orden_taller SET estado = 'terminada', plan_de_corte_json = ?2, terminada_en = ?3, \
+         terminada_por = ?4 WHERE trabajo_id = ?1 AND estado = 'abierta' RETURNING id",
+        params![trabajo, plan_json, cuando, usuario],
+        |f| f.get(0),
+    )
+    .optional()?
+    .ok_or_else(|| ErrorApp::Validacion("La orden ya estaba terminada.".into()))
+}

@@ -25,6 +25,7 @@ pub mod resumen_de_linea;
 pub mod series;
 pub mod series_incluidas;
 pub mod sesion;
+pub mod stock;
 pub mod taller;
 pub mod tarifas;
 pub mod trabajos;
