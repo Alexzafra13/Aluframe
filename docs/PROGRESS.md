@@ -32,6 +32,11 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 - **Señales:** sí. Un cobro puede colgar del trabajo antes de que exista la factura; al emitirla, cuenta como pagado a cuenta (DATOS 7.9).
 - **Orden:** el propietario lo deja a nuestro criterio. Primero **H4** (el trabajo nace al aceptar y es donde se apunta la señal), después **H6** (facturas y cobros: medio efectivo, Bizum, tarjeta, transferencia u otro; pagos parciales y estado calculado).
 
+## Decisiones del propietario para H5 y H7 (2026-11-22)
+- **Stock:** el presupuesto y el trabajo no tocan el stock; se descuenta al **terminar la orden**. Durante la fabricación se apunta **«Repetir pieza»** (corte mal, rayón, golpe…) y ese perfil de más también se descuenta. Al terminar se **revisan los retales** que propone el plan antes de que entren en stock. Las correcciones, siempre como ajuste con motivo.
+- **Actualizaciones:** sin migraciones hasta la versión mínima; desde que el propietario empiece a usarlo de verdad, esquema fijado y migraciones que nunca pierden datos (H7).
+- **Copias (H7):** en un pendrive o disco conectado, reconocido por una marca en la carpeta `AlumFrame-copias` (no por la letra). Copia diaria **a las 14:00 y al cerrar el programa**; si no se hizo (apagón), **al arrancar**. Se comprueba la copia tras hacerla. Se guardan **7 diarias** y **4 semanales**, más una en el propio equipo. Aviso en el Inicio si falla o falta el disco. Mismo formato que Exportar/Importar. En modo servidor, igual en el servidor; la copia fuera de casa (el PC del taller baja la del servidor) queda para después del MVP.
+
 ## Datos que faltan del taller (lista completa en `OPEN_QUESTIONS.md`)
 - **Aluprom 21:** descuento del cristal, referencias de accesorios (kit, ruedas, tornillos), si la de 4 hojas lleva el «cierre 4 hojas» 21344, y si el Climalit cambia descuentos. Los perfiles ya tienen referencia (21210, 21220, 21230; hojas 21310/21340/21350 y Climalit 21312/21341/21351).
 - **Precio:** una tarifa real de Aluval, margen (sobre coste o venta) y mano de obra.
