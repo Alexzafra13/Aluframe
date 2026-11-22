@@ -25,6 +25,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 ## Precios y documentos
 - [ ] Proveedores (Aluval y Sopena de momento) y formato de sus tarifas. El usuario reunirá precios por barra y tarifas.
 - [ ] Recargo por color: el blanco es el más barato y el resto cuesta un porcentaje más. ¿Es el mismo para todas las series o depende del proveedor?
+- [ ] Colores de serie (ADR-0019, `data/acabados.yaml`): confirmar los RAL puestos (blanco 9016, negro 9005, verde 6005, gris antracita 7016, marrón 8014), el nombre «Embero» y qué imitaciones de madera se usan (pino nudo, nogal, embero, roble).
 - [ ] Facturas de compra: ¿llegan en papel, PDF digital o Excel? Decide si se importan (y cómo) o se teclean.
 - [ ] Cómo se cobra el material (barra, metro o kilo) y si el proveedor factura una superficie mínima de cristal. **Desde H3, perfiles por barras enteras o por metros + merma, a elegir en Ajustes > Presupuestos; el presupuesto muestra los dos importes.**
 - [ ] Mano de obra: ¿importe por ventana, por m² o a mano? **Desde H3, importe por ventana en cada línea con un valor por defecto en Ajustes (vacío = 0). Provisional: se suma después del margen (es lo que se cobra, no lleva margen); el propietario aún no lo ha decidido (2026-11-21).**
