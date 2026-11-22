@@ -57,6 +57,36 @@ fn dibuja_una_corredera_con_sus_piezas_numeradas_y_cotas() {
     );
 }
 
+fn posiciones_de_manillas(svg: &str) -> Vec<i64> {
+    let marca = r#"class="manilla" x=""#;
+    svg.match_indices(marca)
+        .map(|(i, _)| {
+            let resto = &svg[i + marca.len()..];
+            resto.split('"').next().unwrap().parse().unwrap()
+        })
+        .collect()
+}
+
+/// Como el catálogo de Aluval (propietario, 2026-11-22): el cierre va en el lateral de cada hoja
+/// que se abre, nunca en el centro, y las flechas miran hacia el centro.
+#[test]
+fn la_corredera_de_dos_hojas_lleva_el_cierre_en_los_laterales() {
+    let mut ambas = datos(TipoDibujo::Corredera, 2);
+    ambas.dibujo.hoja_movil = Some("ambas".into());
+    let svg = dibujar_ventana(&ambas);
+    assert_eq!(contar(&svg, r#"class="flecha""#), 2);
+    let x = posiciones_de_manillas(&svg);
+    assert_eq!(x.len(), 2);
+    assert!(
+        x[0] < 2_000 && x[1] > 13_000,
+        "cierres en los laterales: {x:?}"
+    );
+
+    let svg = dibujar_ventana(&datos(TipoDibujo::Corredera, 2));
+    let x = posiciones_de_manillas(&svg);
+    assert!(x.len() == 1 && x[0] > 13_000, "solo la hoja derecha: {x:?}");
+}
+
 #[test]
 fn la_corredera_de_cuatro_hojas_mueve_las_centrales() {
     let svg = dibujar_ventana(&datos(TipoDibujo::Corredera, 4));

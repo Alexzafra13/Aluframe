@@ -57,11 +57,11 @@ fn validar_dibujo(tipologia: &Tipologia, ruta: &str, informe: &mut Informe) {
         informe.error(&ruta, "una corredera se dibuja con 2 o 4 hojas");
     }
     if let Some(lado) = &dibujo.hoja_movil
-        && !["izquierda", "derecha"].contains(&lado.as_str())
+        && !["izquierda", "derecha", "ambas"].contains(&lado.as_str())
     {
         informe.error(
             &ruta_hija(&ruta, "hoja_movil"),
-            "debe ser izquierda o derecha",
+            "debe ser izquierda, derecha o ambas",
         );
     }
     if dibujo.tipo != TipoDibujo::Abatible {

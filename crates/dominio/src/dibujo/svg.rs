@@ -91,7 +91,9 @@ fn flecha(s: &mut String, hoja: Rect, hacia_la_derecha: bool) {
     );
 }
 
-/// En 2 hojas se mueve la indicada (por defecto la derecha); en 4, las centrales hacia fuera.
+/// En 2 hojas se abren la indicada o `ambas` (por defecto la derecha): flecha hacia el centro y
+/// cierre en su lateral, contra el marco, como en el catálogo de Aluval. En 4, las centrales
+/// hacia fuera, con los cierres donde se encuentran las hojas.
 fn flechas_de_corredera(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     let hojas = &plano.hojas;
     if hojas.len() == 4 {
@@ -99,22 +101,29 @@ fn flechas_de_corredera(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
             flecha(s, *segunda, false);
             flecha(s, *tercera, true);
         }
-    } else {
-        let izquierda = datos.dibujo.hoja_movil.as_deref() == Some("izquierda");
-        let hoja = if izquierda {
-            hojas.first()
-        } else {
-            hojas.last()
-        };
-        if let Some(hoja) = hoja {
-            flecha(s, *hoja, !izquierda);
+        for par in hojas.windows(2) {
+            if let [a, b] = par {
+                let x = (a.derecha() + b.x) / 2 - plano.grosor_hoja / 4;
+                manilla(s, x, a.centro_y(), plano.grosor_hoja);
+            }
         }
+        return;
     }
-    for par in hojas.windows(2) {
-        if let [a, b] = par {
-            let x = (a.derecha() + b.x) / 2 - plano.grosor_hoja / 4;
-            manilla(s, x, a.centro_y(), plano.grosor_hoja);
-        }
+    let movil = datos.dibujo.hoja_movil.as_deref().unwrap_or("derecha");
+    let cuarto = plano.grosor_hoja / 4;
+    if let Some(izquierda) = hojas.first().filter(|_| movil != "derecha") {
+        flecha(s, *izquierda, true);
+        manilla(
+            s,
+            izquierda.x + cuarto,
+            izquierda.centro_y(),
+            plano.grosor_hoja,
+        );
+    }
+    if let Some(derecha) = hojas.last().filter(|_| movil != "izquierda") {
+        flecha(s, *derecha, false);
+        let x = derecha.derecha() - cuarto - (plano.grosor_hoja / 2).max(1);
+        manilla(s, x, derecha.centro_y(), plano.grosor_hoja);
     }
 }
 
