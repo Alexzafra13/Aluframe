@@ -7,6 +7,7 @@ use dominio::precio::{
     calcular_precio_de_linea,
 };
 use dominio::series::{Dato, ResultadoVentana, Serie, calcular_ventana_con_opciones};
+use dominio::texto::nombre_legible;
 use dominio::unidades::{Decimal, Dinero, Longitud, Porcentaje, Unidad};
 use rusqlite::Connection;
 
@@ -14,7 +15,7 @@ use super::ajustes_presupuesto::AjustesDePresupuesto;
 use super::enlace_con_tarifa::enlazar;
 use super::series::reconstruir;
 use super::taller::AjustesDeTaller;
-use crate::bd::consultas::{acabados, series};
+use crate::bd::consultas::{acabados, articulos, series};
 use crate::errores::ErrorApp;
 
 /// Lo que se escribe en el editor de línea.
@@ -71,8 +72,10 @@ pub fn calcular(
         (entrada, recargo),
         ajustes,
     );
+    let vidrio = descripcion_de_articulo(con, entrada.vidrio_articulo_id)?;
     let color = acabado.map(|a| (color_de_dibujo(&a), a.nombre));
-    let (descripcion, dibujo) = presentar(&tipologia, &resultado, (entrada, serie.unidad), color);
+    let descripcion = describir(&serie, &tipologia, entrada, (color.as_ref(), vidrio));
+    let dibujo = dibujar(&tipologia, &resultado, (entrada, serie.unidad), color);
     Ok(CalculoDeVentana {
         descripcion,
         dibujo,
@@ -86,6 +89,11 @@ pub fn calcular(
         materiales,
         precio,
     })
+}
+
+fn descripcion_de_articulo(con: &Connection, id: Option<i64>) -> Result<Option<String>, ErrorApp> {
+    let articulo = id.map(|id| articulos::buscar(con, id)).transpose()?;
+    Ok(articulo.flatten().map(|a| a.descripcion))
 }
 
 fn cargar_serie(
@@ -102,26 +110,57 @@ fn cargar_serie(
     Ok((serie, tipologia))
 }
 
-/// Descripción de la línea («Corredera 2 hojas · 150 × 120 cm · Blanco») y su dibujo.
-fn presentar(
+/// Todo lo elegido en la línea, para el presupuesto y la factura: «Corredera 2 hojas ·
+/// Aluprom 21 (Aluval) · 120 × 150 cm · Anodizado plata · Acristalamiento: Climalit».
+/// El primer tramo es el título; la hoja impresa pone cada tramo en su renglón.
+fn describir(
+    serie: &Serie,
+    tipologia: &dominio::series::Tipologia,
+    entrada: &EntradaDeVentana,
+    (color, vidrio): (Option<&(ColorDeDibujo, String)>, Option<String>),
+) -> String {
+    let (ancho, alto) = (
+        medida(entrada.ancho, serie.unidad),
+        medida(entrada.alto, serie.unidad),
+    );
+    let mut tramos = vec![
+        tipologia.nombre.clone(),
+        format!(
+            "{} ({})",
+            nombre_legible(&serie.codigo),
+            nombre_legible(&serie.fabricante)
+        ),
+        format!("{} × {} cm", ancho.formatear_cm(), alto.formatear_cm()),
+    ];
+    tramos.extend(color.map(|(_, nombre)| nombre.clone()));
+    tramos.extend(tipologia.opciones.iter().map(|o| {
+        let elegido = entrada.opciones.get(&o.codigo).unwrap_or(&o.por_defecto);
+        format!(
+            "{}: {}",
+            nombre_sin_aclaracion(&o.nombre),
+            nombre_legible(elegido)
+        )
+    }));
+    tramos.extend(vidrio.map(|v| format!("Cristal: {v}")));
+    tramos.join(" · ")
+}
+
+/// «Hoja de la cremona (vista desde dentro)» se imprime «Hoja de la cremona».
+fn nombre_sin_aclaracion(nombre: &str) -> &str {
+    nombre.split(" (").next().unwrap_or(nombre).trim()
+}
+
+fn dibujar(
     tipologia: &dominio::series::Tipologia,
     resultado: &ResultadoVentana,
     (entrada, unidad): (&EntradaDeVentana, Unidad),
     color: Option<(ColorDeDibujo, String)>,
-) -> (String, String) {
+) -> String {
     let (ancho, alto) = (medida(entrada.ancho, unidad), medida(entrada.alto, unidad));
     let mut datos =
         DatosDeDibujo::desde_calculo(tipologia, resultado, &entrada.opciones, (ancho, alto));
-    let (color_dibujo, nombre) = color.unzip();
-    datos.color = color_dibujo.unwrap_or_default();
-    let color = nombre.map(|c| format!(" · {c}")).unwrap_or_default();
-    let descripcion = format!(
-        "{} · {} × {} cm{color}",
-        tipologia.nombre,
-        ancho.formatear_cm(),
-        alto.formatear_cm()
-    );
-    (descripcion, dibujar_ventana(&datos))
+    datos.color = color.map(|(c, _)| c).unwrap_or_default();
+    dibujar_ventana(&datos)
 }
 
 /// El color con que se dibuja el acabado; si sus datos no valen, blanco (nunca falla el cálculo).

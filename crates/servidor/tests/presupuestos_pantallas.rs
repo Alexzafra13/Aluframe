@@ -151,7 +151,9 @@ async fn la_ficha_muestra_las_lineas_y_por_que_no_se_acepta() {
     )
     .await;
     assert!(ficha.contains("Línea guardada."));
-    assert!(ficha.contains("Línea 1 · DEMO corredera 2 hojas (ficticia) · 150 × 120 cm"));
+    assert!(ficha.contains(
+        "Línea 1 · DEMO corredera 2 hojas (ficticia) · Demo ficticia (Demo) · 150 × 120 cm"
+    ));
     assert!(ficha.contains("Línea 2 · Instalación"));
     assert!(ficha.contains("No se puede aceptar todavía"));
 }

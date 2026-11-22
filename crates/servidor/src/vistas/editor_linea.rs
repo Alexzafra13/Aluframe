@@ -6,15 +6,7 @@ use super::{GrupoMenu, Opcion, UsuarioEnPantalla};
 use crate::aplicacion::calculo_de_ventana::CalculoDeVentana;
 use crate::series::siluetas::url_de_silueta;
 
-/// «MARCO_LATERAL» se lee «Marco lateral», como en la hoja de taller.
-pub fn nombre_legible(codigo: &str) -> String {
-    let texto = codigo.replace('_', " ").to_lowercase();
-    let mut letras = texto.chars();
-    letras
-        .next()
-        .map(|p| p.to_uppercase().chain(letras).collect())
-        .unwrap_or_default()
-}
+pub use dominio::texto::nombre_legible;
 
 pub struct PestanaDeLinea {
     pub orden: i64,

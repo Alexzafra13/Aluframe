@@ -30,6 +30,16 @@ pub fn limpiar_opcional(texto: &str) -> Option<String> {
     (!limpio.is_empty()).then(|| limpio.to_owned())
 }
 
+/// Un código de los datos como se lee en pantalla: «MARCO_LATERAL» es «Marco lateral».
+pub fn nombre_legible(codigo: &str) -> String {
+    let texto = codigo.replace('_', " ").to_lowercase();
+    let mut letras = texto.chars();
+    letras
+        .next()
+        .map(|p| p.to_uppercase().chain(letras).collect())
+        .unwrap_or_default()
+}
+
 fn quitar_tilde(letra: char) -> char {
     match letra {
         'á' | 'à' | 'ä' | 'â' => 'a',
@@ -52,6 +62,13 @@ mod tests {
         assert_eq!(normalizar_para_buscar("  Peñas   ÁVILA "), "penas avila");
         assert_eq!(normalizar_para_buscar("Güell"), "guell");
         assert_eq!(normalizar_para_buscar(""), "");
+    }
+
+    #[test]
+    fn lee_los_codigos_de_los_datos_como_nombres() {
+        assert_eq!(nombre_legible("ALUPROM_21"), "Aluprom 21");
+        assert_eq!(nombre_legible("climalit"), "Climalit");
+        assert_eq!(nombre_legible(""), "");
     }
 
     #[test]
