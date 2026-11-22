@@ -64,7 +64,7 @@ Comparado con programas como Productor (Gaia), Cortizo Software, GesFácil, Klae
 - [x] Operario: lista de tarjetas y una ventana a pantalla completa al abrirla.
 - [ ] Cristal recibido: se marca a mano en el trabajo (propuesto).
 - [ ] Qué más debe aparecer en el panel de atención del Inicio.
-- [x] Ningún dato de cliente es obligatorio. Pendiente con el gestor: qué casos admiten factura simplificada o sin NIF.
+- [x] Al dar de alta a mano son obligatorios el nombre y un teléfono (propietario, 2026-11-22; antes, ningún dato). Pendiente con el gestor: qué casos admiten factura simplificada o sin NIF.
 - [ ] El prototipo de flujo (`alumframe-flujo.html`) tiene una organización distinta a la aprobada y se rehará con `docs/PANTALLAS.md`.
 
 ## Trabajo diario del operario

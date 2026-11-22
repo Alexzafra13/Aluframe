@@ -1,3 +1,4 @@
+use super::telefono::normalizar_telefono;
 use crate::nif::Nif;
 use crate::texto::{limpiar_opcional, normalizar_para_buscar};
 
@@ -112,14 +113,27 @@ pub fn validar_cliente(entrada: &EntradaDeCliente) -> Result<DatosDeCliente, Vec
         forma_de_pago: texto("forma_de_pago", &entrada.forma_de_pago, LARGO_CAMPO),
         notas: texto("notas", &entrada.notas, LARGO_NOTAS),
     };
-    datos.nif = validar_nif(&entrada.nif, &mut errores);
-    comprobar_email(datos.email.as_deref(), &mut errores);
-    comprobar_telefono("telefono", datos.telefono.as_deref(), &mut errores);
+    comprobar_formatos(entrada, &mut datos, &mut errores);
     if errores.is_empty() {
         Ok(datos)
     } else {
         Err(errores)
     }
+}
+
+fn comprobar_formatos(
+    entrada: &EntradaDeCliente,
+    datos: &mut DatosDeCliente,
+    errores: &mut Vec<ErrorDeCampo>,
+) {
+    datos.nif = validar_nif(&entrada.nif, errores);
+    comprobar_email(datos.email.as_deref(), errores);
+    datos.telefono = comprobar_telefono(
+        "telefono",
+        datos.telefono.take(),
+        datos.fiscal_pais.as_deref(),
+        errores,
+    );
 }
 
 fn error(campo: &'static str, mensaje: &str) -> ErrorDeCampo {
@@ -155,19 +169,38 @@ fn comprobar_email(email: Option<&str>, errores: &mut Vec<ErrorDeCampo>) {
 
 pub(super) fn comprobar_telefono(
     campo: &'static str,
-    telefono: Option<&str>,
+    telefono: Option<String>,
+    pais: Option<&str>,
     errores: &mut Vec<ErrorDeCampo>,
-) {
-    let Some(telefono) = telefono else { return };
-    let caracteres_validos = telefono
-        .chars()
-        .all(|c| c.is_ascii_digit() || matches!(c, ' ' | '+' | '-' | '(' | ')' | '.'));
-    let cifras = telefono.chars().filter(char::is_ascii_digit).count();
-    if !caracteres_validos || !(6..=15).contains(&cifras) {
-        errores.push(error(
-            campo,
-            "el teléfono solo admite cifras, espacios y +, entre 6 y 15 cifras",
-        ));
+) -> Option<String> {
+    let escrito = telefono?;
+    match normalizar_telefono(&escrito, pais) {
+        Ok(normalizado) => Some(normalizado),
+        Err(motivo) => {
+            errores.push(error(campo, motivo));
+            Some(escrito)
+        }
+    }
+}
+
+/// El alta y la edición a mano exigen nombre y teléfono, para no tener fichas
+/// con solo un nombre (decisión del propietario, 2026-11-22). La importación no.
+pub fn validar_alta_de_cliente(
+    entrada: &EntradaDeCliente,
+) -> Result<DatosDeCliente, Vec<ErrorDeCampo>> {
+    let resultado = validar_cliente(entrada);
+    let mut errores = resultado.as_ref().err().cloned().unwrap_or_default();
+    let falta = |campo: &str| limpiar_opcional(campo).is_none();
+    if falta(&entrada.nombre) {
+        errores.push(error("nombre", "escribe el nombre o la razón social"));
+    }
+    if falta(&entrada.telefono) {
+        errores.push(error("telefono", "escribe un teléfono de contacto"));
+    }
+    if errores.is_empty() {
+        resultado
+    } else {
+        Err(errores)
     }
 }
 

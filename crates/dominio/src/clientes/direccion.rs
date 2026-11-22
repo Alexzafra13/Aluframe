@@ -56,7 +56,7 @@ pub fn validar_direccion(
         }
         limpio
     };
-    let datos = DatosDeDireccion {
+    let mut datos = DatosDeDireccion {
         etiqueta: texto("etiqueta", &entrada.etiqueta, 100),
         calle: texto("calle", &entrada.calle, 200),
         cp: texto("cp", &entrada.cp, 10),
@@ -66,9 +66,10 @@ pub fn validar_direccion(
         contacto_telefono: texto("contacto_telefono", &entrada.contacto_telefono, 30),
         notas: texto("notas", &entrada.notas, 2_000),
     };
-    comprobar_telefono(
+    datos.contacto_telefono = comprobar_telefono(
         "contacto_telefono",
-        datos.contacto_telefono.as_deref(),
+        datos.contacto_telefono.take(),
+        None,
         &mut errores,
     );
     if !errores.is_empty() {

@@ -87,12 +87,12 @@ Sigue `design/02-inicio.png`.
 ## 5. Alta de cliente
 Un formulario corto, en este orden:
 1. **Tipo:** particular o empresa (cambia las etiquetas y el IVA).
-2. **Nombre o razón social**, **teléfono**, **NIF o CIF** (si se escribe, se valida mientras se teclea), **correo** y **forma de pago habitual**.
+2. **Nombre o razón social**, **teléfono**, **NIF o CIF** (si se escribe, se valida mientras se teclea), y **correo**. La forma de pago se elige al registrar cada cobro (apartado 11).
 3. **Dirección fiscal** y una casilla "la dirección de montaje es la misma".
 4. **Direcciones de montaje:** las que haga falta; **+ Añadir otra** con etiqueta ("Casa", "Obra Calle X"), persona de contacto y notas ("sin ascensor").
 5. Guardar y elegir: **Guardar** o **Guardar y crear presupuesto**.
 
-**Ningún dato es obligatorio.** Se puede guardar un cliente con todo en blanco, porque a veces no se tienen o no hacen falta. Si no tiene nombre, se muestra como **"Cliente sin nombre (n.º 12)"** y se puede completar después. Solo se avisa (sin bloquear) cuando se emite una factura (apartado 11).
+**Obligatorios: nombre y teléfono** (decisión del propietario, 2026-11-22), para no tener fichas sin forma de contacto. El teléfono español se escribe con sus 9 cifras y se guarda como «612 345 678»; el +34 se da por puesto si el país es España, que viene escrito por defecto. Un número extranjero empieza por su prefijo. Los clientes importados sin nombre se muestran como **"Cliente sin nombre (n.º 12)"**. Solo se avisa (sin bloquear) cuando se emite una factura (apartado 11).
 
 ## 6. Presupuesto
 - **Cabecera:** número (`P-2026-0001`), estado, cliente y **dirección de montaje** (selector con "+ Añadir otra"), validez y condiciones.
@@ -147,7 +147,7 @@ La lista de **Series** muestra su estado (borrador, validada), sus versiones y c
 - **Lista:** número, cliente, total, estado (borrador, emitida, parcial, pagada, vencida). La pestaña **Cobros pendientes** agrupa por cliente.
 - **Borrador:** editable y sin número.
 - **Emitir:** confirmación con la consecuencia: "Recibirá el número F-2026-0001 y ya no se podrá modificar. Una corrección se hará con una rectificativa." Si faltan datos que una factura completa suele exigir (nombre y NIF del cliente), **avisa y lista lo que falta, pero deja emitir** tras una confirmación explícita. Hay que confirmar con el gestor qué casos admiten factura simplificada.
-- **Emitida:** solo lectura. **Registrar cobro** (fecha, importe, medio) y **Crear rectificativa**. El estado de pago se calcula con los cobros.
+- **Emitida:** solo lectura. **Registrar cobro** (fecha, importe —por defecto lo pendiente— y medio: efectivo, Bizum, tarjeta, transferencia u otro; se admiten cobros parciales) y **Crear rectificativa**. El estado de pago se calcula con los cobros.
 
 ## 12. Ajustes
 - **Empresa:** datos fiscales, logotipo, IVA por defecto, formato de numeración, condiciones y validez por defecto del presupuesto.

@@ -24,7 +24,7 @@ Cliente -> Presupuesto -> (aceptado) Trabajo -> Orden de taller -> Stock descont
 - La **factura** se crea desde un trabajo (o libre), con numeración correlativa y estado de cobro.
 
 ## 4. Modelo de dominio (resumen)
-- **Cliente**: datos fiscales y de contacto, tipo (particular o empresa) y las **direcciones de montaje** que haga falta (con persona de contacto y notas). **Ningún dato es obligatorio**; sin nombre se muestra "Cliente sin nombre (n.º N)". El presupuesto elige una dirección o añade otra al momento.
+- **Cliente**: datos fiscales y de contacto, tipo (particular o empresa) y las **direcciones de montaje** que haga falta (con persona de contacto y notas). Al darlo de alta a mano son **obligatorios el nombre y un teléfono** (decisión del propietario, 2026-11-22); el resto se completa después. En España el teléfono se escribe con sus 9 cifras, sin prefijo. Los clientes importados o antiguos sin nombre se muestran como "Cliente sin nombre (n.º N)". El presupuesto elige una dirección o añade otra al momento.
 - **Proveedor** y **Articulo**: perfiles, vidrios, herrajes y accesorios. Cada artículo tiene referencia, descripción, unidad (barra, metro, m², unidad), longitud de barra, color/acabado, stock mínimo.
 - **Acabado (color)**: recargo en % sobre el precio del blanco (el más barato); por confirmar si es igual para todas las series o depende del proveedor.
 - **Precio**: tarifa del proveedor, descuento del proveedor (coste) y margen (venta). Con **histórico** (fecha, origen, importación).

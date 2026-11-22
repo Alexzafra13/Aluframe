@@ -3,7 +3,8 @@ use axum::extract::{Path, Query, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Redirect, Response};
 use dominio::clientes::{
-    DatosDeDireccion, EntradaDeCliente, EntradaDeDireccion, validar_cliente, validar_direccion,
+    DatosDeDireccion, EntradaDeCliente, EntradaDeDireccion, validar_alta_de_cliente,
+    validar_direccion,
 };
 use serde::Deserialize;
 
@@ -106,7 +107,10 @@ pub async fn mostrar_alta(ActorActual(actor): ActorActual) -> Result<Response, E
     let formulario = Formulario {
         id: None,
         version: 0,
-        valores: EntradaDeCliente::default(),
+        valores: EntradaDeCliente {
+            fiscal_pais: "España".into(),
+            ..EntradaDeCliente::default()
+        },
         errores: ErroresDeCampo::default(),
         direcciones: vec![bloque_vacio(0)],
         misma_direccion: false,
@@ -172,7 +176,7 @@ pub async fn procesar_alta(
         misma_direccion,
         aviso: None,
     };
-    let datos = match validar_cliente(&valores) {
+    let datos = match validar_alta_de_cliente(&valores) {
         Ok(datos) if !errores_en_direcciones => datos,
         Ok(_) => return pagina_de_formulario(&actor, formulario),
         Err(errores) => {
@@ -251,7 +255,7 @@ pub async fn procesar_edicion(
         misma_direccion: false,
         aviso: None,
     };
-    let datos = match validar_cliente(&valores) {
+    let datos = match validar_alta_de_cliente(&valores) {
         Ok(datos) => datos,
         Err(errores) => {
             formulario.errores = ErroresDeCampo(errores);

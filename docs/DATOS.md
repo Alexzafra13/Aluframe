@@ -28,7 +28,7 @@ Imagina un archivador con cajones. Cada cajón es una lista (clientes, presupues
 Hay dos tipos de usuario. El **propietario** lo ve y lo cambia todo. El **operario** lo da de alta el propietario con un usuario y un PIN, y solo ve los trabajos que se le asignan, sin precios ni márgenes.
 
 ### 3.2 Clientes
-Una ficha de cliente puede guardar los datos fiscales (nombre o razón social, NIF o CIF, dirección fiscal), el contacto, si es **particular o empresa** (cambia el IVA) y la forma de pago habitual. **Ningún dato es obligatorio**: se puede guardar con todo en blanco y completarlo después; el NIF, si se escribe, se valida. Cada cliente puede tener **una o varias direcciones de montaje**, con persona de contacto y notas ("sin ascensor"). El presupuesto elige una o añade otra al momento. Cuando se emite un documento, los datos del cliente se **copian** dentro de él, así que cambiar la ficha después no altera facturas antiguas.
+Una ficha de cliente puede guardar los datos fiscales (nombre o razón social, NIF o CIF, dirección fiscal), el contacto, si es **particular o empresa** (cambia el IVA) y la forma de pago habitual. Al darlo de alta a mano son **obligatorios el nombre y un teléfono** (en España, 9 cifras sin prefijo; el +34 se da por puesto); el resto se completa después y el NIF, si se escribe, se valida. La importación por CSV no exige nada. Cada cliente puede tener **una o varias direcciones de montaje**, con persona de contacto y notas ("sin ascensor"). El presupuesto elige una o añade otra al momento. Cuando se emite un documento, los datos del cliente se **copian** dentro de él, así que cambiar la ficha después no altera facturas antiguas.
 
 ### 3.3 Catálogo
 - **Proveedor:** quién vende, condiciones de pago y descuento habitual.
@@ -177,7 +177,7 @@ El saldo de un artículo es `SUM(cantidad_mil)` por artículo y color, con índi
 |---|---|
 | `factura` | id, serie_numeracion, anio, numero (NULL hasta emitir), tipo (`ordinaria`/`rectificativa`), rectifica_factura_id, cliente_id, trabajo_id, estado (`borrador`/`emitida`), fecha_emision, fecha_operacion, vencimiento, forma_de_pago, base_cent, iva_cent, total_cent, snapshot_json, snapshot_sha256, huella_anterior, huella, estado_envio (las tres últimas, reservadas y vacías), version |
 | `linea_factura` | id, factura_id, orden, descripcion, cantidad_mil, precio_unitario_pu, descuento_bp, tipo_iva_bp, base_cent |
-| `cobro` | id, factura_id, fecha, importe_cent, medio (`efectivo`/`transferencia`/`tarjeta`/`otro`), nota, anulado, motivo_anulacion, usuario_id, creado_en |
+| `cobro` | id, factura_id, fecha, importe_cent, medio (`efectivo`/`bizum`/`tarjeta`/`transferencia`/`otro`), nota, anulado, motivo_anulacion, usuario_id, creado_en |
 
 Triggers: `BEFORE UPDATE` y `BEFORE DELETE` en `factura`, `linea_factura`, `albaran`, `serie_version` y `tarifa_precio` con `RAISE(ABORT)` cuando el documento ya está emitido o usado. Al emitir, el número se asigna en la misma transacción que el cambio de estado.
 

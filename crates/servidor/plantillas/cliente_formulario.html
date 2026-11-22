@@ -5,7 +5,7 @@
 <header class="cabecera-pagina">
   <p class="antetitulo">Clientes</p>
   <h1>{% if id.is_some() %}Editar cliente{% else %}Nuevo cliente{% endif %}</h1>
-  <p class="texto-apagado">Ningún dato es obligatorio: guarda con lo que tengas y complétalo después.</p>
+  <p class="texto-apagado">Solo son obligatorios el nombre y un teléfono; el resto se puede completar después.</p>
 </header>
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 {% if errores.hay() %}<p class="aviso" role="alert">Revisa los campos marcados; no se ha guardado nada.</p>{% endif %}
@@ -18,25 +18,26 @@
     <label class="casilla"><input type="radio" name="tipo" value="empresa"{% if es_empresa() %} checked{% endif %}> Empresa</label>
   </fieldset>
   <div class="rejilla-campos">
-    {% call m::campo("nombre", "Nombre o razón social", valores.nombre, errores.de("nombre"), "autocomplete=\"off\" maxlength=\"200\"") %}{% endcall %}
-    {% call m::campo("telefono", "Teléfono", valores.telefono, errores.de("telefono"), "inputmode=\"tel\" autocomplete=\"off\"") %}{% endcall %}
+    {% call m::campo("nombre", "Nombre o razón social (obligatorio)", valores.nombre, errores.de("nombre"), "autocomplete=\"off\" maxlength=\"200\" required") %}{% endcall %}
+    {% call m::campo("telefono", "Teléfono móvil o fijo (obligatorio)", valores.telefono, errores.de("telefono"), "type=\"tel\" inputmode=\"tel\" autocomplete=\"off\" maxlength=\"30\" placeholder=\"612 345 678\" required") %}{% endcall %}
     <div class="campo">
       <label for="nif">NIF o CIF</label>
       <input id="nif" name="nif" value="{{ valores.nif }}" autocomplete="off" maxlength="15" hx-get="/clientes/comprobar-nif" hx-trigger="input changed delay:400ms" hx-target="#nif-mensaje" hx-swap="innerHTML"{% if errores.de("nif").is_some() %} aria-invalid="true"{% endif %} aria-describedby="nif-mensaje">
       <div id="nif-mensaje" aria-live="polite">{% if let Some(e) = errores.de("nif") %}<p class="error-campo">{{ e }}</p>{% endif %}</div>
     </div>
     {% call m::campo("email", "Correo", valores.email, errores.de("email"), "type=\"email\" autocomplete=\"off\"") %}{% endcall %}
-    {% call m::campo("forma_de_pago", "Forma de pago habitual", valores.forma_de_pago, errores.de("forma_de_pago"), "list=\"formas-de-pago\"") %}{% endcall %}
   </div>
-  <datalist id="formas-de-pago"><option value="Efectivo"><option value="Transferencia"><option value="Tarjeta"><option value="Bizum"></datalist>
+  <p class="texto-apagado">En España escribe las 9 cifras, sin +34; para un número extranjero, empieza por su prefijo (+33…).</p>
+  <input type="hidden" name="forma_de_pago" value="{{ valores.forma_de_pago }}">
   <h2>Dirección fiscal</h2>
   <div class="rejilla-campos">
     {% call m::campo("fiscal_calle", "Calle y número", valores.fiscal_calle, errores.de("fiscal_calle"), "") %}{% endcall %}
     {% call m::campo("fiscal_cp", "Código postal", valores.fiscal_cp, errores.de("fiscal_cp"), "inputmode=\"numeric\" maxlength=\"10\"") %}{% endcall %}
     {% call m::campo("fiscal_localidad", "Localidad", valores.fiscal_localidad, errores.de("fiscal_localidad"), "") %}{% endcall %}
     {% call m::campo("fiscal_provincia", "Provincia", valores.fiscal_provincia, errores.de("fiscal_provincia"), "") %}{% endcall %}
-    {% call m::campo("fiscal_pais", "País", valores.fiscal_pais, errores.de("fiscal_pais"), "") %}{% endcall %}
+    {% call m::campo("fiscal_pais", "País", valores.fiscal_pais, errores.de("fiscal_pais"), "list=\"paises\"") %}{% endcall %}
   </div>
+  <datalist id="paises"><option value="España"><option value="Portugal"><option value="Francia"><option value="Andorra"></datalist>
   {% if id.is_none() %}
   <h2>Direcciones de montaje</h2>
   <label class="casilla"><input type="checkbox" name="misma_direccion" value="1"{% if misma_direccion %} checked{% endif %}> La dirección de montaje es la misma que la fiscal</label>

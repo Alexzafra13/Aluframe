@@ -3,13 +3,19 @@ const { entrarComoPropietario } = require("./comun");
 
 test.describe.configure({ mode: "serial" });
 
-test("guarda un cliente sin ningún dato", async ({ page }) => {
+test("exige nombre y teléfono y guarda el móvil sin prefijo", async ({ page }) => {
   await entrarComoPropietario(page);
   await page.getByRole("link", { name: "Clientes" }).click();
   await expect(page.getByText("Aún no hay clientes")).toBeVisible();
   await page.getByRole("link", { name: "Nuevo cliente" }).click();
+  await expect(page.getByLabel("País")).toHaveValue("España");
   await page.getByRole("button", { name: "Guardar", exact: true }).click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Cliente sin nombre \(n\.º \d+\)/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Nuevo cliente");
+  await page.getByLabel(/Nombre o razón social/).fill("Jose Pérez");
+  await page.getByLabel(/Teléfono móvil/).fill("612345678");
+  await page.getByRole("button", { name: "Guardar", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Jose Pérez");
+  await expect(page.getByText("612 345 678")).toBeVisible();
   await expect(page.getByRole("status")).toHaveText("Cliente guardado.");
 });
 
@@ -17,7 +23,8 @@ test("comprueba el NIF al escribirlo y guarda varias direcciones", async ({ page
   await entrarComoPropietario(page);
   await page.goto("/clientes/nuevo");
   await page.getByLabel("Empresa").check();
-  await page.getByLabel("Nombre o razón social").fill("Construcciones Peña");
+  await page.getByLabel(/Nombre o razón social/).fill("Construcciones Peña");
+  await page.getByLabel(/Teléfono móvil/).fill("924 55 55 55");
   await page.getByLabel("NIF o CIF").fill("B12345675");
   await expect(page.locator("#nif-mensaje")).toContainText("no coincide");
   await page.getByLabel("NIF o CIF").fill("B12345674");
@@ -38,7 +45,7 @@ test("busca sin tildes mientras se escribe", async ({ page }) => {
   await page.getByRole("link", { name: "Clientes" }).click();
   await page.getByLabel(/Buscar por nombre/).fill("pena");
   await expect(page.locator("#lista-clientes")).toContainText("Construcciones Peña");
-  await expect(page.locator("#lista-clientes")).not.toContainText("Cliente sin nombre");
+  await expect(page.locator("#lista-clientes")).not.toContainText("Jose Pérez");
 });
 
 test("importa clientes de un CSV guardado por Excel en Windows-1252", async ({ page }) => {

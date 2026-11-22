@@ -140,3 +140,29 @@ proptest! {
         let _ = leer_clientes(&format!("nombre;nif;email\n{texto}"));
     }
 }
+
+#[test]
+fn el_alta_a_mano_exige_nombre_y_telefono() {
+    let errores = validar_alta_de_cliente(&EntradaDeCliente::default()).unwrap_err();
+    let campos: Vec<&str> = errores.iter().map(|e| e.campo).collect();
+    assert_eq!(campos, vec!["nombre", "telefono"]);
+    let datos = validar_alta_de_cliente(&EntradaDeCliente {
+        nombre: "Ana".into(),
+        telefono: "612345678".into(),
+        ..EntradaDeCliente::default()
+    })
+    .unwrap();
+    assert_eq!(datos.telefono.as_deref(), Some("612 345 678"));
+}
+
+#[test]
+fn un_telefono_mal_escrito_no_se_cuenta_dos_veces() {
+    let errores = validar_alta_de_cliente(&EntradaDeCliente {
+        nombre: "Ana".into(),
+        telefono: "123".into(),
+        ..EntradaDeCliente::default()
+    })
+    .unwrap_err();
+    assert_eq!(errores.len(), 1);
+    assert_eq!(errores[0].campo, "telefono");
+}

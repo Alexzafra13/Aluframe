@@ -7,7 +7,7 @@ use comun::{Contexto, PIN, destino, formulario, get, get_htmx, post, texto};
 use servidor::aplicacion::entrar::{ResultadoDeEntrada, SolicitudDeEntrada, entrar};
 
 #[tokio::test]
-async fn da_de_alta_un_cliente_en_blanco() {
+async fn no_da_de_alta_un_cliente_sin_nombre_ni_telefono() {
     let contexto = Contexto::nuevo().await;
     let (token, actor) = contexto.con_propietario().await;
     let cuerpo = formulario(&[
@@ -18,17 +18,30 @@ async fn da_de_alta_un_cliente_en_blanco() {
     let respuesta = contexto
         .pedir(post("/clientes/nuevo", Some(&token), &cuerpo))
         .await;
-    assert_eq!(destino(&respuesta), Some("/clientes/1?aviso=creado"));
-    let ficha = texto(
-        contexto
-            .pedir(get("/clientes/1?aviso=creado", Some(&token)))
-            .await,
-    )
-    .await;
-    assert!(ficha.contains("Cliente sin nombre (n.º 1)"));
-    assert!(ficha.contains("Cliente guardado."));
+    assert_eq!(respuesta.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    let html = texto(respuesta).await;
+    assert!(html.contains("escribe el nombre o la razón social"));
+    assert!(html.contains("escribe un teléfono de contacto"));
     let lista = texto(contexto.pedir(get("/clientes", Some(&token))).await).await;
-    assert!(lista.contains("Cliente sin nombre (n.º 1)"));
+    assert!(lista.contains("Aún no hay clientes"));
+}
+
+#[tokio::test]
+async fn guarda_el_movil_sin_prefijo_y_agrupado() {
+    let contexto = Contexto::nuevo().await;
+    let (token, actor) = contexto.con_propietario().await;
+    let cuerpo = formulario(&[
+        ("_csrf", &actor.token_csrf),
+        ("nombre", "Jose"),
+        ("telefono", "+34612345678"),
+        ("fiscal_pais", "España"),
+    ]);
+    let respuesta = contexto
+        .pedir(post("/clientes/nuevo", Some(&token), &cuerpo))
+        .await;
+    assert_eq!(destino(&respuesta), Some("/clientes/1?aviso=creado"));
+    let ficha = texto(contexto.pedir(get("/clientes/1", Some(&token))).await).await;
+    assert!(ficha.contains("612 345 678"));
 }
 
 #[tokio::test]
@@ -38,6 +51,7 @@ async fn un_nif_mal_escrito_no_guarda_y_conserva_lo_escrito() {
     let cuerpo = formulario(&[
         ("_csrf", &actor.token_csrf),
         ("nombre", "Construcciones Peña"),
+        ("telefono", "924555555"),
         ("nif", "12345678A"),
         ("d0_calle", "Calle Mayor 3"),
     ]);
@@ -60,6 +74,7 @@ async fn copia_la_direccion_fiscal_como_montaje_y_anade_otras() {
     let cuerpo = formulario(&[
         ("_csrf", &actor.token_csrf),
         ("nombre", "Ana"),
+        ("telefono", "612345678"),
         ("fiscal_calle", "Calle Sevilla 1"),
         ("fiscal_localidad", "Zafra"),
         ("misma_direccion", "1"),
@@ -80,7 +95,11 @@ async fn la_busqueda_con_htmx_devuelve_solo_la_lista() {
     let contexto = Contexto::nuevo().await;
     let (token, actor) = contexto.con_propietario().await;
     for nombre in ["José Peña", "Ana Ruiz"] {
-        let cuerpo = formulario(&[("_csrf", &actor.token_csrf), ("nombre", nombre)]);
+        let cuerpo = formulario(&[
+            ("_csrf", &actor.token_csrf),
+            ("nombre", nombre),
+            ("telefono", "612345678"),
+        ]);
         contexto
             .pedir(post("/clientes/nuevo", Some(&token), &cuerpo))
             .await;
@@ -102,7 +121,11 @@ async fn la_busqueda_con_htmx_devuelve_solo_la_lista() {
 async fn avisa_si_otra_persona_guardo_antes_sin_perder_lo_escrito() {
     let contexto = Contexto::nuevo().await;
     let (token, actor) = contexto.con_propietario().await;
-    let alta = formulario(&[("_csrf", &actor.token_csrf), ("nombre", "Ana")]);
+    let alta = formulario(&[
+        ("_csrf", &actor.token_csrf),
+        ("nombre", "Ana"),
+        ("telefono", "612345678"),
+    ]);
     contexto
         .pedir(post("/clientes/nuevo", Some(&token), &alta))
         .await;
@@ -110,6 +133,7 @@ async fn avisa_si_otra_persona_guardo_antes_sin_perder_lo_escrito() {
         ("_csrf", &actor.token_csrf),
         ("version", "1"),
         ("nombre", "Ana María"),
+        ("telefono", "612345678"),
     ]);
     let respuesta = contexto
         .pedir(post("/clientes/1/editar", Some(&token), &primera))
@@ -119,6 +143,7 @@ async fn avisa_si_otra_persona_guardo_antes_sin_perder_lo_escrito() {
         ("_csrf", &actor.token_csrf),
         ("version", "1"),
         ("nombre", "Ana Luisa"),
+        ("telefono", "612345678"),
     ]);
     let respuesta = contexto
         .pedir(post("/clientes/1/editar", Some(&token), &tarde))
@@ -133,7 +158,11 @@ async fn avisa_si_otra_persona_guardo_antes_sin_perder_lo_escrito() {
 async fn borrar_exige_confirmacion() {
     let contexto = Contexto::nuevo().await;
     let (token, actor) = contexto.con_propietario().await;
-    let alta = formulario(&[("_csrf", &actor.token_csrf), ("nombre", "Ana")]);
+    let alta = formulario(&[
+        ("_csrf", &actor.token_csrf),
+        ("nombre", "Ana"),
+        ("telefono", "612345678"),
+    ]);
     contexto
         .pedir(post("/clientes/nuevo", Some(&token), &alta))
         .await;
