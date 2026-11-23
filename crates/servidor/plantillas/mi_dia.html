@@ -4,6 +4,14 @@
 {% block cuerpo %}
 {% include "mi_dia_cabecera.html" %}
 <main class="contenido">
+  {% if !tareas.is_empty() %}
+  <h2 class="titulo-seccion">Tareas</h2>
+  {% let volver = "/mi-dia" %}
+  <ul class="lista-tarjetas lista-apuntes" role="list">
+    {% for a in tareas %}{% include "apunte_tarjeta.html" %}{% endfor %}
+  </ul>
+  <h2 class="titulo-seccion">Ventanas</h2>
+  {% endif %}
   {% if tarjetas.is_empty() %}
   <p class="vacio tarjeta">No tienes ventanas asignadas. Cuando te asignen un trabajo aparecerá aquí.</p>
   {% endif %}

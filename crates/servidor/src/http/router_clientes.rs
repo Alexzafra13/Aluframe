@@ -1,13 +1,14 @@
 use axum::Router;
 use axum::routing::{get, post};
 
-use super::rutas::{clientes, clientes_ficha, clientes_fragmentos, importar_clientes};
+use super::rutas::{apuntes, clientes, clientes_ficha, clientes_fragmentos, importar_clientes};
 use crate::estado::EstadoApp;
 
 pub fn rutas_de_clientes() -> Router<EstadoApp> {
     Router::new()
         .merge(rutas_de_importacion())
         .merge(rutas_de_poblaciones())
+        .merge(rutas_de_apuntes())
         .route("/clientes", get(clientes::mostrar_clientes))
         .route(
             "/clientes/nuevo",
@@ -72,5 +73,21 @@ fn rutas_de_poblaciones() -> Router<EstadoApp> {
         .route(
             "/poblaciones/calles",
             get(clientes_fragmentos::sugerir_calles_de_direccion),
+        )
+}
+
+/// Notas y tareas sueltas (ADR-0025).
+fn rutas_de_apuntes() -> Router<EstadoApp> {
+    Router::new()
+        .route(
+            "/apuntes",
+            get(apuntes::mostrar_apuntes).post(apuntes::crear),
+        )
+        .route("/apuntes/nuevo", get(apuntes::mostrar_nuevo))
+        .route("/apuntes/{id}/hecho", post(apuntes::marcar_hecho))
+        .route("/apuntes/{id}/reabrir", post(apuntes::reabrir))
+        .route(
+            "/apuntes/{id}/presupuesto",
+            post(apuntes::hacer_presupuesto),
         )
 }

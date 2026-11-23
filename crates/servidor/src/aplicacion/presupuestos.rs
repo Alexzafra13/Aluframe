@@ -1,5 +1,6 @@
 use dominio::acceso::Accion;
 use rusqlite::{Connection, Transaction};
+use time::OffsetDateTime;
 
 use super::auditar::{Cambio, anotar};
 use super::{Actor, autorizar};
@@ -123,28 +124,38 @@ pub async fn crear_presupuesto(
 ) -> Result<i64, ErrorApp> {
     let (ahora, autor) = (estado.ahora(), actor.id);
     cambiar(estado, actor, "crear_presupuesto", move |tx, cuando| {
-        clientes::buscar(tx, cliente_id)?.ok_or(ErrorApp::NoEncontrado)?;
-        comprobar_direccion(tx, cliente_id, direccion)?;
-        let validez = configuracion::leer(tx, "presupuesto.validez_dias")?
-            .and_then(|d| d.parse::<i64>().ok())
-            .map(|dias| fecha_de_madrid(ahora, dias));
-        let condiciones =
-            configuracion::leer(tx, "presupuesto.condiciones")?.filter(|c| !c.trim().is_empty());
-        let anio = anio_de_madrid(ahora);
-        let nuevo = NuevoPresupuesto {
-            anio,
-            numero: presupuestos::siguiente_numero(tx, "P", anio)?,
-            cliente_id,
-            direccion_montaje_id: direccion,
-            validez_hasta: validez.as_deref(),
-            condiciones: condiciones.as_deref(),
-            creado_por: autor,
-            ahora: cuando,
-        };
-        let id = presupuestos::insertar(tx, &nuevo)?;
+        let id = insertar_presupuesto(tx, (cliente_id, direccion), (ahora, cuando, autor))?;
         Ok((id, id))
     })
     .await
+}
+
+/// El borrador nuevo con la validez y las condiciones de Ajustes, dentro de una transacción
+/// que ya está abierta (también la usa «Hacer presupuesto» de un apunte).
+pub fn insertar_presupuesto(
+    tx: &Transaction,
+    (cliente_id, direccion): (i64, Option<i64>),
+    (ahora, cuando, autor): (OffsetDateTime, &str, i64),
+) -> Result<i64, ErrorApp> {
+    clientes::buscar(tx, cliente_id)?.ok_or(ErrorApp::NoEncontrado)?;
+    comprobar_direccion(tx, cliente_id, direccion)?;
+    let validez = configuracion::leer(tx, "presupuesto.validez_dias")?
+        .and_then(|d| d.parse::<i64>().ok())
+        .map(|dias| fecha_de_madrid(ahora, dias));
+    let condiciones =
+        configuracion::leer(tx, "presupuesto.condiciones")?.filter(|c| !c.trim().is_empty());
+    let anio = anio_de_madrid(ahora);
+    let nuevo = NuevoPresupuesto {
+        anio,
+        numero: presupuestos::siguiente_numero(tx, "P", anio)?,
+        cliente_id,
+        direccion_montaje_id: direccion,
+        validez_hasta: validez.as_deref(),
+        condiciones: condiciones.as_deref(),
+        creado_por: autor,
+        ahora: cuando,
+    };
+    presupuestos::insertar(tx, &nuevo)
 }
 
 fn comprobar_direccion(

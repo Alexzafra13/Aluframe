@@ -29,6 +29,7 @@ pub async fn mostrar_inicio(
         seccion: "inicio",
         columnas,
         avisos: avisos.falta_algo,
+        apuntes: avisos.apuntes,
         stock_bajo: avisos.stock_bajo,
         cobros_vencidos: avisos.cobros_vencidos,
         sin_respuesta: avisos.sin_respuesta,

@@ -8,6 +8,7 @@
   </div>
   <div class="acciones">
     {% if usuario.puede_editar_clientes %}<a class="boton" href="/clientes/{{ cliente.id }}/editar">Editar datos</a>{% endif %}
+    <a class="boton" href="/apuntes/nuevo?cliente={{ cliente.id }}">Nuevo apunte</a>
     {% if usuario.es_propietario %}<form method="post" action="/presupuestos">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <input type="hidden" name="cliente" value="{{ cliente.id }}">

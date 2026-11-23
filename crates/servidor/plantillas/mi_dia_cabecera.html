@@ -1,6 +1,7 @@
 <header class="barra-operario">
   <a class="marca" href="/mi-dia"><span class="marca-logo" aria-hidden="true"></span>Mi día</a>
   <nav class="atajos-operario" aria-label="Secciones">
+    <a class="boton" href="/apuntes">Apuntes</a>
     <a class="boton" href="/clientes">Clientes</a>
     {% if !usuario.es_propietario && usuario.ve_presupuestos %}<a class="boton" href="/presupuestos">Presupuestos</a>{% endif %}
     {% if !usuario.es_propietario && usuario.ve_facturas %}<a class="boton" href="/facturas">Facturas</a>{% endif %}

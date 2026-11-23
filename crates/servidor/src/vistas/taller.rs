@@ -122,6 +122,8 @@ pub struct PaginaMiDia {
     pub tarjetas: Vec<TarjetaVentana>,
     /// Solo con el permiso de ver todo el taller (ADR-0024).
     pub resto: Vec<TarjetaVentana>,
+    /// Las tareas sueltas que le ha mandado el dueño (ADR-0025).
+    pub tareas: Vec<super::TarjetaApunte>,
 }
 
 #[derive(Template)]

@@ -6,6 +6,7 @@ use axum::extract::State;
 use axum::response::{IntoResponse, Response};
 use dominio::acceso::Accion;
 
+use crate::aplicacion::apuntes::apuntes_para_el_dueno;
 use crate::aplicacion::copias::pantalla::aviso_de_copias;
 use crate::aplicacion::facturas::listar_facturas;
 use crate::aplicacion::presupuestos::listar_presupuestos;
@@ -17,8 +18,8 @@ use crate::estado::EstadoApp;
 use crate::fecha::fecha_de_madrid;
 use crate::http::extractores::ActorActual;
 use crate::vistas::{
-    AvisoDelTaller, AvisosReunidos, Campana, estado_de_factura, euros, filas_de_stock, renderizar,
-    tablero,
+    AvisoDelTaller, AvisosReunidos, Campana, avisos_de_apuntes, estado_de_factura, euros,
+    filas_de_stock, renderizar, tablero,
 };
 
 /// `falta_algo` llega hecho porque el Inicio ya ha cargado los trabajos para el tablero.
@@ -31,6 +32,7 @@ pub async fn reunir_avisos(
     let (cobros_vencidos, sin_respuesta) = avisos_de_cobro(estado, actor).await?;
     Ok(AvisosReunidos {
         copias: aviso_de_copias(estado),
+        apuntes: avisos_de_apuntes(&apuntes_para_el_dueno(estado, actor).await?),
         falta_algo,
         cobros_vencidos,
         stock_bajo: stock_bajo(estado, actor).await?,

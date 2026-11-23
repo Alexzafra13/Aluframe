@@ -84,6 +84,10 @@ pub enum Accion {
     /// Emitir facturas, apuntar cobros y señales, y albaranes.
     GestionarFacturas,
     VerMiDia,
+    /// Escribir apuntes y ver los suyos y las tareas que le mandan (ADR-0025).
+    TomarApuntes,
+    /// Ver todos los apuntes, mandar tareas a un operario y pasarlos a presupuesto.
+    GestionarApuntes,
     /// Marcar los pasos de las ventanas que tiene asignadas (con permiso, de cualquiera).
     MarcarPasos,
 }
@@ -93,7 +97,7 @@ pub fn puede_realizar(rol: Rol, permisos: &Permisos, accion: Accion) -> bool {
         return true;
     }
     match accion {
-        Accion::VerMiDia | Accion::MarcarPasos | Accion::VerClientes => true,
+        Accion::VerMiDia | Accion::MarcarPasos | Accion::VerClientes | Accion::TomarApuntes => true,
         Accion::EditarClientes => permisos.tiene(Permiso::EditarClientes),
         Accion::VerPresupuestos => permisos.tiene(Permiso::VerPresupuestos),
         Accion::VerFacturas => permisos.tiene(Permiso::VerFacturas),
@@ -106,7 +110,8 @@ pub fn puede_realizar(rol: Rol, permisos: &Permisos, accion: Accion) -> bool {
         | Accion::VerCostes
         | Accion::GestionarDatos
         | Accion::GestionarTrabajos
-        | Accion::GestionarFacturas => false,
+        | Accion::GestionarFacturas
+        | Accion::GestionarApuntes => false,
     }
 }
 

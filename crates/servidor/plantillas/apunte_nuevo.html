@@ -1,0 +1,43 @@
+{% extends "marco.html" %}
+{% block titulo %}Nuevo apunte{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo"><a href="/apuntes">Apuntes</a></p>
+  <h1>Nuevo apunte</h1>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+<form class="tarjeta formulario-apunte" method="post" action="/apuntes">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  {% if let Some((id, nombre)) = cliente %}
+  <input type="hidden" name="cliente" value="{{ id }}">
+  <p>Cliente: <a href="/clientes/{{ id }}"><strong>{{ nombre }}</strong></a></p>
+  {% if !direcciones.is_empty() %}
+  <label for="direccion">Dirección de montaje</label>
+  <select id="direccion" name="direccion">
+    <option value="">Sin indicar</option>
+    {% for d in direcciones %}<option value="{{ d.valor }}">{{ d.texto }}</option>{% endfor %}
+  </select>
+  {% endif %}
+  {% else %}
+  <label for="contacto">Quién lo pide (nombre o teléfono)</label>
+  <input id="contacto" name="contacto" maxlength="200" value="{{ valores.contacto }}" autocomplete="off" placeholder="Vecina del 3.º, 612 345 678">
+  <p class="texto-apagado pequeno">Si ya es cliente, búscalo en <a href="/clientes">Clientes</a> y pulsa «Nuevo apunte» en su ficha.</p>
+  {% endif %}
+  <label for="texto">Qué hay que hacer o qué ha pasado (obligatorio)</label>
+  <textarea id="texto" name="texto" rows="4" required maxlength="2000" placeholder="Quiere presupuesto de 2 mosquiteras para la cocina, en blanco.">{{ valores.texto }}</textarea>
+  <label for="medidas">Medidas tomadas</label>
+  <textarea id="medidas" name="medidas" rows="3" maxlength="2000" class="mono" placeholder="Cocina: 120 × 100 cm&#10;Baño: 60 × 80 cm">{{ valores.medidas }}</textarea>
+  {% if !operarios.is_empty() %}
+  <label for="para">Para</label>
+  <select id="para" name="para">
+    <option value="">Para mí (nota)</option>
+    {% for o in operarios %}<option value="{{ o.valor }}">Tarea para {{ o.texto }}</option>{% endfor %}
+  </select>
+  <p class="texto-apagado pequeno">Una tarea le aparece al operario en «Mi día» hasta que la marque como hecha.</p>
+  {% endif %}
+  <div class="acciones">
+    <a class="boton" href="/apuntes">Cancelar</a>
+    <button class="boton primario" type="submit">Guardar apunte</button>
+  </div>
+</form>
+{% endblock %}

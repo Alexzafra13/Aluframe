@@ -69,6 +69,7 @@ fn crea_todas_las_tablas_en_una_base_vacia() {
         "serie",
         "usuario",
         "usuario_permiso",
+        "apunte",
         "factura",
         "cobro",
     ] {

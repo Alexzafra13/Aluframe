@@ -86,7 +86,7 @@ Se da de alta un **cliente** con una dirección de montaje. Se crea el **presupu
 10. Facturas de proveedores y archivos adjuntos: ¿entran en el MVP o quedan reservadas?
 
 ## 7. Tablas y campos (para Claude Code)
-El esquema de H0 a H6 (usuarios, sesiones, auditoría y esquema; series; clientes y catálogo; presupuestos; trabajos; stock y facturas) es la migración `crates/servidor/src/bd/migraciones/0001_inicial.sql`; la 0002 añade los permisos de operario (ADR-0024). Desde la 0.11.0 cada cambio es una migración nueva y la versión de la base es `PRAGMA user_version` (ADR-0021).
+El esquema de H0 a H6 (usuarios, sesiones, auditoría y esquema; series; clientes y catálogo; presupuestos; trabajos; stock y facturas) es la migración `crates/servidor/src/bd/migraciones/0001_inicial.sql`; la 0002 añade los permisos de operario (ADR-0024) y la 0003, los apuntes (ADR-0025). Desde la 0.11.0 cada cambio es una migración nueva y la versión de la base es `PRAGMA user_version` (ADR-0021).
 
 ### 7.1 Convenciones
 | Convención | Regla |
@@ -109,6 +109,7 @@ El esquema de H0 a H6 (usuarios, sesiones, auditoría y esquema; series; cliente
 | `usuario` | id, nombre, rol (`propietario`/`operario`), clave_hash (argon2id: contraseña o PIN), activo, intentos_fallidos, bloqueado_hasta, creado_en, version |
 | `bloqueo_ip` | ip (PK), intentos_fallidos, bloqueado_hasta (bloqueo progresivo por dirección) |
 | `usuario_permiso` | usuario_id, permiso (`editar_clientes`/`ver_presupuestos`/`ver_facturas`/`ver_todos_los_trabajos`). Migración 0002, ADR-0024 |
+| `apunte` | id, autor_id, para_id (sin él, para el dueño; con él, tarea para ese operario), cliente_id (se borra con el cliente), direccion_id, contacto, texto, medidas, estado (`pendiente`/`hecho`/`presupuestado`), presupuesto_id, creado_en, cerrado_en, cerrado_por, version. Migración 0003, ADR-0025 |
 | `sesion` | id (hash del identificador de 256 bits), usuario_id, creada_en, ultima_actividad_en, caduca_en, token_csrf, hasta_cerrar_navegador (0/1, opción del propietario al entrar) |
 | `configuracion` | clave (PK), valor, actualizado_en, usuario_id |
 | `secuencia_documentos` | serie, anio, ultimo; PK (serie, anio) |

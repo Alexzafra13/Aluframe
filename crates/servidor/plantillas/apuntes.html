@@ -1,0 +1,25 @@
+{% extends "marco.html" %}
+{% block titulo %}Apuntes{% endblock %}
+{% block contenido %}
+<header class="cabecera-pagina cabecera-con-acciones">
+  <div>
+    <h1>Apuntes</h1>
+    <p class="texto-apagado">Lo que no es una ventana: encargos, llamadas, recados y tareas sueltas.</p>
+  </div>
+  <div class="acciones"><a class="boton primario" href="/apuntes/nuevo">Nuevo apunte</a></div>
+</header>
+{% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
+{% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+<nav class="segmentado" aria-label="Qué ver">
+  <a class="segmento{% if abiertos %} activo{% endif %}" href="/apuntes"{% if abiertos %} aria-current="page"{% endif %}>Pendientes</a>
+  <a class="segmento{% if !abiertos %} activo{% endif %}" href="/apuntes?cerrados=si"{% if !abiertos %} aria-current="page"{% endif %}>Hechos</a>
+</nav>
+{% if apuntes.is_empty() %}
+<p class="vacio tarjeta">{% if abiertos %}No hay nada pendiente. Pulsa «Nuevo apunte» para anotar un encargo o una llamada.{% else %}Aún no hay apuntes hechos.{% endif %}</p>
+{% else %}
+{% let volver = "/apuntes" %}
+<ul class="lista-tarjetas lista-apuntes" role="list">
+  {% for a in apuntes %}{% include "apunte_tarjeta.html" %}{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

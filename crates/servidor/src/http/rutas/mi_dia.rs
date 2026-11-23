@@ -8,6 +8,7 @@ use dominio::acceso::Accion;
 use dominio::taller::AccionDePaso;
 
 use crate::aplicacion::Actor;
+use crate::aplicacion::apuntes::mis_tareas;
 use crate::aplicacion::trabajos::acciones::{anotar_falta, cambiar_paso, repetir_pieza};
 use crate::aplicacion::trabajos::consultar::{ventanas_de_operario, ventanas_del_resto_del_taller};
 use crate::aplicacion::trabajos::operario::abrir_ventana;
@@ -16,8 +17,8 @@ use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
 use crate::http::formulario::Campos;
 use crate::vistas::{
-    HojaDeVentana, PaginaMiDia, PaginaVentanaOperario, TarjetaVentana, VentanaEnPantalla,
-    renderizar,
+    HojaDeVentana, PaginaMiDia, PaginaVentanaOperario, TarjetaApunte, TarjetaVentana,
+    VentanaEnPantalla, renderizar,
 };
 
 pub async fn mostrar_mi_dia(
@@ -36,10 +37,16 @@ pub async fn mostrar_mi_dia(
             .map(|(v, t)| TarjetaVentana::de(v, t))
             .collect()
     };
+    let tareas = mis_tareas(&estado, &actor)
+        .await?
+        .into_iter()
+        .map(|f| TarjetaApunte::de(f, &actor))
+        .collect();
     let pagina = PaginaMiDia {
         usuario: (&actor).into(),
         tarjetas: tarjetas(&ventanas),
         resto: tarjetas(&resto),
+        tareas,
     };
     Ok(renderizar(&pagina)?.into_response())
 }

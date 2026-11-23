@@ -23,6 +23,9 @@
   </section>
   {% endfor %}
   <aside class="panel-atencion" aria-labelledby="titulo-atencion">
+    <h2 class="antetitulo">Apuntes <a class="pequeno" href="/apuntes">ver todos</a></h2>
+    {% if apuntes.is_empty() %}<p class="vacio">Nada pendiente. Aquí llegan los encargos y recados que apuntan los operarios.</p>{% endif %}
+    <ul class="lista-simple">{% for a in apuntes %}<li><a href="{{ a.enlace }}">{{ a.texto }}</a></li>{% endfor %}</ul>
     <h2 class="antetitulo" id="titulo-atencion">Avisos del taller</h2>
     {% if avisos.is_empty() %}<p class="vacio">Nada pendiente. Aquí llegan los «falta algo» de los operarios.</p>{% endif %}
     <ul class="lista-simple">{% for a in avisos %}<li><a href="{{ a.enlace }}">{{ a.texto }}</a></li>{% endfor %}</ul>

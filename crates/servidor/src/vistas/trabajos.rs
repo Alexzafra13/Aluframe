@@ -78,6 +78,7 @@ pub struct PaginaInicio {
     pub seccion: &'static str,
     pub columnas: Vec<(&'static str, Vec<TarjetaTrabajo>)>,
     pub avisos: Vec<AvisoDelTaller>,
+    pub apuntes: Vec<AvisoDelTaller>,
     pub stock_bajo: Vec<AvisoDelTaller>,
     pub cobros_vencidos: Vec<AvisoDelTaller>,
     pub sin_respuesta: Vec<AvisoDelTaller>,

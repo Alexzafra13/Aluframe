@@ -25,6 +25,7 @@ pub const MENU: &[GrupoMenu] = &[
             entrada("Inicio", "/", "inicio"),
             entrada("Mi día", "/mi-dia", "mi-dia"),
             entrada("Clientes", "/clientes", "clientes"),
+            entrada("Apuntes", "/apuntes", "apuntes"),
             entrada("Presupuestos", "/presupuestos", "presupuestos"),
             entrada("Trabajos", "/trabajos", "trabajos"),
         ],

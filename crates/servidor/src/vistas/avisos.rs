@@ -9,6 +9,7 @@ const POR_GRUPO: usize = 5;
 
 pub struct AvisosReunidos {
     pub copias: Option<String>,
+    pub apuntes: Vec<AvisoDelTaller>,
     pub falta_algo: Vec<AvisoDelTaller>,
     pub cobros_vencidos: Vec<AvisoDelTaller>,
     pub stock_bajo: Vec<AvisoDelTaller>,
@@ -36,6 +37,7 @@ impl Campana {
         });
         let grupos: Vec<GrupoDeAvisos> = [
             ("Copias de seguridad", copias.into_iter().collect()),
+            ("Apuntes", avisos.apuntes),
             ("Falta algo en el taller", avisos.falta_algo),
             ("Cobros vencidos", avisos.cobros_vencidos),
             ("Stock bajo mínimo", avisos.stock_bajo),

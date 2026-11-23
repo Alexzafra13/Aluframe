@@ -1,3 +1,4 @@
+mod apuntes;
 mod avisos;
 mod catalogo;
 mod clientes;
@@ -18,6 +19,7 @@ mod tarifas;
 mod terminar;
 mod trabajos;
 
+pub use apuntes::*;
 pub use avisos::*;
 pub use catalogo::*;
 pub use clientes::*;

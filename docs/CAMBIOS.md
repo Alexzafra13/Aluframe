@@ -142,3 +142,11 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Migración 0002, que solo añade la tabla `usuario_permiso`.
   - Cambia la regla de `CLAUDE.md` y `SPEC.md`: el operario no ve precios salvo permiso del dueño, nunca costes.
   - Las pruebas «el operario no llega a los clientes» pasan a la regla nueva, con más comprobaciones. Estilos de formularios en `formularios.css`, para no pasar de 300 líneas en `estilos.css`.
+- **0.15.0 (propietario): apuntes** (ADR-0025, parte 2 del plan), notas y tareas sueltas para lo que no es una ventana:
+  - **Qué lleva un apunte:** texto, medidas tomadas si las hay, y un cliente con su dirección o un contacto suelto.
+  - **Del operario al dueño:** le llegan a la campana y al panel del Inicio.
+  - **Del dueño a un operario:** son tareas y le salen en «Mi día» hasta que las marca como hechas.
+  - **Pantallas:** *Apuntes* en el menú (pendientes y hechos), *Nuevo apunte* también desde la ficha del cliente, y «Hacer presupuesto», que crea el borrador con el cliente y la dirección y cierra el apunte en la misma operación.
+  - **El operario** ve los suyos y sus tareas; no manda tareas ni cierra lo que apuntó para el dueño.
+  - **Datos:** los apuntes van en la exportación de datos del cliente y se borran con él. Migración 0003, que solo añade la tabla `apunte`.
+  - **Pruebas:** casos de uso, permisos y recorrido de pantalla. La E2E de apuntes va al final (`h8-apuntes.spec.js`), porque las pruebas de pantalla comparten base y la primera espera un programa recién instalado.

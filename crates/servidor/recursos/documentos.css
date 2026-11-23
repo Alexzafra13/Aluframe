@@ -189,3 +189,8 @@ span.silueta { background: transparent; }
 }
 
 .fila-accion { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; justify-content: space-between; padding: .5rem 0; border-top: 1px solid var(--linea); }
+/* Apuntes (ADR-0025): tarjetas de nota con quién, qué y medidas. */
+.apunte { margin-bottom: 0; }
+.apunte-cabecera { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.apunte-texto { font-size: 1.05rem; margin: .5rem 0; }
+.apunte-medidas { background: var(--papel); border-radius: 8px; padding: .5rem .75rem; margin: .5rem 0; }

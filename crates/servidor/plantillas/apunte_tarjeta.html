@@ -1,0 +1,40 @@
+<li class="tarjeta apunte" id="apunte-{{ a.id }}">
+  <div class="apunte-cabecera">
+    <span class="texto-apagado pequeno">{{ a.de_para }} · {{ a.fecha }}</span>
+    {% if a.estado == "hecho" %}<span class="etiqueta etiqueta-azul">Hecho</span>{% else if a.estado == "presupuestado" %}<span class="etiqueta etiqueta-azul">Presupuestado</span>{% endif %}
+  </div>
+  <p class="apunte-texto con-saltos">{{ a.texto }}</p>
+  {% if let Some(m) = a.medidas %}<p class="apunte-medidas con-saltos mono">{{ m }}</p>{% endif %}
+  <p class="pequeno">
+    {% if let Some((id, nombre)) = a.cliente %}<a href="/clientes/{{ id }}">{{ nombre }}</a>{% endif %}
+    {% if let Some(c) = a.contacto %}{% if a.cliente.is_some() %} · {% endif %}{{ c }}{% endif %}
+    {% if let Some(d) = a.direccion %} · {{ d }}{% endif %}
+    {% if let Some(p) = a.presupuesto_id %}{% if usuario.ve_presupuestos %} · <a href="/presupuestos/{{ p }}">Ver el presupuesto</a>{% endif %}{% endif %}
+  </p>
+  {% if a.puede_marcar || a.puede_presupuestar %}
+  <div class="acciones">
+    {% if a.puede_presupuestar %}
+    <form method="post" action="/apuntes/{{ a.id }}/presupuesto">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="version" value="{{ a.version }}">
+      <button class="boton primario" type="submit">Hacer presupuesto</button>
+    </form>
+    {% endif %}
+    {% if a.puede_marcar && a.estado == "pendiente" %}
+    <form method="post" action="/apuntes/{{ a.id }}/hecho">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="version" value="{{ a.version }}">
+      <input type="hidden" name="volver" value="{{ volver }}">
+      <button class="boton" type="submit">Hecho</button>
+    </form>
+    {% else if a.puede_marcar && a.estado == "hecho" %}
+    <form method="post" action="/apuntes/{{ a.id }}/reabrir">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="version" value="{{ a.version }}">
+      <input type="hidden" name="volver" value="{{ volver }}">
+      <button class="boton" type="submit">Volver a pendiente</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endif %}
+</li>

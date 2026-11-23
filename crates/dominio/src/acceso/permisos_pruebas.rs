@@ -1,6 +1,6 @@
 use super::*;
 
-const TODAS: [Accion; 16] = [
+const TODAS: [Accion; 18] = [
     Accion::VerPanelDelPropietario,
     Accion::GestionarUsuarios,
     Accion::GestionarCatalogo,
@@ -16,11 +16,13 @@ const TODAS: [Accion; 16] = [
     Accion::VerFacturas,
     Accion::GestionarFacturas,
     Accion::VerMiDia,
+    Accion::TomarApuntes,
+    Accion::GestionarApuntes,
     Accion::MarcarPasos,
 ];
 
 /// Lo que nunca puede hacer un operario, tenga los permisos que tenga.
-const SOLO_DEL_DUENO: [Accion; 9] = [
+const SOLO_DEL_DUENO: [Accion; 10] = [
     Accion::VerPanelDelPropietario,
     Accion::GestionarUsuarios,
     Accion::GestionarCatalogo,
@@ -30,6 +32,7 @@ const SOLO_DEL_DUENO: [Accion; 9] = [
     Accion::GestionarDatos,
     Accion::GestionarTrabajos,
     Accion::GestionarFacturas,
+    Accion::GestionarApuntes,
 ];
 
 #[test]
@@ -51,7 +54,12 @@ fn el_operario_sin_permisos_ve_su_dia_y_los_clientes() {
         .collect();
     assert_eq!(
         permitidas,
-        [Accion::VerClientes, Accion::VerMiDia, Accion::MarcarPasos]
+        [
+            Accion::VerClientes,
+            Accion::VerMiDia,
+            Accion::TomarApuntes,
+            Accion::MarcarPasos
+        ]
     );
 }
 

@@ -1,4 +1,5 @@
 pub mod acabados;
+pub mod apuntes;
 pub mod articulos;
 pub mod articulos_con_precio;
 pub mod auditoria;

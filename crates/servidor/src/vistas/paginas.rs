@@ -34,7 +34,7 @@ impl UsuarioEnPantalla {
     pub fn ve_seccion(&self, seccion: &str) -> bool {
         match seccion {
             "mi-dia" => !self.es_propietario,
-            "clientes" => true,
+            "clientes" | "apuntes" => true,
             "presupuestos" => self.ve_presupuestos,
             "facturas" => self.ve_facturas,
             _ => self.es_propietario,

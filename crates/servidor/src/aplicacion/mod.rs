@@ -2,6 +2,7 @@ pub mod acabados_incluidos;
 pub mod aceptar_presupuesto;
 mod actor;
 pub mod ajustes_presupuesto;
+pub mod apuntes;
 mod auditar;
 pub mod calculo_de_ventana;
 pub mod calles;

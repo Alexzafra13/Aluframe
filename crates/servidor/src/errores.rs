@@ -1,4 +1,5 @@
 use dominio::acceso::ErrorAcceso;
+use dominio::apuntes::ErrorApunte;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -19,6 +20,12 @@ pub enum ErrorApp {
 
 impl From<ErrorAcceso> for ErrorApp {
     fn from(error: ErrorAcceso) -> Self {
+        ErrorApp::Validacion(error.to_string())
+    }
+}
+
+impl From<ErrorApunte> for ErrorApp {
+    fn from(error: ErrorApunte) -> Self {
         ErrorApp::Validacion(error.to_string())
     }
 }
