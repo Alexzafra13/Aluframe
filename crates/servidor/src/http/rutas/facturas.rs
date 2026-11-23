@@ -115,7 +115,7 @@ pub async fn imprimir_factura(
     Path(id): Path<i64>,
 ) -> Result<Response, ErrorApp> {
     let h = hoja_de_factura(&estado, &actor, id).await?;
-    let pagina = hoja_desde_fotografia(id, &h.foto, (h.borrador, h.logo), (h.vencimiento, h.notas));
+    let pagina = hoja_desde_fotografia(id, h);
     Ok(renderizar(&pagina)?.into_response())
 }
 

@@ -8,6 +8,7 @@ use serde_json::Value;
 
 use super::{euros, fecha_corta};
 use crate::aplicacion::datos_de_empresa::CabeceraDeEmpresa;
+use crate::aplicacion::facturas::HojaDeFactura;
 
 pub struct LineaFacturaImpresa {
     pub titulo: String,
@@ -25,6 +26,8 @@ pub struct PaginaFacturaImpresa {
     pub tipo: &'static str,
     pub codigo: String,
     pub fecha: String,
+    /// Vacía si es la misma que la de emisión.
+    pub fecha_operacion: String,
     pub borrador: bool,
     pub rectifica: String,
     pub motivo: String,
@@ -119,13 +122,18 @@ fn porcentaje_o_nada(bp: i64) -> String {
     }
 }
 
-/// Todo sale de la fotografía (o de su equivalente para un borrador).
-pub fn hoja_desde_fotografia(
-    id: i64,
-    foto: &Value,
-    (borrador, logo): (bool, Option<String>),
-    (vencimiento, notas): (String, String),
-) -> PaginaFacturaImpresa {
+fn fecha_de_operacion(foto: &Value, fecha_operacion: &str) -> String {
+    if fecha_operacion.is_empty() || fecha_operacion == texto(&foto["fecha"]) {
+        String::new()
+    } else {
+        fecha_corta(fecha_operacion)
+    }
+}
+
+/// Todo sale de la fotografía (o de su equivalente para un borrador), salvo lo que la factura
+/// guarda aparte y no cambia una vez emitida: vencimiento, notas y fecha de la operación.
+pub fn hoja_desde_fotografia(id: i64, h: HojaDeFactura) -> PaginaFacturaImpresa {
+    let foto = &h.foto;
     let t = &foto["totales"];
     let rectificativa = texto(&foto["tipo"]) == "rectificativa";
     PaginaFacturaImpresa {
@@ -137,10 +145,11 @@ pub fn hoja_desde_fotografia(
         },
         codigo: texto(&foto["codigo"]),
         fecha: fecha_corta(&texto(&foto["fecha"])),
-        borrador,
+        fecha_operacion: fecha_de_operacion(foto, &h.fecha_operacion),
+        borrador: h.borrador,
         rectifica: texto(&foto["rectifica"]),
         motivo: texto(&foto["motivo_rectificacion"]),
-        empresa: empresa_de(&foto["empresa"], logo),
+        empresa: empresa_de(&foto["empresa"], h.logo),
         cliente: cliente_de(&foto["cliente"]),
         lineas: foto["lineas"]
             .as_array()
@@ -152,12 +161,12 @@ pub fn hoja_desde_fotografia(
         descuento: porcentaje_o_nada(entero(&t["descuento_bp"])),
         base: euros(entero(&t["base_cent"])),
         total: euros(entero(&t["total_cent"])),
-        vencimiento: if vencimiento.is_empty() {
-            vencimiento
+        vencimiento: if h.vencimiento.is_empty() {
+            h.vencimiento
         } else {
-            fecha_corta(&vencimiento)
+            fecha_corta(&h.vencimiento)
         },
-        notas,
+        notas: h.notas,
     }
 }
 

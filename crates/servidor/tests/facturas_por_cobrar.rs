@@ -5,60 +5,18 @@
 
 mod comun;
 
+use comun::facturas::{con_cliente, emitida_libre};
 use comun::{Contexto, get, texto};
-use dominio::clientes::{EntradaDeCliente, validar_cliente};
-use dominio::unidades::{Porcentaje, PrecioUnitario};
 use servidor::aplicacion::Actor;
-use servidor::aplicacion::clientes::crear_cliente;
-use servidor::aplicacion::facturas::crear::{factura_libre, rectificativa};
-use servidor::aplicacion::facturas::editar::{
-    DatosDeFactura, LineaNueva, anadir_linea, guardar_datos,
-};
+use servidor::aplicacion::facturas::crear::rectificativa;
 use servidor::aplicacion::facturas::emitir::emitir_factura;
-use servidor::aplicacion::facturas::{cargar_factura, listar_por_cobrar};
+use servidor::aplicacion::facturas::listar_por_cobrar;
 use servidor::estado::EstadoApp;
-
-async fn con_cliente(contexto: &Contexto) -> (String, Actor) {
-    let (token, actor) = contexto.con_propietario().await;
-    let cliente = validar_cliente(&EntradaDeCliente {
-        nombre: "Ana Ruiz".into(),
-        ..EntradaDeCliente::default()
-    })
-    .unwrap();
-    crear_cliente(&contexto.estado, &actor, cliente, vec![])
-        .await
-        .unwrap();
-    (token, actor)
-}
 
 /// Una factura libre de 80 € + IVA que venció antes de hoy (el reloj de las pruebas está en
 /// noviembre de 2026), ya emitida.
 async fn emitida_y_vencida(estado: &EstadoApp, actor: &Actor) -> i64 {
-    let id = factura_libre(estado, actor, 1).await.unwrap();
-    let linea = LineaNueva {
-        descripcion: "Instalación".into(),
-        cantidad_mil: 1_000,
-        precio: PrecioUnitario::desde_texto_es("80").unwrap(),
-        descuento: Porcentaje::CERO,
-        iva: Porcentaje::desde_puntos_basicos(2_100),
-    };
-    anadir_linea(estado, actor, id, linea).await.unwrap();
-    let version = cargar_factura(estado, actor, id)
-        .await
-        .unwrap()
-        .factura
-        .version;
-    let datos = DatosDeFactura {
-        fecha_operacion: None,
-        vencimiento: Some("2026-10-31".into()),
-        notas: None,
-        descuento: Porcentaje::CERO,
-    };
-    guardar_datos(estado, actor, (id, version), datos)
-        .await
-        .unwrap();
-    emitir_factura(estado, actor, id, true).await.unwrap();
-    id
+    emitida_libre(estado, actor, (None, Some("2026-10-31"))).await
 }
 
 /// Fallo corregido: una factura anulada con una rectificativa emitida seguía «Vencida», con su

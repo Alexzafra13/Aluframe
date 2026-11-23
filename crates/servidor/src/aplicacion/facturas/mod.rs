@@ -118,6 +118,9 @@ pub struct HojaDeFactura {
     pub logo: Option<String>,
     pub vencimiento: String,
     pub notas: String,
+    /// Como el vencimiento, de la factura: una emitida ya no cambia (disparador del esquema) y
+    /// así también sale en las emitidas antes de que la fotografía la guardara.
+    pub fecha_operacion: String,
 }
 
 pub async fn hoja_de_factura(
@@ -138,7 +141,7 @@ pub async fn hoja_de_factura(
                 None => {
                     let textos = super::ajustes_presupuesto::leer_de_la_base(con)?.textos;
                     let empresa = super::datos_de_empresa::CabeceraDeEmpresa::desde(&textos, None);
-                    emitir::fotografia(&ficha, &empresa, ("Borrador", &hoy))
+                    emitir::fotografia(&ficha, &empresa, ("Borrador", &hoy))?
                 }
             };
             Ok(HojaDeFactura {
@@ -147,6 +150,7 @@ pub async fn hoja_de_factura(
                 logo,
                 vencimiento: f.vencimiento.clone().unwrap_or_default(),
                 notas: f.notas.clone().unwrap_or_default(),
+                fecha_operacion: f.fecha_operacion.clone().unwrap_or_default(),
             })
         })
         .await

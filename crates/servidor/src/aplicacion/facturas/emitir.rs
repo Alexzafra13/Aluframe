@@ -30,7 +30,7 @@ fn lineas_en_json(ficha: &FichaDeFactura) -> Vec<Value> {
         .collect()
 }
 
-fn totales_en_json(ficha: &FichaDeFactura) -> Value {
+fn totales_en_json(ficha: &FichaDeFactura) -> Result<Value, ErrorApp> {
     let para_totales: Vec<LineaParaTotales> = ficha
         .lineas
         .iter()
@@ -40,7 +40,8 @@ fn totales_en_json(ficha: &FichaDeFactura) -> Value {
         })
         .collect();
     let descuento = Porcentaje::desde_puntos_basicos(ficha.factura.descuento_bp);
-    let t = calcular_totales(&para_totales, descuento).unwrap_or_default();
+    let t = calcular_totales(&para_totales, descuento)
+        .ok_or_else(|| ErrorApp::Validacion("Los importes son demasiado grandes.".into()))?;
     let bases: Vec<Value> = t
         .bases
         .iter()
@@ -49,16 +50,19 @@ fn totales_en_json(ficha: &FichaDeFactura) -> Value {
                 "cuota_cent": b.cuota.centimos() })
         })
         .collect();
-    json!({ "descuento_bp": ficha.factura.descuento_bp, "bases": bases,
-        "base_cent": t.base.centimos(), "iva_cent": t.iva.centimos(), "total_cent": t.total.centimos() })
+    Ok(
+        json!({ "descuento_bp": ficha.factura.descuento_bp, "bases": bases,
+        "base_cent": t.base.centimos(), "iva_cent": t.iva.centimos(), "total_cent": t.total.centimos() }),
+    )
 }
 
-/// Lo que se congela: empresa, cliente, líneas, IVA por tipo y totales.
+/// Lo que se congela: empresa, cliente, fechas, líneas, IVA por tipo y totales. La fecha de la
+/// operación es la de emisión salvo que se haya indicado otra (la ley pide que conste si difiere).
 pub(crate) fn fotografia(
     ficha: &FichaDeFactura,
     empresa: &CabeceraDeEmpresa,
     (codigo, fecha): (&str, &str),
-) -> String {
+) -> Result<String, ErrorApp> {
     let c = &ficha.cliente;
     let fiscal = [
         &c.fiscal_calle,
@@ -68,9 +72,10 @@ pub(crate) fn fotografia(
         &c.fiscal_pais,
     ];
     let direccion: Vec<&String> = fiscal.into_iter().flatten().collect();
-    json!({
+    Ok(json!({
         "codigo": codigo,
         "fecha": fecha,
+        "fecha_operacion": ficha.factura.fecha_operacion.as_deref().unwrap_or(fecha),
         "tipo": ficha.factura.tipo,
         "rectifica": ficha.rectifica.as_ref().map(|r| r.codigo()),
         "motivo_rectificacion": ficha.factura.motivo_rectificacion,
@@ -79,9 +84,9 @@ pub(crate) fn fotografia(
         "cliente": { "numero": c.id, "nombre": c.nombre, "nif": c.nif, "telefono": c.telefono,
             "email": c.email, "direccion": direccion },
         "lineas": lineas_en_json(ficha),
-        "totales": totales_en_json(ficha),
+        "totales": totales_en_json(ficha)?,
     })
-    .to_string()
+    .to_string())
 }
 
 fn comprobar(ficha: &FichaDeFactura, confirmado: bool) -> Result<(), ErrorApp> {
@@ -119,7 +124,7 @@ fn emitir_en(
         &ficha,
         &CabeceraDeEmpresa::desde(&textos, logo),
         (&codigo, &fecha),
-    );
+    )?;
     let sha = calcular_sha256(&foto);
     let emision = Emision {
         anio,

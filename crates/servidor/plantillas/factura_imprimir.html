@@ -19,6 +19,7 @@
       <p class="a4-codigo mono">{{ codigo }}</p>
       <dl class="a4-fechas">
         <div><dt>Fecha</dt><dd>{{ fecha }}</dd></div>
+        {% if !fecha_operacion.is_empty() %}<div><dt>Fecha de la operación</dt><dd>{{ fecha_operacion }}</dd></div>{% endif %}
         {% if !vencimiento.is_empty() %}<div><dt>Vencimiento</dt><dd>{{ vencimiento }}</dd></div>{% endif %}
       </dl>
       {% if borrador %}<p class="a4-provisional">Borrador: sin validez hasta que se emita</p>{% endif %}
