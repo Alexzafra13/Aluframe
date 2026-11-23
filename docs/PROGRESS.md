@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H7 terminados**; publicada la **v0.11.2**. Desde ella los datos se conservan al actualizar. Siguiente: importar tarifas desde Excel (.xlsx, .xls, .ods) y PDF (asistido); después el propietario simula con datos a mano y pule la interfaz.
+Estado (2026-11-22): **H0–H7 terminados**; publicada la **v0.12.0**. Desde ella los datos se conservan al actualizar. Siguiente: importar tarifas desde Excel (.xlsx, .xls, .ods) y PDF (asistido); después el propietario simula con datos a mano y pule la interfaz.
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.

@@ -87,3 +87,5 @@ Implementación: `crates/servidor/recursos/movil.css` e iconos en `plantillas/ic
 - Cabecera: marca y, a la derecha, el botón de plegar **solo con icono** (44 × 44 px, nombre accesible «Plegar menú» / «Desplegar menú»). Plegado, ocupa el sitio de la marca.
 - Pie: Ajustes y una tarjeta con avatar, nombre y rol; **Salir** es un botón con icono en rojo `--peligro: #F2555A` (fondo al pasar `rgb(242 85 90 / .14)`). Excepción pedida por el propietario a la regla de solo azul y naranja: el rojo se reserva para salir y acciones destructivas. En la hoja «Más» del móvil, Salir va en `#D93D42` sobre blanco.
 - Con menú lateral, el nombre de quien ha entrado ya no se repite en la barra superior (sí en el móvil).
+- **0.12.0:** sin títulos de grupo (Vender, Taller, Cobrar) en el menú ni encima del título de las páginas: los grupos se separan con una línea fina. Campana de avisos en la barra superior (insignia naranja con el número; panel con los grupos por urgencia: copias, falta algo, cobros vencidos, stock bajo, presupuestos sin respuesta, hasta 5 de cada uno).
+

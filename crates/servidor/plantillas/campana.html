@@ -1,0 +1,17 @@
+<details class="campana" id="campana" data-campana>
+  <summary class="boton-campana" aria-label="{% if total == 0 %}Avisos: ninguno{% else %}Avisos: {{ total }}{% endif %}" title="Avisos">
+    <svg class="icono" aria-hidden="true"><use href="#i-campana"/></svg>
+    {% if total > 0 %}<span class="insignia" aria-hidden="true">{% if total > 99 %}99+{% else %}{{ total }}{% endif %}</span>{% endif %}
+  </summary>
+  <div class="panel-campana">
+    <p class="panel-campana-titulo">Avisos</p>
+    {% if grupos.is_empty() %}<p class="vacio">Todo en orden: nada pendiente.</p>{% endif %}
+    {% for g in grupos %}
+    <section class="grupo-campana" aria-label="{{ g.titulo }}">
+      <p class="antetitulo">{{ g.titulo }}</p>
+      <ul>{% for a in g.avisos %}<li><a href="{{ a.enlace }}">{{ a.texto }}</a></li>{% endfor %}</ul>
+      {% if g.mas > 0 %}<a class="pequeno" href="/">y {{ g.mas }} más en el Inicio</a>{% endif %}
+    </section>
+    {% endfor %}
+  </div>
+</details>

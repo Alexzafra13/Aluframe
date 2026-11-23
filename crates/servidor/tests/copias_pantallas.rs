@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use comun::{Contexto, destino, formulario, get, post, texto};
 use servidor::aplicacion::Actor;
 use servidor::aplicacion::copias::discos::DiscosDeCopia;
+use servidor::aplicacion::entrar::{ResultadoDeEntrada, SolicitudDeEntrada, entrar};
 
 fn carpeta_temporal() -> PathBuf {
     let carpeta = std::env::temp_dir().join(format!(
@@ -97,4 +98,40 @@ async fn restaurar_lleva_a_revisar_la_copia_y_no_acepta_rutas_inventadas() {
         ))
         .await;
     assert_eq!(inventada.status(), axum::http::StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn la_campana_cuenta_los_avisos_y_el_operario_no_la_ve() {
+    let pendrive = carpeta_temporal();
+    let (contexto, token, actor) = preparado(&pendrive).await;
+    let inicio = texto(contexto.pedir(get("/", Some(&token))).await).await;
+    assert!(inicio.contains("hx-get=\"/avisos/campana\""));
+    let vacia = texto(contexto.pedir(get("/avisos/campana", Some(&token))).await).await;
+    assert!(vacia.contains("Avisos: ninguno") && vacia.contains("Todo en orden"));
+
+    let csrf = formulario(&[("_csrf", &actor.token_csrf)]);
+    contexto
+        .pedir(post("/ajustes/copias/ahora", Some(&token), &csrf))
+        .await;
+    let campana = texto(contexto.pedir(get("/avisos/campana", Some(&token))).await).await;
+    assert!(campana.contains("Avisos: 1") && campana.contains("Copias de seguridad"));
+    assert!(campana.contains("href=\"/ajustes/copias\""));
+
+    let id = contexto.con_operario(&actor).await;
+    let solicitud = SolicitudDeEntrada {
+        usuario_id: id,
+        clave: comun::PIN.into(),
+        ip: "10.0.0.7".into(),
+        duracion: servidor::aplicacion::sesion::DuracionDeSesion::Normal,
+    };
+    let ResultadoDeEntrada::Correcta {
+        token: operario, ..
+    } = entrar(&contexto.estado, solicitud).await.unwrap()
+    else {
+        panic!("el operario no pudo entrar");
+    };
+    let prohibida = contexto
+        .pedir(get("/avisos/campana", Some(&operario)))
+        .await;
+    assert!(prohibida.status().is_client_error());
 }

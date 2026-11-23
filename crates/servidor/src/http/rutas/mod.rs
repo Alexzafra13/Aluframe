@@ -1,6 +1,7 @@
 pub mod acceso;
 pub mod ajustes;
 pub mod ajustes_presupuestos;
+pub mod avisos;
 pub mod catalogo_articulos;
 pub mod catalogo_fichas;
 pub mod clientes;

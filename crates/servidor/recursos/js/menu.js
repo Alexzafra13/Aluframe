@@ -27,4 +27,17 @@
     } catch (e) {}
     rotular(boton);
   });
+
+  // La campana se cierra al pulsar fuera o con Esc, como cualquier menú desplegable.
+  function cerrarCampana(excepto) {
+    document.querySelectorAll("[data-campana][open]").forEach(function (c) {
+      if (c !== excepto) c.removeAttribute("open");
+    });
+  }
+  document.addEventListener("click", function (evento) {
+    cerrarCampana(evento.target.closest("[data-campana]"));
+  });
+  document.addEventListener("keydown", function (evento) {
+    if (evento.key === "Escape") cerrarCampana(null);
+  });
 })();

@@ -9,8 +9,8 @@
     <button class="boton-plegar" type="button" data-plegar-menu aria-expanded="true" aria-label="Plegar menú" title="Plegar menú"><svg class="icono" aria-hidden="true"><use href="#i-plegar"/></svg></button>
   </div>
   {% for grupo in menu %}
-  <p class="menu-grupo"><span class="menu-texto">{{ grupo.titulo }}</span></p>
-  <ul>
+  {% if !loop.first %}<hr class="menu-separador">{% endif %}
+  <ul aria-label="{{ grupo.titulo }}">
     {% for entrada in grupo.entradas %}
     <li><a class="menu-entrada{% if entrada.seccion == seccion %} activa{% endif %}" href="{{ entrada.ruta }}" title="{{ entrada.nombre }}"{% if entrada.seccion == seccion %} aria-current="page"{% endif %}>{% if entrada.seccion == seccion %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-{{ entrada.seccion }}"/></svg><span class="menu-texto">{{ entrada.nombre }}</span></a></li>
     {% endfor %}
@@ -36,6 +36,7 @@
       <svg class="icono icono-buscar" aria-hidden="true"><use href="#i-buscar"/></svg>
       <input id="buscar-global" class="buscador" type="search" name="q" placeholder="Buscar cliente" autocomplete="off">
     </form>{% endif %}
+    {% if usuario.es_propietario %}<span id="campana" class="campana-reservada" hx-get="/avisos/campana" hx-trigger="load" hx-swap="outerHTML"></span>{% endif %}
     <span class="usuario-actual"><span class="avatar pequeno-avatar" aria-hidden="true">{{ usuario.nombre.chars().next().unwrap_or('A') }}</span><span class="usuario-nombre">{{ usuario.nombre }}</span></span>
   </header>
   <main class="contenido">
