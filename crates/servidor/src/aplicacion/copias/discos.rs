@@ -38,12 +38,25 @@ impl DiscosDeCopia {
             .collect()
     }
 
-    /// Discos conectados que todavía no tienen la carpeta, para ofrecer prepararlos.
+    /// Discos conectados que todavía no tienen la carpeta, para ofrecer prepararlos. El disco
+    /// del sistema solo se descarta entre los encontrados: una carpeta indicada a propósito en
+    /// la configuración se respeta aunque esté en `C:`.
     pub fn sin_preparar(&self) -> Vec<PathBuf> {
-        self.raices()
+        let encontrados = if self.buscar_en_el_sistema {
+            raices_del_sistema()
+        } else {
+            Vec::new()
+        };
+        let mut raices = self.indicados.clone();
+        raices.extend(
+            encontrados
+                .into_iter()
+                .filter(|raiz| !es_disco_del_sistema(raiz)),
+        );
+        raices.dedup();
+        raices
             .into_iter()
             .filter(|raiz| raiz.is_dir() && !raiz.join(CARPETA_DE_COPIAS).exists())
-            .filter(|raiz| !es_disco_del_sistema(raiz))
             .collect()
     }
 
@@ -104,6 +117,21 @@ fn montajes_de_discos(texto: &str) -> Vec<PathBuf> {
 #[cfg(test)]
 mod pruebas {
     use super::*;
+
+    #[test]
+    fn una_carpeta_indicada_a_mano_se_ofrece_aunque_este_en_el_disco_del_sistema() {
+        let raiz = if cfg!(windows) {
+            PathBuf::from("C:\\")
+        } else {
+            std::env::temp_dir()
+        };
+        let discos = DiscosDeCopia {
+            indicados: vec![raiz.clone()],
+            buscar_en_el_sistema: false,
+        };
+        // La raíz de C: de los ejecutores de CI no tiene la carpeta de copias.
+        assert_eq!(discos.sin_preparar(), [raiz]);
+    }
 
     #[test]
     fn lee_los_montajes_de_discos_y_no_los_del_sistema() {
