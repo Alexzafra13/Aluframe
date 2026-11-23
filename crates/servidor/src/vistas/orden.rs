@@ -5,7 +5,6 @@ use std::collections::BTreeMap;
 use askama::Template;
 use dominio::corte::BarraCortada;
 use dominio::taller::BarrasDePerfil;
-use dominio::texto::nombre_legible;
 use dominio::unidades::Longitud;
 
 use super::{HojaDeVentana, fecha_corta, mm};
@@ -103,9 +102,8 @@ fn titulo_con_cuentas(titulo: &str, plan: &dominio::corte::PlanDeCorte) -> Strin
 
 fn grupo(barras: &BarrasDePerfil, largos: &BTreeMap<u32, i64>) -> GrupoDeCorte {
     let titulo = format!(
-        "{} · {} · barra de {}",
-        nombre_legible(&barras.perfil),
-        barras.color,
+        "{} · barra de {}",
+        barras.clave().nombre(),
         mm(barras.longitud_barra.decimas_de_mm())
     );
     match &barras.plan {

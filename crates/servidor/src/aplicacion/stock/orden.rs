@@ -6,7 +6,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use dominio::corte::RetalDisponible;
 use dominio::series::{Dato, Serie};
-use dominio::taller::RetalesPorPerfil;
+use dominio::taller::{ClaveDePerfil, RetalesPorPerfil};
 use dominio::unidades::Longitud;
 use rusqlite::Connection;
 
@@ -21,8 +21,8 @@ pub type ArticuloEnStock = (i64, Option<i64>);
 
 #[derive(Debug, Clone, Default)]
 pub struct EnlaceDeStock {
-    /// Por (perfil, color) del plan de corte.
-    pub perfiles: BTreeMap<(String, String), ArticuloEnStock>,
+    /// Por serie, perfil y color del plan de corte.
+    pub perfiles: BTreeMap<ClaveDePerfil, ArticuloEnStock>,
     /// Por (ventana, código del accesorio).
     pub accesorios: BTreeMap<(i64, String), ArticuloEnStock>,
     pub retales: RetalesPorPerfil,
@@ -89,7 +89,11 @@ fn enlazar_perfiles(
     let perfiles = c.resumen.piezas.iter().map(|p| p.perfil.clone());
     let repetidos = ventana.repetidas.iter().map(|r| r.perfil.clone());
     for perfil in perfiles.chain(repetidos) {
-        let clave = (perfil.clone(), c.acabado.clone());
+        let clave = ClaveDePerfil {
+            serie: c.resumen.serie.clone(),
+            perfil: perfil.clone(),
+            color: c.acabado.clone(),
+        };
         if enlace.perfiles.contains_key(&clave) {
             continue;
         }
@@ -130,9 +134,15 @@ fn enlazar_accesorios(
 }
 
 /// Cada retal del stock (varios iguales cuentan uno a uno) con un identificador para el plan.
+/// Si dos grupos del plan son el mismo artículo y color, sus retales se ofrecen solo al primero:
+/// un retal físico no se puede coger dos veces.
 fn cargar_retales(con: &Connection, enlace: &mut EnlaceDeStock) -> Result<(), ErrorApp> {
     let mut siguiente: u32 = 1;
+    let mut ofrecidos = BTreeSet::new();
     for (clave, (articulo, color)) in &enlace.perfiles {
+        if !ofrecidos.insert((*articulo, *color)) {
+            continue;
+        }
         let mut disponibles = Vec::new();
         for (largo, cantidad_mil) in stock::retales(con, *articulo, *color)? {
             for _ in 0..(cantidad_mil / 1_000) {

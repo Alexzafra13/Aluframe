@@ -21,7 +21,8 @@ pub struct OrdenDeTaller {
     pub enlace: EnlaceDeStock,
 }
 
-/// Las piezas de todas las ventanas, más las que se han vuelto a cortar (H5).
+/// Las piezas de todas las ventanas, más las que se han vuelto a cortar (H5), y la longitud de
+/// barra de cada serie.
 fn piezas_del_trabajo(ficha: &FichaDeTrabajo) -> (Vec<PiezaDeTrabajo>, BTreeMap<String, Longitud>) {
     let mut piezas = Vec::new();
     let mut barras = BTreeMap::new();
@@ -29,6 +30,7 @@ fn piezas_del_trabajo(ficha: &FichaDeTrabajo) -> (Vec<PiezaDeTrabajo>, BTreeMap<
         let c = &ventana.congelado;
         let orden = u32::try_from(ventana.fila.orden).unwrap_or_default();
         let pieza = |perfil: &str, longitud_dmm: i64, cantidad: u32, numero: u32| PiezaDeTrabajo {
+            serie: c.resumen.serie.clone(),
             perfil: perfil.to_owned(),
             color: c.acabado.clone(),
             longitud: Longitud::desde_decimas_de_mm(longitud_dmm),
@@ -36,10 +38,10 @@ fn piezas_del_trabajo(ficha: &FichaDeTrabajo) -> (Vec<PiezaDeTrabajo>, BTreeMap<
             ventana: orden,
             numero,
         };
+        if let Some(dmm) = c.longitud_barra_dmm {
+            barras.insert(c.resumen.serie.clone(), Longitud::desde_decimas_de_mm(dmm));
+        }
         for p in &c.resumen.piezas {
-            if let Some(dmm) = c.longitud_barra_dmm {
-                barras.insert(p.perfil.clone(), Longitud::desde_decimas_de_mm(dmm));
-            }
             piezas.push(pieza(&p.perfil, p.longitud_dmm, p.cantidad, p.numero));
         }
         for r in &ventana.repetidas {

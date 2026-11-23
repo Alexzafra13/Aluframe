@@ -143,7 +143,7 @@ async fn el_plan_usa_el_retal_del_stock_y_al_terminar_entra_el_retal_confirmado(
         .enlace
         .perfiles
         .keys()
-        .position(|(p, _)| p == "DEMO_HOJA_HORIZONTAL")
+        .position(|clave| clave.perfil == "DEMO_HOJA_HORIZONTAL")
         .unwrap();
     let confirmado = RetalConfirmado {
         grupo: grupo_indice,

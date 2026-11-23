@@ -1,5 +1,7 @@
 //! Plan de corte de un trabajo entero (decisión 2 del plan de H4): todas sus ventanas juntas,
-//! por perfil y color, para aprovechar las barras. Cada pieza recuerda su ventana y su número.
+//! por serie, perfil y color, para aprovechar las barras. Cada pieza recuerda su ventana y su
+//! número. El código del perfil es propio de cada serie («MARCO_LATERAL» es el 21210 en
+//! Aluprom 21 y otro perfil en la V-94): sin la serie se mezclarían perfiles distintos.
 
 use std::collections::BTreeMap;
 
@@ -7,10 +9,20 @@ use crate::corte::{
     ErrorCorte, ParametrosDeCorte, PiezaACortar, PlanDeCorte, RetalDisponible,
     optimizar_con_retales,
 };
+use crate::texto::nombre_legible;
 use crate::unidades::Longitud;
+
+/// Qué barra es: el perfil de una serie en un color.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ClaveDePerfil {
+    pub serie: String,
+    pub perfil: String,
+    pub color: String,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PiezaDeTrabajo {
+    pub serie: String,
     pub perfil: String,
     pub color: String,
     pub longitud: Longitud,
@@ -22,6 +34,7 @@ pub struct PiezaDeTrabajo {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BarrasDePerfil {
+    pub serie: String,
     pub perfil: String,
     pub color: String,
     pub longitud_barra: Longitud,
@@ -30,25 +43,56 @@ pub struct BarrasDePerfil {
     pub origen: BTreeMap<u32, (u32, u32)>,
 }
 
-/// Retales del stock por (perfil, color), para usarlos antes de abrir barras nuevas.
-pub type RetalesPorPerfil = BTreeMap<(String, String), Vec<RetalDisponible>>;
+impl ClaveDePerfil {
+    /// «Marco lateral (Aluprom 21) · Blanco», para la hoja y la revisión de retales.
+    pub fn nombre(&self) -> String {
+        format!(
+            "{} ({}) · {}",
+            nombre_legible(&self.perfil),
+            nombre_legible(&self.serie),
+            self.color
+        )
+    }
+}
 
-/// `parametros` lleva sierra, recorte y retal; la longitud de barra es la de cada perfil.
-/// Un perfil sin longitud de barra conocida no se planifica (queda fuera del resultado).
+impl BarrasDePerfil {
+    pub fn clave(&self) -> ClaveDePerfil {
+        ClaveDePerfil {
+            serie: self.serie.clone(),
+            perfil: self.perfil.clone(),
+            color: self.color.clone(),
+        }
+    }
+}
+
+impl PiezaDeTrabajo {
+    pub fn clave(&self) -> ClaveDePerfil {
+        ClaveDePerfil {
+            serie: self.serie.clone(),
+            perfil: self.perfil.clone(),
+            color: self.color.clone(),
+        }
+    }
+}
+
+/// Retales del stock de cada barra, para usarlos antes de abrir barras nuevas.
+pub type RetalesPorPerfil = BTreeMap<ClaveDePerfil, Vec<RetalDisponible>>;
+
+/// `parametros` lleva sierra, recorte y retal; la longitud de barra es la de cada serie.
+/// Una serie sin longitud de barra conocida no se planifica (queda fuera del resultado).
 pub fn planificar_trabajo(
     piezas: &[PiezaDeTrabajo],
     (longitudes_barra, retales): (&BTreeMap<String, Longitud>, &RetalesPorPerfil),
     parametros: ParametrosDeCorte,
 ) -> Vec<BarrasDePerfil> {
-    let mut grupos: BTreeMap<(String, String), Vec<&PiezaDeTrabajo>> = BTreeMap::new();
+    let mut grupos: BTreeMap<ClaveDePerfil, Vec<&PiezaDeTrabajo>> = BTreeMap::new();
     for pieza in piezas {
-        let clave = (pieza.perfil.clone(), pieza.color.clone());
-        grupos.entry(clave).or_default().push(pieza);
+        grupos.entry(pieza.clave()).or_default().push(pieza);
     }
     grupos
         .into_iter()
-        .filter_map(|((perfil, color), del_grupo)| {
-            let longitud_barra = *longitudes_barra.get(&perfil)?;
+        .filter_map(|(clave, del_grupo)| {
+            let longitud_barra = *longitudes_barra.get(&clave.serie)?;
             let mut origen = BTreeMap::new();
             let mut a_cortar = Vec::new();
             for pieza in del_grupo {
@@ -65,13 +109,12 @@ pub fn planificar_trabajo(
                 longitud_barra,
                 ..parametros
             };
-            let disponibles = retales
-                .get(&(perfil.clone(), color.clone()))
-                .map_or(&[][..], Vec::as_slice);
+            let disponibles = retales.get(&clave).map_or(&[][..], Vec::as_slice);
             Some(BarrasDePerfil {
                 plan: optimizar_con_retales(&a_cortar, disponibles, &parametros),
-                perfil,
-                color,
+                serie: clave.serie,
+                perfil: clave.perfil,
+                color: clave.color,
                 longitud_barra,
                 origen,
             })
@@ -94,6 +137,7 @@ mod pruebas {
         ventana: u32,
     ) -> PiezaDeTrabajo {
         PiezaDeTrabajo {
+            serie: "SERIE_A".into(),
             perfil: perfil.into(),
             color: color.into(),
             longitud: cm(largo),
@@ -103,24 +147,30 @@ mod pruebas {
         }
     }
 
+    fn sin_sierra() -> ParametrosDeCorte {
+        ParametrosDeCorte {
+            longitud_barra: Longitud::CERO,
+            grosor_sierra: Longitud::CERO,
+            recorte_extremos: Longitud::CERO,
+            retal_minimo: Longitud::CERO,
+        }
+    }
+
     #[test]
     fn junta_las_ventanas_por_perfil_y_color_sin_perder_piezas() {
+        let mut sin_barra = pieza(("MARCO", "Blanco"), 50, 1, 1);
+        sin_barra.serie = "SIN_BARRA".into();
         let piezas = [
             pieza(("HOJA", "Blanco"), 73, 4, 1),
             pieza(("HOJA", "Blanco"), 73, 4, 2),
             pieza(("HOJA", "Negro"), 73, 4, 3),
             pieza(("MARCO", "Blanco"), 120, 2, 1),
-            pieza(("SIN_BARRA", "Blanco"), 50, 1, 1),
+            pieza(("SIN_PERFIL", "Blanco"), 50, 1, 1),
+            sin_barra,
         ];
-        let barras = BTreeMap::from([("HOJA".to_owned(), cm(640)), ("MARCO".to_owned(), cm(640))]);
-        let parametros = ParametrosDeCorte {
-            longitud_barra: Longitud::CERO,
-            grosor_sierra: Longitud::CERO,
-            recorte_extremos: Longitud::CERO,
-            retal_minimo: Longitud::CERO,
-        };
-        let plan = planificar_trabajo(&piezas, (&barras, &BTreeMap::new()), parametros);
-        assert_eq!(plan.len(), 3);
+        let barras = BTreeMap::from([("SERIE_A".to_owned(), cm(640))]);
+        let plan = planificar_trabajo(&piezas, (&barras, &BTreeMap::new()), sin_sierra());
+        assert_eq!(plan.len(), 4);
         let blanco = plan
             .iter()
             .find(|b| b.perfil == "HOJA" && b.color == "Blanco")
@@ -133,5 +183,41 @@ mod pruebas {
         );
         assert_eq!(cortado.piezas().count(), 8);
         assert_eq!(blanco.origen.values().filter(|(v, _)| *v == 2).count(), 4);
+    }
+
+    /// Fallo corregido: el mismo código de perfil en dos series son perfiles distintos y no se
+    /// pueden cortar de la misma barra ni compartir sus retales.
+    #[test]
+    fn el_mismo_codigo_de_perfil_en_dos_series_no_se_mezcla() {
+        let mut de_otra_serie = pieza(("MARCO", "Blanco"), 120, 2, 2);
+        de_otra_serie.serie = "SERIE_B".into();
+        let piezas = [pieza(("MARCO", "Blanco"), 120, 2, 1), de_otra_serie];
+        let barras = BTreeMap::from([
+            ("SERIE_A".to_owned(), cm(640)),
+            ("SERIE_B".to_owned(), cm(500)),
+        ]);
+        let retal = RetalDisponible {
+            id: 1,
+            longitud: cm(300),
+        };
+        let clave_b = ClaveDePerfil {
+            serie: "SERIE_B".into(),
+            perfil: "MARCO".into(),
+            color: "Blanco".into(),
+        };
+        let retales = BTreeMap::from([(clave_b.clone(), vec![retal])]);
+        let plan = planificar_trabajo(&piezas, (&barras, &retales), sin_sierra());
+        assert_eq!(plan.len(), 2, "un grupo por serie");
+        let a = plan.iter().find(|g| g.serie == "SERIE_A").unwrap();
+        let b = plan.iter().find(|g| g.clave() == clave_b).unwrap();
+        assert_eq!(a.longitud_barra, cm(640));
+        assert_eq!(b.longitud_barra, cm(500));
+        let corte_a = a.plan.as_ref().unwrap();
+        assert!(
+            corte_a.barras.iter().all(|barra| barra.retal.is_none()),
+            "el retal es de B"
+        );
+        assert_eq!(corte_a.piezas().count(), 2);
+        assert_eq!(b.plan.as_ref().unwrap().barras[0].retal, Some(1));
     }
 }

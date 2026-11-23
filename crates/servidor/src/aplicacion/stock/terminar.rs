@@ -43,7 +43,7 @@ fn plan_en_json(orden: &OrdenDeTaller) -> String {
                     })
                     .collect()
             });
-            json!({ "perfil": g.perfil, "color": g.color, "barra_dmm": g.longitud_barra.decimas_de_mm(), "barras": barras })
+            json!({ "serie": g.serie, "perfil": g.perfil, "color": g.color, "barra_dmm": g.longitud_barra.decimas_de_mm(), "barras": barras })
         })
         .collect();
     json!(grupos).to_string()

@@ -2,7 +2,6 @@
 
 use askama::Template;
 use dominio::stock::formatear_cantidad;
-use dominio::texto::nombre_legible;
 use dominio::unidades::Longitud;
 
 use super::{GrupoMenu, Opcion, UsuarioEnPantalla};
@@ -67,9 +66,9 @@ impl PaginaTerminar {
                 .perfiles
                 .keys()
                 .enumerate()
-                .map(|(i, (perfil, color))| Opcion {
+                .map(|(i, clave)| Opcion {
                     valor: i.to_string(),
-                    texto: format!("{} · {color}", nombre_legible(perfil)),
+                    texto: clave.nombre(),
                 })
                 .collect(),
             aviso,

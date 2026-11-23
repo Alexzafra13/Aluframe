@@ -3,6 +3,7 @@
 //! entren en el stock (decisión del propietario, 2026-11-22).
 
 use dominio::stock::{ClaveDeStock, leer_cantidad_mil};
+use dominio::taller::ClaveDePerfil;
 use dominio::texto::nombre_legible;
 use dominio::unidades::Longitud;
 
@@ -42,15 +43,15 @@ pub fn prever(orden: &OrdenDeTaller) -> Prevision {
     p
 }
 
-fn indice_de_grupo(enlace: &EnlaceDeStock, clave: &(String, String)) -> Option<usize> {
+fn indice_de_grupo(enlace: &EnlaceDeStock, clave: &ClaveDePerfil) -> Option<usize> {
     enlace.perfiles.keys().position(|k| k == clave)
 }
 
 fn salidas_de_perfiles(orden: &OrdenDeTaller, p: &mut Prevision) {
     let enlace = &orden.enlace;
     for grupo in &orden.plan {
-        let clave = (grupo.perfil.clone(), grupo.color.clone());
-        let nombre = format!("{} · {}", nombre_legible(&grupo.perfil), grupo.color);
+        let clave = grupo.clave();
+        let nombre = clave.nombre();
         let (Some(&(articulo, color)), Ok(plan)) = (enlace.perfiles.get(&clave), &grupo.plan)
         else {
             if let Err(error) = &grupo.plan {
