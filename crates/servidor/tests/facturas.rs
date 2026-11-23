@@ -4,7 +4,7 @@ mod comun;
 
 use comun::Contexto;
 use comun::presupuestos::{SERIE_COMPLETA, elegir_reglas, preparar_demo, ventana};
-use dominio::factura::{EstadoDeCobro, ImportesDeFactura, estado_de_cobro};
+use dominio::factura::{EstadoDeCobro, ImportesDeFactura, estado_de_cobro, importe_de_linea};
 use dominio::unidades::{Dinero, Porcentaje, PrecioUnitario};
 use servidor::aplicacion::Actor;
 use servidor::aplicacion::aceptar_presupuesto::aceptar_presupuesto;
@@ -252,4 +252,35 @@ async fn un_cobro_se_anula_con_motivo_y_el_albaran_entrega_el_trabajo() {
     assert_eq!(albaran, 1);
     let trabajo = cargar_trabajo(&estado, &actor, 1).await.unwrap();
     assert_eq!(trabajo.trabajo.estado, "entregado");
+}
+
+/// Fallo corregido: al facturar un trabajo, el precio unitario de una ventana con descuento se
+/// deducía del importe ya descontado y la hoja decía «Precio 900, Dto. 10 %, Importe 900».
+#[tokio::test]
+async fn la_factura_del_trabajo_cuadra_precio_descuento_e_importe() {
+    let contexto = Contexto::nuevo().await;
+    let (_, actor) = contexto.con_propietario().await;
+    let estado = contexto.estado.clone().con_datos_demo(true);
+    preparar_demo(&estado, &actor, SERIE_COMPLETA).await;
+    elegir_reglas(&estado, &actor).await;
+    let id = crear_presupuesto(&estado, &actor, 1, None).await.unwrap();
+    let mut con_descuento = ventana(150, 120);
+    con_descuento.cantidad = 2;
+    con_descuento.descuento = Porcentaje::desde_puntos_basicos(1_000);
+    let iva = Porcentaje::desde_puntos_basicos(2_100);
+    guardar_ventana(&estado, &actor, (id, 0), (con_descuento, iva, false))
+        .await
+        .unwrap();
+    aceptar_presupuesto(&estado, &actor, id).await.unwrap();
+    let factura = factura_de_trabajo(&estado, &actor, 1).await.unwrap();
+    let ficha = cargar_factura(&estado, &actor, factura).await.unwrap();
+    let l = &ficha.lineas[0];
+    let precio = PrecioUnitario::desde_diezmilesimas(l.precio_unitario_pu);
+    let descuento = Porcentaje::desde_puntos_basicos(l.descuento_bp);
+    assert_eq!(l.descuento_bp, 1_000);
+    assert_eq!(
+        importe_de_linea(precio, l.cantidad_mil, descuento),
+        Some(Dinero::desde_centimos(l.base_cent)),
+        "precio × cantidad − descuento = importe"
+    );
 }

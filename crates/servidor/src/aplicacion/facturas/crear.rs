@@ -21,9 +21,16 @@ fn linea_de_la_copia(l: &Value) -> FilaLineaFactura {
     let entero = |c: &str| l[c].as_i64().unwrap_or_default();
     let cantidad = entero("cantidad_mil").max(1);
     let base = entero("precio_cent");
-    // Las ventanas guardan el precio de la línea; su unitario se deduce de él.
+    // Una ventana guarda su venta unitaria antes del descuento de línea: con ella, precio ×
+    // cantidad − descuento da el importe aceptado, como en el presupuesto. Sin ella (copias sin
+    // cálculo), el unitario se deduce del importe.
     let unitario = l["precio_unitario_pu"]
         .as_i64()
+        .or_else(|| {
+            l["resultado"]["venta_unitaria_cent"]
+                .as_i64()
+                .map(|c| c * 100)
+        })
         .unwrap_or_else(|| (i128::from(base) * 100_000 / i128::from(cantidad)) as i64);
     FilaLineaFactura {
         id: 0,
