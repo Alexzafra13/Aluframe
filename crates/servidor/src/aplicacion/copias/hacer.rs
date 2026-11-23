@@ -80,7 +80,11 @@ fn repartir(
 fn llevar_a(origen: &Path, carpeta: &Path, nombre: &str) -> Result<(), ErrorApp> {
     let temporal = carpeta.join(format!("{nombre}.tmp"));
     std::fs::copy(origen, &temporal).map_err(error_de_archivo)?;
-    std::fs::File::open(&temporal)
+    // En Windows, volcar al disco exige abrir con permiso de escritura: con `File::open`
+    // (solo lectura) responde «Acceso denegado» y la copia al pendrive fallaba.
+    std::fs::OpenOptions::new()
+        .write(true)
+        .open(&temporal)
         .and_then(|archivo| archivo.sync_all())
         .map_err(error_de_archivo)?;
     let final_ = carpeta.join(nombre);
