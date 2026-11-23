@@ -29,6 +29,26 @@
   </fieldset>
   <button class="boton primario" type="submit">Guardar</button>
 </form>
+<section class="tarjeta" aria-labelledby="titulo-habituales">
+  <h2 id="titulo-habituales">Medidas habituales</h2>
+  <p class="texto-apagado">Las ventanas que más hacéis. Con ellas y con los presupuestos que se van aceptando, el reparto deja los retales que más sirven. Cada una cuenta como cinco ventanas; con el tiempo manda lo que de verdad se corta.</p>
+  {% if habituales.is_empty() %}<p class="vacio">Ninguna: el reparto aprende solo de lo que se acepta.</p>{% endif %}
+  <ul class="lista-simple lista-con-quitar">{% for m in habituales %}<li>
+    <span>{{ m.texto }}{% if let Some(a) = m.aviso %} <span class="etiqueta etiqueta-aviso">No se usa: {{ a }}</span>{% endif %}</span>
+    <form method="post" action="/ajustes/taller/habituales/{{ m.indice }}/quitar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton-icono" type="submit" aria-label="Quitar {{ m.texto }}">✕</button></form>
+  </li>{% endfor %}</ul>
+  {% if !tipologias.is_empty() %}
+  <form method="post" action="/ajustes/taller/habituales">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <div class="formulario-en-linea">
+      <label>Serie y tipología <select name="tipologia" required>{% for (valor, texto) in tipologias %}<option value="{{ valor }}">{{ texto }}</option>{% endfor %}</select></label>
+      <label>Ancho (cm) <input name="ancho" inputmode="decimal" required placeholder="120"></label>
+      <label>Alto (cm) <input name="alto" inputmode="decimal" required placeholder="120"></label>
+    </div>
+    <button class="boton" type="submit">Añadir</button>
+  </form>
+  {% endif %}
+</section>
 <form class="tarjeta" method="post" action="/ajustes/taller/pasos">
   <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
   <h2>Pasos de cada ventana</h2>

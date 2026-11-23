@@ -12,3 +12,6 @@
 .opciones-verticales legend { margin-bottom: .5rem; }
 .opciones-verticales .casilla { align-items: flex-start; }
 .opciones-verticales .casilla input { margin-top: .1rem; flex: none; }
+/* Lista con un botón para quitar cada elemento (Ajustes > Taller > Medidas habituales). */
+.lista-con-quitar li { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.lista-con-quitar form { margin: 0; }

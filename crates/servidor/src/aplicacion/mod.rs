@@ -21,6 +21,8 @@ pub mod importar_serie;
 pub mod importar_tarifa;
 pub mod lineas_de_presupuesto;
 pub mod logo_empresa;
+pub mod medidas_habituales;
+pub mod medidas_habituales_ajustes;
 pub mod poblaciones;
 pub mod presupuestos;
 pub mod primer_arranque;

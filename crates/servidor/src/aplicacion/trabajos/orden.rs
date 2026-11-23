@@ -9,6 +9,7 @@ use dominio::taller::{
 use dominio::unidades::Longitud;
 
 use super::consultar::{FichaDeTrabajo, cargar};
+use crate::aplicacion::medidas_habituales::valoraciones_del_trabajo;
 use crate::aplicacion::stock::orden::{EnlaceDeStock, enlazar_stock};
 use crate::aplicacion::taller::{self, AjustesDeTaller};
 use crate::aplicacion::{Actor, autorizar};
@@ -57,15 +58,14 @@ fn piezas_del_trabajo(ficha: &FichaDeTrabajo) -> (Vec<PiezaDeTrabajo>, BTreeMap<
 
 pub fn planificar(
     ficha: &FichaDeTrabajo,
-    ajustes: &AjustesDeTaller,
-    retales: &RetalesPorPerfil,
+    (ajustes, retales, valoraciones): (&AjustesDeTaller, &RetalesPorPerfil, &ValoracionesPorPerfil),
 ) -> Vec<BarrasDePerfil> {
     let (piezas, barras) = piezas_del_trabajo(ficha);
     planificar_trabajo(
         &piezas,
         (&barras, retales),
         ajustes.parametros_de_corte(Longitud::CERO),
-        (ajustes.metodo, &ValoracionesPorPerfil::new()),
+        (ajustes.metodo, valoraciones),
     )
 }
 
@@ -73,8 +73,10 @@ pub fn cargar_en(con: &rusqlite::Connection, id: i64) -> Result<OrdenDeTaller, E
     let ficha = cargar(con, id)?;
     let ajustes = taller::leer_de_la_base(con)?;
     let enlace = enlazar_stock(con, &ficha)?;
+    let t = &ficha.trabajo;
+    let valoraciones = valoraciones_del_trabajo(con, (t.id, &t.creado_en))?;
     Ok(OrdenDeTaller {
-        plan: planificar(&ficha, &ajustes, &enlace.retales),
+        plan: planificar(&ficha, (&ajustes, &enlace.retales, &valoraciones)),
         ficha,
         ajustes,
         enlace,

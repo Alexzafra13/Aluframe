@@ -151,6 +151,9 @@ pub struct PaginaTaller {
     pub retal_minimo_cm: String,
     /// «aprovechamiento» o «rapido» (ADR-0026).
     pub metodo: &'static str,
+    pub habituales: Vec<crate::aplicacion::medidas_habituales_ajustes::MedidaEnPantalla>,
+    /// Valor «SERIE|tipologia» y texto para elegir.
+    pub tipologias: Vec<(String, String)>,
     /// Un paso por renglón (decisión 5 del plan de H4).
     pub pasos: String,
     pub provisional: bool,

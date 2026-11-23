@@ -185,3 +185,28 @@ pub fn anotar_revision(con: &Connection, r: &Revision<'_>) -> Result<(), ErrorAp
     )?;
     Ok(())
 }
+
+/// Una pieza cortada en un trabajo anterior: cuándo se aceptó, serie, perfil, largo y cantidad.
+pub type PiezaDelHistorial = (String, String, String, i64, i64);
+
+/// Las piezas de las ventanas de los trabajos aceptados antes que `trabajo` (los anulados no
+/// cuentan). Se leen de la copia congelada con las funciones JSON de SQLite, sin cargar el resto
+/// (el dibujo pesa mucho más que las piezas).
+pub fn piezas_anteriores(
+    con: &Connection,
+    trabajo: i64,
+) -> Result<Vec<PiezaDelHistorial>, ErrorApp> {
+    let mut consulta = con.prepare(
+        "SELECT t.creado_en, json_extract(v.congelado_json, '$.resumen.serie'), \
+         json_extract(p.value, '$.perfil'), json_extract(p.value, '$.longitud_dmm'), \
+         json_extract(p.value, '$.cantidad') \
+         FROM ventana_trabajo v JOIN trabajo t ON t.id = v.trabajo_id, \
+         json_each(v.congelado_json, '$.resumen.piezas') p \
+         WHERE t.estado <> 'anulado' AND t.id < ?1 \
+         AND json_extract(p.value, '$.longitud_dmm') > 0",
+    )?;
+    let filas = consulta.query_map([trabajo], |f| {
+        Ok((f.get(0)?, f.get(1)?, f.get(2)?, f.get(3)?, f.get(4)?))
+    })?;
+    Ok(filas.collect::<Result<_, _>>()?)
+}

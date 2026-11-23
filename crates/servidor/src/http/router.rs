@@ -92,6 +92,11 @@ fn rutas_de_ajustes() -> Router<EstadoApp> {
         )
         .route("/ajustes/taller/pasos", post(taller::guardar_pasos))
         .route("/ajustes/taller/metodo", post(taller::guardar_metodo))
+        .route("/ajustes/taller/habituales", post(taller::anadir_habitual))
+        .route(
+            "/ajustes/taller/habituales/{indice}/quitar",
+            post(taller::quitar_habitual),
+        )
         .merge(rutas_de_datos())
 }
 
