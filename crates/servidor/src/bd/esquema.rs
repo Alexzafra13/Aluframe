@@ -13,10 +13,16 @@ pub struct Migracion {
     pub sql: &'static str,
 }
 
-pub const MIGRACIONES: &[Migracion] = &[Migracion {
-    numero: 1,
-    sql: include_str!("migraciones/0001_inicial.sql"),
-}];
+pub const MIGRACIONES: &[Migracion] = &[
+    Migracion {
+        numero: 1,
+        sql: include_str!("migraciones/0001_inicial.sql"),
+    },
+    Migracion {
+        numero: 2,
+        sql: include_str!("migraciones/0002_permisos_de_operario.sql"),
+    },
+];
 
 /// Huella del esquema único de las versiones 0.8.0 a 0.10.0, que es la migración 0001: sus
 /// bases se adoptan como versión 1 sin tocar los datos.

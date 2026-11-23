@@ -49,7 +49,7 @@ pub async fn cargar_factura(
     actor: &Actor,
     id: i64,
 ) -> Result<FichaDeFactura, ErrorApp> {
-    autorizar(actor, Accion::GestionarFacturas)?;
+    autorizar(actor, Accion::VerFacturas)?;
     estado.bd.leer(move |con| cargar(con, id)).await
 }
 
@@ -57,7 +57,7 @@ pub async fn listar_facturas(
     estado: &EstadoApp,
     actor: &Actor,
 ) -> Result<Vec<FilaFactura>, ErrorApp> {
-    autorizar(actor, Accion::GestionarFacturas)?;
+    autorizar(actor, Accion::VerFacturas)?;
     estado.bd.leer(facturas::listar).await
 }
 
@@ -113,7 +113,7 @@ pub async fn hoja_de_factura(
     actor: &Actor,
     id: i64,
 ) -> Result<HojaDeFactura, ErrorApp> {
-    autorizar(actor, Accion::GestionarFacturas)?;
+    autorizar(actor, Accion::VerFacturas)?;
     let hoy = crate::fecha::fecha_de_madrid(estado.ahora(), 0);
     estado
         .bd

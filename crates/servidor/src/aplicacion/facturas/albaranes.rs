@@ -96,7 +96,7 @@ pub async fn buscar_albaran(
     actor: &Actor,
     id: i64,
 ) -> Result<FilaAlbaran, ErrorApp> {
-    crate::aplicacion::autorizar(actor, dominio::acceso::Accion::GestionarFacturas)?;
+    crate::aplicacion::autorizar(actor, dominio::acceso::Accion::VerFacturas)?;
     estado
         .bd
         .leer(move |con| buscar(con, id)?.ok_or(ErrorApp::NoEncontrado))

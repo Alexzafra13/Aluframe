@@ -9,7 +9,7 @@ El taller corta **todo a mano** (sin tronzadora ni máquinas conectadas). El doc
 
 ## 2. Usuarios y roles
 - `propietario` (dueño): ve precios, márgenes, facturas y configuración.
-- `operario` (operario): lo da de alta el propietario (usuario y PIN). Ve solo los trabajos que se le asignan ("Mi día"), con la orden de taller (dibujo, medidas, material), y va marcando lo que hace y lo que falta. No ve precios ni márgenes.
+- `operario` (operario): lo da de alta el propietario (usuario y PIN). Ve los trabajos que se le asignan ("Mi día"), con la orden de taller (dibujo, medidas, material), va marcando lo que hace y lo que falta, y busca clientes. El dueño puede darle además permisos para dar de alta clientes, ver presupuestos, ver facturas o ver todo el taller (ADR-0024). Nunca ve costes ni márgenes.
 
 ## 3. Flujo principal
 ```

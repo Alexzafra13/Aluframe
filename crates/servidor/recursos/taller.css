@@ -77,3 +77,6 @@
 .lista-cobros li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; padding: .35rem 0; border-bottom: 1px solid var(--linea); }
 .lista-cobros li.anulado > span { text-decoration: line-through; color: var(--apagado); }
 .anular-cobro summary, .registrar-senal summary { cursor: pointer; color: var(--acero); font-weight: 600; min-height: var(--tactil); display: flex; align-items: center; }
+
+.atajos-operario { display: flex; flex-wrap: wrap; gap: .5rem; margin-right: auto; }
+.titulo-seccion { margin: 2rem 0 1rem; }

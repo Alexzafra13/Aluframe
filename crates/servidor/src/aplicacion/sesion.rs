@@ -3,7 +3,7 @@ use time::{Duration, OffsetDateTime};
 
 use super::Actor;
 use crate::autenticacion::{generar_token, huella_de_token};
-use crate::bd::consultas::{sesiones, usuarios};
+use crate::bd::consultas::{permisos, sesiones, usuarios};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 use crate::fecha::{formatear_utc, leer_utc};
@@ -100,6 +100,7 @@ fn buscar_actor(
         return Ok(None);
     }
     let actor = Actor {
+        permisos: permisos::leer(con, usuario.id)?,
         id: usuario.id,
         nombre: usuario.nombre,
         rol: usuario.rol,

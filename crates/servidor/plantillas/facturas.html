@@ -6,11 +6,11 @@
     <h1>Facturas</h1>
     <p class="texto-apagado">La factura de un trabajo se crea desde su ficha. Aquí también puedes hacer una factura libre.</p>
   </div>
-  <form method="post" action="/facturas/libre" class="formulario-en-linea">
+  {% if usuario.es_propietario %}<form method="post" action="/facturas/libre" class="formulario-en-linea">
     <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
     <label>Cliente <select name="cliente" required><option value="">Elige…</option>{% for c in clientes %}<option value="{{ c.valor }}">{{ c.texto }}</option>{% endfor %}</select></label>
     <button class="boton primario" type="submit">Nueva factura libre</button>
-  </form>
+  </form>{% endif %}
 </header>
 <nav class="segmentado" aria-label="Qué ver">
   <a class="segmento{% if !pendientes %} activo{% endif %}" href="/facturas">Todas</a>

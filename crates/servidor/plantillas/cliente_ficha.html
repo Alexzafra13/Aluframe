@@ -7,12 +7,12 @@
     <h1>{{ nombre }}</h1>
   </div>
   <div class="acciones">
-    <a class="boton" href="/clientes/{{ cliente.id }}/editar">Editar datos</a>
-    <form method="post" action="/presupuestos">
+    {% if usuario.puede_editar_clientes %}<a class="boton" href="/clientes/{{ cliente.id }}/editar">Editar datos</a>{% endif %}
+    {% if usuario.es_propietario %}<form method="post" action="/presupuestos">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <input type="hidden" name="cliente" value="{{ cliente.id }}">
       <button class="boton primario" type="submit">Nuevo presupuesto</button>
-    </form>
+    </form>{% endif %}
   </div>
 </header>
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
@@ -42,27 +42,28 @@
           {% if !d.contacto.is_empty() %}<br><span class="texto-apagado">{{ d.contacto }}</span>{% endif %}
           {% if !d.notas.is_empty() %}<br><span class="texto-apagado pequeno">{{ d.notas }}</span>{% endif %}
         </div>
-        <div class="acciones">
+        {% if usuario.puede_editar_clientes %}<div class="acciones">
           <a class="boton" href="/clientes/{{ cliente.id }}/direcciones/{{ d.id }}/editar">Editar</a>
           <form method="post" action="/clientes/{{ cliente.id }}/direcciones/{{ d.id }}/quitar">
             <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
             <button class="boton" type="submit">Quitar</button>
           </form>
-        </div>
+        </div>{% endif %}
       </li>
       {% endfor %}
     </ul>
     {% endif %}
-    <details>
+    {% if usuario.puede_editar_clientes %}<details>
       <summary>+ Añadir dirección de montaje</summary>
       <form method="post" action="/clientes/{{ cliente.id }}/direcciones">
         <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
         {% let bloque = nueva_direccion %}{% include "direccion_bloque.html" %}
         <button class="boton primario" type="submit">Añadir</button>
       </form>
-    </details>
+    </details>{% endif %}
   </section>
 </div>
+{% if usuario.ve_presupuestos %}
 <nav class="pestanas" aria-label="Documentos del cliente">
   <span class="pestana activa">Presupuestos</span>
   <span class="pestana desactivada" title="Llega en el hito H4">Trabajos</span>
@@ -77,6 +78,8 @@
   {% endfor %}
 </ul>
 {% endif %}
+{% endif %}
+{% if usuario.es_propietario %}
 <section class="tarjeta">
   <h2>Datos personales</h2>
   <p class="texto-apagado">Exportar descarga todo lo guardado de este cliente. Archivar lo oculta de la lista sin borrarlo.</p>
@@ -97,4 +100,5 @@
     </form>
   </details>
 </section>
+{% endif %}
 {% endblock %}

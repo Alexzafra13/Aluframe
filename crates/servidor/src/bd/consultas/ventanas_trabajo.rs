@@ -88,6 +88,24 @@ pub fn de_operario(con: &Connection, usuario: i64) -> Result<Vec<FilaVentana>, E
     Ok(filas.collect::<Result<_, _>>()?)
 }
 
+/// Las ventanas abiertas del taller que no son de `usuario` (de otros o sin asignar).
+pub fn abiertas_de_otros(con: &Connection, usuario: i64) -> Result<Vec<FilaVentana>, ErrorApp> {
+    let columnas = COLUMNAS
+        .split(", ")
+        .map(|c| format!("v.{c}"))
+        .collect::<Vec<_>>()
+        .join(", ");
+    let sql = format!(
+        "SELECT {columnas} FROM ventana_trabajo v JOIN trabajo t ON t.id = v.trabajo_id \
+         WHERE t.estado NOT IN ('entregado', 'anulado') \
+         AND coalesce(v.asignado_a, t.asignado_a, 0) <> ?1 \
+         ORDER BY t.fecha_prevista IS NULL, t.fecha_prevista, t.id, v.orden"
+    );
+    let mut consulta = con.prepare(&sql)?;
+    let filas = consulta.query_map([usuario], leer_ventana)?;
+    Ok(filas.collect::<Result<_, _>>()?)
+}
+
 pub fn asignar(con: &Connection, id: i64, usuario: Option<i64>) -> Result<(), ErrorApp> {
     con.execute(
         "UPDATE ventana_trabajo SET asignado_a = ?2, version = version + 1 WHERE id = ?1",

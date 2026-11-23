@@ -46,8 +46,12 @@ async fn pagina_de_ficha(
     (nueva_direccion, confirmacion): (BloqueDireccion, Option<String>),
 ) -> Result<Response, ErrorApp> {
     let ficha = cargar_cliente(estado, actor, id).await?;
-    let presupuestos =
-        crate::aplicacion::presupuestos::presupuestos_del_cliente(estado, actor, id).await?;
+    // Sin permiso de ver presupuestos, la ficha sale sin ellos (ADR-0024).
+    let presupuestos = if actor.puede(dominio::acceso::Accion::VerPresupuestos) {
+        crate::aplicacion::presupuestos::presupuestos_del_cliente(estado, actor, id).await?
+    } else {
+        Vec::new()
+    };
     let con_errores = nueva_direccion.errores.hay();
     let pagina = PaginaFichaCliente {
         usuario: actor.into(),

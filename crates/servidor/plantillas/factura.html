@@ -1,9 +1,11 @@
 {% extends "marco.html" %}
 {% block titulo %}{{ codigo }}{% endblock %}
 {% block contenido %}
+{# Un operario con permiso solo la ve (ADR-0024): emitir, cobrar y corregir es del dueño. #}
+{% let edita = borrador && usuario.es_propietario %}
 <header class="cabecera-pagina cabecera-documento">
   <div>
-    <p class="antetitulo"><a href="/facturas">Facturas</a>{% if let Some(t) = trabajo_id %} · <a href="/trabajos/{{ t }}">Trabajo</a>{% endif %}</p>
+    <p class="antetitulo"><a href="/facturas">Facturas</a>{% if let Some(t) = trabajo_id %}{% if usuario.es_propietario %} · <a href="/trabajos/{{ t }}">Trabajo</a>{% endif %}{% endif %}</p>
     <h1>{% if rectificativa %}Rectificativa {% else %}Factura {% endif %}<span class="mono">{{ codigo }}</span> <span class="etiqueta etiqueta-cobro-{{ estado|lower }}">{{ estado }}</span></h1>
     <p><a href="/clientes/{{ cliente_id }}">{{ cliente }}</a>{% if let Some((r, c)) = rectifica %} · rectifica a <a href="/facturas/{{ r }}">{{ c }}</a>: {{ motivo }}{% endif %}</p>
   </div>
@@ -16,10 +18,10 @@
     <h2 id="titulo-lineas">Líneas</h2>
     {% if lineas.is_empty() %}<p class="vacio">Sin líneas todavía.</p>{% endif %}
     <div class="tabla-desplazable"><table class="tabla">
-      <thead><tr><th scope="col">Descripción</th><th scope="col" class="numero">Cant.</th><th scope="col" class="numero">Precio</th><th scope="col" class="numero">Dto.</th><th scope="col" class="numero">IVA</th><th scope="col" class="numero">Importe</th>{% if borrador %}<th></th>{% endif %}</tr></thead>
+      <thead><tr><th scope="col">Descripción</th><th scope="col" class="numero">Cant.</th><th scope="col" class="numero">Precio</th><th scope="col" class="numero">Dto.</th><th scope="col" class="numero">IVA</th><th scope="col" class="numero">Importe</th>{% if edita %}<th></th>{% endif %}</tr></thead>
       <tbody>{% for l in lineas %}<tr>
         <td>{{ l.descripcion }}</td><td class="numero mono">{{ l.cantidad }}</td><td class="numero mono">{{ l.precio }}</td><td class="numero mono">{{ l.descuento }}</td><td class="numero mono">{{ l.iva }}</td><td class="numero mono">{{ l.importe }}</td>
-        {% if borrador %}<td><form method="post" action="/facturas/{{ id }}/lineas/{{ l.id }}/quitar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton-icono" type="submit" aria-label="Quitar la línea {{ l.descripcion }}">✕</button></form></td>{% endif %}
+        {% if edita %}<td><form method="post" action="/facturas/{{ id }}/lineas/{{ l.id }}/quitar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton-icono" type="submit" aria-label="Quitar la línea {{ l.descripcion }}">✕</button></form></td>{% endif %}
       </tr>{% endfor %}</tbody>
     </table></div>
     <dl class="lista-datos totales-factura">
@@ -27,7 +29,7 @@
       <div><dt>IVA</dt><dd class="mono">{{ iva }}</dd></div>
       <div class="total-factura"><dt>Total</dt><dd class="mono">{{ total }}</dd></div>
     </dl>
-    {% if borrador %}
+    {% if edita %}
     <form method="post" action="/facturas/{{ id }}/lineas" class="tarjeta-interior">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <h3>Añadir línea</h3>
@@ -43,7 +45,7 @@
     {% endif %}
   </section>
   <aside class="columna-datos">
-    {% if borrador %}
+    {% if edita %}
     <form class="tarjeta" method="post" action="/facturas/{{ id }}/datos">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <input type="hidden" name="version" value="{{ version }}">
@@ -65,12 +67,12 @@
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <button class="boton ancho" type="submit">Descartar el borrador</button>
     </form>
-    {% else %}
+    {% else if !borrador %}
     <section class="tarjeta" aria-labelledby="titulo-cobros">
       <h2 id="titulo-cobros">Cobros</h2>
       <dl class="lista-datos"><div><dt>Cobrado</dt><dd class="mono">{{ cobrado }}</dd></div><div><dt>Pendiente</dt><dd class="mono">{{ pendiente }}</dd></div></dl>
       {% include "lista_cobros.html" %}
-      {% if !rectificativa %}
+      {% if !rectificativa && usuario.es_propietario %}
       <form method="post" action="/facturas/{{ id }}/cobros" class="pila">
         <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
         {% let importe = pendiente_en_campo.clone() %}{% include "campos_cobro.html" %}
@@ -78,7 +80,7 @@
       </form>
       {% endif %}
     </section>
-    {% if !rectificativa %}
+    {% if !rectificativa && usuario.es_propietario %}
     <form class="tarjeta" method="post" action="/facturas/{{ id }}/rectificar">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <h2>Corregir</h2>

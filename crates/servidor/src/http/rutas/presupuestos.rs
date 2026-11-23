@@ -10,13 +10,15 @@ use crate::aplicacion::aceptar_presupuesto::motivos_para_no_aceptar;
 use crate::aplicacion::ajustes_presupuesto::leer_ajustes_de_presupuesto;
 use crate::aplicacion::clientes::{ConsultaDeClientes, listar_clientes};
 use crate::aplicacion::lineas_de_presupuesto::{ivas_de, totales_de};
-use crate::aplicacion::presupuestos::{cargar_presupuesto, crear_presupuesto, listar_presupuestos};
+use crate::aplicacion::presupuestos::{
+    FichaDePresupuesto, cargar_presupuesto, crear_presupuesto, listar_presupuestos,
+};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
 use crate::vistas::{
-    FilaDePresupuesto, MENU, Opcion, PaginaPresupuesto, PaginaPresupuestos, TarjetaDeLinea,
-    desglosar, nombre_de_estado, porcentaje_en_campo, porcentaje_texto, renderizar,
+    Desglose, FilaDePresupuesto, MENU, Opcion, PaginaPresupuesto, PaginaPresupuestos,
+    TarjetaDeLinea, desglosar, nombre_de_estado, porcentaje_en_campo, porcentaje_texto, renderizar,
 };
 
 pub const SECCION: &str = "presupuestos";
@@ -140,7 +142,7 @@ pub async fn pagina(
         cliente: ficha.cliente.nombre_visible(),
         nombre_estado: nombre_de_estado(&p.estado),
         lineas: ficha.lineas.iter().map(TarjetaDeLinea::from).collect(),
-        desglose: desglosar(&ficha.lineas),
+        desglose: desglose_para(actor, &ficha),
         ivas,
         motivos: motivos_para_no_aceptar(&ficha),
         direcciones: ficha
@@ -158,6 +160,15 @@ pub async fn pagina(
         confirmacion,
     };
     Ok((estado_http, renderizar(&pagina)?).into_response())
+}
+
+/// Costes: solo el dueño; al operario ni se calculan (ADR-0024).
+fn desglose_para(actor: &Actor, ficha: &FichaDePresupuesto) -> Desglose {
+    if actor.puede(dominio::acceso::Accion::VerCostes) {
+        desglosar(&ficha.lineas)
+    } else {
+        Desglose::default()
+    }
 }
 
 pub fn opciones_de_iva(general: Porcentaje, reducido: Porcentaje) -> Vec<Opcion> {

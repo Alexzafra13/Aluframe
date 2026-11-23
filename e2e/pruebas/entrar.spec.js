@@ -51,6 +51,39 @@ test("el operario entra con el teclado de PIN y solo ve su día", async ({ page 
   await salir(page);
 });
 
+test("el dueño da permisos al operario y este ve solo lo permitido", async ({ page }) => {
+  await page.goto("/entrar");
+  await page.getByRole("link", { name: PROPIETARIO.nombre }).click();
+  await page.getByLabel("Contraseña").fill(PROPIETARIO.contrasena);
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await page.goto("/ajustes/usuarios");
+  const fila = page.getByRole("row", { name: new RegExp(OPERARIO.nombre) });
+  await fila.getByText("Permisos (0 de 4)").click();
+  await fila.getByLabel("Ver facturas y cobros").check();
+  await fila.getByRole("button", { name: "Guardar permisos" }).click();
+  await expect(page.getByRole("status")).toContainText("Permisos guardados");
+  await expect(page.getByRole("row", { name: new RegExp(OPERARIO.nombre) }).getByText("Permisos (1 de 4)")).toBeVisible();
+  await salir(page);
+
+  await page.goto("/entrar");
+  await page.getByRole("link", { name: OPERARIO.nombre }).click();
+  for (const cifra of OPERARIO.pin) {
+    await page.locator(`.teclado button[data-cifra="${cifra}"]`).click();
+  }
+  await expect(page).toHaveURL(/\/mi-dia$/);
+  await expect(page.getByRole("link", { name: "Clientes" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Facturas" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Presupuestos" })).toHaveCount(0);
+  await page.getByRole("link", { name: "Clientes" }).click();
+  await expect(page.getByRole("heading", { name: "Clientes" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Nuevo cliente" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Importar clientes" })).toHaveCount(0);
+  expect((await page.goto("/presupuestos")).status()).toBe(404);
+  expect((await page.goto("/facturas")).status()).toBe(200);
+  await page.goto("/mi-dia");
+  await salir(page);
+});
+
 test("un PIN incorrecto no deja entrar", async ({ page }) => {
   await page.goto("/entrar");
   await page.getByRole("link", { name: OPERARIO.nombre }).click();

@@ -97,6 +97,7 @@ pub struct PaginaClientes {
 #[derive(Template)]
 #[template(path = "clientes_lista.html")]
 pub struct FragmentoListaClientes {
+    pub usuario: UsuarioEnPantalla,
     pub lista: VistaListaClientes,
 }
 

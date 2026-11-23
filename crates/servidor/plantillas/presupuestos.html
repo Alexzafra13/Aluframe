@@ -6,7 +6,7 @@
   <div>
     <h1>Presupuestos</h1>
   </div>
-  <button class="boton primario" type="button" data-abrir-hoja="hoja-nuevo">Nuevo presupuesto</button>
+  {% if usuario.es_propietario %}<button class="boton primario" type="button" data-abrir-hoja="hoja-nuevo">Nuevo presupuesto</button>{% endif %}
 </header>
 <nav class="segmentado" aria-label="Filtrar por estado">
   {% for (valor, texto) in [("", "Todos"), ("borrador", "Borradores"), ("enviado", "Enviados"), ("aceptado", "Aceptados"), ("rechazado", "Rechazados")] %}
@@ -30,6 +30,7 @@
   {% endfor %}
 </ul>
 {% endif %}
+{% if usuario.es_propietario %}
 <dialog class="hoja" id="hoja-nuevo" aria-labelledby="hoja-nuevo-titulo">
   <form method="post" action="/presupuestos" class="hoja-contenido">
     <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
@@ -52,4 +53,5 @@
     </div>
   </form>
 </dialog>
+{% endif %}
 {% endblock %}

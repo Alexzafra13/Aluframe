@@ -6,8 +6,8 @@
     <h1>Clientes</h1>
   </div>
   <div class="acciones">
-    <a class="boton" href="/clientes/importar">Importar clientes</a>
-    <a class="boton primario" href="/clientes/nuevo">Nuevo cliente</a>
+    {% if usuario.es_propietario %}<a class="boton" href="/clientes/importar">Importar clientes</a>{% endif %}
+    {% if usuario.puede_editar_clientes %}<a class="boton primario" href="/clientes/nuevo">Nuevo cliente</a>{% endif %}
   </div>
 </header>
 {% if let Some(texto) = confirmacion %}
@@ -26,7 +26,7 @@
   <label class="crece" for="q">Buscar por nombre, NIF, teléfono, correo o localidad
     <input id="q" name="q" type="search" value="{{ lista.texto }}" autocomplete="off">
   </label>
-  <label class="casilla"><input id="archivados" type="checkbox" name="archivados" value="1"{% if lista.archivados %} checked{% endif %}> Ver archivados</label>
+  {% if usuario.es_propietario %}<label class="casilla"><input id="archivados" type="checkbox" name="archivados" value="1"{% if lista.archivados %} checked{% endif %}> Ver archivados</label>{% endif %}
   <button class="boton" type="submit">Buscar</button>
 </form>
 <div id="lista-clientes" aria-live="polite">

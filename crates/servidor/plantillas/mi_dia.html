@@ -7,22 +7,10 @@
   {% if tarjetas.is_empty() %}
   <p class="vacio tarjeta">No tienes ventanas asignadas. Cuando te asignen un trabajo aparecerá aquí.</p>
   {% endif %}
-  <ol class="rejilla-ventanas" role="list">
-    {% for t in tarjetas %}
-    <li><a class="tarjeta-ventana" href="/mi-dia/{{ t.id }}">
-      <span class="miniatura miniatura-grande" aria-hidden="true">{{ t.dibujo|safe }}</span>
-      <span class="mono texto-apagado pequeno">{{ t.codigo }}</span>
-      <strong>{{ t.cliente }}</strong>
-      <span>{{ t.titulo }}</span>
-      <span class="mono">{{ t.medidas }}</span>
-      <progress class="progreso" max="{{ t.total }}" value="{{ t.hechos }}" aria-label="Pasos hechos">{{ t.hechos }} de {{ t.total }}</progress>
-      <span class="etiquetas">
-        <span class="etiqueta">{{ t.hechos }} de {{ t.total }}</span>
-        {% if let Some(f) = t.falta_algo %}<span class="etiqueta etiqueta-aviso">Falta algo: {{ f }}</span>{% endif %}
-        {% if t.medida_cambiada %}<span class="etiqueta etiqueta-aviso">Medida cambiada</span>{% endif %}
-      </span>
-    </a></li>
-    {% endfor %}
-  </ol>
+  {% let lista = tarjetas %}{% include "mi_dia_tarjetas.html" %}
+  {% if !resto.is_empty() %}
+  <h2 class="titulo-seccion">Resto del taller</h2>
+  {% let lista = resto %}{% include "mi_dia_tarjetas.html" %}
+  {% endif %}
 </main>
 {% endblock %}

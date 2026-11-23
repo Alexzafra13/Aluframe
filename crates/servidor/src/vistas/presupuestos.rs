@@ -182,8 +182,9 @@ impl PaginaPresupuesto {
         euros(self.ficha.presupuesto.base_cent)
     }
 
+    /// Solo el dueño cambia presupuestos; un operario con permiso los ve (ADR-0024).
     pub fn editable(&self) -> bool {
-        self.ficha.es_editable()
+        self.usuario.es_propietario && self.ficha.es_editable()
     }
 
     pub fn estado(&self) -> &str {

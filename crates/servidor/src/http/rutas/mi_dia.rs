@@ -4,11 +4,12 @@ use axum::Form;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Redirect, Response};
+use dominio::acceso::Accion;
 use dominio::taller::AccionDePaso;
 
 use crate::aplicacion::Actor;
 use crate::aplicacion::trabajos::acciones::{anotar_falta, cambiar_paso, repetir_pieza};
-use crate::aplicacion::trabajos::consultar::ventanas_de_operario;
+use crate::aplicacion::trabajos::consultar::{ventanas_de_operario, ventanas_del_resto_del_taller};
 use crate::aplicacion::trabajos::operario::abrir_ventana;
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -24,12 +25,21 @@ pub async fn mostrar_mi_dia(
     ActorActual(actor): ActorActual,
 ) -> Result<Response, ErrorApp> {
     let ventanas = ventanas_de_operario(&estado, &actor).await?;
-    let pagina = PaginaMiDia {
-        usuario: (&actor).into(),
-        tarjetas: ventanas
+    let resto = if actor.puede(Accion::VerTodosLosTrabajos) && !actor.rol.es_propietario() {
+        ventanas_del_resto_del_taller(&estado, &actor).await?
+    } else {
+        Vec::new()
+    };
+    let tarjetas = |lista: &[(_, _)]| {
+        lista
             .iter()
             .map(|(v, t)| TarjetaVentana::de(v, t))
-            .collect(),
+            .collect()
+    };
+    let pagina = PaginaMiDia {
+        usuario: (&actor).into(),
+        tarjetas: tarjetas(&ventanas),
+        resto: tarjetas(&resto),
     };
     Ok(renderizar(&pagina)?.into_response())
 }

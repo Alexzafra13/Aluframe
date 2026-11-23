@@ -45,7 +45,7 @@ pub async fn cargar_datos_del_editor(
     actor: &Actor,
     seleccion: Option<(i64, String)>,
 ) -> Result<DatosDelEditor, ErrorApp> {
-    autorizar(actor, Accion::GestionarClientes)?;
+    autorizar(actor, Accion::GestionarPresupuestos)?;
     estado.bd.leer(move |con| leer_datos(con, seleccion)).await
 }
 

@@ -120,6 +120,8 @@ impl TarjetaVentana {
 pub struct PaginaMiDia {
     pub usuario: UsuarioEnPantalla,
     pub tarjetas: Vec<TarjetaVentana>,
+    /// Solo con el permiso de ver todo el taller (ADR-0024).
+    pub resto: Vec<TarjetaVentana>,
 }
 
 #[derive(Template)]

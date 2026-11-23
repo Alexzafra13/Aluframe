@@ -125,7 +125,9 @@ pub fn ventana_para(
     let fila = ventanas_trabajo::buscar(con, id)?.ok_or(ErrorApp::NoEncontrado)?;
     let trabajo = trabajos::buscar(con, fila.trabajo_id)?.ok_or(ErrorApp::NoEncontrado)?;
     if !actor.rol.es_propietario() {
-        let suya = fila.asignado_a == Some(actor.id)
+        // Con permiso (ADR-0024), un operario ve y marca las de todo el taller.
+        let suya = actor.puede(Accion::VerTodosLosTrabajos)
+            || fila.asignado_a == Some(actor.id)
             || (fila.asignado_a.is_none() && trabajo.asignado_a == Some(actor.id));
         let abierto = !matches!(trabajo.estado.as_str(), "entregado" | "anulado");
         if !suya || !abierto {
@@ -133,6 +135,27 @@ pub fn ventana_para(
         }
     }
     Ok((ventana_completa(con, fila)?, trabajo))
+}
+
+/// Con permiso de ver todo el taller: las ventanas abiertas de los demás (sin importes).
+pub async fn ventanas_del_resto_del_taller(
+    estado: &EstadoApp,
+    actor: &Actor,
+) -> Result<Vec<(VentanaDeTrabajo, FilaTrabajo)>, ErrorApp> {
+    autorizar(actor, Accion::VerTodosLosTrabajos)?;
+    let usuario = actor.id;
+    estado
+        .bd
+        .leer(move |con| {
+            let mut resultado = Vec::new();
+            for fila in ventanas_trabajo::abiertas_de_otros(con, usuario)? {
+                let trabajo =
+                    trabajos::buscar(con, fila.trabajo_id)?.ok_or(ErrorApp::NoEncontrado)?;
+                resultado.push((ventana_completa(con, fila)?, trabajo));
+            }
+            Ok(resultado)
+        })
+        .await
 }
 
 /// «Mi día»: las ventanas asignadas al usuario con el trabajo al que pertenecen.

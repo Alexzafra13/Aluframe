@@ -101,7 +101,7 @@ Prefiere lo simple y estable. Una herramienta compleja solo se justifica si resu
 - Objetivos táctiles de al menos 44 px (se usará en tablet). Formularios con etiquetas, foco visible y buen contraste. Formatos es-ES. Estados vacíos, de carga y de error en cada pantalla.
 
 ## Seguridad y dependencias
-- Sesiones por cookie `httpOnly`, hash `argon2id` y roles (`propietario`, `operario`). El operario entra en la tablet con un **PIN** corto y el dueño con contraseña. Limita los intentos de acceso. El trabajador no ve precios ni márgenes.
+- Sesiones por cookie `httpOnly`, hash `argon2id` y roles (`propietario`, `operario`). El operario entra en la tablet con un **PIN** corto y el dueño con contraseña. Limita los intentos de acceso. El operario **no ve precios salvo que el dueño se lo permita, y nunca costes ni márgenes** (permisos por operario, ADR-0024).
 - Protección contra CSRF en los formularios. El servidor escucha solo en la red local. Datos personales de clientes (RGPD): solo los necesarios, exportables y borrables.
 - Sin secretos en el repositorio. Configuración junto al ejecutable o por variables de entorno.
 - Versiones fijadas por `Cargo.lock`. No instales versiones publicadas hace menos de 14 días. `cargo deny` en CI.

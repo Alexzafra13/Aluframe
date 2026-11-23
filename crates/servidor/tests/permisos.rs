@@ -34,10 +34,13 @@ async fn sin_sesion_se_pide_entrar() {
 async fn el_operario_no_ve_las_pantallas_del_propietario() {
     let contexto = Contexto::nuevo().await;
     let token = token_de_operario(&contexto).await;
-    for ruta in ["/ajustes/usuarios", "/clientes", "/facturas"] {
+    for ruta in ["/ajustes/usuarios", "/clientes/importar", "/facturas"] {
         let respuesta = contexto.pedir(get(ruta, Some(&token))).await;
         assert_eq!(respuesta.status(), StatusCode::NOT_FOUND, "{ruta}");
     }
+    // Buscar clientes sí puede, sin permisos extra (ADR-0024).
+    let clientes = contexto.pedir(get("/clientes", Some(&token))).await;
+    assert_eq!(clientes.status(), StatusCode::OK);
     let inicio = contexto.pedir(get("/", Some(&token))).await;
     assert_eq!(destino(&inicio), Some("/mi-dia"));
     let mi_dia = contexto.pedir(get("/mi-dia", Some(&token))).await;

@@ -40,6 +40,17 @@
             <button class="boton" type="submit">{% if u.activo %}Desactivar{% else %}Activar{% endif %}</button>
           </form>
           </div>
+          <details class="permisos-operario">
+            <summary>Permisos ({{ u.permisos_marcados() }} de {{ u.permisos.len() }})</summary>
+            <form method="post" action="/ajustes/usuarios/{{ u.id }}/permisos" class="pila">
+              <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+              <p class="texto-apagado pequeno">Siempre puede ver sus trabajos, marcar los pasos y buscar clientes. Nunca ve costes ni márgenes.</p>
+              {% for c in u.permisos %}
+              <label class="casilla"><input type="checkbox" name="{{ c.campo }}" value="si"{% if c.marcada %} checked{% endif %}> {{ c.texto }}</label>
+              {% endfor %}
+              <button class="boton" type="submit">Guardar permisos</button>
+            </form>
+          </details>
           {% endif %}
         </td>
       </tr>

@@ -2,7 +2,7 @@
 <p class="vacio tarjeta">
   {% if !lista.texto.is_empty() %}Ningún cliente coincide con «{{ lista.texto }}». Prueba con otra parte del nombre o con el teléfono.
   {% else if lista.archivados %}No hay clientes archivados.
-  {% else %}Aún no hay clientes. Pulsa «Nuevo cliente» (no hace falta rellenar nada) o «Importar clientes» si los tienes en una hoja de cálculo.{% endif %}
+  {% else %}Aún no hay clientes.{% if usuario.es_propietario %} Pulsa «Nuevo cliente» (no hace falta rellenar nada) o «Importar clientes» si los tienes en una hoja de cálculo.{% else if usuario.puede_editar_clientes %} Pulsa «Nuevo cliente» para dar de alta el primero.{% endif %}{% endif %}
 </p>
 {% else %}
 <section class="tarjeta">

@@ -134,3 +134,11 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - **Los estilos y scripts con `?v=`** se guardan un año en el navegador; con la versión nueva cambia la dirección. Las letras, pedidas desde el CSS sin versión, siguen con una hora.
   - **La lectura de la base** usa un lector libre antes de esperar al de su turno.
   - Pendiente, con plan aparte: optimizador de cortes exacto cuando el rápido no llega al mínimo (`PROGRESS.md`).
+- **0.14.0 (propietario): permisos por operario** (ADR-0024, parte 1 del plan «dueño y operarios con lo justo»):
+  - Cada operario busca clientes y ve su contacto y direcciones (no los archivados).
+  - En Ajustes > Usuarios, el dueño le marca casillas: *dar de alta y corregir clientes*, *ver presupuestos con su precio de venta* (en lectura y para imprimir), *ver facturas y cobros* (en lectura) y *ver y marcar los trabajos de todo el taller* («Resto del taller» en «Mi día»).
+  - Nunca ve costes ni márgenes (el desglose ni se calcula para él). Tampoco puede gestionar presupuestos, facturas o trabajos, ni catálogo, ajustes, copias, ni archivar, borrar, exportar o importar clientes. Lo comprueban las pruebas, también escribiendo la dirección a mano.
+  - El menú y la cabecera de «Mi día» enseñan solo lo permitido.
+  - Migración 0002, que solo añade la tabla `usuario_permiso`.
+  - Cambia la regla de `CLAUDE.md` y `SPEC.md`: el operario no ve precios salvo permiso del dueño, nunca costes.
+  - Las pruebas «el operario no llega a los clientes» pasan a la regla nueva, con más comprobaciones. Estilos de formularios en `formularios.css`, para no pasar de 300 líneas en `estilos.css`.

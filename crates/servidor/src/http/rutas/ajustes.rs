@@ -6,12 +6,14 @@ use serde::Deserialize;
 
 use crate::aplicacion::Actor;
 use crate::aplicacion::usuarios::{
-    cambiar_activo, crear_operario, listar_usuarios, restablecer_pin,
+    cambiar_activo, crear_operario, guardar_permisos, listar_usuarios, restablecer_pin,
 };
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
+use crate::http::formulario::Campos;
 use crate::vistas::{MENU, OpcionUsuario, PaginaUsuarios, renderizar};
+use dominio::acceso::{Permiso, Permisos};
 
 #[derive(Deserialize)]
 pub struct Aviso {
@@ -75,6 +77,21 @@ pub async fn activacion(
     volver(&estado, &actor, resultado.map(|()| "activado")).await
 }
 
+/// Las casillas marcadas son los permisos; las desmarcadas no llegan en el formulario.
+pub async fn cambio_de_permisos(
+    State(estado): State<EstadoApp>,
+    ActorActual(actor): ActorActual,
+    Path(id): Path<i64>,
+    Form(pares): Form<Vec<(String, String)>>,
+) -> Result<Response, ErrorApp> {
+    let campos = Campos::de(pares);
+    let marcados = Permiso::TODOS
+        .into_iter()
+        .filter(|p| campos.marcado(p.como_texto()));
+    let resultado = guardar_permisos(&estado, &actor, id, Permisos::con(marcados)).await;
+    volver(&estado, &actor, resultado.map(|()| "permisos")).await
+}
+
 async fn volver(
     estado: &EstadoApp,
     actor: &Actor,
@@ -115,6 +132,7 @@ fn texto_de_confirmacion(hecho: &str) -> String {
         "pin" => "PIN cambiado. El operario tendrá que volver a entrar.",
         "desactivado" => "Usuario desactivado.",
         "activado" => "Usuario activado.",
+        "permisos" => "Permisos guardados. Se aplican en la siguiente página que abra el operario.",
         _ => "Hecho.",
     }
     .to_owned()

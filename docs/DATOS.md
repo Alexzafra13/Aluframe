@@ -25,7 +25,7 @@ Imagina un archivador con cajones. Cada cajón es una lista (clientes, presupues
 ## 3. Cada grupo en palabras
 
 ### 3.1 Personas y acceso
-Hay dos tipos de usuario. El **propietario** lo ve y lo cambia todo. El **operario** lo da de alta el propietario con un usuario y un PIN, y solo ve los trabajos que se le asignan, sin precios ni márgenes.
+Hay dos tipos de usuario. El **propietario** lo ve y lo cambia todo. El **operario** lo da de alta el propietario con un usuario y un PIN: ve los trabajos que se le asignan y busca clientes, y el propietario puede darle permisos extra (ADR-0024). Nunca ve costes ni márgenes.
 
 ### 3.2 Clientes
 Una ficha de cliente puede guardar los datos fiscales (nombre o razón social, NIF o CIF, dirección fiscal), el contacto, si es **particular o empresa** (cambia el IVA) y la forma de pago habitual. Al darlo de alta a mano son **obligatorios el nombre y un teléfono** (en España, 9 cifras sin prefijo; el +34 se da por puesto); el resto se completa después y el NIF, si se escribe, se valida. La importación por CSV no exige nada. Cada cliente puede tener **una o varias direcciones de montaje**, con persona de contacto y notas ("sin ascensor"). El presupuesto elige una o añade otra al momento. Cuando se emite un documento, los datos del cliente se **copian** dentro de él, así que cambiar la ficha después no altera facturas antiguas.
@@ -86,7 +86,7 @@ Se da de alta un **cliente** con una dirección de montaje. Se crea el **presupu
 10. Facturas de proveedores y archivos adjuntos: ¿entran en el MVP o quedan reservadas?
 
 ## 7. Tablas y campos (para Claude Code)
-El esquema de H0 a H6 (usuarios, sesiones, auditoría y esquema; series; clientes y catálogo; presupuestos; trabajos; stock y facturas) es la migración `crates/servidor/src/bd/migraciones/0001_inicial.sql`. Desde la 0.11.0 cada cambio es una migración nueva y la versión de la base es `PRAGMA user_version` (ADR-0021).
+El esquema de H0 a H6 (usuarios, sesiones, auditoría y esquema; series; clientes y catálogo; presupuestos; trabajos; stock y facturas) es la migración `crates/servidor/src/bd/migraciones/0001_inicial.sql`; la 0002 añade los permisos de operario (ADR-0024). Desde la 0.11.0 cada cambio es una migración nueva y la versión de la base es `PRAGMA user_version` (ADR-0021).
 
 ### 7.1 Convenciones
 | Convención | Regla |
@@ -108,6 +108,7 @@ El esquema de H0 a H6 (usuarios, sesiones, auditoría y esquema; series; cliente
 |---|---|
 | `usuario` | id, nombre, rol (`propietario`/`operario`), clave_hash (argon2id: contraseña o PIN), activo, intentos_fallidos, bloqueado_hasta, creado_en, version |
 | `bloqueo_ip` | ip (PK), intentos_fallidos, bloqueado_hasta (bloqueo progresivo por dirección) |
+| `usuario_permiso` | usuario_id, permiso (`editar_clientes`/`ver_presupuestos`/`ver_facturas`/`ver_todos_los_trabajos`). Migración 0002, ADR-0024 |
 | `sesion` | id (hash del identificador de 256 bits), usuario_id, creada_en, ultima_actividad_en, caduca_en, token_csrf, hasta_cerrar_navegador (0/1, opción del propietario al entrar) |
 | `configuracion` | clave (PK), valor, actualizado_en, usuario_id |
 | `secuencia_documentos` | serie, anio, ultimo; PK (serie, anio) |

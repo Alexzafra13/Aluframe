@@ -36,7 +36,7 @@ pub async fn listar_presupuestos(
     actor: &Actor,
     filtro: Option<String>,
 ) -> Result<Vec<FilaPresupuesto>, ErrorApp> {
-    autorizar(actor, Accion::GestionarClientes)?;
+    autorizar(actor, Accion::VerPresupuestos)?;
     estado
         .bd
         .leer(move |con| presupuestos::listar(con, filtro.as_deref(), None))
@@ -48,7 +48,7 @@ pub async fn presupuestos_del_cliente(
     actor: &Actor,
     cliente_id: i64,
 ) -> Result<Vec<FilaPresupuesto>, ErrorApp> {
-    autorizar(actor, Accion::GestionarClientes)?;
+    autorizar(actor, Accion::VerPresupuestos)?;
     estado
         .bd
         .leer(move |con| presupuestos::listar(con, None, Some(cliente_id)))
@@ -83,7 +83,7 @@ pub async fn cargar_presupuesto(
     actor: &Actor,
     id: i64,
 ) -> Result<FichaDePresupuesto, ErrorApp> {
-    autorizar(actor, Accion::GestionarClientes)?;
+    autorizar(actor, Accion::VerPresupuestos)?;
     estado.bd.leer(move |con| cargar(con, id)).await
 }
 
@@ -94,7 +94,7 @@ pub async fn cambiar<T: Send + 'static>(
     accion: &'static str,
     operacion: impl FnOnce(&Transaction, &str) -> Result<(T, i64), ErrorApp> + Send + 'static,
 ) -> Result<T, ErrorApp> {
-    autorizar(actor, Accion::GestionarClientes)?;
+    autorizar(actor, Accion::GestionarPresupuestos)?;
     let (ahora, autor) = (estado.ahora(), actor.id);
     estado
         .bd

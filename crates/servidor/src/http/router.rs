@@ -71,6 +71,10 @@ fn rutas_de_ajustes() -> Router<EstadoApp> {
         )
         .route("/ajustes/usuarios/{id}/activar", post(ajustes::activacion))
         .route(
+            "/ajustes/usuarios/{id}/permisos",
+            post(ajustes::cambio_de_permisos),
+        )
+        .route(
             "/ajustes/presupuestos",
             get(ajustes_presupuestos::mostrar).post(ajustes_presupuestos::guardar),
         )

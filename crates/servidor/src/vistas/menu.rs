@@ -23,6 +23,7 @@ pub const MENU: &[GrupoMenu] = &[
         titulo: "Vender",
         entradas: &[
             entrada("Inicio", "/", "inicio"),
+            entrada("Mi día", "/mi-dia", "mi-dia"),
             entrada("Clientes", "/clientes", "clientes"),
             entrada("Presupuestos", "/presupuestos", "presupuestos"),
             entrada("Trabajos", "/trabajos", "trabajos"),

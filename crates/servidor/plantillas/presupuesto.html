@@ -12,7 +12,7 @@
 </header>
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 {% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
-{% if ficha.tarifas_cambiadas %}
+{% if ficha.tarifas_cambiadas && usuario.es_propietario %}
 <div class="aviso con-accion" role="alert">
   <span>La tarifa ha cambiado desde que se calcularon estas ventanas.</span>
   <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/recalcular">
@@ -60,7 +60,7 @@
     </ol>
   </section>
   <aside class="columna-datos">
-    {% if let Some(t) = ficha.trabajo_id %}<a class="boton primario ancho" href="/trabajos/{{ t }}">Ver el trabajo en el taller</a>{% endif %}
+    {% if let Some(t) = ficha.trabajo_id %}{% if usuario.es_propietario %}<a class="boton primario ancho" href="/trabajos/{{ t }}">Ver el trabajo en el taller</a>{% endif %}{% endif %}
     <form class="tarjeta" method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/datos">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <input type="hidden" name="version" value="{{ ficha.presupuesto.version }}">
@@ -85,6 +85,7 @@
       <h2>Acciones</h2>
       <div class="pila-botones">
         <a class="boton" href="/presupuestos/{{ ficha.presupuesto.id }}/imprimir">Imprimir o guardar PDF</a>
+        {% if usuario.es_propietario %}
         {% if estado() == "borrador" %}
         <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/estado/enviado"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton" type="submit">Marcar como enviado</button></form>
         {% endif %}
@@ -94,8 +95,9 @@
         {% if estado() == "borrador" || estado() == "enviado" %}
         <button class="boton" type="button" data-abrir-hoja="hoja-rechazar">Rechazar</button>
         {% endif %}
+        {% endif %}
       </div>
-      {% if estado() == "borrador" || estado() == "enviado" %}
+      {% if usuario.es_propietario && (estado() == "borrador" || estado() == "enviado") %}
       {% if motivos.is_empty() %}
       <button class="boton primario ancho" type="button" data-abrir-hoja="hoja-aceptar">Aceptar presupuesto</button>
       {% else %}
@@ -114,10 +116,12 @@
 </div>
 <footer class="pie-fijo" aria-label="Totales">
   <dl class="pie-desglose">
+    {% if usuario.es_propietario %}
     <div><dt>Perfiles</dt><dd>{{ desglose.perfiles }}</dd></div>
     <div><dt>Cristal</dt><dd>{{ desglose.cristal }}</dd></div>
     <div><dt>Accesorios</dt><dd>{{ desglose.accesorios }}</dd></div>
     <div><dt>Mano de obra</dt><dd>{{ desglose.mano_de_obra }}</dd></div>
+    {% endif %}
     <div><dt>Sin IVA</dt><dd>{{ base() }}</dd></div>
     {% for (tipo, base, cuota) in ivas %}<div><dt>IVA {{ tipo }}</dt><dd title="sobre {{ base }}">{{ cuota }}</dd></div>{% endfor %}
   </dl>
@@ -126,5 +130,5 @@
     <div><span class="pie-total-titulo">Total con IVA</span><span class="pie-total-importe mono">{{ total() }}</span></div>
   </div>
 </footer>
-{% include "presupuesto_hojas.html" %}
+{% if usuario.es_propietario %}{% include "presupuesto_hojas.html" %}{% endif %}
 {% endblock %}

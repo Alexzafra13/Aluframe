@@ -56,7 +56,11 @@ pub async fn mostrar_clientes(
     let lista = listar_clientes(&estado, &actor, consulta).await?;
     let lista = VistaListaClientes::nueva(&lista, texto, archivados);
     if es_htmx(&cabeceras) {
-        return Ok(renderizar(&FragmentoListaClientes { lista })?.into_response());
+        return Ok(renderizar(&FragmentoListaClientes {
+            usuario: (&actor).into(),
+            lista,
+        })?
+        .into_response());
     }
     let confirmacion = texto_de_confirmacion(&filtro);
     let pagina = PaginaClientes {
@@ -103,7 +107,7 @@ fn pagina_de_formulario(actor: &Actor, f: Formulario) -> Result<Response, ErrorA
 }
 
 pub async fn mostrar_alta(ActorActual(actor): ActorActual) -> Result<Response, ErrorApp> {
-    crate::aplicacion::autorizar(&actor, dominio::acceso::Accion::GestionarClientes)?;
+    crate::aplicacion::autorizar(&actor, dominio::acceso::Accion::EditarClientes)?;
     let formulario = Formulario {
         id: None,
         version: 0,

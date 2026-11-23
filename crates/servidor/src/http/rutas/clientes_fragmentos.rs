@@ -35,7 +35,7 @@ pub async fn comprobar_nif(
     ActorActual(actor): ActorActual,
     Query(escrito): Query<NifEscrito>,
 ) -> Result<Response, ErrorApp> {
-    autorizar(&actor, Accion::GestionarClientes)?;
+    autorizar(&actor, Accion::EditarClientes)?;
     let texto = escrito.nif.unwrap_or_default();
     let (mensaje, correcto) = if texto.trim().is_empty() {
         (None, false)
@@ -57,7 +57,7 @@ pub async fn direccion_en_blanco(
     ActorActual(actor): ActorActual,
     Query(numero): Query<NumeroDeBloque>,
 ) -> Result<Response, ErrorApp> {
-    autorizar(&actor, Accion::GestionarClientes)?;
+    autorizar(&actor, Accion::EditarClientes)?;
     let n = numero.n.unwrap_or(1).min(19);
     let direccion = bloque_vacio(n);
     Ok(renderizar(&FragmentoDireccion { direccion })?.into_response())

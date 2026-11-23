@@ -11,13 +11,13 @@
   {% for grupo in menu %}
   {% if !loop.first %}<hr class="menu-separador">{% endif %}
   <ul aria-label="{{ grupo.titulo }}">
-    {% for entrada in grupo.entradas %}
+    {% for entrada in grupo.entradas %}{% if usuario.ve_seccion(entrada.seccion) %}
     <li><a class="menu-entrada{% if entrada.seccion == seccion %} activa{% endif %}" href="{{ entrada.ruta }}" title="{{ entrada.nombre }}"{% if entrada.seccion == seccion %} aria-current="page"{% endif %}>{% if entrada.seccion == seccion %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-{{ entrada.seccion }}"/></svg><span class="menu-texto">{{ entrada.nombre }}</span></a></li>
-    {% endfor %}
+    {% endif %}{% endfor %}
   </ul>
   {% endfor %}
   <div class="menu-pie">
-    <a class="menu-entrada{% if seccion == "ajustes" %} activa{% endif %}" href="/ajustes/usuarios" title="Ajustes">{% if seccion == "ajustes" %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-ajustes"/></svg><span class="menu-texto">Ajustes</span></a>
+    {% if usuario.es_propietario %}<a class="menu-entrada{% if seccion == "ajustes" %} activa{% endif %}" href="/ajustes/usuarios" title="Ajustes">{% if seccion == "ajustes" %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-ajustes"/></svg><span class="menu-texto">Ajustes</span></a>{% endif %}
     <div class="menu-usuario">
       <span class="avatar avatar-menu" aria-hidden="true">{{ usuario.nombre.chars().next().unwrap_or('A') }}</span>
       <span class="menu-usuario-datos menu-texto"><span class="menu-usuario-nombre">{{ usuario.nombre }}</span><span class="menu-usuario-rol">{% if usuario.es_propietario %}Propietario{% else %}Operario{% endif %}</span></span>
@@ -31,11 +31,11 @@
 <div class="area">
   <header class="barra-superior">
     <a class="marca-movil" href="/" aria-label="AlumFrame, inicio"><span class="marca-logo" aria-hidden="true"></span></a>
-    {% if usuario.es_propietario %}<form class="buscador-global" method="get" action="/clientes" role="search">
+    <form class="buscador-global" method="get" action="/clientes" role="search">
       <label class="oculto" for="buscar-global">Buscar cliente</label>
       <svg class="icono icono-buscar" aria-hidden="true"><use href="#i-buscar"/></svg>
       <input id="buscar-global" class="buscador" type="search" name="q" placeholder="Buscar cliente" autocomplete="off">
-    </form>{% endif %}
+    </form>
     {% if usuario.es_propietario %}<span id="campana" class="campana-reservada" hx-get="/avisos/campana" hx-trigger="load" hx-swap="outerHTML"></span>{% endif %}
     <span class="usuario-actual"><span class="avatar pequeno-avatar" aria-hidden="true">{{ usuario.nombre.chars().next().unwrap_or('A') }}</span><span class="usuario-nombre">{{ usuario.nombre }}</span></span>
   </header>
@@ -44,7 +44,7 @@
   </main>
 </div>
 <nav class="barra-pestanas" aria-label="Menú principal">
-  {% for grupo in menu %}{% for entrada in grupo.entradas %}{% if grupo.titulo == "Vender" %}
+  {% for grupo in menu %}{% for entrada in grupo.entradas %}{% if grupo.titulo == "Vender" && usuario.ve_seccion(entrada.seccion) %}
   <a class="pestana-ios{% if entrada.seccion == seccion %} activa{% endif %}" href="{{ entrada.ruta }}"{% if entrada.seccion == seccion %} aria-current="page"{% endif %}>{% if entrada.seccion == seccion %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-{{ entrada.seccion }}"/></svg><span>{{ entrada.nombre }}</span></a>
   {% endif %}{% endfor %}{% endfor %}
   <button class="pestana-ios{% if en_mas %} activa{% endif %}" type="button" data-abrir-hoja="hoja-mas"{% if en_mas %} aria-current="page"{% endif %}>{% if en_mas %}<span class="indicador-menu" aria-hidden="true"></span>{% endif %}<svg class="icono" aria-hidden="true"><use href="#i-mas"/></svg><span>Más</span></button>
@@ -56,10 +56,10 @@
       <button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button>
     </header>
     <ul class="grupo-ios" role="list">
-      {% for grupo in menu %}{% for entrada in grupo.entradas %}{% if grupo.titulo != "Vender" %}
+      {% for grupo in menu %}{% for entrada in grupo.entradas %}{% if grupo.titulo != "Vender" && usuario.ve_seccion(entrada.seccion) %}
       <li><a class="celda-ios{% if entrada.seccion == seccion %} activa{% endif %}" href="{{ entrada.ruta }}"><svg class="icono" aria-hidden="true"><use href="#i-{{ entrada.seccion }}"/></svg>{{ entrada.nombre }}</a></li>
       {% endif %}{% endfor %}{% endfor %}
-      <li><a class="celda-ios{% if seccion == "ajustes" %} activa{% endif %}" href="/ajustes/usuarios"><svg class="icono" aria-hidden="true"><use href="#i-ajustes"/></svg>Ajustes</a></li>
+      {% if usuario.es_propietario %}<li><a class="celda-ios{% if seccion == "ajustes" %} activa{% endif %}" href="/ajustes/usuarios"><svg class="icono" aria-hidden="true"><use href="#i-ajustes"/></svg>Ajustes</a></li>{% endif %}
     </ul>
     <form class="grupo-ios" method="post" action="/salir">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">

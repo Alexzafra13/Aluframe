@@ -3,7 +3,7 @@
 mod comun;
 
 use comun::Contexto;
-use dominio::acceso::Rol;
+use dominio::acceso::{Permiso, Permisos, Rol};
 use dominio::clientes::{
     DatosDeCliente, EntradaDeCliente, EntradaDeDireccion, validar_cliente, validar_direccion,
 };
@@ -185,22 +185,70 @@ async fn archiva_y_borra_del_todo_con_sus_direcciones() {
     ));
 }
 
+fn operario_con(propietario: &Actor, permisos: &[Permiso]) -> Actor {
+    Actor {
+        rol: Rol::Operario,
+        permisos: Permisos::con(permisos.iter().copied()),
+        ..propietario.clone()
+    }
+}
+
 #[tokio::test]
-async fn el_operario_no_llega_a_los_clientes() {
+async fn el_operario_ve_los_clientes_pero_sin_permiso_no_los_da_de_alta() {
     let contexto = Contexto::nuevo().await;
     let (_, propietario) = contexto.con_propietario().await;
-    let operario = Actor {
-        rol: Rol::Operario,
-        ..propietario
-    };
-    let lista = listar_clientes(&contexto.estado, &operario, consulta("")).await;
-    assert!(matches!(lista, Err(ErrorApp::NoEncontrado)));
-    let alta = crear_cliente(
-        &contexto.estado,
-        &operario,
-        DatosDeCliente::default(),
-        vec![],
-    )
-    .await;
+    let id = crear_cliente(&contexto.estado, &propietario, datos("Ana", ""), vec![])
+        .await
+        .unwrap();
+    let operario = operario_con(&propietario, &[]);
+    let lista = listar_clientes(&contexto.estado, &operario, consulta(""))
+        .await
+        .unwrap();
+    assert_eq!(lista.total, 1);
+    assert!(
+        cargar_cliente(&contexto.estado, &operario, id)
+            .await
+            .is_ok()
+    );
+    let alta = crear_cliente(&contexto.estado, &operario, datos("Luis", ""), vec![]).await;
     assert!(matches!(alta, Err(ErrorApp::NoEncontrado)));
+}
+
+#[tokio::test]
+async fn con_permiso_da_de_alta_pero_nunca_archiva_borra_ni_exporta() {
+    let contexto = Contexto::nuevo().await;
+    let (_, propietario) = contexto.con_propietario().await;
+    let operario = operario_con(&propietario, &Permiso::TODOS);
+    let id = crear_cliente(&contexto.estado, &operario, datos("Luis", ""), vec![])
+        .await
+        .unwrap();
+    let archivar = archivar_cliente(&contexto.estado, &operario, id, true).await;
+    assert!(matches!(archivar, Err(ErrorApp::NoEncontrado)));
+    let borrar = borrar_cliente(&contexto.estado, &operario, id).await;
+    assert!(matches!(borrar, Err(ErrorApp::NoEncontrado)));
+    let exportar = exportar_cliente(&contexto.estado, &operario, id).await;
+    assert!(matches!(exportar, Err(ErrorApp::NoEncontrado)));
+}
+
+#[tokio::test]
+async fn el_operario_no_ve_los_clientes_archivados() {
+    let contexto = Contexto::nuevo().await;
+    let (_, propietario) = contexto.con_propietario().await;
+    let id = crear_cliente(&contexto.estado, &propietario, datos("Ana", ""), vec![])
+        .await
+        .unwrap();
+    archivar_cliente(&contexto.estado, &propietario, id, true)
+        .await
+        .unwrap();
+    let operario = operario_con(&propietario, &Permiso::TODOS);
+    let archivados = ConsultaDeClientes {
+        archivados: true,
+        ..consulta("")
+    };
+    let lista = listar_clientes(&contexto.estado, &operario, archivados)
+        .await
+        .unwrap();
+    assert_eq!(lista.total, 0);
+    let ficha = cargar_cliente(&contexto.estado, &operario, id).await;
+    assert!(matches!(ficha, Err(ErrorApp::NoEncontrado)));
 }

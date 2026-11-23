@@ -50,6 +50,16 @@ fn la_migracion_0001_publicada_no_se_edita() {
 }
 
 #[test]
+fn una_base_de_la_0001_con_datos_pasa_a_la_ultima_sin_perderlos() {
+    let mut conexion = Connection::open_in_memory().unwrap();
+    aplicar_migraciones(&mut conexion, &MIGRACIONES[..1], AHORA).unwrap();
+    anotar_dato(&conexion);
+    preparar_esquema(&mut conexion, AHORA).unwrap();
+    assert_eq!(version(&conexion), version_del_programa());
+    assert_eq!(dato(&conexion), "v");
+}
+
+#[test]
 fn crea_todas_las_tablas_en_una_base_vacia() {
     let conexion = preparada();
     assert_eq!(version(&conexion), version_del_programa());
@@ -58,6 +68,7 @@ fn crea_todas_las_tablas_en_una_base_vacia() {
         "esquema",
         "serie",
         "usuario",
+        "usuario_permiso",
         "factura",
         "cobro",
     ] {
@@ -104,7 +115,8 @@ fn adopta_las_bases_de_las_versiones_sin_migraciones_con_sus_datos() {
         let mut antigua = base_antigua(huella);
         assert_eq!(version(&antigua), 0);
         preparar_esquema(&mut antigua, AHORA).unwrap();
-        assert_eq!(version(&antigua), 1, "{huella}");
+        // Se adopta como la 1 y se lleva hasta la última migración.
+        assert_eq!(version(&antigua), version_del_programa(), "{huella}");
         assert_eq!(dato(&antigua), "v");
     }
 }
@@ -135,19 +147,25 @@ fn rechaza_bases_desconocidas_o_mas_nuevas() {
     ));
 }
 
-const AMPLIAR: Migracion = Migracion {
-    numero: 2,
-    sql: "ALTER TABLE configuracion ADD COLUMN nota TEXT;",
-};
+/// Las migraciones del programa y una más detrás, como la próxima que se publique.
+fn con_una_mas(sql: &'static str) -> Vec<Migracion> {
+    let mut migraciones = MIGRACIONES.to_vec();
+    migraciones.push(Migracion {
+        numero: version_del_programa() + 1,
+        sql,
+    });
+    migraciones
+}
 
 #[test]
 fn una_migracion_nueva_conserva_los_datos() {
     let mut conexion = preparada();
     anotar_dato(&conexion);
-    let migraciones = [MIGRACIONES[0], AMPLIAR];
+    let migraciones = con_una_mas("ALTER TABLE configuracion ADD COLUMN nota TEXT;");
+    let siguiente = version_del_programa() + 1;
     assert_eq!(migraciones_pendientes(&conexion).unwrap(), 0);
     aplicar_migraciones(&mut conexion, &migraciones, AHORA).unwrap();
-    assert_eq!(version(&conexion), 2);
+    assert_eq!(version(&conexion), siguiente);
     assert_eq!(dato(&conexion), "v");
     let nota: Option<String> = conexion
         .query_row(
@@ -159,7 +177,7 @@ fn una_migracion_nueva_conserva_los_datos() {
     assert_eq!(nota, None);
     assert_eq!(
         leer_huella_guardada(&conexion).unwrap().unwrap(),
-        calcular_sha256("migracion-2")
+        calcular_sha256(&format!("migracion-{siguiente}"))
     );
     let mut fallos = conexion.prepare("PRAGMA foreign_key_check").unwrap();
     assert!(fallos.query([]).unwrap().next().unwrap().is_none());
@@ -169,13 +187,11 @@ fn una_migracion_nueva_conserva_los_datos() {
 fn una_migracion_que_falla_no_deja_nada_a_medias() {
     let mut conexion = preparada();
     anotar_dato(&conexion);
-    let rota = Migracion {
-        numero: 2,
-        sql: "ALTER TABLE configuracion ADD COLUMN nota TEXT; ALTER TABLE no_existe ADD COLUMN x TEXT;",
-    };
-    let migraciones = [MIGRACIONES[0], rota];
+    let migraciones = con_una_mas(
+        "ALTER TABLE configuracion ADD COLUMN nota TEXT; ALTER TABLE no_existe ADD COLUMN x TEXT;",
+    );
     assert!(aplicar_migraciones(&mut conexion, &migraciones, AHORA).is_err());
-    assert_eq!(version(&conexion), 1);
+    assert_eq!(version(&conexion), version_del_programa());
     assert!(conexion.prepare("SELECT nota FROM configuracion").is_err());
     assert_eq!(dato(&conexion), "v");
 }

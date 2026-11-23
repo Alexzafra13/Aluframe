@@ -1,10 +1,10 @@
-use dominio::acceso::{Accion, Rol, validar_nombre_usuario, validar_pin};
+use dominio::acceso::{Accion, Permisos, Rol, validar_nombre_usuario, validar_pin};
 
 use super::auditar::{Evento, auditar};
 use super::primer_arranque::cifrar_en_segundo_plano;
 use super::{Actor, autorizar};
-use crate::bd::consultas::sesiones;
 use crate::bd::consultas::usuarios::{self, FilaUsuario, NuevoUsuario};
+use crate::bd::consultas::{permisos, sesiones};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 use crate::fecha::formatear_utc;
@@ -15,6 +15,8 @@ pub struct UsuarioVisible {
     pub nombre: String,
     pub rol: Rol,
     pub activo: bool,
+    /// Solo se rellenan en la lista de Ajustes > Usuarios.
+    pub permisos: Permisos,
 }
 
 impl From<FilaUsuario> for UsuarioVisible {
@@ -24,6 +26,7 @@ impl From<FilaUsuario> for UsuarioVisible {
             nombre: fila.nombre,
             rol: fila.rol,
             activo: fila.activo,
+            permisos: Permisos::default(),
         }
     }
 }
@@ -38,8 +41,20 @@ pub async fn listar_usuarios(
     actor: &Actor,
 ) -> Result<Vec<UsuarioVisible>, ErrorApp> {
     autorizar(actor, Accion::GestionarUsuarios)?;
-    let filas = estado.bd.leer(|con| usuarios::listar(con, false)).await?;
-    Ok(filas.into_iter().map(UsuarioVisible::from).collect())
+    estado
+        .bd
+        .leer(|con| {
+            let mut lista = Vec::new();
+            for fila in usuarios::listar(con, false)? {
+                let permisos = permisos::leer(con, fila.id)?;
+                lista.push(UsuarioVisible {
+                    permisos,
+                    ..UsuarioVisible::from(fila)
+                });
+            }
+            Ok(lista)
+        })
+        .await
 }
 
 pub async fn crear_operario(
@@ -141,6 +156,32 @@ pub async fn cambiar_activo(
                     usuario: operario_id,
                 },
             )
+        })
+        .await
+}
+
+/// Lo que el dueño deja ver o hacer a un operario además de lo básico (ADR-0024). Vale desde
+/// la siguiente página que abra: los permisos se leen en cada petición.
+pub async fn guardar_permisos(
+    estado: &EstadoApp,
+    actor: &Actor,
+    operario_id: i64,
+    nuevos: Permisos,
+) -> Result<(), ErrorApp> {
+    autorizar(actor, Accion::GestionarUsuarios)?;
+    let (ahora, actor_id) = (estado.ahora(), actor.id);
+    estado
+        .bd
+        .escribir(move |tx| {
+            buscar_operario(tx, operario_id)?;
+            permisos::guardar(tx, operario_id, &nuevos)?;
+            let evento = Evento {
+                ahora,
+                autor: Some(actor_id),
+                accion: "cambiar_permisos",
+                usuario: operario_id,
+            };
+            auditar(tx, evento)
         })
         .await
 }

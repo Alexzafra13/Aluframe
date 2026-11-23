@@ -27,7 +27,7 @@ pub async fn calcular_ventana_sin_guardar(
     actor: &Actor,
     entrada: EntradaDeVentana,
 ) -> Result<CalculoDeVentana, ErrorApp> {
-    super::autorizar(actor, dominio::acceso::Accion::GestionarClientes)?;
+    super::autorizar(actor, dominio::acceso::Accion::GestionarPresupuestos)?;
     estado
         .bd
         .leer(move |con| {
