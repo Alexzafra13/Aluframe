@@ -91,7 +91,7 @@ pub fn mostrar_error(mensaje: &str, perfil: &Path) {
     }
 }
 
-fn escapar_html(texto: &str) -> String {
+pub(crate) fn escapar_html(texto: &str) -> String {
     texto
         .replace('&', "&amp;")
         .replace('<', "&lt;")

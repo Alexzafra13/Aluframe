@@ -23,6 +23,12 @@ pub enum ErrorArranque {
     Configuracion(#[from] ErrorConfiguracion),
     #[error(transparent)]
     Esquema(#[from] ErrorEsquema),
+    /// La base de la carpeta de datos no se puede usar con esta versión: se dice cuál es.
+    #[error("{error}\nCarpeta de datos: {}", carpeta.display())]
+    BaseNoUsable {
+        error: ErrorEsquema,
+        carpeta: PathBuf,
+    },
     #[error("No se pudo abrir la base de datos: {0}")]
     BaseDeDatos(#[from] rusqlite::Error),
     #[error("No se pudo crear la carpeta de datos {ruta}: {causa}")]
@@ -59,7 +65,13 @@ pub async fn preparar_estado(config: &Configuracion) -> Result<EstadoApp, ErrorA
         causa,
     })?;
     let reloj: Arc<dyn Reloj> = Arc::new(RelojDelSistema);
-    preparar_base(config, &formatear_utc(reloj.ahora()))?;
+    preparar_base(config, &formatear_utc(reloj.ahora())).map_err(|error| match error {
+        ErrorArranque::Esquema(error) => ErrorArranque::BaseNoUsable {
+            error,
+            carpeta: config.carpeta_datos.clone(),
+        },
+        otro => otro,
+    })?;
     let bd = BaseDeDatos::abrir(&config.ruta_base_de_datos())?;
     let estado = EstadoApp::nuevo(bd, reloj)
         .await?

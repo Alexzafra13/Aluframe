@@ -6,12 +6,16 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 use anyhow::Context;
-use servidor::arranque::{escuchar, preparar_estado, servir_hasta};
+use servidor::arranque::{ErrorArranque, escuchar, preparar_estado, servir_hasta};
+use servidor::autenticacion::generar_token;
 use servidor::config::{Configuracion, Modo};
 use servidor::escritorio::latido::la_ventana_sigue_abierta;
 use servidor::escritorio::preferencias::{ARCHIVO_DE_PREFERENCIAS, Preferencias};
+use servidor::escritorio::recuperacion::Recuperacion;
 use servidor::escritorio::ventana::{abrir_ventana, mostrar_error};
 use servidor::escritorio::{carpeta_de_la_aplicacion, responde_alumframe};
+use servidor::fecha::formatear_utc;
+use servidor::http::crear_router_de_recuperacion;
 
 const ARCHIVO_DE_REGISTRO: &str = "alumframe.log";
 /// Con más, el registro se empieza de nuevo al abrir: no crece sin límite en el PC.
@@ -59,9 +63,14 @@ async fn servir_mientras_la_ventana_siga_abierta(
     preferencias: PathBuf,
     (url, perfil): (&str, &Path),
 ) -> anyhow::Result<()> {
-    let estado = preparar_estado(config)
-        .await?
-        .con_preferencias_escritorio(preferencias);
+    let estado = match preparar_estado(config).await {
+        Ok(estado) => estado.con_preferencias_escritorio(preferencias),
+        Err(ErrorArranque::BaseNoUsable { error, carpeta }) => {
+            let recuperacion = Recuperacion::desde(&error, &carpeta);
+            return servir_recuperacion(config, recuperacion, perfil).await;
+        }
+        Err(otro) => return Err(otro.into()),
+    };
     let escucha = escuchar(config)
         .await
         .with_context(|| format!("el puerto {} está ocupado por otro programa", config.puerto))?;
@@ -70,6 +79,35 @@ async fn servir_mientras_la_ventana_siga_abierta(
         let _ = apagado.await;
     }));
     if esperar_a_que_se_cierre(abrir_ventana(url, perfil)?).await? {
+        let _ = avisar.send(());
+    }
+    servidor.await??;
+    Ok(())
+}
+
+/// La base de este equipo no se puede usar: en vez del programa, una pantalla que lo explica y
+/// ofrece abrir la carpeta de datos o, si es una base antigua, empezar de cero.
+async fn servir_recuperacion(
+    config: &Configuracion,
+    recuperacion: Recuperacion,
+    perfil: &Path,
+) -> anyhow::Result<()> {
+    let token = generar_token().map_err(|e| anyhow::anyhow!("{e}"))?;
+    let marca = formatear_utc(time::OffsetDateTime::now_utc()).replace(':', "-");
+    let router = crear_router_de_recuperacion(recuperacion, (token, marca));
+    let escucha = escuchar(config)
+        .await
+        .with_context(|| format!("el puerto {} está ocupado por otro programa", config.puerto))?;
+    let (avisar, apagado) = tokio::sync::oneshot::channel::<()>();
+    let servidor = tokio::spawn(async move {
+        axum::serve(escucha, router)
+            .with_graceful_shutdown(async {
+                let _ = apagado.await;
+            })
+            .await
+    });
+    let inicio = format!("http://127.0.0.1:{}/", config.puerto);
+    if esperar_a_que_se_cierre(abrir_ventana(&inicio, perfil)?).await? {
         let _ = avisar.send(());
     }
     servidor.await??;

@@ -173,3 +173,8 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Viene llena: 12 clientes «Demo», presupuestos en cada situación, trabajos sin empezar, a medias, terminados y entregado, stock con retales y un aviso de stock bajo, facturas pagada, vencida, pendiente y anulada, una señal, apuntes y un operario. Precios inventados sobre la serie real Aluprom 21.
   - Va aparte y marcada: no entra en las copias, no se exporta ni se importa en los datos de verdad, y una base real nunca arranca como demostración. Cada equipo entra y sale por su cuenta. «Empezar de nuevo» la deja como al principio.
   - Idea del propietario: un modo dentro del programa, en lugar del programa aparte que se propuso primero.
+- **0.18.1 (propietario): qué hacer cuando la aplicación de Windows no arranca por la base de datos.**
+  - Antes salía solo el aviso «La base de datos es de una versión de desarrollo antigua… borra la carpeta de datos», sin decir cuál era la carpeta.
+  - Ahora la ventana dice la carpeta (`%LOCALAPPDATA%\AlumFrame\datos`), tiene el botón «Abrir la carpeta de datos» y, si la base es de un desarrollo antiguo, «Empezar de cero». **No borra nada:** mueve la base a la subcarpeta `apartadas`, por si tuviera algo que hiciera falta, y deja las copias y la demostración como estaban. Con una base de una versión más nueva solo pide instalar la más reciente.
+  - En el servidor Linux el aviso del registro también dice la carpeta (`/var/lib/alumframe`).
+  - Idea del propietario: desde el aviso, ir a la carpeta o poder borrarlo.

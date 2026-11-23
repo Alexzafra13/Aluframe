@@ -3,6 +3,7 @@
 
 pub mod latido;
 pub mod preferencias;
+pub mod recuperacion;
 pub mod ventana;
 
 use std::io::{Read, Write};

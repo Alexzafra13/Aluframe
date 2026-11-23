@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-23): **H0–H7 terminados**; publicada la **v0.18.0** con la **demostración** de datos inventados (ADR-0028). Antes, la v0.17.0 (llevada a `main` con permiso del propietario): arreglos de la segunda auditoría (antes 0.16.1, que no llegó a publicarse), mejor aprovechamiento de las barras con medidas habituales e historial (ADR-0026) y caducidad de los presupuestos (ADR-0027, migración 0004). Los datos se conservan al actualizar (migraciones, ADR-0021) y hay copias automáticas (ADR-0022).
+Estado (2026-11-23): **H0–H7 terminados**; publicada la **v0.18.1**: si la aplicación de Windows no arranca por la base de datos, dice la carpeta y ofrece abrirla o «Empezar de cero» (aparta la base, no la borra). Antes, la v0.18.0 con la **demostración** de datos inventados (ADR-0028), y la v0.17.0 (llevada a `main` con permiso del propietario): arreglos de la segunda auditoría (antes 0.16.1, que no llegó a publicarse), mejor aprovechamiento de las barras con medidas habituales e historial (ADR-0026) y caducidad de los presupuestos (ADR-0027, migración 0004). Los datos se conservan al actualizar (migraciones, ADR-0021) y hay copias automáticas (ADR-0022).
 
 **Fase actual (2026-11-23): versión mínima.** El propietario instala la versión publicada, la prueba (también con la demostración, ADR-0028) y apunta todo lo que vea mal; con su lista se arregla y se pule hasta tener una versión mínima para el taller. Los arreglos que pida se hacen directamente; una tarea nueva grande, con plan y aprobación. **Los datos que faltan (apartado «Datos que faltan del taller») los pasará cuando los tenga: no se inventan, se esperan.**
 
@@ -88,6 +88,7 @@ El propietario los pasará todos cuando los tenga (2026-11-23). Mientras, el pro
 | 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
 | 0.7.1 | Arreglo de la aplicación de Windows: no se apaga mientras la ventana siga abierta |
 | 0.7.2 | Editor: «Guardar ventana» vuelve al presupuesto; «+ Otro concepto» (antes línea libre); aviso de medida fuera de la serie solo cuando ocurre; menú lateral fijo y plegable; Aluprom 21 validada por el propietario |
+| 0.18.1 | Aplicación de Windows que no arranca por la base: dice la carpeta de datos, «Abrir la carpeta de datos» y, con una base de desarrollo antigua, «Empezar de cero» (la aparta en `apartadas`, no la borra) |
 | 0.18.0 | Demostración con datos inventados dentro del programa: se entra y se sale desde la pantalla de entrada, base aparte y marcada, «Empezar de nuevo» (ADR-0028) |
 | 0.17.0 | Plan de corte por serie, perfil y color (arreglo); mejor aprovechamiento de barras, medidas habituales e historial (ADR-0026); presupuestos que caducan a los 30 días, se renuevan y se archivan (ADR-0027, migración 0004); y lo de la segunda auditoría (abajo) |
 | (0.16.1, sin publicar) | Segunda auditoría: factura anulada por rectificativa ya no sale vencida («Anulada»); avisos de cobro sin el límite de 500 facturas; todos los clientes al crear presupuesto o factura; fecha de la operación congelada e impresa; precio unitario de ventana con descuento que cuadra |
