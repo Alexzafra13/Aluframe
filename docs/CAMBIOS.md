@@ -150,3 +150,8 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - **El operario** ve los suyos y sus tareas; no manda tareas ni cierra lo que apuntó para el dueño.
   - **Datos:** los apuntes van en la exportación de datos del cliente y se borran con él. Migración 0003, que solo añade la tabla `apunte`.
   - **Pruebas:** casos de uso, permisos y recorrido de pantalla. La E2E de apuntes va al final (`h8-apuntes.spec.js`), porque las pruebas de pantalla comparten base y la primera espera un programa recién instalado.
+- **0.16.0 (propietario): pantalla del operario para la tablet** (parte 3 y última del plan):
+  - «Mi día» empieza con una cabecera de una sola línea (Mi día, nombre y Salir).
+  - Debajo, botones grandes para el dedo: **Nuevo apunte** (destacado), **Apuntes** (con el número de pendientes), **Clientes** y, si el dueño se lo permite, **Presupuestos** y **Facturas**.
+  - Después, sus tareas y sus ventanas. Antes esos accesos iban en la cabecera, que en el móvil se partía en dos líneas.
+  - Icono nuevo «+» para el apunte nuevo.

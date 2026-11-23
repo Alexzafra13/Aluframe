@@ -173,7 +173,7 @@ body.con-menu .usuario-actual { display: none; }
 .casilla input { width: 24px; min-height: 24px; margin: 0; accent-color: var(--acero); }
 .enlace-secundario { display: inline-block; margin-top: 1rem; }
 .barra-operario { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; padding: 1rem 1.5rem; background: var(--menu-fondo); color: #fff; }
-.barra-operario .marca { font-size: 1.4rem; }
+.barra-operario .marca { font-size: 1.4rem; margin-right: auto; }
 .barra-operario .boton { min-height: var(--tactil); }
 
 @media (max-width: 900px) {

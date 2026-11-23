@@ -2,8 +2,10 @@
 {% block titulo %}Mi día{% endblock %}
 {% block clase_body %}pantalla-operario{% endblock %}
 {% block cuerpo %}
+{% include "iconos.html" %}
 {% include "mi_dia_cabecera.html" %}
 <main class="contenido">
+  {% include "mi_dia_accesos.html" %}
   {% if !tareas.is_empty() %}
   <h2 class="titulo-seccion">Tareas</h2>
   {% let volver = "/mi-dia" %}

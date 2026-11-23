@@ -36,5 +36,5 @@ Esto cambia la regla «el trabajador no ve precios ni márgenes» de `CLAUDE.md`
 
 ## Pendiente (mismo plan aprobado)
 - **Parte 2 (hecha, ADR-0025):** *apuntes*, notas y tareas sueltas para lo que no es una ventana: del operario al dueño (le llegan a la campana) y del dueño a un operario (le aparecen en «Mi día»).
-- **Parte 3:** pantalla del operario pensada para la tablet (Mi día · Apuntes · Clientes y lo permitido).
+- **Parte 3 (hecha, 0.16.0):** pantalla del operario pensada para la tablet (Mi día · Apuntes · Clientes y lo permitido).
 - **Más adelante:** fotos en los apuntes.

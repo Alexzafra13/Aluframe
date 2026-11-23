@@ -8,7 +8,7 @@ use dominio::acceso::Accion;
 use dominio::taller::AccionDePaso;
 
 use crate::aplicacion::Actor;
-use crate::aplicacion::apuntes::mis_tareas;
+use crate::aplicacion::apuntes::{listar_apuntes, mis_tareas};
 use crate::aplicacion::trabajos::acciones::{anotar_falta, cambiar_paso, repetir_pieza};
 use crate::aplicacion::trabajos::consultar::{ventanas_de_operario, ventanas_del_resto_del_taller};
 use crate::aplicacion::trabajos::operario::abrir_ventana;
@@ -37,6 +37,7 @@ pub async fn mostrar_mi_dia(
             .map(|(v, t)| TarjetaVentana::de(v, t))
             .collect()
     };
+    let apuntes_pendientes = listar_apuntes(&estado, &actor, true, None).await?.len();
     let tareas = mis_tareas(&estado, &actor)
         .await?
         .into_iter()
@@ -47,6 +48,7 @@ pub async fn mostrar_mi_dia(
         tarjetas: tarjetas(&ventanas),
         resto: tarjetas(&resto),
         tareas,
+        apuntes_pendientes,
     };
     Ok(renderizar(&pagina)?.into_response())
 }

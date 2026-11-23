@@ -78,5 +78,9 @@
 .lista-cobros li.anulado > span { text-decoration: line-through; color: var(--apagado); }
 .anular-cobro summary, .registrar-senal summary { cursor: pointer; color: var(--acero); font-weight: 600; min-height: var(--tactil); display: flex; align-items: center; }
 
-.atajos-operario { display: flex; flex-wrap: wrap; gap: .5rem; margin-right: auto; }
+.accesos-operario { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .75rem; margin: 1.5rem 0 .5rem; }
+.acceso { box-sizing: border-box; width: 100%; justify-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; min-height: 96px; padding: .75rem; border: 1.5px solid var(--linea); border-radius: 14px; background: var(--superficie); color: var(--tinta); text-decoration: none; font-weight: 600; font-size: 1.1rem; text-align: center; }
+.acceso .icono { width: 28px; height: 28px; color: var(--acero); }
+.acceso-principal { background: var(--acero); border-color: var(--acero); color: #fff; }
+.acceso-principal .icono { color: #fff; }
 .titulo-seccion { margin: 2rem 0 1rem; }

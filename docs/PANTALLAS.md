@@ -8,7 +8,7 @@ Los diseños aprobados (`design/01-presupuesto.png`, `02-inicio.png`, `03-hoja-t
 1. **Por tareas, no por tablas.** El menú se agrupa por lo que hace el dueño: **Vender**, **Taller** y **Cobrar**, tal como en el diseño aprobado. Nadie tiene que saber qué es una "entidad".
 2. **El Inicio responde a "¿qué hay que hacer hoy?"**: un tablero de trabajos (por cortar, en montaje, listos para entregar) y un panel con lo que requiere atención (avisos del taller, stock bajo, presupuestos sin respuesta, cobros vencidos).
 3. **Cada documento enseña el siguiente paso.** Presupuesto → Trabajo → Orden de taller → Factura, siempre con la misma barra de pasos arriba y un único botón principal.
-4. **El operario tiene otra pantalla, no una versión recortada.** Empieza en "Mi día": sus ventanas, grandes y táctiles, sin precios. Además toma apuntes, ve las tareas que le manda el dueño (ADR-0025), busca clientes y, con permiso del dueño, ve presupuestos, facturas o todo el taller (ADR-0024), nunca costes.
+4. **El operario tiene otra pantalla, no una versión recortada.** Empieza en "Mi día": cabecera de una línea, botones grandes (Nuevo apunte, Apuntes con su contador, Clientes y, con permiso, Presupuestos y Facturas), sus tareas y sus ventanas, grandes y táctiles, sin precios. Además toma apuntes, ve las tareas que le manda el dueño (ADR-0025), busca clientes y, con permiso del dueño, ve presupuestos, facturas o todo el taller (ADR-0024), nunca costes.
 5. **Un botón desactivado siempre dice por qué** ("No se puede aceptar: la línea 2 no tiene medida de cristal").
 6. **Lo irreversible pide confirmación con su consecuencia** (aceptar un presupuesto, terminar una orden, emitir una factura). Lo reversible no pregunta: se deshace.
 

@@ -124,6 +124,8 @@ pub struct PaginaMiDia {
     pub resto: Vec<TarjetaVentana>,
     /// Las tareas sueltas que le ha mandado el dueño (ADR-0025).
     pub tareas: Vec<super::TarjetaApunte>,
+    /// Sus apuntes y tareas sin cerrar, para el contador del botón «Apuntes».
+    pub apuntes_pendientes: usize,
 }
 
 #[derive(Template)]

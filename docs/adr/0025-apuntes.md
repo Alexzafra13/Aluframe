@@ -34,4 +34,3 @@ No todo el trabajo del taller es una ventana que se calcula con una serie. Llama
 
 ## Pendiente
 - Fotos en los apuntes (hueco, papel escrito a mano).
-- Parte 3 del plan: la pantalla del operario para la tablet.
