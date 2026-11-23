@@ -8,7 +8,7 @@ use serde::Deserialize;
 use super::presupuestos::opciones_de_iva;
 use crate::aplicacion::Actor;
 use crate::aplicacion::ajustes_presupuesto::leer_ajustes_de_presupuesto;
-use crate::aplicacion::clientes::{ConsultaDeClientes, listar_clientes};
+use crate::aplicacion::clientes::clientes_para_elegir;
 use crate::aplicacion::datos_de_empresa::CabeceraDeEmpresa;
 use crate::aplicacion::facturas::albaranes::buscar_albaran;
 use crate::aplicacion::facturas::{
@@ -30,19 +30,13 @@ pub struct FiltroFacturas {
     aviso: Option<String>,
 }
 
-async fn clientes_para_elegir(estado: &EstadoApp, actor: &Actor) -> Result<Vec<Opcion>, ErrorApp> {
-    let consulta = ConsultaDeClientes {
-        texto: String::new(),
-        archivados: false,
-        pagina: 1,
-    };
-    let lista = listar_clientes(estado, actor, consulta).await?;
-    Ok(lista
-        .clientes
-        .iter()
-        .map(|c| Opcion {
-            valor: c.id.to_string(),
-            texto: c.nombre_visible(),
+async fn opciones_de_clientes(estado: &EstadoApp, actor: &Actor) -> Result<Vec<Opcion>, ErrorApp> {
+    Ok(clientes_para_elegir(estado, actor)
+        .await?
+        .into_iter()
+        .map(|(id, nombre)| Opcion {
+            valor: id.to_string(),
+            texto: nombre,
         })
         .collect())
 }
@@ -69,7 +63,7 @@ pub async fn mostrar_facturas(
         seccion: "facturas",
         filas,
         pendientes,
-        clientes: clientes_para_elegir(&estado, &actor).await?,
+        clientes: opciones_de_clientes(&estado, &actor).await?,
     };
     Ok(renderizar(&pagina)?.into_response())
 }

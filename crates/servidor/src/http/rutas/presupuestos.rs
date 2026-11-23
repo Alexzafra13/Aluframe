@@ -8,7 +8,7 @@ use serde::Deserialize;
 use crate::aplicacion::Actor;
 use crate::aplicacion::aceptar_presupuesto::motivos_para_no_aceptar;
 use crate::aplicacion::ajustes_presupuesto::leer_ajustes_de_presupuesto;
-use crate::aplicacion::clientes::{ConsultaDeClientes, listar_clientes};
+use crate::aplicacion::clientes::clientes_para_elegir;
 use crate::aplicacion::lineas_de_presupuesto::{ivas_de, totales_de};
 use crate::aplicacion::presupuestos::{
     FichaDePresupuesto, cargar_presupuesto, crear_presupuesto, listar_presupuestos,
@@ -37,20 +37,7 @@ pub async fn mostrar_lista(
         .estado
         .filter(|e| ["borrador", "enviado", "aceptado", "rechazado"].contains(&e.as_str()));
     let filas = listar_presupuestos(&estado, &actor, elegido.clone()).await?;
-    let consulta = ConsultaDeClientes {
-        texto: String::new(),
-        archivados: false,
-        pagina: 1,
-    };
-    let clientes = listar_clientes(
-        &estado,
-        &actor,
-        ConsultaDeClientes {
-            pagina: 1,
-            ..consulta
-        },
-    )
-    .await?;
+    let clientes = clientes_para_elegir(&estado, &actor).await?;
     let pagina = PaginaPresupuestos {
         usuario: (&actor).into(),
         menu: MENU,
@@ -58,11 +45,10 @@ pub async fn mostrar_lista(
         filas: filas.iter().map(FilaDePresupuesto::from).collect(),
         filtro: elegido.unwrap_or_default(),
         clientes: clientes
-            .clientes
-            .iter()
-            .map(|c| Opcion {
-                valor: c.id.to_string(),
-                texto: c.nombre_visible(),
+            .into_iter()
+            .map(|(id, nombre)| Opcion {
+                valor: id.to_string(),
+                texto: nombre,
             })
             .collect(),
     };

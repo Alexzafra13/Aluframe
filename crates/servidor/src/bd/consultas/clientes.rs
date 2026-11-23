@@ -85,6 +85,16 @@ pub fn listar(con: &Connection, pagina: &Pagina) -> Result<(Vec<FilaCliente>, i6
     Ok((filas.collect::<Result<_, _>>()?, total))
 }
 
+/// Todos los activos, con el mismo orden que la lista, para un desplegable.
+pub fn para_elegir(con: &Connection) -> Result<Vec<(i64, Option<String>)>, ErrorApp> {
+    let mut consulta = con.prepare(
+        "SELECT id, nombre_o_razon_social FROM cliente WHERE archivado = 0 \
+         ORDER BY coalesce(nombre_o_razon_social, '') = '', busqueda, id",
+    )?;
+    let filas = consulta.query_map([], |f| Ok((f.get(0)?, f.get(1)?)))?;
+    Ok(filas.collect::<Result<_, _>>()?)
+}
+
 pub fn buscar(con: &Connection, id: i64) -> Result<Option<FilaCliente>, ErrorApp> {
     Ok(con
         .query_row(

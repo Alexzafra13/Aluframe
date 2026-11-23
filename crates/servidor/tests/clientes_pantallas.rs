@@ -205,3 +205,31 @@ async fn el_operario_recibe_404_en_las_pantallas_de_clientes() {
         assert_eq!(respuesta.status(), StatusCode::NOT_FOUND, "{ruta}");
     }
 }
+
+/// Fallo corregido: «Nuevo presupuesto» y «Nueva factura» solo ofrecían los 50 primeros clientes;
+/// el resto parecía no existir y la pantalla invitaba a darlo de alta otra vez.
+#[tokio::test]
+async fn nuevo_presupuesto_y_factura_ofrecen_todos_los_clientes() {
+    let contexto = Contexto::nuevo().await;
+    let (token, actor) = contexto.con_propietario().await;
+    for numero in 1..=60 {
+        let nombre = if numero == 60 {
+            "Zoe Zapata".to_owned()
+        } else {
+            format!("Cliente {numero:02}")
+        };
+        let cliente = dominio::clientes::validar_cliente(&dominio::clientes::EntradaDeCliente {
+            nombre,
+            ..Default::default()
+        })
+        .unwrap();
+        servidor::aplicacion::clientes::crear_cliente(&contexto.estado, &actor, cliente, vec![])
+            .await
+            .unwrap();
+    }
+    for ruta in ["/presupuestos", "/facturas"] {
+        let pagina = texto(contexto.pedir(get(ruta, Some(&token))).await).await;
+        assert!(pagina.contains("Zoe Zapata"), "{ruta}");
+        assert!(pagina.contains("Cliente 01"), "{ruta}");
+    }
+}

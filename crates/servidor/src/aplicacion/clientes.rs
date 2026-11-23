@@ -64,6 +64,20 @@ pub async fn listar_clientes(
     })
 }
 
+/// Todos los clientes activos para elegir uno (nuevo presupuesto, factura libre), sin paginar:
+/// con la primera página sola, el que no salía parecía no existir y se daba de alta dos veces.
+pub async fn clientes_para_elegir(
+    estado: &EstadoApp,
+    actor: &Actor,
+) -> Result<Vec<(i64, String)>, ErrorApp> {
+    autorizar(actor, Accion::VerClientes)?;
+    let filas = estado.bd.leer(clientes::para_elegir).await?;
+    Ok(filas
+        .into_iter()
+        .map(|(id, nombre)| (id, nombre_visible(id, nombre.as_deref())))
+        .collect())
+}
+
 pub async fn cargar_cliente(
     estado: &EstadoApp,
     actor: &Actor,
