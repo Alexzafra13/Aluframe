@@ -10,7 +10,7 @@ El propietario va a empezar a meter datos (aunque sea de prueba, a mano) y quier
 - La versión de la base es `PRAGMA user_version`. Cada migración se aplica en **una transacción** junto con el cambio de versión: si falla, la base queda como estaba.
 - Al arrancar:
   - base vacía: se aplican todas;
-  - base de 0.8.0–0.10.0 (sin número y con la huella de la 0001): se **adopta** como versión 1 sin tocar los datos;
+  - base de 0.8.0–0.10.0 (sin número y con la huella de la 0001): se **adopta** como versión 1 sin tocar los datos. Valen las dos huellas con que se guardó: la del archivo con LF (Linux) y la del archivo con CRLF (las versiones de Windows, compiladas con el código sacado por Git en Windows). Desde 0.12.1, `.gitattributes` fija LF para los `.sql` y la prueba calcula la huella sin `\r`;
   - base con migraciones pendientes y datos: antes se guarda `copias/antes-de-actualizar-….alumframe` con `VACUUM INTO`;
   - base **más nueva** que el programa: no arranca y pide instalar la versión reciente;
   - base de un desarrollo anterior a 0.8.0: no arranca (no hay instalaciones así con datos).

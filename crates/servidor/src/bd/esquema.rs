@@ -21,6 +21,10 @@ pub const MIGRACIONES: &[Migracion] = &[Migracion {
 /// Huella del esquema único de las versiones 0.8.0 a 0.10.0, que es la migración 0001: sus
 /// bases se adoptan como versión 1 sin tocar los datos.
 const HUELLA_DE_LA_0001: &str = "56113df2d94d8fdd5eab5a3bc3a0512a092b6124c6e6515eda162bcfed4bc70e";
+/// La misma, del archivo con finales de línea CRLF: así la guardaron las versiones de Windows,
+/// compiladas con el código sacado por Git en Windows.
+const HUELLA_DE_LA_0001_EN_WINDOWS: &str =
+    "22d808e2a546eb8d641fe2815d785971d1a67d7988e7fdd360e82f432e5c41f9";
 
 #[derive(Debug, Error)]
 pub enum ErrorEsquema {
@@ -52,7 +56,8 @@ pub fn version_de_la_base(con: &Connection) -> Result<Option<u32>, rusqlite::Err
     if contar_tablas(con)? == 0 {
         return Ok(Some(0));
     }
-    let adoptable = leer_huella_guardada(con)?.as_deref() == Some(HUELLA_DE_LA_0001);
+    let adoptable = leer_huella_guardada(con)?
+        .is_some_and(|h| h == HUELLA_DE_LA_0001 || h == HUELLA_DE_LA_0001_EN_WINDOWS);
     Ok(adoptable.then_some(1))
 }
 

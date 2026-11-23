@@ -1,0 +1,3 @@
+# Los .sql se guardan siempre con LF: su huella identifica el esquema (ADR-0021) y debe ser
+# la misma al compilar en Linux y en Windows.
+*.sql text eol=lf

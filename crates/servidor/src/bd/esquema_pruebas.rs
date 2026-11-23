@@ -35,7 +35,11 @@ fn dato(conexion: &Connection) -> String {
 
 #[test]
 fn la_migracion_0001_publicada_no_se_edita() {
-    assert_eq!(calcular_sha256(MIGRACIONES[0].sql), HUELLA_DE_LA_0001);
+    // Sin `\r`: en Windows Git puede sacar el archivo con finales CRLF y el SQL es el mismo.
+    let sin_retornos = MIGRACIONES[0].sql.replace('\r', "");
+    assert_eq!(calcular_sha256(&sin_retornos), HUELLA_DE_LA_0001);
+    let en_windows = sin_retornos.replace('\n', "\r\n");
+    assert_eq!(calcular_sha256(&en_windows), HUELLA_DE_LA_0001_EN_WINDOWS);
     for (indice, migracion) in MIGRACIONES.iter().enumerate() {
         assert_eq!(
             migracion.numero as usize,
@@ -80,22 +84,29 @@ fn preparar_dos_veces_no_cambia_nada() {
     assert_eq!(dato(&conexion), "v");
 }
 
-#[test]
-fn adopta_las_bases_de_las_versiones_sin_migraciones_con_sus_datos() {
+fn base_antigua(huella: &str) -> Connection {
     // Así crearon la base las versiones 0.8.0 a 0.10.0: esquema único, huella y sin número.
-    let mut antigua = Connection::open_in_memory().unwrap();
+    let antigua = Connection::open_in_memory().unwrap();
     antigua.execute_batch(MIGRACIONES[0].sql).unwrap();
     antigua
         .execute(
             "INSERT INTO esquema (huella, creado_en) VALUES (?1, ?2)",
-            params![HUELLA_DE_LA_0001, AHORA],
+            params![huella, AHORA],
         )
         .unwrap();
     anotar_dato(&antigua);
-    assert_eq!(version(&antigua), 0);
-    preparar_esquema(&mut antigua, AHORA).unwrap();
-    assert_eq!(version(&antigua), 1);
-    assert_eq!(dato(&antigua), "v");
+    antigua
+}
+
+#[test]
+fn adopta_las_bases_de_las_versiones_sin_migraciones_con_sus_datos() {
+    for huella in [HUELLA_DE_LA_0001, HUELLA_DE_LA_0001_EN_WINDOWS] {
+        let mut antigua = base_antigua(huella);
+        assert_eq!(version(&antigua), 0);
+        preparar_esquema(&mut antigua, AHORA).unwrap();
+        assert_eq!(version(&antigua), 1, "{huella}");
+        assert_eq!(dato(&antigua), "v");
+    }
 }
 
 #[test]
