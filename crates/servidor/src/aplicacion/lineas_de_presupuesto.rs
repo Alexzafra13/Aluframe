@@ -224,35 +224,36 @@ pub async fn recalcular_precios(
     id: i64,
 ) -> Result<(), ErrorApp> {
     cambiar(estado, actor, "recalcular_presupuesto", move |tx, _| {
-        let presupuesto = presupuestos::buscar(tx, id)?.ok_or(ErrorApp::NoEncontrado)?;
-        exigir_borrador(&presupuesto)?;
-        let (taller, ajustes) = ajustes(tx)?;
-        for linea in lineas_presupuesto::listar(tx, presupuesto.version_id)?
-            .iter()
-            .filter(|l| l.tipo == "ventana")
-        {
-            let unidad = Unidad::Cm;
-            let Some(entrada) = entrada_de(linea, unidad) else {
-                continue;
-            };
-            let calculo = calcular(tx, &entrada, (&taller, &ajustes))?;
-            let revisados = !linea.revisar_limites;
-            let fila = fila_de_ventana(
-                presupuesto.version_id,
-                linea.orden,
-                &entrada,
-                (
-                    &calculo,
-                    Porcentaje::desde_puntos_basicos(linea.tipo_iva_bp),
-                    revisados,
-                ),
-            )?;
-            lineas_presupuesto::guardar(tx, &fila)?;
-        }
-        recalcular_totales(tx, id)?;
+        recalcular_en(tx, id)?;
         Ok(((), id))
     })
     .await
+}
+
+/// Recalcula un borrador dentro de una transacción abierta (también al renovar).
+pub(crate) fn recalcular_en(tx: &Connection, id: i64) -> Result<(), ErrorApp> {
+    let presupuesto = presupuestos::buscar(tx, id)?.ok_or(ErrorApp::NoEncontrado)?;
+    exigir_borrador(&presupuesto)?;
+    let (taller, ajustes) = ajustes(tx)?;
+    for linea in lineas_presupuesto::listar(tx, presupuesto.version_id)?
+        .iter()
+        .filter(|l| l.tipo == "ventana")
+    {
+        let Some(entrada) = entrada_de(linea, Unidad::Cm) else {
+            continue;
+        };
+        let calculo = calcular(tx, &entrada, (&taller, &ajustes))?;
+        let iva = Porcentaje::desde_puntos_basicos(linea.tipo_iva_bp);
+        let revisados = !linea.revisar_limites;
+        let fila = fila_de_ventana(
+            presupuesto.version_id,
+            linea.orden,
+            &entrada,
+            (&calculo, iva, revisados),
+        )?;
+        lineas_presupuesto::guardar(tx, &fila)?;
+    }
+    recalcular_totales(tx, id)
 }
 
 pub fn unidad_de_serie(con: &Connection, linea: &FilaLinea) -> Result<Unidad, ErrorApp> {

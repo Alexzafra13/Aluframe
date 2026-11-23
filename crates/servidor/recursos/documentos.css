@@ -58,7 +58,7 @@ dialog.hoja.cerrando::backdrop { animation: velo-sale 260ms ease forwards; }
 .etiqueta-estado-enviado { background: var(--acero-tinte); color: var(--acero); box-shadow: inset 0 0 0 1.5px var(--acero); }
 .etiqueta-estado-aceptado { background: var(--acero); color: #fff; }
 .etiqueta-estado-rechazado { background: var(--aviso-fondo); color: var(--aviso); }
-.etiqueta-estado-caducado { background: rgb(21 25 29 / .07); color: var(--apagado); }
+.etiqueta-estado-caducado, .etiqueta-estado-archivado { background: rgb(21 25 29 / .07); color: var(--apagado); }
 .etiqueta-aviso-oscura { background: var(--aviso-fondo); color: var(--aviso); border-radius: 999px; padding: .35rem .9rem; font-weight: 600; font-size: .9rem; }
 
 /* Lista de presupuestos como celdas de iOS. */

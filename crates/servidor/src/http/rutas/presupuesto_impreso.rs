@@ -11,10 +11,9 @@ use crate::aplicacion::presupuestos::{FichaDePresupuesto, cargar_presupuesto};
 use crate::aplicacion::resumen_de_linea::ResumenDeVentana;
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
+use crate::fecha::fechas_de_situacion;
 use crate::http::extractores::ActorActual;
-use crate::vistas::{
-    LineaImpresa, PaginaPresupuestoImpreso, euros, fecha_corta, nombre_de_estado, renderizar,
-};
+use crate::vistas::{LineaImpresa, PaginaPresupuestoImpreso, euros, fecha_corta, renderizar};
 
 /// Lo congelado al aceptar manda sobre la ficha actual del cliente.
 fn cliente_de_la_copia(copia: &str) -> Option<Vec<String>> {
@@ -147,7 +146,9 @@ pub async fn mostrar(
         total: euros(p.total_cent),
         condiciones: p.condiciones.clone().unwrap_or_default(),
         provisional: !p.completo,
-        estado: nombre_de_estado(&p.estado),
+        estado: ficha
+            .situacion(&fechas_de_situacion(estado.ahora()))
+            .nombre(),
     };
     Ok(renderizar(&pagina)?.into_response())
 }

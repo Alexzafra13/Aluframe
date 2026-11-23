@@ -19,6 +19,7 @@ pub mod informe;
 pub mod localidades;
 pub mod nif;
 pub mod precio;
+pub mod presupuesto;
 pub mod series;
 pub mod stock;
 pub mod taller;

@@ -226,3 +226,30 @@ fn la_auditoria_y_las_versiones_de_serie_no_se_modifican() {
     );
     assert!(conexion.execute("DELETE FROM serie_version", []).is_err());
 }
+
+/// La 0004 pone 30 días de validez solo si estaba vacía; un número puesto a mano se respeta.
+#[test]
+fn la_0004_pone_30_dias_de_validez_solo_si_estaba_vacia() {
+    let validez = |antes: &str| {
+        let mut conexion = Connection::open_in_memory().unwrap();
+        aplicar_migraciones(&mut conexion, &MIGRACIONES[..3], AHORA).unwrap();
+        conexion
+            .execute(
+                "INSERT INTO configuracion (clave, valor, actualizado_en) \
+                 VALUES ('presupuesto.validez_dias', ?1, ?2)",
+                [antes, AHORA],
+            )
+            .unwrap();
+        preparar_esquema(&mut conexion, AHORA).unwrap();
+        conexion
+            .query_row(
+                "SELECT valor FROM configuracion WHERE clave = 'presupuesto.validez_dias'",
+                [],
+                |f| f.get::<_, String>(0),
+            )
+            .unwrap()
+    };
+    assert_eq!(validez(""), "30");
+    assert_eq!(validez("  "), "30");
+    assert_eq!(validez("45"), "45");
+}

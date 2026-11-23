@@ -62,17 +62,38 @@ fn leer(f: &Row) -> rusqlite::Result<FilaPresupuesto> {
     })
 }
 
-pub fn listar(
+/// Lo justo para decidir la situación de cada presupuesto (dominio::presupuesto), del más nuevo
+/// al más antiguo: identificador, estado y validez.
+pub fn estados_y_validez(
     con: &Connection,
-    estado: Option<&str>,
     cliente: Option<i64>,
-) -> Result<Vec<FilaPresupuesto>, ErrorApp> {
-    let mut consulta = con.prepare(&format!(
-        "{SELECCION} WHERE (?1 IS NULL OR p.estado = ?1) AND (?2 IS NULL OR p.cliente_id = ?2) \
-         ORDER BY p.anio DESC, p.numero DESC LIMIT 500"
-    ))?;
-    let filas = consulta.query_map(params![estado, cliente], leer)?;
+) -> Result<Vec<(i64, String, Option<String>)>, ErrorApp> {
+    let mut consulta = con.prepare(
+        "SELECT id, estado, validez_hasta FROM presupuesto \
+         WHERE (?1 IS NULL OR cliente_id = ?1) ORDER BY anio DESC, numero DESC",
+    )?;
+    let filas = consulta.query_map([cliente], |f| Ok((f.get(0)?, f.get(1)?, f.get(2)?)))?;
     Ok(filas.collect::<Result<_, _>>()?)
+}
+
+/// Los presupuestos con esos identificadores, del más nuevo al más antiguo.
+pub fn buscar_varios(con: &Connection, ids: &[i64]) -> Result<Vec<FilaPresupuesto>, ErrorApp> {
+    let lista = serde_json::to_string(ids).map_err(|e| ErrorApp::Interno(e.to_string()))?;
+    let mut consulta = con.prepare(&format!(
+        "{SELECCION} WHERE p.id IN (SELECT value FROM json_each(?1)) \
+         ORDER BY p.anio DESC, p.numero DESC"
+    ))?;
+    let filas = consulta.query_map([lista], leer)?;
+    Ok(filas.collect::<Result<_, _>>()?)
+}
+
+/// Renovar (ADR-0027): la validez nueva cuenta desde hoy.
+pub fn cambiar_validez(con: &Connection, id: i64, validez: Option<&str>) -> Result<(), ErrorApp> {
+    con.execute(
+        "UPDATE presupuesto SET validez_hasta = ?2, version = version + 1 WHERE id = ?1",
+        params![id, validez],
+    )?;
+    Ok(())
 }
 
 pub fn buscar(con: &Connection, id: i64) -> Result<Option<FilaPresupuesto>, ErrorApp> {

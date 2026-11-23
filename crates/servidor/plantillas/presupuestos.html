@@ -9,12 +9,12 @@
   {% if usuario.es_propietario %}<button class="boton primario" type="button" data-abrir-hoja="hoja-nuevo">Nuevo presupuesto</button>{% endif %}
 </header>
 <nav class="segmentado" aria-label="Filtrar por estado">
-  {% for (valor, texto) in [("", "Todos"), ("borrador", "Borradores"), ("enviado", "Enviados"), ("aceptado", "Aceptados"), ("rechazado", "Rechazados")] %}
+  {% for (valor, texto) in [("", "Todos"), ("borrador", "Borradores"), ("enviado", "Enviados"), ("aceptado", "Aceptados"), ("rechazado", "Rechazados"), ("caducado", "Caducados"), ("archivado", "Archivados")] %}
   <a class="segmento{% if filtro == *valor %} activo{% endif %}" href="/presupuestos{% if !valor.is_empty() %}?estado={{ valor }}{% endif %}"{% if filtro == *valor %} aria-current="page"{% endif %}>{{ texto }}</a>
   {% endfor %}
 </nav>
 {% if filas.is_empty() %}
-<p class="vacio tarjeta">{% if filtro.is_empty() %}Aún no hay presupuestos. Pulsa «Nuevo presupuesto» o créalo desde la ficha de un cliente.{% else %}No hay presupuestos en este estado.{% endif %}</p>
+<p class="vacio tarjeta">{% if filtro.is_empty() %}Aún no hay presupuestos. Pulsa «Nuevo presupuesto» o créalo desde la ficha de un cliente.{% else if filtro == "archivado" %}No hay archivados. Un presupuesto sin aceptar se archiva medio año después de caducar; nunca se borra.{% else %}No hay presupuestos en este estado.{% endif %}</p>
 {% else %}
 <ul class="lista-tarjetas" role="list">
   {% for p in filas %}

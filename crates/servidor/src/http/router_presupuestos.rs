@@ -35,6 +35,10 @@ pub fn rutas_de_presupuestos() -> Router<EstadoApp> {
             "/presupuestos/{id}/recalcular",
             post(presupuesto_acciones::recalcular),
         )
+        .route(
+            "/presupuestos/{id}/renovar",
+            post(presupuesto_acciones::renovar),
+        )
         .merge(rutas_de_lineas())
 }
 

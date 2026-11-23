@@ -12,6 +12,7 @@ use crate::aplicacion::lineas_de_presupuesto::{
 use crate::aplicacion::presupuestos::{
     DatosDeCabecera, cambiar_estado, guardar_cabecera, nueva_version,
 };
+use crate::aplicacion::renovar_presupuesto::renovar_presupuesto;
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
@@ -134,6 +135,17 @@ pub async fn recalcular(
     let resultado = recalcular_precios(&estado, &actor, id)
         .await
         .map(|()| "recalculado");
+    o_en_la_ficha(&estado, &actor, id, resultado).await
+}
+
+pub async fn renovar(
+    State(estado): State<EstadoApp>,
+    ActorActual(actor): ActorActual,
+    Path(id): Path<i64>,
+) -> Result<Response, ErrorApp> {
+    let resultado = renovar_presupuesto(&estado, &actor, id)
+        .await
+        .map(|()| "renovado");
     o_en_la_ficha(&estado, &actor, id, resultado).await
 }
 

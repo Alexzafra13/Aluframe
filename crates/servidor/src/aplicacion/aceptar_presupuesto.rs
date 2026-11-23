@@ -2,6 +2,7 @@
 //! cálculos, precios, versiones de serie y de tarifa) y su SHA-256 (DATOS, apartado 4). En la
 //! misma transacción nace el trabajo del taller (H4).
 
+use dominio::presupuesto::Situacion;
 use serde::Serialize;
 
 use super::Actor;
@@ -14,6 +15,7 @@ use crate::bd::consultas::clientes::FilaCliente;
 use crate::bd::consultas::presupuestos;
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
+use crate::fecha::fechas_de_situacion;
 
 #[derive(Serialize)]
 struct CopiaDeLinea {
@@ -87,11 +89,36 @@ impl From<&FilaCliente> for CopiaDeCliente {
     }
 }
 
+fn motivo_de_caducidad(ficha: &FichaDePresupuesto, fechas: &(String, String)) -> Option<String> {
+    if !matches!(
+        ficha.situacion(fechas),
+        Situacion::Caducado | Situacion::Archivado
+    ) {
+        return None;
+    }
+    let hasta = ficha
+        .presupuesto
+        .validez_hasta
+        .as_deref()
+        .unwrap_or_default();
+    let dia: Vec<&str> = hasta.split('-').rev().collect();
+    Some(format!(
+        "su validez terminó el {}: pulsa «Renovar» para poner los precios de hoy",
+        dia.join("/")
+    ))
+}
+
 /// Por qué no se puede aceptar todavía; vacío si se puede (el botón lo muestra desactivado).
-pub fn motivos_para_no_aceptar(ficha: &FichaDePresupuesto) -> Vec<String> {
+/// `fechas` sale de `fecha::fechas_de_situacion`: uno caducado se renueva antes (ADR-0027).
+pub fn motivos_para_no_aceptar(
+    ficha: &FichaDePresupuesto,
+    fechas: &(String, String),
+) -> Vec<String> {
     let mut motivos = Vec::new();
     if !matches!(ficha.presupuesto.estado.as_str(), "borrador" | "enviado") {
         motivos.push(format!("el presupuesto está {}", ficha.presupuesto.estado));
+    } else if let Some(caducado) = motivo_de_caducidad(ficha, fechas) {
+        motivos.push(caducado);
     }
     if ficha.lineas.is_empty() {
         motivos.push("no tiene líneas".into());
@@ -175,9 +202,10 @@ pub async fn aceptar_presupuesto(
     actor: &Actor,
     id: i64,
 ) -> Result<(), ErrorApp> {
+    let fechas = fechas_de_situacion(estado.ahora());
     cambiar(estado, actor, "aceptar_presupuesto", move |tx, ahora| {
         let ficha = cargar(tx, id)?;
-        let motivos = motivos_para_no_aceptar(&ficha);
+        let motivos = motivos_para_no_aceptar(&ficha, &fechas);
         if !motivos.is_empty() {
             return Err(ErrorApp::Validacion(format!(
                 "No se puede aceptar: {}.",

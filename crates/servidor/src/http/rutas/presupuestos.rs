@@ -15,10 +15,11 @@ use crate::aplicacion::presupuestos::{
 };
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
+use crate::fecha::fechas_de_situacion;
 use crate::http::extractores::ActorActual;
 use crate::vistas::{
     Desglose, FilaDePresupuesto, MENU, Opcion, PaginaPresupuesto, PaginaPresupuestos,
-    TarjetaDeLinea, desglosar, nombre_de_estado, porcentaje_en_campo, porcentaje_texto, renderizar,
+    TarjetaDeLinea, desglosar, porcentaje_en_campo, porcentaje_texto, renderizar,
 };
 
 pub const SECCION: &str = "presupuestos";
@@ -33,9 +34,15 @@ pub async fn mostrar_lista(
     ActorActual(actor): ActorActual,
     Query(filtro): Query<Filtro>,
 ) -> Result<Response, ErrorApp> {
-    let elegido = filtro
-        .estado
-        .filter(|e| ["borrador", "enviado", "aceptado", "rechazado"].contains(&e.as_str()));
+    let validos = [
+        "borrador",
+        "enviado",
+        "aceptado",
+        "rechazado",
+        "caducado",
+        "archivado",
+    ];
+    let elegido = filtro.estado.filter(|e| validos.contains(&e.as_str()));
     let filas = listar_presupuestos(&estado, &actor, elegido.clone()).await?;
     let clientes = clientes_para_elegir(&estado, &actor).await?;
     let pagina = PaginaPresupuestos {
@@ -86,6 +93,7 @@ fn texto_de_aviso(clave: &str) -> Option<&'static str> {
         "version" => "Versión nueva creada en borrador.",
         "aceptado" => "Presupuesto aceptado y congelado.",
         "recalculado" => "Precios recalculados con la tarifa vigente.",
+        "renovado" => "Renovado: precios de hoy y validez nueva. Revísalo y vuelve a enviarlo.",
         _ => return None,
     })
 }
@@ -113,6 +121,8 @@ pub async fn pagina(
 ) -> Result<Response, ErrorApp> {
     let ficha = cargar_presupuesto(estado, actor, id).await?;
     let ajustes = leer_ajustes_de_presupuesto(estado).await?;
+    let fechas = fechas_de_situacion(estado.ahora());
+    let situacion = ficha.situacion(&fechas);
     let p = &ficha.presupuesto;
     let ivas = ivas_de(&totales_de(&ficha.lineas, p.descuento_bp));
     let estado_http = if aviso.is_some() {
@@ -126,11 +136,12 @@ pub async fn pagina(
         seccion: SECCION,
         codigo: p.codigo(),
         cliente: ficha.cliente.nombre_visible(),
-        nombre_estado: nombre_de_estado(&p.estado),
+        nombre_estado: situacion.nombre(),
+        situacion: situacion.clave(),
         lineas: ficha.lineas.iter().map(TarjetaDeLinea::from).collect(),
         desglose: desglose_para(actor, &ficha),
         ivas,
-        motivos: motivos_para_no_aceptar(&ficha),
+        motivos: motivos_para_no_aceptar(&ficha, &fechas),
         direcciones: ficha
             .direcciones
             .iter()

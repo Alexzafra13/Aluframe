@@ -40,8 +40,13 @@ pub const CLAVES: [&str; 22] = [
 ];
 
 /// El IVA general (21 %) y el reducido (10 %) son los de la ley; cuándo aplica cada uno lo
-/// confirma el gestor (OPEN_QUESTIONS).
-const POR_DEFECTO: [(&str, &str); 2] = [("iva.general", "21"), ("iva.reducido", "10")];
+/// confirma el gestor (OPEN_QUESTIONS). 30 días de validez, porque los precios cambian
+/// (propietario, 2026-11-23); dejarlo vacío en Ajustes es «sin fecha».
+const POR_DEFECTO: [(&str, &str); 3] = [
+    ("iva.general", "21"),
+    ("iva.reducido", "10"),
+    ("presupuesto.validez_dias", "30"),
+];
 
 #[derive(Debug, Clone, Default)]
 pub struct TextosDeAjustes(pub Vec<(String, String)>);

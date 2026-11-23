@@ -59,6 +59,7 @@ pub async fn elegir_reglas(estado: &EstadoApp, actor: &Actor) {
         ("precio.perfiles", "barras"),
         ("iva.general", "21"),
         ("iva.reducido", "10"),
+        ("presupuesto.validez_dias", "30"),
         ("empresa.nombre", "Taller de prueba"),
     ];
     let textos = TextosDeAjustes(

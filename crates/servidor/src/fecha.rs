@@ -38,6 +38,15 @@ pub fn momento_de_madrid(instante: OffsetDateTime) -> dominio::copias::MomentoLo
     )
 }
 
+/// Hoy y el día antes del cual un presupuesto sin aceptar se archiva (dominio::presupuesto).
+pub fn fechas_de_situacion(instante: OffsetDateTime) -> (String, String) {
+    let archivar = -dominio::presupuesto::DIAS_HASTA_ARCHIVAR;
+    (
+        fecha_de_madrid(instante, 0),
+        fecha_de_madrid(instante, archivar),
+    )
+}
+
 pub fn anio_de_madrid(instante: OffsetDateTime) -> i64 {
     i64::from(a_hora_de_madrid(instante).year())
 }

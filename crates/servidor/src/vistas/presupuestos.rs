@@ -26,23 +26,13 @@ use dominio::unidades::{Dinero, Porcentaje};
 use super::Opcion;
 use crate::aplicacion::datos_de_empresa::CabeceraDeEmpresa;
 use crate::aplicacion::presupuestos::FichaDePresupuesto;
+use crate::aplicacion::presupuestos::PresupuestoListado;
 use crate::aplicacion::resumen_de_linea::ResumenDeVentana;
 use crate::bd::consultas::lineas_presupuesto::FilaLinea;
-use crate::bd::consultas::presupuestos::FilaPresupuesto;
 use crate::fecha::{formatear_para_pantalla, leer_utc};
 
 pub fn euros(centimos: i64) -> String {
     Dinero::desde_centimos(centimos).formatear()
-}
-
-pub fn nombre_de_estado(estado: &str) -> &'static str {
-    match estado {
-        "borrador" => "Borrador",
-        "enviado" => "Enviado",
-        "aceptado" => "Aceptado",
-        "rechazado" => "Rechazado",
-        _ => "Caducado",
-    }
 }
 
 pub struct FilaDePresupuesto {
@@ -56,14 +46,15 @@ pub struct FilaDePresupuesto {
     pub fecha: String,
 }
 
-impl From<&FilaPresupuesto> for FilaDePresupuesto {
-    fn from(p: &FilaPresupuesto) -> Self {
+impl From<&PresupuestoListado> for FilaDePresupuesto {
+    fn from(listado: &PresupuestoListado) -> Self {
+        let p = &listado.fila;
         FilaDePresupuesto {
             id: p.id,
             codigo: p.codigo(),
             cliente: dominio::clientes::nombre_visible(p.cliente_id, p.cliente_nombre.as_deref()),
-            estado: p.estado.clone(),
-            nombre_estado: nombre_de_estado(&p.estado),
+            estado: listado.situacion.clave().to_owned(),
+            nombre_estado: listado.situacion.nombre(),
             total: euros(p.total_cent),
             completo: p.completo,
             fecha: leer_utc(&p.creado_en)
@@ -162,6 +153,8 @@ pub struct PaginaPresupuesto {
     pub codigo: String,
     pub cliente: String,
     pub nombre_estado: &'static str,
+    /// Clave de `dominio::presupuesto::Situacion`: «caducado», «archivado»…
+    pub situacion: &'static str,
     pub lineas: Vec<TarjetaDeLinea>,
     pub desglose: Desglose,
     pub ivas: Vec<(String, String, String)>,

@@ -26,6 +26,10 @@ pub const MIGRACIONES: &[Migracion] = &[
         numero: 3,
         sql: include_str!("migraciones/0003_apuntes.sql"),
     },
+    Migracion {
+        numero: 4,
+        sql: include_str!("migraciones/0004_validez_de_presupuestos.sql"),
+    },
 ];
 
 /// Huella del esquema único de las versiones 0.8.0 a 0.10.0, que es la migración 0001: sus

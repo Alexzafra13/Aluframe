@@ -1,8 +1,12 @@
 use dominio::acceso::Accion;
+use dominio::presupuesto::{Situacion, situacion};
 use rusqlite::{Connection, Transaction};
 use time::OffsetDateTime;
 
 use super::auditar::{Cambio, anotar};
+pub use super::lista_de_presupuestos::{
+    PresupuestoListado, listar_presupuestos, presupuestos_del_cliente,
+};
 use super::{Actor, autorizar};
 use crate::bd::consultas::clientes::{self, FilaCliente};
 use crate::bd::consultas::direcciones::{self, FilaDireccion};
@@ -30,30 +34,12 @@ impl FichaDePresupuesto {
     pub fn es_editable(&self) -> bool {
         self.presupuesto.estado == "borrador"
     }
-}
 
-pub async fn listar_presupuestos(
-    estado: &EstadoApp,
-    actor: &Actor,
-    filtro: Option<String>,
-) -> Result<Vec<FilaPresupuesto>, ErrorApp> {
-    autorizar(actor, Accion::VerPresupuestos)?;
-    estado
-        .bd
-        .leer(move |con| presupuestos::listar(con, filtro.as_deref(), None))
-        .await
-}
-
-pub async fn presupuestos_del_cliente(
-    estado: &EstadoApp,
-    actor: &Actor,
-    cliente_id: i64,
-) -> Result<Vec<FilaPresupuesto>, ErrorApp> {
-    autorizar(actor, Accion::VerPresupuestos)?;
-    estado
-        .bd
-        .leer(move |con| presupuestos::listar(con, None, Some(cliente_id)))
-        .await
+    /// Cómo se ve hoy (caducado, archivado…); `fechas` sale de `fecha::fechas_de_situacion`.
+    pub fn situacion(&self, (hoy, archivar): &(String, String)) -> Situacion {
+        let p = &self.presupuesto;
+        situacion(&p.estado, p.validez_hasta.as_deref(), (hoy, archivar))
+    }
 }
 
 pub fn cargar(con: &Connection, id: i64) -> Result<FichaDePresupuesto, ErrorApp> {
@@ -139,8 +125,8 @@ pub fn insertar_presupuesto(
 ) -> Result<i64, ErrorApp> {
     clientes::buscar(tx, cliente_id)?.ok_or(ErrorApp::NoEncontrado)?;
     comprobar_direccion(tx, cliente_id, direccion)?;
-    let validez = configuracion::leer(tx, "presupuesto.validez_dias")?
-        .and_then(|d| d.parse::<i64>().ok())
+    let validez = super::ajustes_presupuesto::leer_de_la_base(tx)?
+        .validez_dias
         .map(|dias| fecha_de_madrid(ahora, dias));
     let condiciones =
         configuracion::leer(tx, "presupuesto.condiciones")?.filter(|c| !c.trim().is_empty());

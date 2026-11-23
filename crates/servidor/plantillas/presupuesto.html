@@ -6,7 +6,7 @@
 <header class="cabecera-pagina cabecera-documento">
   <div>
     <p class="antetitulo"><a href="/presupuestos">Presupuestos</a> / {{ codigo }}{% if ficha.presupuesto.numero_version > 1 %} · versión {{ ficha.presupuesto.numero_version }}{% endif %}</p>
-    <h1>{{ cliente }} <span class="etiqueta etiqueta-estado-{{ estado() }}">{{ nombre_estado }}</span></h1>
+    <h1>{{ cliente }} <span class="etiqueta etiqueta-estado-{{ situacion }}">{{ nombre_estado }}</span></h1>
   </div>
   {% let paso_actual = 1 %}{% include "pasos_documento.html" %}
 </header>
@@ -97,6 +97,13 @@
         {% endif %}
         {% endif %}
       </div>
+      {% if usuario.es_propietario && (situacion == "caducado" || situacion == "archivado" || situacion == "rechazado") %}
+      <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/renovar" class="pila">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <button class="boton primario ancho" type="submit">Renovar</button>
+        <p class="pequeno texto-apagado">Pone los precios de hoy y una validez nueva desde hoy. Si se había enviado, lo enviado queda como versión anterior.</p>
+      </form>
+      {% endif %}
       {% if usuario.es_propietario && (estado() == "borrador" || estado() == "enviado") %}
       {% if motivos.is_empty() %}
       <button class="boton primario ancho" type="button" data-abrir-hoja="hoja-aceptar">Aceptar presupuesto</button>

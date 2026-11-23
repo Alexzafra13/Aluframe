@@ -77,13 +77,16 @@ async fn avisos_de_cobro(
     let enviados = listar_presupuestos(estado, actor, Some("enviado".into()))
         .await?
         .iter()
-        .map(|p| AvisoDelTaller {
-            texto: format!(
-                "{} · {}",
-                p.codigo(),
-                dominio::clientes::nombre_visible(p.cliente_id, p.cliente_nombre.as_deref())
-            ),
-            enlace: format!("/presupuestos/{}", p.id),
+        .map(|listado| {
+            let p = &listado.fila;
+            AvisoDelTaller {
+                texto: format!(
+                    "{} · {}",
+                    p.codigo(),
+                    dominio::clientes::nombre_visible(p.cliente_id, p.cliente_nombre.as_deref())
+                ),
+                enlace: format!("/presupuestos/{}", p.id),
+            }
         })
         .collect();
     Ok((vencidos, enviados))

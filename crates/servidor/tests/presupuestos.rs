@@ -54,7 +54,8 @@ async fn sin_reglas_elegidas_la_linea_sale_incompleta_y_dice_por_que() {
         faltan.contains("Serie de demostración"),
         "una serie demo nunca da precio final"
     );
-    assert!(!motivos_para_no_aceptar(&ficha).is_empty());
+    let hoy = ("2026-11-21".to_owned(), "2026-05-23".to_owned());
+    assert!(!motivos_para_no_aceptar(&ficha, &hoy).is_empty());
     assert!(aceptar_presupuesto(&estado, &actor, id).await.is_err());
 }
 
