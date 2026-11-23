@@ -1,0 +1,14 @@
+referencia,descripción,unidad,precio_tarifa,longitud_barra
+21210,DEMO marco lateral Aluprom 21 (precio inventado),barra,34.00,640
+21220,DEMO marco superior Aluprom 21 (precio inventado),barra,30.00,640
+21230,DEMO marco inferior Aluprom 21 (precio inventado),barra,38.00,640
+21310,DEMO hoja lateral Aluprom 21 (precio inventado),barra,28.00,640
+21340,DEMO hoja cierre Aluprom 21 (precio inventado),barra,32.00,640
+21350,DEMO hoja rodamiento Aluprom 21 (precio inventado),barra,26.00,640
+21312,DEMO hoja lateral Climalit Aluprom 21 (precio inventado),barra,31.00,640
+21341,DEMO hoja cierre Climalit Aluprom 21 (precio inventado),barra,35.00,640
+21351,DEMO hoja rodamiento Climalit Aluprom 21 (precio inventado),barra,29.00,640
+KIT-CORREDERA,DEMO kit de corredera (precio inventado),unidad,12.00,
+RUEDA-CORREDERA,DEMO rueda de corredera (precio inventado),unidad,2.50,
+"TORNILLO-4,8X25","DEMO tornillo 4,8 x 25 (precio inventado)",unidad,0.05,
+CRISTAL,DEMO cristal sencillo (precio inventado),m2,18.00,

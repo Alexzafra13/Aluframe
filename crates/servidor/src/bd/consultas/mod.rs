@@ -7,6 +7,7 @@ pub mod bloqueo_ip;
 pub mod clientes;
 pub mod cobros;
 pub mod configuracion;
+pub mod demostracion;
 pub mod direcciones;
 pub mod facturas;
 pub mod importaciones;

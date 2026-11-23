@@ -182,6 +182,7 @@ async fn el_operario_no_ve_el_catalogo() {
         token_csrf: String::new(),
         huella_sesion: String::new(),
         permisos: Default::default(),
+        en_demostracion: false,
     };
     let resultado = listar_series(&contexto.estado, &operario).await;
     assert!(matches!(resultado, Err(ErrorApp::NoEncontrado)));

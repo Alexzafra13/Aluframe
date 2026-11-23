@@ -27,3 +27,20 @@ pub fn guardar(con: &Connection, nuevo: &Valor) -> Result<(), ErrorApp> {
     )?;
     Ok(())
 }
+
+/// Marca de la base de la demostración (ADR-0028): una base así nunca se usa como la de verdad
+/// ni se importa en ella.
+const MARCA_DE_DEMOSTRACION: &str = "demostracion";
+
+pub fn es_de_demostracion(con: &Connection) -> Result<bool, ErrorApp> {
+    Ok(leer(con, MARCA_DE_DEMOSTRACION)?.as_deref() == Some("si"))
+}
+
+pub fn marcar_como_demostracion(con: &Connection, ahora: &str) -> Result<(), ErrorApp> {
+    con.execute(
+        "INSERT INTO configuracion (clave, valor, actualizado_en) VALUES (?1, 'si', ?2) \
+         ON CONFLICT (clave) DO UPDATE SET valor = 'si', actualizado_en = ?2",
+        params![MARCA_DE_DEMOSTRACION, ahora],
+    )?;
+    Ok(())
+}

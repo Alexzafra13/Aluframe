@@ -8,6 +8,7 @@ use crate::aplicacion::acabados_incluidos::cargar_acabados_incluidos;
 use crate::aplicacion::copias::discos::DiscosDeCopia;
 use crate::aplicacion::copias::programador::{copiar_al_cerrar, vigilar_copias};
 use crate::aplicacion::series_incluidas::{CargaDeSerie, cargar_series_incluidas};
+use crate::bd::consultas::configuracion;
 use crate::bd::{BaseDeDatos, ErrorEsquema, migraciones_pendientes, preparar_esquema};
 use crate::config::{Configuracion, ErrorConfiguracion, NOMBRE_ARCHIVO_CONFIGURACION};
 use crate::errores::ErrorApp;
@@ -68,9 +69,57 @@ pub async fn preparar_estado(config: &Configuracion) -> Result<EstadoApp, ErrorA
             indicados: config.discos_de_copia.clone(),
             buscar_en_el_sistema: true,
         });
+    if estado.bd.leer(configuracion::es_de_demostracion).await? {
+        return Err(ErrorArranque::App(ErrorApp::Validacion(
+            "Esta base de datos es la de la demostración (datos inventados): no se usa para \
+             trabajar. Revisa la carpeta de datos."
+                .into(),
+        )));
+    }
     anotar_series_incluidas(&cargar_series_incluidas(&estado).await?);
     cargar_acabados_incluidos(&estado).await?;
-    Ok(estado)
+    Ok(match preparar_demostracion(config, estado.reloj()).await {
+        Some(demo) => estado.con_demostracion(demo),
+        None => estado,
+    })
+}
+
+/// La demostración (ADR-0028), en su propia subcarpeta. Si algo falla, el programa sigue sin
+/// ella: nunca impide trabajar con los datos de verdad.
+async fn preparar_demostracion(config: &Configuracion, reloj: Arc<dyn Reloj>) -> Option<EstadoApp> {
+    match abrir_demostracion(config, reloj).await {
+        Ok(demo) => demo,
+        Err(error) => {
+            anotar_error(&format!("la demostración no está disponible: {error}"));
+            None
+        }
+    }
+}
+
+async fn abrir_demostracion(
+    config: &Configuracion,
+    reloj: Arc<dyn Reloj>,
+) -> Result<Option<EstadoApp>, ErrorArranque> {
+    let carpeta = config.carpeta_demostracion();
+    std::fs::create_dir_all(&carpeta).map_err(|causa| ErrorArranque::Carpeta {
+        ruta: carpeta.clone(),
+        causa,
+    })?;
+    let ruta = carpeta.join("alumframe.db");
+    let mut conexion = rusqlite::Connection::open(&ruta)?;
+    preparar_esquema(&mut conexion, &formatear_utc(reloj.ahora()))?;
+    drop(conexion);
+    let demo = EstadoApp::nuevo(BaseDeDatos::abrir(&ruta)?, reloj)
+        .await?
+        .como_demostracion()
+        .con_carpeta_copias(carpeta.join("copias"));
+    if demo.hay_usuarios() && !demo.bd.leer(configuracion::es_de_demostracion).await? {
+        anotar_error("la carpeta de la demostración tiene una base sin su marca: no se toca");
+        return Ok(None);
+    }
+    cargar_series_incluidas(&demo).await?;
+    cargar_acabados_incluidos(&demo).await?;
+    Ok(Some(demo))
 }
 
 /// Crea la base o la actualiza; antes de actualizar una con datos, guarda una copia

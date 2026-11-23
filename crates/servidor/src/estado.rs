@@ -21,6 +21,12 @@ pub struct EstadoApp {
     discos_de_copia: Arc<DiscosDeCopia>,
     /// Una copia cada vez: la programada, la de «Copiar ahora» y la de cerrar no se pisan.
     turno_de_copia: Arc<tokio::sync::Mutex<()>>,
+    /// Esta es la base de la demostración (ADR-0028), con datos inventados.
+    es_demostracion: bool,
+    /// En la de verdad: la demostración que se abre desde la pantalla de entrada, aparte.
+    demostracion: Option<Arc<EstadoApp>>,
+    /// La demostración se rellena una sola vez aunque entren dos a la vez.
+    turno_de_demostracion: Arc<tokio::sync::Mutex<()>>,
 }
 
 impl EstadoApp {
@@ -35,7 +41,38 @@ impl EstadoApp {
             preferencias_escritorio: None,
             discos_de_copia: Arc::new(DiscosDeCopia::default()),
             turno_de_copia: Arc::new(tokio::sync::Mutex::new(())),
+            es_demostracion: false,
+            demostracion: None,
+            turno_de_demostracion: Arc::new(tokio::sync::Mutex::new(())),
         })
+    }
+
+    pub fn reloj(&self) -> Arc<dyn Reloj> {
+        Arc::clone(&self.reloj)
+    }
+
+    /// Marca este estado como el de la demostración (su base es otra, con datos inventados).
+    pub fn como_demostracion(mut self) -> EstadoApp {
+        self.es_demostracion = true;
+        self
+    }
+
+    pub fn es_demostracion(&self) -> bool {
+        self.es_demostracion
+    }
+
+    /// Engancha la demostración a la base de verdad: se entra y se sale desde la entrada.
+    pub fn con_demostracion(mut self, demostracion: EstadoApp) -> EstadoApp {
+        self.demostracion = Some(Arc::new(demostracion));
+        self
+    }
+
+    pub fn demostracion(&self) -> Option<&EstadoApp> {
+        self.demostracion.as_deref()
+    }
+
+    pub fn turno_de_demostracion(&self) -> &tokio::sync::Mutex<()> {
+        &self.turno_de_demostracion
     }
 
     pub fn ahora(&self) -> OffsetDateTime {

@@ -8,6 +8,12 @@
 </header>
 {% include "pestanas_ajustes.html" %}
 {% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
+<form class="tarjeta" method="post" action="/demostracion/entrar">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <h2>Demostración</h2>
+  <p class="texto-apagado">El programa con clientes, presupuestos, trabajos, stock y facturas inventados, para probarlo o aprender a usarlo. Va aparte: no toca estos datos ni entra en las copias. Se sale con el botón de la franja de arriba.</p>
+  <button class="boton" type="submit">Probar la demostración</button>
+</form>
 <section class="tarjeta">
   <h2>Exportar</h2>
   <p class="texto-apagado">Descarga una copia con todos los datos ({{ resumen.clientes }} clientes, {{ resumen.presupuestos }} presupuestos, {{ resumen.usuarios }} usuarios). Sirve para llevarlos de este equipo al servidor del taller o al revés, o para guardarla aparte.</p>

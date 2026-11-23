@@ -27,6 +27,7 @@ pub async fn mostrar_datos(
     Query(aviso): Query<Aviso>,
 ) -> Result<Response, ErrorApp> {
     autorizar(&actor, Accion::GestionarDatos)?;
+    crate::aplicacion::demostracion::exigir_datos_reales(&estado)?;
     let resumen = estado.bd.leer(resumir).await?;
     let pagina = PaginaDatos {
         usuario: (&actor).into(),

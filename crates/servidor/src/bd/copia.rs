@@ -66,7 +66,16 @@ pub fn comprobar_copia(ruta: &Path) -> Result<ResumenDeDatos, ErrorApp> {
             "La copia es de una versión más nueva de AlumFrame: actualiza el programa antes."
                 .into(),
         )),
-        Some(version) if version >= 1 => resumir(&con),
+        Some(version) if version >= 1 => {
+            if super::consultas::configuracion::es_de_demostracion(&con).unwrap_or(false) {
+                return Err(ErrorApp::Validacion(
+                    "Es una copia de la demostración (datos inventados): no se importa en los \
+                     datos de verdad."
+                        .into(),
+                ));
+            }
+            resumir(&con)
+        }
         None if tiene_tabla_de_esquema(&con) => Err(ErrorApp::Validacion(
             "La copia es de otra versión de desarrollo de AlumFrame, anterior a las \
              actualizaciones automáticas: no se puede importar."

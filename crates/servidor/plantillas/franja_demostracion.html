@@ -1,0 +1,19 @@
+<aside class="franja-demostracion" aria-label="Demostración">
+  <p><strong>Demostración.</strong> Datos inventados para probar y aprender: lo que hagas aquí no toca tus datos de verdad.</p>
+  <div class="franja-acciones">
+    {% if usuario.es_propietario %}
+    <details class="franja-reiniciar">
+      <summary class="boton">Empezar de nuevo</summary>
+      <form method="post" action="/demostracion/empezar-de-nuevo">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <p class="pequeno">Se borra lo que hayas hecho en la demostración y vuelve como al principio.</p>
+        <button class="boton" type="submit">Sí, empezar de nuevo</button>
+      </form>
+    </details>
+    {% endif %}
+    <form method="post" action="/demostracion/salir">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <button class="boton primario" type="submit">Salir de la demostración</button>
+    </form>
+  </div>
+</aside>

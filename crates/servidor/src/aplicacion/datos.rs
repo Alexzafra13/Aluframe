@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 use dominio::acceso::Accion;
 
 use super::{Actor, autorizar};
+use crate::aplicacion::demostracion::exigir_datos_reales;
 use crate::autenticacion::generar_token;
 use crate::bd::consultas::auditoria::{Apunte, registrar};
 use crate::bd::copia::{self, ResumenDeDatos};
@@ -28,6 +29,7 @@ pub struct VistaDeImportacion {
 
 pub async fn exportar_datos(estado: &EstadoApp, actor: &Actor) -> Result<CopiaExportada, ErrorApp> {
     autorizar(actor, Accion::GestionarDatos)?;
+    exigir_datos_reales(estado)?;
     let carpeta = preparar_carpeta(estado)?;
     let ruta = carpeta.join(format!("exportacion-{}{EXTENSION}", generar_token()?));
     let destino = ruta.clone();
@@ -55,6 +57,7 @@ pub async fn recibir_importacion(
     bytes: Vec<u8>,
 ) -> Result<String, ErrorApp> {
     autorizar(actor, Accion::GestionarDatos)?;
+    exigir_datos_reales(estado)?;
     let carpeta = preparar_carpeta(estado)?;
     borrar_importaciones_pendientes(&carpeta);
     let clave = generar_token()?;
@@ -73,6 +76,7 @@ pub async fn previsualizar_importacion(
     clave: &str,
 ) -> Result<VistaDeImportacion, ErrorApp> {
     autorizar(actor, Accion::GestionarDatos)?;
+    exigir_datos_reales(estado)?;
     let archivo = comprobar(&importacion_existente(estado, clave)?).await?;
     let actual = estado.bd.leer(copia::resumir).await?;
     Ok(VistaDeImportacion { actual, archivo })
@@ -85,6 +89,7 @@ pub async fn confirmar_importacion(
     clave: &str,
 ) -> Result<String, ErrorApp> {
     autorizar(actor, Accion::GestionarDatos)?;
+    exigir_datos_reales(estado)?;
     let origen = importacion_existente(estado, clave)?;
     let resumen = comprobar(&origen).await?;
     let ahora = formatear_utc(estado.ahora()).replace(':', "-");

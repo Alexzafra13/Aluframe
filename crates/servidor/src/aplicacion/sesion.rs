@@ -67,7 +67,10 @@ pub async fn identificar(estado: &EstadoApp, token: &str) -> Result<Option<Actor
                     .escribir(move |tx| sesiones::anotar_actividad(tx, &huella, &ahora_texto))
                     .await?;
             }
-            Ok(Some(actor))
+            Ok(Some(Actor {
+                en_demostracion: estado.es_demostracion(),
+                ..actor
+            }))
         }
         None => {
             estado
@@ -106,6 +109,7 @@ fn buscar_actor(
         rol: usuario.rol,
         token_csrf: sesion.token_csrf,
         huella_sesion: huella.to_owned(),
+        en_demostracion: false,
     };
     Ok(Some((actor, ahora - ultima >= INTERVALO_DE_ACTIVIDAD)))
 }

@@ -8,8 +8,8 @@ use super::middleware::{
 };
 use super::recursos::{servir_recurso, servir_silueta};
 use super::rutas::{
-    acceso, ajustes, ajustes_presupuestos, copias, datos, escritorio, primer_arranque, salud,
-    taller,
+    acceso, ajustes, ajustes_presupuestos, copias, datos, demostracion, escritorio,
+    primer_arranque, salud, taller,
 };
 use crate::estado::EstadoApp;
 
@@ -20,7 +20,23 @@ const LIMITE_DE_LOGO: usize = 2 * 1024 * 1024;
 /// Una copia completa de los datos llega como archivo binario (ADR-0016).
 const LIMITE_DE_COPIA: usize = 512 * 1024 * 1024;
 
+/// Con la demostración enganchada (ADR-0028), las peticiones de quien está en ella van a su
+/// propio enrutador, con su base; las demás, al de la base de verdad.
 pub fn crear_router(estado: EstadoApp) -> Router {
+    let principal = enrutador_de(estado.clone());
+    match estado.demostracion() {
+        Some(demo) => {
+            let de_la_demostracion = enrutador_de(demo.clone());
+            principal.layer(from_fn_with_state(
+                de_la_demostracion,
+                super::demostracion::desviar,
+            ))
+        }
+        None => principal,
+    }
+}
+
+fn enrutador_de(estado: EstadoApp) -> Router {
     rutas_de_acceso()
         .merge(rutas_de_ajustes())
         .merge(super::router_catalogo::rutas_de_catalogo())
@@ -51,6 +67,12 @@ fn rutas_de_acceso() -> Router<EstadoApp> {
             get(acceso::mostrar_entrar).post(acceso::procesar_entrar),
         )
         .route("/salir", post(acceso::salir))
+        .route("/demostracion/entrar", post(demostracion::entrar))
+        .route("/demostracion/salir", post(demostracion::salir))
+        .route(
+            "/demostracion/empezar-de-nuevo",
+            post(demostracion::empezar_otra_vez),
+        )
         .route(
             "/escritorio/conexion",
             get(escritorio::mostrar_conexion).post(escritorio::elegir_conexion),

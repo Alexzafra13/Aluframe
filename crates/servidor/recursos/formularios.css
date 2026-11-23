@@ -14,3 +14,12 @@
 /* Lista con un botón para quitar cada elemento (Ajustes > Taller > Medidas habituales). */
 .lista-con-quitar li { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
 .lista-con-quitar form { margin: 0; }
+/* Demostración (ADR-0028): franja en cada pantalla, inconfundible, con salir siempre a mano. */
+.franja-demostracion { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1rem; margin: 0 0 1.25rem; padding: .75rem 1rem; border-radius: var(--radio); background: var(--aviso-fondo); color: var(--aviso); border-left: 6px solid var(--indicador); }
+.franja-demostracion p { margin: 0; flex: 1 1 20rem; }
+.franja-acciones { display: flex; flex-wrap: wrap; gap: .5rem; align-items: flex-start; }
+.franja-acciones form { margin: 0; }
+.franja-reiniciar summary { list-style: none; cursor: pointer; }
+.franja-reiniciar summary::-webkit-details-marker { display: none; }
+.franja-reiniciar[open] form { margin-top: .5rem; }
+.probar-demostracion { margin-top: 2rem; text-align: center; }

@@ -10,6 +10,7 @@ pub mod clientes_ficha;
 pub mod clientes_fragmentos;
 pub mod copias;
 pub mod datos;
+pub mod demostracion;
 pub mod editor_formulario;
 pub mod editor_linea;
 pub mod escritorio;

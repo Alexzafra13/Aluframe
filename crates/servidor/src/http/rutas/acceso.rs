@@ -99,6 +99,8 @@ async fn pagina_de_entrada(
         usuarios,
         elegido,
         aviso,
+        en_demostracion: estado.es_demostracion(),
+        hay_demostracion: estado.demostracion().is_some(),
     };
     Ok(renderizar(&pagina)?.into_response())
 }

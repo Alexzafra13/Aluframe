@@ -5,6 +5,12 @@
 {% block cuerpo %}
 <main class="acceso">
   <h1 class="marca"><span class="marca-logo" aria-hidden="true"></span>AlumFrame</h1>
+  {% if en_demostracion %}
+  <aside class="franja-demostracion" aria-label="Demostración">
+    <p><strong>Demostración</strong> con datos inventados. Entra como <strong>{{ crate::aplicacion::demostracion::DUENO }}</strong> con la contraseña <span class="mono">{{ crate::aplicacion::demostracion::CONTRASENA }}</span>, o como <strong>{{ crate::aplicacion::demostracion::OPERARIO }}</strong> con el PIN <span class="mono">{{ crate::aplicacion::demostracion::PIN }}</span>.</p>
+    <form method="post" action="/demostracion/salir"><button class="boton" type="submit">Salir de la demostración</button></form>
+  </aside>
+  {% endif %}
   {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
   {% match elegido %}
   {% when Some(u) %}
@@ -38,5 +44,11 @@
     {% endfor %}
   </ul>
   {% endmatch %}
+  {% if hay_demostracion %}
+  <form class="probar-demostracion" method="post" action="/demostracion/entrar">
+    <p class="texto-apagado">¿Quieres probar el programa o aprender a usarlo sin tocar tus datos?</p>
+    <button class="boton" type="submit">Probar la demostración</button>
+  </form>
+  {% endif %}
 </main>
 {% endblock %}

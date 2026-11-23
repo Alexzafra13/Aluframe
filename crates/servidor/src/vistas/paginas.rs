@@ -14,6 +14,8 @@ pub struct UsuarioEnPantalla {
     pub puede_editar_clientes: bool,
     pub ve_presupuestos: bool,
     pub ve_facturas: bool,
+    /// En la demostración: franja de aviso y botón para salir (ADR-0028).
+    pub en_demostracion: bool,
 }
 
 impl From<&Actor> for UsuarioEnPantalla {
@@ -25,6 +27,7 @@ impl From<&Actor> for UsuarioEnPantalla {
             puede_editar_clientes: actor.puede(Accion::EditarClientes),
             ve_presupuestos: actor.puede(Accion::VerPresupuestos),
             ve_facturas: actor.puede(Accion::VerFacturas),
+            en_demostracion: actor.en_demostracion,
         }
     }
 }
@@ -122,6 +125,10 @@ pub struct PaginaEntrar {
     pub usuarios: Vec<OpcionUsuario>,
     pub elegido: Option<OpcionUsuario>,
     pub aviso: Option<String>,
+    /// Es la entrada de la demostración: se enseñan los usuarios y claves de prueba.
+    pub en_demostracion: bool,
+    /// En la de verdad, con la demostración disponible: botón para probarla.
+    pub hay_demostracion: bool,
 }
 
 #[derive(Template)]

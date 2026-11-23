@@ -46,6 +46,7 @@ fn operario(id: i64) -> Actor {
         token_csrf: String::new(),
         huella_sesion: String::new(),
         permisos: Default::default(),
+        en_demostracion: false,
     }
 }
 

@@ -5,13 +5,18 @@ pub const NOMBRE_COOKIE_SESION: &str = "alumframe_sesion";
 const DURACION_EN_SEGUNDOS: u32 = 12 * 60 * 60;
 
 pub fn leer_cookie_de_sesion(cabeceras: &HeaderMap) -> Option<String> {
+    leer_cookie(cabeceras, NOMBRE_COOKIE_SESION)
+}
+
+/// El valor de una cookie, si viene y no está vacía.
+pub fn leer_cookie(cabeceras: &HeaderMap, buscada: &str) -> Option<String> {
     cabeceras
         .get_all(COOKIE)
         .iter()
         .filter_map(|valor| valor.to_str().ok())
         .flat_map(|linea| linea.split(';'))
         .filter_map(|par| par.trim().split_once('='))
-        .find(|(nombre, _)| *nombre == NOMBRE_COOKIE_SESION)
+        .find(|(nombre, _)| *nombre == buscada)
         .map(|(_, valor)| valor.to_owned())
         .filter(|valor| !valor.is_empty())
 }

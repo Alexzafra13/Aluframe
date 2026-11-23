@@ -11,6 +11,8 @@ pub struct Actor {
     pub permisos: Permisos,
     pub token_csrf: String,
     pub huella_sesion: String,
+    /// Está en la demostración (ADR-0028): las pantallas lo avisan.
+    pub en_demostracion: bool,
 }
 
 /// Lo que no está permitido se responde como no encontrado, para no revelar que existe.

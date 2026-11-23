@@ -9,6 +9,7 @@ use dominio::copias::{MomentoLocal, leer_nombre_de_copia};
 use super::hacer::{carpeta_local, hacer_copia};
 use super::registro::{RegistroDeCopias, leer_registro};
 use crate::aplicacion::datos::recibir_importacion;
+use crate::aplicacion::demostracion::exigir_datos_reales;
 use crate::aplicacion::{Actor, autorizar};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -37,6 +38,7 @@ pub struct EstadoDeLasCopias {
 
 pub fn consultar_copias(estado: &EstadoApp, actor: &Actor) -> Result<EstadoDeLasCopias, ErrorApp> {
     autorizar(actor, Accion::GestionarDatos)?;
+    exigir_datos_reales(estado)?;
     let local = carpeta_local(estado);
     let discos = estado.discos_de_copia();
     let mut lugares = vec![LugarDeCopias {
@@ -79,11 +81,13 @@ fn leer_copia(entrada: &std::fs::DirEntry) -> Option<CopiaGuardada> {
 
 pub async fn copiar_ahora(estado: &EstadoApp, actor: &Actor) -> Result<RegistroDeCopias, ErrorApp> {
     autorizar(actor, Accion::GestionarDatos)?;
+    exigir_datos_reales(estado)?;
     hacer_copia(estado).await
 }
 
 pub fn preparar_disco(estado: &EstadoApp, actor: &Actor, raiz: &str) -> Result<(), ErrorApp> {
     autorizar(actor, Accion::GestionarDatos)?;
+    exigir_datos_reales(estado)?;
     estado
         .discos_de_copia()
         .preparar(Path::new(raiz))
@@ -98,6 +102,7 @@ pub async fn restaurar_copia(
     (disco, nombre): (&str, &str),
 ) -> Result<String, ErrorApp> {
     autorizar(actor, Accion::GestionarDatos)?;
+    exigir_datos_reales(estado)?;
     let ruta = ruta_de_copia(estado, disco, nombre)?;
     let bytes = tokio::task::spawn_blocking(move || std::fs::read(ruta))
         .await
@@ -127,6 +132,9 @@ fn ruta_de_copia(estado: &EstadoApp, disco: &str, nombre: &str) -> Result<PathBu
 
 /// El aviso del Inicio: el fallo del último intento o, si no, una copia completa demasiado vieja.
 pub fn aviso_de_copias(estado: &EstadoApp) -> Option<String> {
+    if estado.es_demostracion() {
+        return None;
+    }
     let registro = leer_registro(&carpeta_local(estado));
     registro.ultimo_intento.as_ref()?;
     if let Some(aviso) = registro.aviso {

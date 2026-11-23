@@ -135,6 +135,11 @@ impl Configuracion {
     pub fn carpeta_copias(&self) -> PathBuf {
         self.carpeta_datos.join("copias")
     }
+
+    /// La demostración (ADR-0028) guarda su base aparte, en una subcarpeta propia.
+    pub fn carpeta_demostracion(&self) -> PathBuf {
+        self.carpeta_datos.join("demostracion")
+    }
 }
 
 fn variable_no_valida(variable: &'static str, valor: String) -> ErrorConfiguracion {
