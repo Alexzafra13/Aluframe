@@ -221,6 +221,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .htmx-request ~ #resultado { opacity: .55; }
 
 .tarjeta-usuario { gap: 1rem; }
+button.tarjeta-usuario { width: 100%; font-family: inherit; text-align: left; cursor: pointer; }
 .tarjeta-usuario::after { content: "›"; margin-left: auto; color: var(--apagado); font-size: 1.6rem; line-height: 1; }
 .avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--acero-tinte); color: var(--acero); font: 600 1.1rem var(--condensada); flex: none; }
 .avatar.grande { width: 72px; height: 72px; font-size: 1.8rem; margin: 0 auto .75rem; }

@@ -11,6 +11,10 @@
       </form>
     </details>
     {% endif %}
+    <form method="post" action="/salir">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <button class="boton" type="submit">Cambiar de usuario</button>
+    </form>
     <form method="post" action="/demostracion/salir">
       <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
       <button class="boton primario" type="submit">Salir de la demostración</button>

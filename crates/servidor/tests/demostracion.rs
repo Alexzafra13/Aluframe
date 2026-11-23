@@ -7,8 +7,8 @@ mod comun;
 
 use axum::body::Body;
 use axum::http::{Request, Response, StatusCode, header};
-use comun::{Contexto, formulario, texto};
-use servidor::aplicacion::demostracion::{CONTRASENA, asegurar_rellena};
+use comun::{Contexto, destino, formulario, texto};
+use servidor::aplicacion::demostracion::{QuienEntra, asegurar_rellena, entrar_sin_clave};
 use servidor::bd::{BaseDeDatos, preparar_esquema};
 use servidor::estado::EstadoApp;
 use servidor::http::crear_router;
@@ -95,8 +95,8 @@ async fn se_rellena_con_todo_el_recorrido_y_no_toca_la_base_real() {
     assert_eq!(contar(&contexto.estado, marca).await, 0);
 }
 
-/// El dueño real entra en la demostración y luego como «Dueño (demo)». Devuelve el estado, su
-/// token real y las cookies que lleva el navegador dentro de la demostración.
+/// El dueño real pulsa «Probar la demostración» y entra directamente como «Dueño (demo)», sin
+/// contraseña. Devuelve el estado, su token real y las cookies que lleva el navegador dentro.
 async fn dentro_de_la_demostracion() -> (EstadoApp, String, String) {
     let (contexto, demo, (real, csrf_real)) = con_demostracion().await;
     let estado = contexto.estado.clone().con_demostracion(demo);
@@ -107,7 +107,7 @@ async fn dentro_de_la_demostracion() -> (EstadoApp, String, String) {
         con_cookies("POST", "/demostracion/entrar", &sesion_real, &cuerpo),
     )
     .await;
-    assert!(entrar.status().is_redirection(), "{}", entrar.status());
+    assert_eq!(destino(&entrar), Some("/"), "{}", entrar.status());
     let puestas = cookies_puestas(&entrar);
     let volver = format!("alumframe_volver={real}");
     assert!(
@@ -116,17 +116,61 @@ async fn dentro_de_la_demostracion() -> (EstadoApp, String, String) {
             .any(|c| c.starts_with("alumframe_demostracion=si"))
     );
     assert!(puestas.iter().any(|c| c.starts_with(&volver)));
-    let en_demo = format!("alumframe_demostracion=si; {volver}");
-    let entrada = texto(pedir(&estado, con_cookies("GET", "/entrar", &en_demo, "")).await).await;
-    assert!(entrada.contains("Dueño (demo)") && entrada.contains(CONTRASENA));
-    let datos = formulario(&[("usuario_id", "1"), ("clave", CONTRASENA)]);
-    let dentro = pedir(&estado, con_cookies("POST", "/entrar", &en_demo, &datos)).await;
-    let token_demo = comun::token_de_la_cookie(&cookies_puestas(&dentro)[0]);
-    (
-        estado,
-        real,
-        format!("{en_demo}; alumframe_sesion={token_demo}"),
-    )
+    let sesion = puestas
+        .iter()
+        .find(|c| c.starts_with("alumframe_sesion="))
+        .unwrap();
+    let token_demo = comun::token_de_la_cookie(sesion);
+    assert_ne!(token_demo, real, "la sesión de dentro es otra");
+    let todo = format!("alumframe_demostracion=si; {volver}; alumframe_sesion={token_demo}");
+    (estado, real, todo)
+}
+
+/// Entra en la demostración como el usuario elegido, sin clave. Devuelve la respuesta.
+async fn entrar_como(estado: &EstadoApp, cookies: &str, usuario: i64) -> Response<Body> {
+    let cuerpo = formulario(&[("usuario_id", &usuario.to_string())]);
+    let peticion = con_cookies("POST", "/demostracion/entrar-como", cookies, &cuerpo);
+    pedir(estado, peticion).await
+}
+
+#[tokio::test]
+async fn dentro_se_elige_usuario_sin_contrasena_ni_pin() {
+    let (contexto, demo, _) = con_demostracion().await;
+    let juan = "SELECT id FROM usuario WHERE rol = 'operario'";
+    let juan = contar(&demo, juan).await;
+    let estado = contexto.estado.clone().con_demostracion(demo);
+    let en_demo = "alumframe_demostracion=si";
+    for ruta in ["/entrar", "/entrar?usuario=1"] {
+        let entrada = texto(pedir(&estado, con_cookies("GET", ruta, en_demo, "")).await).await;
+        assert!(entrada.contains("Juan (demo)") && entrada.contains("/demostracion/entrar-como"));
+        assert!(
+            !entrada.contains("type=\"password\""),
+            "{ruta} no pide clave"
+        );
+    }
+    let respuesta = entrar_como(&estado, en_demo, juan).await;
+    assert_eq!(destino(&respuesta), Some("/mi-dia"));
+    let token = comun::token_de_la_cookie(&cookies_puestas(&respuesta)[0]);
+    let dentro = format!("{en_demo}; alumframe_sesion={token}");
+    let mi_dia = texto(pedir(&estado, con_cookies("GET", "/mi-dia", &dentro, "")).await).await;
+    assert!(mi_dia.contains("Juan (demo)") && mi_dia.contains("Cambiar de usuario"));
+}
+
+#[tokio::test]
+async fn en_los_datos_de_verdad_nunca_se_entra_sin_clave() {
+    let (contexto, demo, _) = con_demostracion().await;
+    let fuera = QuienEntra::Dueno;
+    assert!(entrar_sin_clave(&contexto.estado, fuera).await.is_err());
+    let estado = contexto.estado.clone().con_demostracion(demo);
+    let respuesta = entrar_como(&estado, "", 1).await;
+    assert_eq!(respuesta.status(), StatusCode::NOT_FOUND);
+    assert!(cookies_puestas(&respuesta).is_empty(), "sin sesión");
+    let entrada =
+        texto(pedir(&estado, con_cookies("GET", "/entrar?usuario=1", "", "")).await).await;
+    assert!(
+        entrada.contains("type=\"password\""),
+        "la de verdad pide contraseña"
+    );
 }
 
 #[tokio::test]
@@ -174,8 +218,7 @@ async fn en_la_demostracion_no_hay_copias_ni_exportar_datos() {
     let (contexto, demo, _) = con_demostracion().await;
     let estado = contexto.estado.clone().con_demostracion(demo.clone());
     let en_demo = "alumframe_demostracion=si";
-    let datos = formulario(&[("usuario_id", "1"), ("clave", CONTRASENA)]);
-    let dentro = pedir(&estado, con_cookies("POST", "/entrar", en_demo, &datos)).await;
+    let dentro = entrar_como(&estado, en_demo, 1).await;
     let token_demo = comun::token_de_la_cookie(&cookies_puestas(&dentro)[0]);
     let todo = format!("{en_demo}; alumframe_sesion={token_demo}");
     for ruta in [

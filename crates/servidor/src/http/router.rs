@@ -69,6 +69,7 @@ fn rutas_de_acceso() -> Router<EstadoApp> {
         .route("/salir", post(acceso::salir))
         .route("/demostracion/entrar", post(demostracion::entrar))
         .route("/demostracion/salir", post(demostracion::salir))
+        .route("/demostracion/entrar-como", post(demostracion::entrar_como))
         .route(
             "/demostracion/empezar-de-nuevo",
             post(demostracion::empezar_otra_vez),

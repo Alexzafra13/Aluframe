@@ -7,7 +7,9 @@ mod comun;
 use std::path::PathBuf;
 
 use servidor::aplicacion::Actor;
-use servidor::aplicacion::demostracion::{asegurar_rellena, empezar_de_nuevo};
+use servidor::aplicacion::demostracion::{
+    QuienEntra, asegurar_rellena, empezar_de_nuevo, entrar_sin_clave,
+};
 use servidor::aplicacion::sesion::identificar;
 use servidor::arranque::preparar_estado;
 use servidor::bd::copia::{comprobar_copia, exportar};
@@ -46,19 +48,7 @@ async fn arrancada(nombre: &str) -> (PathBuf, EstadoApp) {
 }
 
 async fn dueno_de(demo: &EstadoApp) -> Actor {
-    let datos = servidor::aplicacion::entrar::SolicitudDeEntrada {
-        usuario_id: 1,
-        clave: servidor::aplicacion::demostracion::CONTRASENA.into(),
-        ip: "127.0.0.1".into(),
-        duracion: servidor::aplicacion::sesion::DuracionDeSesion::Normal,
-    };
-    let servidor::aplicacion::entrar::ResultadoDeEntrada::Correcta { token, .. } =
-        servidor::aplicacion::entrar::entrar(demo, datos)
-            .await
-            .unwrap()
-    else {
-        panic!("el dueño de la demostración no pudo entrar");
-    };
+    let (token, _) = entrar_sin_clave(demo, QuienEntra::Dueno).await.unwrap();
     identificar(demo, &token).await.unwrap().unwrap()
 }
 

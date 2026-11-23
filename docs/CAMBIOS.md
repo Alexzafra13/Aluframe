@@ -178,3 +178,8 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Ahora la ventana dice la carpeta (`%LOCALAPPDATA%\AlumFrame\datos`), tiene el botón «Abrir la carpeta de datos» y, si la base es de un desarrollo antiguo, «Empezar de cero». **No borra nada:** mueve la base a la subcarpeta `apartadas`, por si tuviera algo que hiciera falta, y deja las copias y la demostración como estaban. Con una base de una versión más nueva solo pide instalar la más reciente.
   - En el servidor Linux el aviso del registro también dice la carpeta (`/var/lib/alumframe`).
   - Idea del propietario: desde el aviso, ir a la carpeta o poder borrarlo.
+- **0.18.2 (propietario): la demostración, sin contraseña ni PIN.** «Para qué pones una contraseña a una demo, es solo para probar el programa.»
+  - «Probar la demostración» entra directamente como «Dueño (demo)».
+  - En la franja naranja, «Cambiar de usuario» lleva a la entrada de la demostración, donde se elige con quién entrar con un toque (dueño u operario), sin clave.
+  - Arreglo: la pantalla del operario («Mi día» y la ventana) no llevaba la franja, y desde ahí no se podía salir de la demostración.
+  - Los datos de verdad siguen pidiendo contraseña y PIN siempre; hay una prueba que lo comprueba (ADR-0028, punto 7).

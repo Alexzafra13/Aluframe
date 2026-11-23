@@ -4,8 +4,11 @@
 
 mod catalogo;
 mod clientes;
+mod entrada;
 mod taller;
 mod ventas;
+
+pub use entrada::{QuienEntra, entrar_sin_clave};
 
 use dominio::acceso::Accion;
 
@@ -20,11 +23,12 @@ use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 use crate::fecha::formatear_utc;
 
-/// Se enseñan en la entrada de la demostración: no protegen nada real.
+/// Los usuarios necesitan una clave para existir, pero en la demostración se entra sin ella
+/// (`entrada.rs`) y no se enseña.
 pub const DUENO: &str = "Dueño (demo)";
-pub const CONTRASENA: &str = "demostracion";
+const CONTRASENA: &str = "demostracion";
 pub const OPERARIO: &str = "Juan (demo)";
-pub const PIN: &str = "123456";
+const PIN: &str = "123456";
 
 /// En la demostración no hay copias de seguridad ni se exportan o importan datos.
 pub fn exigir_datos_reales(estado: &EstadoApp) -> Result<(), ErrorApp> {

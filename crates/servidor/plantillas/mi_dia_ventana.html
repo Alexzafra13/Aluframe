@@ -4,6 +4,7 @@
 {% block cuerpo %}
 {% include "mi_dia_cabecera.html" %}
 <main class="contenido">
+  {% if usuario.en_demostracion %}{% include "franja_demostracion.html" %}{% endif %}
   <nav class="navegacion-ventanas" aria-label="Otras ventanas del trabajo">
     <a class="boton" href="/mi-dia">← Mi día</a>
     {% if let Some(a) = anterior %}<a class="boton" href="/mi-dia/{{ a }}">Anterior</a>{% endif %}

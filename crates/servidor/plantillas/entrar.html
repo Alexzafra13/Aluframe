@@ -7,7 +7,7 @@
   <h1 class="marca"><span class="marca-logo" aria-hidden="true"></span>AlumFrame</h1>
   {% if en_demostracion %}
   <aside class="franja-demostracion" aria-label="Demostración">
-    <p><strong>Demostración</strong> con datos inventados. Entra como <strong>{{ crate::aplicacion::demostracion::DUENO }}</strong> con la contraseña <span class="mono">{{ crate::aplicacion::demostracion::CONTRASENA }}</span>, o como <strong>{{ crate::aplicacion::demostracion::OPERARIO }}</strong> con el PIN <span class="mono">{{ crate::aplicacion::demostracion::PIN }}</span>.</p>
+    <p><strong>Demostración</strong> con datos inventados. Elige con quién entrar, sin contraseña: el dueño lo ve todo y el operario ve su pantalla de la tablet.</p>
     <form method="post" action="/demostracion/salir"><button class="boton" type="submit">Salir de la demostración</button></form>
   </aside>
   {% endif %}
@@ -40,7 +40,11 @@
   <p class="texto-apagado">¿Quién eres?</p>
   <ul class="lista-usuarios">
     {% for u in usuarios %}
+    {% if en_demostracion %}
+    <li><form method="post" action="/demostracion/entrar-como"><input type="hidden" name="usuario_id" value="{{ u.id }}"><button class="tarjeta-usuario" type="submit"><span class="avatar" aria-hidden="true">{{ u.inicial }}</span>{{ u.nombre }}</button></form></li>
+    {% else %}
     <li><a class="tarjeta-usuario" href="/entrar?usuario={{ u.id }}"><span class="avatar" aria-hidden="true">{{ u.inicial }}</span>{{ u.nombre }}</a></li>
+    {% endif %}
     {% endfor %}
   </ul>
   {% endmatch %}

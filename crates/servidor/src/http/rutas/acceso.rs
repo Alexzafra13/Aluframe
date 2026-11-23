@@ -92,7 +92,9 @@ async fn pagina_de_entrada(
         .into_iter()
         .map(OpcionUsuario::from)
         .collect();
+    // En la demostración no se pide clave: siempre se elige de la lista.
     let elegido = elegido
+        .filter(|_| !estado.es_demostracion())
         .and_then(|id| usuarios.iter().position(|u| u.id == id))
         .map(|indice| usuarios.remove(indice));
     let pagina = PaginaEntrar {

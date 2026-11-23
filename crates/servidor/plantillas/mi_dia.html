@@ -5,6 +5,7 @@
 {% include "iconos.html" %}
 {% include "mi_dia_cabecera.html" %}
 <main class="contenido">
+  {% if usuario.en_demostracion %}{% include "franja_demostracion.html" %}{% endif %}
   {% include "mi_dia_accesos.html" %}
   {% if !tareas.is_empty() %}
   <h2 class="titulo-seccion">Tareas</h2>
