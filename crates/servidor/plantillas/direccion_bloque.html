@@ -3,7 +3,7 @@
   <legend>Dirección de montaje {{ bloque.n + 1 }}</legend>
   <div class="rejilla-campos">
     {% call m::campo(format!("d{}_etiqueta", bloque.n), "Nombre para reconocerla (Casa, Obra Calle X)", bloque.valores.etiqueta, bloque.errores.de("etiqueta"), "maxlength=\"100\"") %}{% endcall %}
-    {% call m::campo(format!("d{}_calle", bloque.n), "Calle y número", bloque.valores.calle, bloque.errores.de("calle"), "autocomplete=\"off\"") %}{% endcall %}
+    {% call m::campo(format!("d{}_calle", bloque.n), "Calle y número", bloque.valores.calle, bloque.errores.de("calle"), format!("autocomplete=\"off\" data-calle-rellena data-cp=\"d{0}_cp\" data-localidad=\"d{0}_localidad\" data-provincia=\"d{0}_provincia\"", bloque.n)) %}{% endcall %}
     {% call m::campo(format!("d{}_cp", bloque.n), "Código postal", bloque.valores.cp, bloque.errores.de("cp"), format!("inputmode=\"numeric\" maxlength=\"10\" autocomplete=\"off\" data-cp-rellena data-localidad=\"d{0}_localidad\" data-provincia=\"d{0}_provincia\"", bloque.n)) %}{% endcall %}
     {% call m::campo(format!("d{}_localidad", bloque.n), "Localidad", bloque.valores.localidad, bloque.errores.de("localidad"), format!("autocomplete=\"off\" data-localidad-rellena data-cp=\"d{0}_cp\" data-provincia=\"d{0}_provincia\"", bloque.n)) %}{% endcall %}
     {% call m::campo(format!("d{}_provincia", bloque.n), "Provincia", bloque.valores.provincia, bloque.errores.de("provincia"), "") %}{% endcall %}

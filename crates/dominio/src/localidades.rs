@@ -109,7 +109,7 @@ impl IndiceDeLocalidades {
 }
 
 /// Cuanto menor, más parecido; `None` si no lo contiene.
-fn parecido(clave: &str, buscado: &str) -> Option<u8> {
+pub(crate) fn parecido(clave: &str, buscado: &str) -> Option<u8> {
     if clave == buscado {
         Some(0)
     } else if clave.starts_with(buscado) {

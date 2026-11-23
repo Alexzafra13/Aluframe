@@ -60,12 +60,17 @@ fn rutas_de_importacion() -> Router<EstadoApp> {
         )
 }
 
-/// Para rellenar código postal, localidad y provincia en los formularios con dirección (ADR-0020).
+/// Para rellenar calle, código postal, localidad y provincia en los formularios con dirección
+/// (ADR-0020 y ADR-0023).
 fn rutas_de_poblaciones() -> Router<EstadoApp> {
     Router::new()
         .route("/poblaciones", get(clientes_fragmentos::buscar_poblacion))
         .route(
             "/poblaciones/sugerencias",
             get(clientes_fragmentos::sugerir_poblaciones),
+        )
+        .route(
+            "/poblaciones/calles",
+            get(clientes_fragmentos::sugerir_calles_de_direccion),
         )
 }

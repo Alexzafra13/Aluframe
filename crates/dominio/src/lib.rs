@@ -2,6 +2,7 @@
 //! Lógica pura del taller: sin entrada/salida, sin reloj y sin base de datos.
 
 pub mod acceso;
+pub mod callejero;
 pub mod catalogo;
 pub mod clientes;
 pub mod codigos_postales;

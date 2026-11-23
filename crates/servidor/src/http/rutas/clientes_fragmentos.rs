@@ -7,6 +7,7 @@ use dominio::nif::Nif;
 use serde::Deserialize;
 
 use crate::aplicacion::autorizar;
+use crate::aplicacion::calles::{SugerenciaDeCalle, sugerir_calles};
 use crate::aplicacion::poblaciones::{
     Poblacion, SugerenciaDeLocalidad, buscar_por_codigo_postal, buscar_por_localidad,
     sugerir_localidades,
@@ -94,5 +95,24 @@ pub async fn sugerir_poblaciones(
 ) -> Json<Vec<SugerenciaDeLocalidad>> {
     Json(sugerir_localidades(
         consulta.texto.as_deref().unwrap_or_default(),
+    ))
+}
+
+#[derive(Deserialize)]
+pub struct ConsultaDeCalles {
+    texto: Option<String>,
+    localidad: Option<String>,
+    cp: Option<String>,
+}
+
+/// Las calles más parecidas a lo escrito, en la localidad o el código postal del formulario.
+pub async fn sugerir_calles_de_direccion(
+    ActorActual(_actor): ActorActual,
+    Query(consulta): Query<ConsultaDeCalles>,
+) -> Json<Vec<SugerenciaDeCalle>> {
+    Json(sugerir_calles(
+        consulta.texto.as_deref().unwrap_or_default(),
+        consulta.localidad.as_deref().unwrap_or_default(),
+        consulta.cp.as_deref().unwrap_or_default(),
     ))
 }

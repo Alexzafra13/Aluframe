@@ -15,6 +15,7 @@ Uso:
 """
 
 import collections
+import re
 import sys
 import unicodedata
 import zipfile
@@ -46,6 +47,20 @@ def arreglar_mayusculas(nombre):
     )
 
 
+ARTICULO_DETRAS = re.compile(r"^(.*), (el|la|los|las|l'|o|a|os|as|es|sa|ses|s')$", re.IGNORECASE)
+
+
+def poner_articulo_delante(nombre):
+    """GeoNames escribe «Santos de Maimona, los» y «Alcora, l'»; se escriben «Los Santos de
+    Maimona» y «L'Alcora», como en el callejero del INE (ADR-0023)."""
+    partes = ARTICULO_DETRAS.match(nombre)
+    if not partes:
+        return nombre
+    resto, articulo = partes.group(1), partes.group(2).capitalize()
+    separador = "" if articulo.endswith("'") else " "
+    return f"{articulo}{separador}{resto}"
+
+
 def leer(ruta_zip):
     texto = zipfile.ZipFile(ruta_zip).read("ES.txt").decode("utf-8")
     localidades = collections.defaultdict(list)
@@ -62,7 +77,7 @@ def leer(ruta_zip):
         if not ine.startswith(cp[:2]):
             municipio = ""
         for nombre in (municipio, lugar):
-            nombre = arreglar_mayusculas(nombre.strip())
+            nombre = poner_articulo_delante(arreglar_mayusculas(nombre.strip()))
             ya = {clave(n) for n in localidades[cp]}
             if nombre and clave(nombre) not in ya:
                 localidades[cp].append(nombre)

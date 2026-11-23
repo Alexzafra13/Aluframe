@@ -1,4 +1,6 @@
-// Código postal, localidad, provincia y país se rellenan entre sí (ADR-0020):
+// Calle, código postal, localidad, provincia y país se rellenan entre sí (ADR-0020 y ADR-0023):
+// - Al escribir la calle salen las del callejero (en la localidad escrita, o en toda la provincia);
+//   al elegir una se ponen su localidad, su provincia y su código postal si tiene uno solo.
 // - Al escribir el código postal se ponen la provincia, el país y la localidad si solo hay una;
 //   con varias, se ofrecen en la lista de la localidad.
 // - Al escribir la localidad salen las más parecidas; al elegir una se ponen su provincia, su país
@@ -211,6 +213,45 @@
     });
   }
 
+  // --- Calle (ADR-0023) ----------------------------------------------------------------------
+
+  function elegirCalle(entrada, s) {
+    const d = entrada.dataset;
+    // El número lo escribe la persona: se deja la coma y el cursor detrás.
+    entrada.value = s.calle + ", ";
+    entrada.setSelectionRange(entrada.value.length, entrada.value.length);
+    poner(campo(d.localidad), s.localidad);
+    poner(campo(d.provincia), s.provincia);
+    poner(campo(d.pais), s.pais);
+    ponerCodigos(campo(d.cp), s.calle, s.codigos_postales);
+  }
+
+  function detalleDeCalle(s) {
+    const codigos = s.codigos_postales;
+    if (!codigos.length) return s.localidad;
+    return s.localidad + " · " + (codigos.length === 1 ? codigos[0] : codigos.length + " códigos");
+  }
+
+  function sugerirCalles(entrada) {
+    const escrito = entrada.value;
+    const d = entrada.dataset;
+    const valor = function (id) { const c = campo(id); return c ? c.value : ""; };
+    const numero = ++consultaEnCurso;
+    consultar("/poblaciones/calles", { texto: escrito, localidad: valor(d.localidad), cp: valor(d.cp) }).then(function (lista) {
+      if (!lista || numero !== consultaEnCurso || entrada.value !== escrito) return;
+      mostrarLista(entrada, lista.map(function (s) {
+        return { titulo: s.calle, detalle: detalleDeCalle(s), elegir: function () { elegirCalle(entrada, s); } };
+      }));
+    });
+  }
+
+  // Tras la coma va el número: ahí ya no hay nada que sugerir.
+  function alEscribirCalle(entrada) {
+    clearTimeout(temporizador);
+    if (entrada.value.includes(",") || sinTildes(entrada.value).length < 2) return cerrarLista();
+    temporizador = setTimeout(function () { sugerirCalles(entrada); }, RETARDO_MS);
+  }
+
   // --- Eventos --------------------------------------------------------------------------------
 
   document.addEventListener("input", function (evento) {
@@ -223,6 +264,7 @@
       trasCodigoPostal(entrada);
     }
     if (entrada.matches("[data-localidad-rellena]")) alEscribirLocalidad(entrada);
+    if (entrada.matches("[data-calle-rellena]")) alEscribirCalle(entrada);
   });
   document.addEventListener("focusin", function (evento) {
     const entrada = evento.target;

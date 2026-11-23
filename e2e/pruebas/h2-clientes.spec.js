@@ -74,6 +74,39 @@ test("una ciudad con varios códigos no se adivina: deja elegir el código", asy
   await expect(page.locator("#d0_cp")).toHaveValue("28015");
 });
 
+test("la calle sugiere las de la localidad y deja el cursor para el número", async ({ page }) => {
+  await entrarComoPropietario(page);
+  await page.goto("/clientes/nuevo");
+  await page.locator("#fiscal_cp").pressSequentially("06300");
+  await expect(page.locator("#fiscal_localidad")).toHaveValue("Zafra");
+  const calle = page.locator("#fiscal_calle");
+  await calle.pressSequentially("duques");
+  const opcion = page.locator("#fiscal_calle-lista [role=option]").first();
+  await expect(opcion).toContainText("Avenida Duques de Feria");
+  await expect(opcion).toContainText("Zafra · 06300");
+  await opcion.click();
+  await expect(calle).toHaveValue("Avenida Duques de Feria, ");
+  await calle.pressSequentially("12");
+  await expect(calle).toHaveValue("Avenida Duques de Feria, 12");
+  await expect(page.locator("#fiscal_calle-lista")).toHaveCount(0);
+});
+
+test("con la calle escrita primero se rellenan la localidad y el código", async ({ page }) => {
+  await entrarComoPropietario(page);
+  await page.goto("/clientes/nuevo");
+  const calle = page.locator("#d0_calle");
+  await calle.pressSequentially("avda duques de feria");
+  await page.locator("#d0_calle-lista [role=option]", { hasText: "Zafra" }).first().click();
+  await expect(page.locator("#d0_localidad")).toHaveValue("Zafra");
+  await expect(page.locator("#d0_cp")).toHaveValue("06300");
+  await expect(page.locator("#d0_provincia")).toHaveValue("Badajoz");
+  // Una localidad de otra provincia no recibe calles de Badajoz.
+  await page.locator("#fiscal_localidad").fill("Bilbao");
+  await page.locator("#fiscal_calle").pressSequentially("calle");
+  await page.waitForTimeout(500);
+  await expect(page.locator("#fiscal_calle-lista")).toHaveCount(0);
+});
+
 test("la lista de localidades se maneja con el teclado sin enviar el formulario", async ({ page }) => {
   await entrarComoPropietario(page);
   await page.goto("/clientes/nuevo");
