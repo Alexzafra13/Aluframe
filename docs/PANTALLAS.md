@@ -37,7 +37,7 @@ El diseño tiene 10 entradas. Propongo **8 para el MVP** y se decide al construi
 | Clientes | `/clientes` | H2 | Lista con búsqueda; botón Nuevo cliente |
 | Cliente (alta y edición) | `/clientes/nuevo`, `/clientes/{id}/editar` | H2 | Formulario (apartado 5) |
 | Ficha de cliente | `/clientes/{id}` | H2 | Datos, direcciones de montaje, pestañas Presupuestos, Trabajos y Facturas; botón **Nuevo presupuesto** |
-| Presupuestos | `/presupuestos` | H3 | Lista con filtros por estado (borrador, enviado, aceptado, rechazado, caducado) |
+| Presupuestos | `/presupuestos` | H3 | Lista con filtros por estado (borrador, enviado, aceptado, rechazado, caducado y archivado; ADR-0027). Sin filtro, todos menos los archivados |
 | Presupuesto | `/presupuestos/{id}` | H3 | Cabecera, líneas, totales y acciones (apartado 6) |
 | Línea de ventana | `/presupuestos/{id}/lineas/{n}` | H3 | Editor con dibujo y cálculo en vivo (apartado 7) |
 | Línea libre | hoja en `/presupuestos/{id}` | H3 | Descripción, cantidad, precio unitario, descuento e IVA |
@@ -153,7 +153,7 @@ La lista de **Series** muestra su estado (borrador, validada), sus versiones y c
 ## 12. Ajustes
 - **Empresa:** datos fiscales, logotipo, IVA por defecto, formato de numeración, condiciones y validez por defecto del presupuesto.
 - **Usuarios:** altas de operarios (nombre y PIN de 6 dígitos), restablecer PIN, desactivar.
-- **Taller:** grosor de sierra, merma, lista de pasos por defecto de una ventana.
+- **Taller:** grosor de sierra, recorte, retal mínimo, cómo se reparten las piezas (mejor aprovechamiento o rápido), medidas habituales por serie y tipología (ADR-0026) y lista de pasos por defecto de una ventana.
 - **Datos** (desde 0.5.0, ADR-0016): exportar todos los datos a un archivo `.alumframe` e importar uno (sustituye los datos tras revisar qué contiene y guardar una copia de lo anterior). Base de la restauración guiada de H7.
 - **Copias de seguridad:** estado de la última, descarga manual, restauración guiada.
 - **Registro de actividad:** quién hizo qué y cuándo (solo lectura).

@@ -153,7 +153,7 @@ Las tipologías, piezas, vidrios, accesorios y opciones no tienen tablas propias
 | `presupuesto_tarifa` | presupuesto_id, tarifa_id: tarifas usadas por un presupuesto aceptado (no se pueden deshacer) |
 | `secuencia_documentos` | serie (`P`, `T`, `F`, `R`, `A`), anio, ultimo |
 
-Ajustes de empresa y precio en `configuracion`: `empresa.*`, `precio.margen_modo`, `precio.margen`, `precio.perfiles`, `precio.merma`, `precio.mano_de_obra`, `iva.general`, `iva.reducido`, `presupuesto.validez_dias`, `presupuesto.condiciones`.
+Ajustes de empresa y precio en `configuracion`: `empresa.*`, `precio.margen_modo`, `precio.margen`, `precio.perfiles`, `precio.merma`, `precio.mano_de_obra`, `iva.general`, `iva.reducido`, `presupuesto.validez_dias` (30 por defecto; la migración 0004 lo pone si estaba vacío), `presupuesto.condiciones`. Del taller: `taller.grosor_sierra_dmm`, `taller.recorte_extremos_dmm`, `taller.retal_minimo_dmm`, `taller.metodo_corte` (`aprovechamiento` o `rapido`) y `taller.medidas_habituales` (JSON con serie, tipología, ancho y alto en décimas de mm; ADR-0026). El estado `caducado` del presupuesto no se guarda: «caducado» y «archivado» se calculan con la validez y la fecha de hoy (ADR-0027).
 
 ### 7.7 Trabajos y orden de taller
 | Tabla | Campos |

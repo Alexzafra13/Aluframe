@@ -17,13 +17,15 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] V-94 abatible: cantidad de inversores y su ángulo de corte, cálculo de las pletinas de falleba, tipos de escuadra (exterior e interior de hoja) y si los marcos superior, lateral e inferior son el mismo perfil.
 - [ ] Redondeo: ¿a 0,1 cm hacia abajo es lo correcto? Validarlo con ventanas reales.
 - [ ] Optimizador con cortes a 45°: de momento cada pieza cuenta por su lado más largo (conservador). Revisarlo con el taller.
+- [x] Mejor aprovechamiento de las barras con medidas habituales e historial (propietario, 2026-11-23; ADR-0026). Medida de partida: Aluprom 21, corredera de 2 hojas, 120 × 120, editable en Ajustes > Taller.
+- [x] Validez de los presupuestos: 30 días; caducado se renueva con los precios de hoy y se archiva a los 6 meses sin borrar (propietario, 2026-11-23; ADR-0027).
 - [x] Cómo se modifica un trabajo ya aceptado: lo hace el propietario con "Modificar medidas" (`docs/PANTALLAS.md`, apartado 8). El operario no.
 - [x] Al modificar medidas con pasos ya hechos decide el propietario con una casilla (decisión 4 de H4).
 
 - [x] Longitud de barra de la V-94: 6,40 m (confirmado 2026-11-21).
 
 ## Precios y documentos
-- [ ] Proveedores (Aluval y Sopena de momento) y formato de sus tarifas. No se sabe cómo las enviarán: el propietario pide admitir lo máximo posible. Hoy: CSV, pegar desde Excel y precios a mano en Catálogo > Artículos. **Siguiente tarea:** Excel (.xlsx, .xls, .ods) y PDF asistido.
+- [ ] Proveedores (Aluval y Sopena de momento) y formato de sus tarifas. No se sabe cómo las enviarán: el propietario pide admitir lo máximo posible. Hoy: CSV, pegar desde Excel y precios a mano en Catálogo > Artículos. **Siguiente tarea:** Excel (.xlsx, .xls, .ods) y PDF asistido. **Pregunta al propietario (2026-11-23, sin respuesta):** ¿cómo manda Aluval los precios (Excel, PDF, papel o web)?
 - [ ] Recargo por color: el blanco es el más barato y el resto cuesta un porcentaje más. ¿Es el mismo para todas las series o depende del proveedor?
 - [ ] Colores de serie (ADR-0019, `data/acabados.yaml`): confirmar los RAL puestos (blanco 9016, negro 9005, verde 6005, gris antracita 7016, marrón 8014), el nombre «Embero», qué imitaciones de madera se usan (pino nudo, nogal, embero, roble) y la superficie de cada uno (brillo, mate, texturado; anodizado plata y bronce).
 - [ ] Facturas de compra: ¿llegan en papel, PDF digital o Excel? Decide si se importan (y cómo) o se teclean.
@@ -39,7 +41,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [x] Enlace entre el perfil de una serie y la referencia de la tarifa: resuelto con la tabla `referencias` (`docs/FORMATO_SERIES.md`, apartado 5).
 - [x] Formato de `vidrio` en las series: `docs/FORMATO_SERIES.md`, apartado 6.
 - [ ] Pletinas de falleba: fórmula y unidad (¿se venden por metro o por unidad cortada?).
-- [ ] Límites de medida por serie (`limites`): mínimos y máximos reales de cada tipología.
+- [ ] Límites de medida por serie (`limites`): mínimos y máximos reales de cada tipología. **Desde la 0.17.0 sirven también para el corte:** con el mínimo, el programa sabrá cuál es la pieza más corta de cada perfil y marcará como desecho lo que quede por debajo (ADR-0026).
 
 ## Implantación y fiscalidad
 - [ ] ¿Con qué se gestionan hoy clientes, presupuestos y facturas (papel, hoja de cálculo, otro programa)? ¿Qué datos hay que importar?

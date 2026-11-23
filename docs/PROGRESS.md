@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-23): **H0–H7 terminados**; publicada la **v0.16.0** y preparada la **v0.16.1** (arreglos de la segunda auditoría, rama `claude/nifty-wright-wyje1n`, pendiente de llevar a `main`). Los datos se conservan al actualizar (migraciones, ADR-0021) y hay copias automáticas (ADR-0022).
+Estado (2026-11-23): **H0–H7 terminados**; publicada la **v0.16.0**. Preparada en la rama `claude/nifty-wright-wyje1n`, pendiente de llevar a `main`, la **v0.17.0**: arreglos de la segunda auditoría (antes 0.16.1, que no llegó a publicarse), mejor aprovechamiento de las barras con medidas habituales e historial (ADR-0026) y caducidad de los presupuestos (ADR-0027, migración 0004). Los datos se conservan al actualizar (migraciones, ADR-0021) y hay copias automáticas (ADR-0022).
 
 **Siguiente tarea:** importar tarifas desde **Excel** (.xlsx, .xls, .ods, directo) y **PDF** (asistido: se extrae el texto, se proponen las columnas y el propietario revisa), entrando en la misma revisión en 3 pasos que ya usa el CSV (`aplicacion/importar_tarifa.rs`, ADR-0012). Necesita ADR de dependencia (por ejemplo `calamine` para hojas de cálculo; para PDF, valorar extracción de texto propia o una biblioteca) con las seis preguntas de `CLAUDE.md`. Proponer el plan y esperar aprobación. Después, el propietario simula con datos a mano y se pule la interfaz con su lista.
 
@@ -8,7 +8,7 @@ Estado (2026-11-23): **H0–H7 terminados**; publicada la **v0.16.0** y preparad
 
 **Segunda auditoría (2026-11-23, v0.16.1):** cuatro fallos de facturas y clientes corregidos con su prueba (detalle en `docs/CAMBIOS.md`). Queda pendiente del propietario cómo volver a facturar un trabajo cuya factura se anuló (`OPEN_QUESTIONS.md`). Vistos sin arreglar, por ser poco probables con un solo dueño: «Terminar orden» recalcula el plan al confirmar y, si entre medias otra orden gastó un retal, los retales revisados se asignan por posición del perfil; y la lista de Presupuestos muestra los 500 últimos sin paginar (los antiguos siguen en la ficha de cada cliente).
 
-**Pendiente de la auditoría (2026-11-23):** mejorar el optimizador de cortes. Best Fit Decreasing a veces gasta una barra más que el óptimo. Propuesta: cuando el plan supera `calcular_minimo_de_barras`, una búsqueda exacta acotada en tiempo y, a igualdad de barras, preferir el reparto que deje un retal aprovechable. Con una prueba de propiedades de que nunca sale peor que BFD. Plan y aprobación antes. Valorar también `cargo-mutants` de vez en cuando sobre `dominio::precio` y `dominio::corte`.
+**Optimizador (hecho en la 0.17.0, ADR-0026):** mejor aprovechamiento con búsqueda acotada por pasos, medidas habituales e historial. Falta la fase que depende de datos: cuando cada serie tenga sus medidas mínimas (`limites`, hoy `CONFIRMAR`), el mínimo útil de cada perfil será su pieza más corta posible y lo que quede por debajo saldrá desmarcado como desecho en «Terminar orden». Valorar también `cargo-mutants` de vez en cuando sobre `dominio::precio` y `dominio::corte`.
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo (sobre todo «Siguiente tarea», «Reglas» y «Antes de publicar»), `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para tocar la interfaz, `docs/design.md` y `docs/PANTALLAS.md`; para datos, `docs/DATOS.md`; los porqués, en `docs/adr/` y `docs/CAMBIOS.md`.
@@ -81,7 +81,8 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
 | 0.7.1 | Arreglo de la aplicación de Windows: no se apaga mientras la ventana siga abierta |
 | 0.7.2 | Editor: «Guardar ventana» vuelve al presupuesto; «+ Otro concepto» (antes línea libre); aviso de medida fuera de la serie solo cuando ocurre; menú lateral fijo y plegable; Aluprom 21 validada por el propietario |
-| 0.16.1 | Segunda auditoría: factura anulada por rectificativa ya no sale vencida («Anulada»); avisos de cobro sin el límite de 500 facturas; todos los clientes al crear presupuesto o factura; fecha de la operación congelada e impresa; precio unitario de ventana con descuento que cuadra |
+| 0.17.0 | Plan de corte por serie, perfil y color (arreglo); mejor aprovechamiento de barras, medidas habituales e historial (ADR-0026); presupuestos que caducan a los 30 días, se renuevan y se archivan (ADR-0027, migración 0004); y lo de la segunda auditoría (abajo) |
+| (0.16.1, sin publicar) | Segunda auditoría: factura anulada por rectificativa ya no sale vencida («Anulada»); avisos de cobro sin el límite de 500 facturas; todos los clientes al crear presupuesto o factura; fecha de la operación congelada e impresa; precio unitario de ventana con descuento que cuadra |
 | 0.16.0 | Pantalla del operario para la tablet: cabecera en una línea y botones grandes (Nuevo apunte, Apuntes, Clientes y lo permitido) encima de sus tareas y ventanas. Termina el plan «dueño y operarios» |
 | 0.15.0 | Apuntes (ADR-0025): notas y tareas sueltas; del operario al dueño (campana e Inicio) y del dueño a un operario («Mi día»); «Hacer presupuesto» desde el apunte. Migración 0003 |
 | 0.14.0 | Permisos por operario (ADR-0024): busca clientes y, si el dueño lo marca, los da de alta, ve presupuestos (sin costes), facturas o todo el taller. Migración 0002 |
