@@ -4,6 +4,8 @@ use thiserror::Error;
 pub enum ErrorAcceso {
     #[error("El rol «{0}» no existe.")]
     RolDesconocido(String),
+    #[error("El permiso «{0}» no existe.")]
+    PermisoDesconocido(String),
     #[error("El nombre no puede estar vacío.")]
     NombreVacio,
     #[error("El nombre no puede tener más de {maximo} caracteres.")]
