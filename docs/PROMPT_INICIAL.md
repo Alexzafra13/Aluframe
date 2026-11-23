@@ -2,9 +2,9 @@
 
 Abre Claude Code en la raíz del repositorio. No hace falta ejecutar `/init`. Trabaja con una sesión por hito y usa `/clear` entre hitos.
 
-## Siguiente sesión (H4), en modo plan
+## Siguiente sesión: importar tarifas desde Excel y PDF, en modo plan
 ```
-Lee CLAUDE.md y docs/PROGRESS.md (apartado «Cómo retomar»), y después docs/CONTEXTO.md, docs/OPEN_QUESTIONS.md, el apartado H4 de SPEC.md, docs/DATOS.md (3.6, 4 y 7.7), docs/PANTALLAS.md (8 y 13), docs/design.md y design/03-hoja-taller.png. Comprueba que todo está en verde. En docs/PROGRESS.md están las seis decisiones de H4 que propuse; recuérdamelas para que las apruebe o cambie. Después, sin escribir código, propón el plan de H4: tablas que añadirás a esquema.sql, casos de uso, pantallas (con el estilo iOS ya acordado), pruebas y cómo comprobarás los criterios de aceptación. Señala huecos o contradicciones y espera mi aprobación.
+Lee CLAUDE.md y docs/PROGRESS.md («Siguiente tarea», «Reglas» y «Antes de publicar»), docs/OPEN_QUESTIONS.md, ADR-0012 y crates/servidor/src/aplicacion/importar_tarifa.rs. Comprueba que todo está en verde. Sin escribir código, propón el plan para importar tarifas desde Excel (.xlsx, .xls, .ods) y PDF (asistido) en la misma revisión de 3 pasos del CSV: dependencias con su ADR (las seis preguntas de CLAUDE.md), cómo se eligen hoja, fila de cabecera y columnas, qué pasa con un PDF escaneado, pruebas y E2E. Espera mi aprobación.
 ```
 
 ## Empezar un hito

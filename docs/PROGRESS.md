@@ -1,12 +1,31 @@
 # Progreso
 
-Estado (2026-11-22): **H0–H7 terminados**; publicada la **v0.12.1**. Desde ella los datos se conservan al actualizar. Siguiente: importar tarifas desde Excel (.xlsx, .xls, .ods) y PDF (asistido); después el propietario simula con datos a mano y pule la interfaz.
+Estado (2026-11-23): **H0–H7 terminados**; publicada la **v0.12.1**. Los datos se conservan al actualizar (migraciones, ADR-0021) y hay copias automáticas (ADR-0022).
+
+**Siguiente tarea:** importar tarifas desde **Excel** (.xlsx, .xls, .ods, directo) y **PDF** (asistido: se extrae el texto, se proponen las columnas y el propietario revisa), entrando en la misma revisión en 3 pasos que ya usa el CSV (`aplicacion/importar_tarifa.rs`, ADR-0012). Necesita ADR de dependencia (por ejemplo `calamine` para hojas de cálculo; para PDF, valorar extracción de texto propia o una biblioteca) con las seis preguntas de `CLAUDE.md`. Proponer el plan y esperar aprobación. Después, el propietario simula con datos a mano y se pule la interfaz con su lista.
 
 ## Cómo retomar en una sesión nueva
-1. Lee `CLAUDE.md`, este archivo, `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para H4, además `SPEC.md` (H4), `docs/DATOS.md` (3.6, 4 y 7.7), `docs/PANTALLAS.md` (8 y 13), `design/03-hoja-taller.png` y ADR-0003.
-2. Trabaja en una rama; al terminar algo que el propietario quiera probar, sube `version` en `Cargo.toml` y llévalo a `main` (ya ha dado permiso para publicar así): GitHub Actions prueba, compila y publica el `.tar.gz` de Linux y el instalador de Windows.
-3. Comprueba que todo está en verde. En la nube no hay `just`: `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, `cargo test --workspace --locked`; E2E: `cargo build --release --locked -p servidor` y en `e2e/` `npm ci` y `ALUMFRAME_BIN=../target/release/alumframe npx playwright test --trace off`.
-4. Para un hito, propón el plan y **espera la aprobación** antes de escribir código.
+1. Lee `CLAUDE.md`, este archivo (sobre todo «Siguiente tarea», «Reglas» y «Antes de publicar»), `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para tocar la interfaz, `docs/design.md` y `docs/PANTALLAS.md`; para datos, `docs/DATOS.md`; los porqués, en `docs/adr/` y `docs/CAMBIOS.md`.
+2. Trabaja en una rama; al terminar algo que el propietario quiera probar, sube `version` en `Cargo.toml` y llévalo a `main` (ya ha dado permiso para publicar así): GitHub Actions prueba en Linux y Windows, compila y publica el `.tar.gz` de Linux y el instalador de Windows.
+3. Para una tarea nueva grande, propón el plan y **espera la aprobación**. Los arreglos y retoques que pida el propietario se hacen directamente.
+4. Al responder al propietario: en español llano, sin jerga; dale el comando de actualización del servidor con la versión nueva y dile si hay que borrar datos (desde 0.11.0, nunca).
+
+## Antes de publicar (lecciones aprendidas)
+En la nube no hay `just`; ejecuta lo mismo que `just check` y la E2E:
+```
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets --locked -- -D warnings
+find crates -name '*.rs' -exec wc -l {} + | awk '$1>300 && $2!="total"'   # debe salir vacío
+cargo test --workspace --locked
+cargo build -p servidor --offline        # tras subir la versión: actualiza Cargo.lock
+cargo build --release --locked -p servidor
+cd e2e && npm ci && ALUMFRAME_BIN=../target/release/alumframe npx playwright test --trace off
+```
+- La comprobación de tamaño (300 líneas) la pasa CI aunque clippy no la vea: ya rompió una publicación.
+- CI también prueba en **Windows**: cuidado con lo que dependa de finales de línea (los `.sql` van con LF por `.gitattributes`; una huella de un archivo de texto puede cambiar con CRLF) o de rutas con `/`.
+- Si cambias la versión, primero `cargo build --offline` (actualiza `Cargo.lock`) y después la compilación `--locked`, o fallará.
+- Revisa con capturas de Playwright lo visual que cambies (PC a 1366 × 768 y 1366 × 620, e iPhone 13); espera ~1 s a que terminen las animaciones antes de capturar.
+- El disco de la nube es pequeño: si se llena, borra `target/debug` o carpetas de capturas del scratchpad.
 
 ## Reglas que conviene no olvidar
 - **Migraciones desde la 0.11.0** (ADR-0021): cada cambio de la base es un archivo nuevo en `crates/servidor/src/bd/migraciones/` que conserva los datos; **las publicadas no se editan**. Una migración destructiva exige preguntar al propietario.
@@ -16,8 +35,8 @@ Estado (2026-11-22): **H0–H7 terminados**; publicada la **v0.12.1**. Desde ell
 - **Interfaz:** estilo iOS (`docs/design.md`), adaptada a móvil (barra de pestañas, tablas como celdas; E2E `movil.spec.js`). La CSP no deja estilos en línea: los colores del dibujo van en atributos SVG. Los estilos y scripts llevan `?v=` con la versión.
 - **Datos de prueba:** serie y tarifa ficticias en `fixtures/demo/` (E2E con `ALUMFRAME_DATOS_DEMO=si`).
 
-## Instalación del propietario (para pruebas, sin datos reales)
-Servidor Ubuntu en casa (`192.168.1.100`, servicio `alumframe`, datos en `/var/lib/alumframe`), acceso desde fuera con Tailscale (`100.104.229.16:9090`). Pasos en `docs/MAINTENANCE.md`, apartado 4. **Pendiente de probar por él:** el instalador de Windows (que no salga consola y que se cierre al cerrar la ventana).
+## Instalación del propietario (pruebas; sus datos ya se conservan al actualizar)
+Servidor Ubuntu en casa (`192.168.1.100`, servicio `alumframe`, datos en `/var/lib/alumframe`), acceso desde fuera con Tailscale (`100.104.229.16:9090`). Actualizar: `docs/MAINTENANCE.md`, apartado 4 (descargar el `.tar.gz` de la versión y `sudo ./instalar.sh`). **Pendiente de probar por él:** disco de copias montado en el servidor (`despliegue/linux/LEEME.txt`), que el servicio arranca solo tras reiniciar, y el instalador de Windows.
 
 ## H4: plan aprobado (sin objeciones del propietario, 2026-11-22) y hecho
 Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de taller A4, asignar operarios, «Mi día» y pasos del operario, modificar medidas con revisiones. Seis decisiones propuestas:
@@ -38,10 +57,11 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 - **Copias (H7):** en un pendrive o disco conectado, reconocido por una marca en la carpeta `AlumFrame-copias` (no por la letra). Copia diaria **a las 14:00 y al cerrar el programa**; si no se hizo (apagón), **al arrancar**. Se comprueba la copia tras hacerla. Se guardan **7 diarias** y **4 semanales**, más una en el propio equipo. Aviso en el Inicio si falla o falta el disco. Mismo formato que Exportar/Importar. En modo servidor, igual en el servidor; la copia fuera de casa (el PC del taller baja la del servidor) queda para después del MVP.
 
 ## Datos que faltan del taller (lista completa en `OPEN_QUESTIONS.md`)
-- **Aluprom 21:** descuento del cristal, referencias de accesorios (kit, ruedas, tornillos), si la de 4 hojas lleva el «cierre 4 hojas» 21344, y si el Climalit cambia descuentos. Los perfiles ya tienen referencia (21210, 21220, 21230; hojas 21310/21340/21350 y Climalit 21312/21341/21351).
-- **Precio:** una tarifa real de Aluval, margen (sobre coste o venta) y mano de obra.
+- **Precio:** una tarifa real de Aluval (y luego Sopena), margen (sobre coste o venta) y mano de obra. Sin margen elegido, los presupuestos salen «Provisional».
+- **Aluprom 21:** cristal de la 2 hojas puesto (ancho del propietario; **alto provisional**, comprobar con un cristal real); falta el cristal de la 4 hojas, si la 4 hojas lleva el «cierre 4 hojas» 21344 y si el Climalit cambia descuentos. Kit, ruedas, tornillos y cristal usan referencias genéricas del taller (`KIT-CORREDERA`, `RUEDA-CORREDERA`, `TORNILLO-4,8X25`, `CRISTAL`) que se dan de alta con precio en Catálogo > Artículos.
+- **Sopena V-94:** en borrador hasta tener su catálogo.
 - **Colores:** confirmar RAL y superficies de `data/acabados.yaml` y el nombre «Embero».
-- **Validación:** Aluprom 21 (2 y 4 hojas) **validada por el propietario** el 2026-11-22 tras probar las medidas de corte; siguen faltando el descuento del cristal y las referencias de kit, ruedas y tornillos (sin ellos no hay precio final). Sopena V-94 sigue en borrador (falta su catálogo). Datos fiscales y logotipo: ya se cargan en Ajustes.
+- **Gestor:** IVA y menciones legales de la factura; Verifactu (fuera del MVP).
 
 ## Hecho después de H3 (resumen; detalle en `docs/CAMBIOS.md`)
 | Versión | Qué |
@@ -55,6 +75,9 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
 | 0.7.1 | Arreglo de la aplicación de Windows: no se apaga mientras la ventana siga abierta |
 | 0.7.2 | Editor: «Guardar ventana» vuelve al presupuesto; «+ Otro concepto» (antes línea libre); aviso de medida fuera de la serie solo cuando ocurre; menú lateral fijo y plegable; Aluprom 21 validada por el propietario |
+| 0.12.1 | Arreglo: las bases creadas por las versiones de Windows 0.8–0.10 (huella con CRLF) se reconocen; `.gitattributes` con LF para `.sql` |
+| 0.12.0 | Campana de avisos en la barra superior; menú sin títulos de grupo |
+| 0.11.1–0.11.2 | Notificaciones bajo la barra superior; menú lateral completo en pantallas bajas, plegar solo con icono, tarjeta de usuario y Salir en rojo |
 | 0.11.0 | **H7:** copias automáticas (14:00, al cerrar, al arrancar si faltó) en el equipo y en el disco con la carpeta `AlumFrame-copias`, 7 diarias y 4 semanales, aviso en el Inicio, Ajustes > Copias con restaurar; esquema fijado como migración 0001: **los datos ya no se borran al actualizar** |
 | 0.10.0 | **H6:** facturas desde el trabajo o libres, número sin huecos al emitir, hoja A4, rectificativas, cobros parciales (efectivo, Bizum, tarjeta, transferencia u otro), señales a cuenta, albarán de entrega; cobros vencidos y presupuestos sin respuesta en el Inicio. Sin cambio de esquema |
 | 0.9.0 | **H5:** stock con entradas, ajustes, retales y mínimos; el plan de corte usa los retales del stock y la hoja dice cuál coger; repetir pieza; terminar orden descontando el plan con retales revisados; lista de la compra; stock bajo en el Inicio |

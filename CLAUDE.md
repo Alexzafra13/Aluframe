@@ -58,12 +58,12 @@ Prefiere lo simple y estable. Una herramienta compleja solo se justifica si resu
 
 ## Stack (ver ADR-0001 y ADR-0002; cambiarlo exige un ADR nuevo)
 - **Rust estable**, versión fijada en `rust-toolchain.toml`. Workspace de Cargo.
-- Servidor: Tokio + Axum. **rusqlite** con SQLite incluido (tablas `STRICT`, claves foráneas activas, modo WAL, `busy_timeout`), usado desde tareas bloqueantes con una conexión de escritura y un grupo pequeño de lectura. Esquema único hasta el primer despliegue (ADR-0011). Además `serde`, `thiserror`, `tracing`, `argon2` y `time` (`time` no incluye zonas horarias: la conversión a Europe/Madrid se decide en un ADR durante H0).
+- Servidor: Tokio + Axum. **rusqlite** con SQLite incluido (tablas `STRICT`, claves foráneas activas, modo WAL, `busy_timeout`), usado desde tareas bloqueantes con una conexión de escritura y un grupo pequeño de lectura. Base de datos con migraciones numeradas (ADR-0021). Además `serde`, `thiserror`, `tracing`, `argon2` y `time` (`time` no incluye zonas horarias: la conversión a Europe/Madrid se decide en un ADR durante H0).
 - Interfaz: **HTML generado en el servidor** con plantillas comprobadas al compilar (Askama o Maud; decide en un ADR) y **HTMX** incluido en el repositorio, sin npm. JavaScript mínimo, sin empaquetador. **CSS propio con variables**, sin Tailwind ni frameworks CSS.
 - Dibujo de la ventana: función de Rust que devuelve SVG, usada en pantalla y en la hoja impresa.
 - Impresión: hojas HTML con hoja de estilos de impresión A4 (`@page`, saltos de página). PDF automático en el servidor (correo, archivo): spike y ADR-0003; aíslalo tras un puerto, porque su API puede cambiar.
 - Calidad: `cargo fmt`, `clippy` con `-D warnings`, `cargo test` o `nextest`, `proptest`, `cargo deny`. Playwright solo en `e2e/`.
-- Tareas: `just`. Despliegue: un único ejecutable `alumframe` con plantillas y recursos incrustados (`rust-embed`) más `alumframe.db`, instalado como servicio de Windows o systemd (en Windows hace falta un envoltorio de servicio: ADR en H7). El mismo ejecutable funciona en **modo servidor** (red local) o **modo local** (solo ese PC): ver `docs/BACKEND.md`, apartado 14. Acceso remoto opcional con Tailscale.
+- Tareas: `just`. Despliegue: un único ejecutable `alumframe` con plantillas y recursos incrustados (`rust-embed`) más `alumframe.db`, instalado como servicio systemd en el servidor Linux o como aplicación de escritorio en Windows (ADR-0015); un servicio de Windows solo haría falta si el servidor fuera Windows (aplazado, ADR-0022). El mismo ejecutable funciona en **modo servidor** (red local) o **modo local** (solo ese PC): ver `docs/BACKEND.md`, apartado 14. Acceso remoto opcional con Tailscale.
 
 ## Arquitectura
 - `crates/dominio` **no depende** de tokio, axum ni rusqlite; Cargo lo garantiza.

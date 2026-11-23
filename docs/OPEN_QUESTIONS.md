@@ -6,7 +6,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] Fórmulas de ancho y alto del cristal (descuento) y tipo de vidrio habitual, en cada serie. Aluprom 21, corredera de 2 hojas: **dos cristales de (ancho / 2 − 9,8) × (alto − 13,1) cm**. El ancho lo da el propietario y coincide con el plano de Aluval ((L/2) − 98 mm); el alto es **provisional** (alto de la hoja menos los mismos 7,8 cm que en el ancho), pendiente de comprobar con un cristal real. Falta el cristal de la de 4 hojas. El plano de Aluval (con Climalit y cierre 21343) acota la hoja en H − 55 y (L/2) − 13,5 mm, distinto de los descuentos del taller (5,3 y 2 cm): el propietario decide mantener los suyos, que calculan bien.
 - [x] `ancho` y `alto` son la **medida de la ventana** (plan de H3 aprobado, 2026-11-21); se valida con las 5 ventanas reales tras H3. Aluprom 21: medidas de corte de la 2 y la 4 hojas validadas por el propietario (2026-11-22).
 - [ ] ¿Marco superior, lateral e inferior salen del mismo perfil o de perfiles distintos?
-- [ ] ¿Se optimizan los cortes por ventana o por trabajo? ¿Qué se hace con los retales?
+- [x] Los cortes se optimizan **por trabajo** (decisión 2 de H4) y los retales del stock se usan antes que barras nuevas; al terminar la orden se revisan los que entran (H5).
 - [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos sin dato (se usa 0); retal mínimo 0 por decisión del propietario. Se cambian en Ajustes > Taller.
 - [ ] Aluprom 21 de 4 hojas: confirmar ruedas (8) y tornillos (9 + 16), que son supuestos. Otras tipologías (fija, puertas). ¿Lleva el perfil «cierre 4 hojas» 21344?
 - [x] Nombres de las hojas de Aluprom 21: los del catálogo de Aluval, HOJA LATERAL y HOJA CIERRE (propietario, 2026-11-22; ADR-0017).
@@ -18,12 +18,12 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] Redondeo: ¿a 0,1 cm hacia abajo es lo correcto? Validarlo con ventanas reales.
 - [ ] Optimizador con cortes a 45°: de momento cada pieza cuenta por su lado más largo (conservador). Revisarlo con el taller.
 - [x] Cómo se modifica un trabajo ya aceptado: lo hace el propietario con "Modificar medidas" (`docs/PANTALLAS.md`, apartado 8). El operario no.
-- [ ] Al modificar medidas con pasos ya hechos: ¿se reinician siempre o decide el propietario (propuesto: decide él)?
+- [x] Al modificar medidas con pasos ya hechos decide el propietario con una casilla (decisión 4 de H4).
 
 - [x] Longitud de barra de la V-94: 6,40 m (confirmado 2026-11-21).
 
 ## Precios y documentos
-- [ ] Proveedores (Aluval y Sopena de momento) y formato de sus tarifas. El usuario reunirá precios por barra y tarifas.
+- [ ] Proveedores (Aluval y Sopena de momento) y formato de sus tarifas. No se sabe cómo las enviarán: el propietario pide admitir lo máximo posible. Hoy: CSV, pegar desde Excel y precios a mano en Catálogo > Artículos. **Siguiente tarea:** Excel (.xlsx, .xls, .ods) y PDF asistido.
 - [ ] Recargo por color: el blanco es el más barato y el resto cuesta un porcentaje más. ¿Es el mismo para todas las series o depende del proveedor?
 - [ ] Colores de serie (ADR-0019, `data/acabados.yaml`): confirmar los RAL puestos (blanco 9016, negro 9005, verde 6005, gris antracita 7016, marrón 8014), el nombre «Embero», qué imitaciones de madera se usan (pino nudo, nogal, embero, roble) y la superficie de cada uno (brillo, mate, texturado; anodizado plata y bronce).
 - [ ] Facturas de compra: ¿llegan en papel, PDF digital o Excel? Decide si se importan (y cómo) o se teclean.
@@ -31,8 +31,8 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] Mano de obra: ¿importe por ventana, por m² o a mano? **Desde H3, importe por ventana en cada línea con un valor por defecto en Ajustes (vacío = 0). Provisional: se suma después del margen (es lo que se cobra, no lleva margen); el propietario aún no lo ha decidido (2026-11-21).**
 - [ ] Margen: ¿sobre coste o sobre venta? Descuentos habituales. **Desde H3 es configurable en Ajustes > Presupuestos; mientras no se elija, ninguna línea tiene precio final. El propietario aún no lo ha decidido (2026-11-21).**
 - [ ] Tipos de IVA, casos especiales, y cómo se redondea la cuota (confirmar con el gestor). **Confirmado por el propietario (2026-11-21):** 21 % por defecto; las líneas y la base se muestran sin IVA y el IVA se suma al final (total con IVA).
-- [ ] Documentos que realmente se emiten (presupuesto, albarán, factura) y formato de numeración.
-- [ ] Datos fiscales del taller y logotipo.
+- [x] Documentos: presupuesto P-AAAA-NNNN, trabajo T-AAAA-NNNN, albarán A-AAAA-NNNN, factura F-AAAA-NNNN y rectificativa R-AAAA-NNNN, sin huecos en las facturas (H6). Pendiente que el gestor revise las menciones legales.
+- [ ] Datos fiscales del taller y logotipo: se cargan en Ajustes > Empresa y precios; falta que el propietario los meta.
 
 ## Formato de datos
 - [x] Enlace entre el perfil de una serie y la referencia de la tarifa: resuelto con la tabla `referencias` (`docs/FORMATO_SERIES.md`, apartado 5).
