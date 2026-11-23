@@ -3,7 +3,9 @@
 use std::collections::BTreeMap;
 
 use dominio::acceso::Accion;
-use dominio::taller::{BarrasDePerfil, PiezaDeTrabajo, RetalesPorPerfil, planificar_trabajo};
+use dominio::taller::{
+    BarrasDePerfil, PiezaDeTrabajo, RetalesPorPerfil, ValoracionesPorPerfil, planificar_trabajo,
+};
 use dominio::unidades::Longitud;
 
 use super::consultar::{FichaDeTrabajo, cargar};
@@ -63,6 +65,7 @@ pub fn planificar(
         &piezas,
         (&barras, retales),
         ajustes.parametros_de_corte(Longitud::CERO),
+        (ajustes.metodo, &ValoracionesPorPerfil::new()),
     )
 }
 

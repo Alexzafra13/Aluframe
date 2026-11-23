@@ -19,6 +19,16 @@
   </div>
   <button class="boton primario" type="submit">Guardar</button>
 </form>
+<form class="tarjeta" method="post" action="/ajustes/taller/metodo">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <h2>Cómo se reparten las piezas</h2>
+  <fieldset class="opciones-verticales">
+    <legend class="texto-apagado">Vale para el precio de cada ventana, «Probar una ventana» y la orden de taller.</legend>
+    <label class="casilla"><input type="radio" name="metodo" value="aprovechamiento"{% if metodo == "aprovechamiento" %} checked{% endif %}> <span><strong>Mejor aprovechamiento</strong> (recomendado): prueba más repartos para gastar las menos barras posibles y, con las mismas, dejar los retales que mejor sirven.</span></label>
+    <label class="casilla"><input type="radio" name="metodo" value="rapido"{% if metodo == "rapido" %} checked{% endif %}> <span><strong>Rápido</strong>: cada pieza, de mayor a menor, a la barra donde menos sobra. A veces gasta una barra de más.</span></label>
+  </fieldset>
+  <button class="boton primario" type="submit">Guardar</button>
+</form>
 <form class="tarjeta" method="post" action="/ajustes/taller/pasos">
   <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
   <h2>Pasos de cada ventana</h2>

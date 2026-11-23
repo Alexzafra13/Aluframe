@@ -30,7 +30,23 @@ pub fn optimizar_con_retales(
     comprobar_piezas(piezas, parametros, util)?;
     let mut ordenadas = piezas.to_vec();
     ordenadas.sort_by(|a, b| b.longitud.cmp(&a.longitud).then(a.id.cmp(&b.id)));
-    let mut barras: Vec<BarraCortada> = retales
+    let mut barras = barras_de_retales(retales, parametros);
+    for pieza in ordenadas {
+        colocar(&mut barras, pieza, (parametros.consumo(&pieza)?, util))?;
+    }
+    barras.retain(|b| !b.piezas.is_empty());
+    Ok(PlanDeCorte {
+        barras,
+        retal_minimo: parametros.retal_minimo,
+    })
+}
+
+/// Los retales del stock como barras vacías, ya sin el recorte de los extremos.
+pub(super) fn barras_de_retales(
+    retales: &[RetalDisponible],
+    parametros: &ParametrosDeCorte,
+) -> Vec<BarraCortada> {
+    retales
         .iter()
         .filter_map(|r| {
             let util_retal = r.longitud.restar(parametros.recorte_extremos)?;
@@ -40,15 +56,7 @@ pub fn optimizar_con_retales(
                 retal: Some(r.id),
             })
         })
-        .collect();
-    for pieza in ordenadas {
-        colocar(&mut barras, pieza, (parametros.consumo(&pieza)?, util))?;
-    }
-    barras.retain(|b| !b.piezas.is_empty());
-    Ok(PlanDeCorte {
-        barras,
-        retal_minimo: parametros.retal_minimo,
-    })
+        .collect()
 }
 
 fn colocar(

@@ -4,6 +4,7 @@ mod comun;
 
 use axum::http::StatusCode;
 use comun::{Contexto, destino, get, post, texto};
+use dominio::corte::MetodoDeCorte;
 use dominio::unidades::Longitud;
 use servidor::aplicacion::importar_serie::importar_serie;
 use servidor::aplicacion::taller::leer_ajustes_de_taller;
@@ -109,4 +110,35 @@ async fn el_operario_no_ve_los_ajustes_del_taller() {
     };
     let respuesta = contexto.pedir(get("/ajustes/taller", Some(&token))).await;
     assert_eq!(respuesta.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn el_reparto_es_el_mejor_aprovechamiento_salvo_que_se_elija_el_rapido() {
+    let contexto = Contexto::nuevo().await;
+    let (token, actor) = contexto.con_propietario().await;
+    let ajustes = leer_ajustes_de_taller(&contexto.estado).await.unwrap();
+    assert_eq!(ajustes.metodo, MetodoDeCorte::MejorAprovechamiento);
+    let elegir = |metodo: &str| format!("_csrf={}&metodo={metodo}", actor.token_csrf);
+    let rapido = contexto
+        .pedir(post(
+            "/ajustes/taller/metodo",
+            Some(&token),
+            &elegir("rapido"),
+        ))
+        .await;
+    assert_eq!(destino(&rapido), Some("/ajustes/taller?guardado=si"));
+    let ajustes = leer_ajustes_de_taller(&contexto.estado).await.unwrap();
+    assert_eq!(ajustes.metodo, MetodoDeCorte::Rapido);
+    let pagina = texto(contexto.pedir(get("/ajustes/taller", Some(&token))).await).await;
+    assert!(pagina.contains("value=\"rapido\" checked"));
+    let inventado = contexto
+        .pedir(post(
+            "/ajustes/taller/metodo",
+            Some(&token),
+            &elegir("magia"),
+        ))
+        .await;
+    assert_eq!(inventado.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    let ajustes = leer_ajustes_de_taller(&contexto.estado).await.unwrap();
+    assert_eq!(ajustes.metodo, MetodoDeCorte::Rapido, "no cambia");
 }

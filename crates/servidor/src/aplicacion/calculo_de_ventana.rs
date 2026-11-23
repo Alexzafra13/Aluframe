@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use dominio::corte::optimizar_cortes;
+use dominio::corte::{ValoracionDeSobrantes, planificar_cortes};
 use dominio::dibujo::{ColorDeDibujo, DatosDeDibujo, Herrajes, Superficie, dibujar_ventana};
 use dominio::precio::{
     CosteDeMateriales, DatosDeLinea, PerfilUsado, PrecioDeLinea, calcular_coste_de_materiales,
@@ -191,12 +191,14 @@ fn perfiles_usados(
     };
     let mut faltan = Vec::new();
     let parametros = taller.parametros_de_corte(longitud_barra);
+    // Una ventana sola: lo que cuenta son las barras; los sobrantes se valoran en el trabajo.
+    let sin_historial = ValoracionDeSobrantes::default();
     for (perfil, piezas) in resultado.piezas_a_cortar() {
         let cortado = piezas
             .iter()
             .map(|p| p.longitud.decimas_de_mm())
             .sum::<i64>();
-        match optimizar_cortes(&piezas, &parametros) {
+        match planificar_cortes((&piezas, &[]), &parametros, (taller.metodo, &sin_historial)) {
             Ok(plan) => {
                 let barras = u32::try_from(plan.barras.len()).unwrap_or(u32::MAX);
                 usados.insert(

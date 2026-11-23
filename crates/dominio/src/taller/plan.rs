@@ -6,8 +6,8 @@
 use std::collections::BTreeMap;
 
 use crate::corte::{
-    ErrorCorte, ParametrosDeCorte, PiezaACortar, PlanDeCorte, RetalDisponible,
-    optimizar_con_retales,
+    ErrorCorte, MetodoDeCorte, ParametrosDeCorte, PiezaACortar, PlanDeCorte, RetalDisponible,
+    ValoracionDeSobrantes, planificar_cortes,
 };
 use crate::texto::nombre_legible;
 use crate::unidades::Longitud;
@@ -78,12 +78,18 @@ impl PiezaDeTrabajo {
 /// Retales del stock de cada barra, para usarlos antes de abrir barras nuevas.
 pub type RetalesPorPerfil = BTreeMap<ClaveDePerfil, Vec<RetalDisponible>>;
 
+/// Cómo se valoran los sobrantes de cada perfil, por (serie, perfil): lo que se suele cortar no
+/// depende del color.
+pub type ValoracionesPorPerfil = BTreeMap<(String, String), ValoracionDeSobrantes>;
+
 /// `parametros` lleva sierra, recorte y retal; la longitud de barra es la de cada serie.
 /// Una serie sin longitud de barra conocida no se planifica (queda fuera del resultado).
+/// Un sobrante por debajo del retal mínimo de Ajustes nunca cuenta como útil.
 pub fn planificar_trabajo(
     piezas: &[PiezaDeTrabajo],
     (longitudes_barra, retales): (&BTreeMap<String, Longitud>, &RetalesPorPerfil),
     parametros: ParametrosDeCorte,
+    (metodo, valoraciones): (MetodoDeCorte, &ValoracionesPorPerfil),
 ) -> Vec<BarrasDePerfil> {
     let mut grupos: BTreeMap<ClaveDePerfil, Vec<&PiezaDeTrabajo>> = BTreeMap::new();
     for pieza in piezas {
@@ -93,25 +99,23 @@ pub fn planificar_trabajo(
         .into_iter()
         .filter_map(|(clave, del_grupo)| {
             let longitud_barra = *longitudes_barra.get(&clave.serie)?;
-            let mut origen = BTreeMap::new();
-            let mut a_cortar = Vec::new();
-            for pieza in del_grupo {
-                for _ in 0..pieza.cantidad {
-                    let id = u32::try_from(a_cortar.len()).unwrap_or(u32::MAX);
-                    origen.insert(id, (pieza.ventana, pieza.numero));
-                    a_cortar.push(PiezaACortar {
-                        id,
-                        longitud: pieza.longitud,
-                    });
-                }
-            }
+            let (a_cortar, origen) = una_por_unidad(&del_grupo);
             let parametros = ParametrosDeCorte {
                 longitud_barra,
                 ..parametros
             };
             let disponibles = retales.get(&clave).map_or(&[][..], Vec::as_slice);
+            let mut valoracion = valoraciones
+                .get(&(clave.serie.clone(), clave.perfil.clone()))
+                .cloned()
+                .unwrap_or_default();
+            valoracion.minimo_util = valoracion.minimo_util.max(parametros.retal_minimo);
             Some(BarrasDePerfil {
-                plan: optimizar_con_retales(&a_cortar, disponibles, &parametros),
+                plan: planificar_cortes(
+                    (&a_cortar, disponibles),
+                    &parametros,
+                    (metodo, &valoracion),
+                ),
                 serie: clave.serie,
                 perfil: clave.perfil,
                 color: clave.color,
@@ -120,6 +124,23 @@ pub fn planificar_trabajo(
             })
         })
         .collect()
+}
+
+/// Cada unidad es una pieza a cortar, numerada; `origen` recuerda su ventana y su número.
+fn una_por_unidad(piezas: &[&PiezaDeTrabajo]) -> (Vec<PiezaACortar>, BTreeMap<u32, (u32, u32)>) {
+    let mut origen = BTreeMap::new();
+    let mut a_cortar = Vec::new();
+    for pieza in piezas {
+        for _ in 0..pieza.cantidad {
+            let id = u32::try_from(a_cortar.len()).unwrap_or(u32::MAX);
+            origen.insert(id, (pieza.ventana, pieza.numero));
+            a_cortar.push(PiezaACortar {
+                id,
+                longitud: pieza.longitud,
+            });
+        }
+    }
+    (a_cortar, origen)
 }
 
 #[cfg(test)]
@@ -169,7 +190,12 @@ mod pruebas {
             sin_barra,
         ];
         let barras = BTreeMap::from([("SERIE_A".to_owned(), cm(640))]);
-        let plan = planificar_trabajo(&piezas, (&barras, &BTreeMap::new()), sin_sierra());
+        let plan = planificar_trabajo(
+            &piezas,
+            (&barras, &BTreeMap::new()),
+            sin_sierra(),
+            (MetodoDeCorte::MejorAprovechamiento, &BTreeMap::new()),
+        );
         assert_eq!(plan.len(), 4);
         let blanco = plan
             .iter()
@@ -206,7 +232,12 @@ mod pruebas {
             color: "Blanco".into(),
         };
         let retales = BTreeMap::from([(clave_b.clone(), vec![retal])]);
-        let plan = planificar_trabajo(&piezas, (&barras, &retales), sin_sierra());
+        let plan = planificar_trabajo(
+            &piezas,
+            (&barras, &retales),
+            sin_sierra(),
+            (MetodoDeCorte::Rapido, &BTreeMap::new()),
+        );
         assert_eq!(plan.len(), 2, "un grupo por serie");
         let a = plan.iter().find(|g| g.serie == "SERIE_A").unwrap();
         let b = plan.iter().find(|g| g.clave() == clave_b).unwrap();

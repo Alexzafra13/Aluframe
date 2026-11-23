@@ -1,5 +1,5 @@
 use dominio::acceso::Accion;
-use dominio::corte::{PlanDeCorte, optimizar_cortes};
+use dominio::corte::{PlanDeCorte, ValoracionDeSobrantes, planificar_cortes};
 use dominio::series::{Dato, ResultadoVentana, Serie, calcular_ventana, importar_serie};
 use dominio::unidades::Decimal;
 
@@ -119,9 +119,11 @@ pub fn probar_ventana(
     };
     avisos_de_corte.push(describir_ajustes(taller));
     let parametros = taller.parametros_de_corte(longitud_barra);
+    // Una ventana sola: lo que cuenta son las barras; los sobrantes se valoran en el trabajo.
+    let sin_historial = ValoracionDeSobrantes::default();
     let mut cortes = Vec::new();
     for (perfil, piezas) in resultado.piezas_a_cortar() {
-        match optimizar_cortes(&piezas, &parametros) {
+        match planificar_cortes((&piezas, &[]), &parametros, (taller.metodo, &sin_historial)) {
             Ok(plan) => cortes.push(CorteDePerfil { perfil, plan }),
             Err(error) => avisos_de_corte.push(format!("{perfil}: {error}")),
         }

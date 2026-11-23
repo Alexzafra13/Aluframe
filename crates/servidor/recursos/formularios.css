@@ -7,3 +7,8 @@
 .sugerencia-detalle { font-family: var(--mono); font-size: .85rem; color: var(--apagado); }
 .permisos-operario { margin-top: .5rem; }
 .permisos-operario summary { min-height: var(--tactil); display: flex; align-items: center; cursor: pointer; font-weight: 500; }
+/* Opciones con explicación: el botón arriba, junto a la primera línea del texto. */
+.opciones-verticales { display: grid; gap: .5rem; }
+.opciones-verticales legend { margin-bottom: .5rem; }
+.opciones-verticales .casilla { align-items: flex-start; }
+.opciones-verticales .casilla input { margin-top: .1rem; flex: none; }

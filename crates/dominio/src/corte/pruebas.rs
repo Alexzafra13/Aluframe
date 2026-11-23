@@ -124,7 +124,7 @@ fn sin_piezas_no_hay_barras() {
     );
 }
 
-fn optimo_exhaustivo(longitudes: &[i64], util: i64) -> usize {
+pub(super) fn optimo_exhaustivo(longitudes: &[i64], util: i64) -> usize {
     fn colocar(resto: &[i64], barras: &mut Vec<i64>, util: i64, mejor: &mut usize) {
         if barras.len() >= *mejor {
             return;

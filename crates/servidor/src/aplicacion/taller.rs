@@ -1,5 +1,5 @@
 use dominio::acceso::Accion;
-use dominio::corte::ParametrosDeCorte;
+use dominio::corte::{MetodoDeCorte, ParametrosDeCorte};
 use dominio::unidades::{Decimal, Longitud, Unidad};
 use rusqlite::Connection;
 
@@ -13,6 +13,7 @@ use crate::fecha::formatear_utc;
 const GROSOR_SIERRA: &str = "taller.grosor_sierra_dmm";
 const RECORTE_EXTREMOS: &str = "taller.recorte_extremos_dmm";
 const RETAL_MINIMO: &str = "taller.retal_minimo_dmm";
+const METODO_DE_CORTE: &str = "taller.metodo_corte";
 
 /// 2 mm lo dio el propietario como valor provisional (2026-11-21); recorte y retal, sin datos.
 const POR_DEFECTO: [(&str, i64); 3] = [
@@ -27,6 +28,8 @@ pub struct AjustesDeTaller {
     pub recorte_extremos: Longitud,
     pub retal_minimo: Longitud,
     pub confirmados: bool,
+    /// Sin elegir, el mejor aprovechamiento (ADR-0026).
+    pub metodo: MetodoDeCorte,
 }
 
 impl AjustesDeTaller {
@@ -64,7 +67,45 @@ pub(crate) fn leer_de_la_base(con: &Connection) -> Result<AjustesDeTaller, Error
         recorte_extremos: recorte,
         retal_minimo: retal,
         confirmados,
+        metodo: configuracion::leer(con, METODO_DE_CORTE)?
+            .and_then(|texto| MetodoDeCorte::desde_texto(&texto))
+            .unwrap_or_default(),
     })
+}
+
+/// Cambia cómo se reparten las piezas en las barras (la interfaz deja elegir, SPEC 6).
+pub async fn guardar_metodo_de_corte(
+    estado: &EstadoApp,
+    actor: &Actor,
+    texto: String,
+) -> Result<(), ErrorApp> {
+    autorizar(actor, Accion::GestionarCatalogo)?;
+    let metodo = MetodoDeCorte::desde_texto(&texto)
+        .ok_or_else(|| ErrorApp::Validacion("Elige cómo se reparten las piezas.".into()))?;
+    let (ahora, usuario_id) = (formatear_utc(estado.ahora()), actor.id);
+    estado
+        .bd
+        .escribir(move |tx| {
+            let nuevo = Valor {
+                clave: METODO_DE_CORTE,
+                valor: metodo.como_texto(),
+                ahora: &ahora,
+                usuario_id,
+            };
+            configuracion::guardar(tx, &nuevo)?;
+            registrar(tx, &apunte_de_ajustes(&ahora, usuario_id))
+        })
+        .await
+}
+
+fn apunte_de_ajustes(ahora: &str, usuario_id: i64) -> Apunte<'_> {
+    Apunte {
+        cuando_en: ahora,
+        usuario_id: Some(usuario_id),
+        accion: "ajustes_de_taller",
+        entidad: "configuracion",
+        entidad_id: None,
+    }
 }
 
 fn leer_medida(
@@ -140,12 +181,5 @@ fn guardar_en_la_base(
         };
         configuracion::guardar(tx, &nuevo)?;
     }
-    let apunte = Apunte {
-        cuando_en: ahora,
-        usuario_id: Some(usuario_id),
-        accion: "ajustes_de_taller",
-        entidad: "configuracion",
-        entidad_id: None,
-    };
-    registrar(tx, &apunte)
+    registrar(tx, &apunte_de_ajustes(ahora, usuario_id))
 }

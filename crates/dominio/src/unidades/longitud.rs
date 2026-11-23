@@ -27,7 +27,9 @@ impl Unidad {
 }
 
 /// Longitud en décimas de milímetro (640 cm = 64 000).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
+)]
 pub struct Longitud(i64);
 
 impl Longitud {
