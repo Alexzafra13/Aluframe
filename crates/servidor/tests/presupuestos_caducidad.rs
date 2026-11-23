@@ -125,3 +125,19 @@ async fn medio_anio_despues_se_archiva_sin_borrarse() {
     let ficha = lista("/presupuestos/1").await;
     assert!(ficha.contains("Archivado") && ficha.contains("Renovar"));
 }
+
+#[tokio::test]
+async fn un_borrador_caducado_no_se_envia_sin_renovarlo() {
+    let contexto = Contexto::nuevo().await;
+    let (_, actor) = contexto.con_propietario().await;
+    let estado = contexto.estado.clone().con_datos_demo(true);
+    preparar_demo(&estado, &actor, SERIE_COMPLETA).await;
+    elegir_reglas(&estado, &actor).await;
+    let id = crear_presupuesto(&estado, &actor, 1, None).await.unwrap();
+    contexto.reloj.avanzar(Duration::days(31));
+    let error = cambiar_estado(&estado, &actor, id, "enviado").await;
+    assert!(error.is_err(), "hay que renovarlo antes");
+    let (token, _) = contexto.con_propietario_existente().await;
+    let ficha = texto(contexto.pedir(get("/presupuestos/1", Some(&token))).await).await;
+    assert!(!ficha.contains("Marcar como enviado"));
+}

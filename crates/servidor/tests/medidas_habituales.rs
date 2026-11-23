@@ -31,7 +31,7 @@ async fn la_medida_de_partida_es_la_120_por_120_de_aluprom_21() {
     cargar_series_incluidas(&contexto.estado).await.unwrap();
     let pagina = texto(contexto.pedir(get("/ajustes/taller", Some(&token))).await).await;
     assert!(
-        pagina.contains("Aluprom 21 · Corredera 2 hojas · 120 × 120 cm"),
+        pagina.contains("Aluprom 21 · Ventana corredera 2 hojas · 120 × 120 cm"),
         "{pagina}"
     );
     assert!(!pagina.contains("No se usa"));
@@ -77,7 +77,7 @@ async fn se_anade_una_medida_y_se_rechaza_lo_que_no_vale() {
     let contexto = Contexto::nuevo().await;
     let (token, actor) = con_una_anadida(&contexto).await;
     let pagina = texto(contexto.pedir(get("/ajustes/taller", Some(&token))).await).await;
-    assert!(pagina.contains("Prueba completa · Corredera 2 hojas demo · 150 × 120 cm"));
+    assert!(pagina.contains("Prueba completa · DEMO corredera 2 hojas (ficticia) · 150 × 120 cm"));
     assert!(
         pagina.contains("No se usa: la serie no está en el programa"),
         "Aluprom 21 no está cargada en esta prueba"

@@ -86,7 +86,7 @@
       <div class="pila-botones">
         <a class="boton" href="/presupuestos/{{ ficha.presupuesto.id }}/imprimir">Imprimir o guardar PDF</a>
         {% if usuario.es_propietario %}
-        {% if estado() == "borrador" %}
+        {% if estado() == "borrador" && situacion == "borrador" %}
         <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/estado/enviado"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton" type="submit">Marcar como enviado</button></form>
         {% endif %}
         {% if estado() == "borrador" || estado() == "enviado" || estado() == "rechazado" %}

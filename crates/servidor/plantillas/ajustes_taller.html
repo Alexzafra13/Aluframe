@@ -21,9 +21,9 @@
 </form>
 <form class="tarjeta" method="post" action="/ajustes/taller/metodo">
   <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
-  <h2>Cómo se reparten las piezas</h2>
-  <fieldset class="opciones-verticales">
-    <legend class="texto-apagado">Vale para el precio de cada ventana, «Probar una ventana» y la orden de taller.</legend>
+  <h2 id="titulo-metodo">Cómo se reparten las piezas</h2>
+  <p class="texto-apagado" id="explica-metodo">Vale para el precio de cada ventana, «Probar una ventana» y la orden de taller.</p>
+  <fieldset class="opciones-verticales" aria-labelledby="titulo-metodo" aria-describedby="explica-metodo">
     <label class="casilla"><input type="radio" name="metodo" value="aprovechamiento"{% if metodo == "aprovechamiento" %} checked{% endif %}> <span><strong>Mejor aprovechamiento</strong> (recomendado): prueba más repartos para gastar las menos barras posibles y, con las mismas, dejar los retales que mejor sirven.</span></label>
     <label class="casilla"><input type="radio" name="metodo" value="rapido"{% if metodo == "rapido" %} checked{% endif %}> <span><strong>Rápido</strong>: cada pieza, de mayor a menor, a la barra donde menos sobra. A veces gasta una barra de más.</span></label>
   </fieldset>
@@ -40,8 +40,9 @@
   {% if !tipologias.is_empty() %}
   <form method="post" action="/ajustes/taller/habituales">
     <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <label for="habitual-tipologia">Serie y tipología</label>
+    <select id="habitual-tipologia" name="tipologia" required>{% for (valor, texto) in tipologias %}<option value="{{ valor }}">{{ texto }}</option>{% endfor %}</select>
     <div class="formulario-en-linea">
-      <label>Serie y tipología <select name="tipologia" required>{% for (valor, texto) in tipologias %}<option value="{{ valor }}">{{ texto }}</option>{% endfor %}</select></label>
       <label>Ancho (cm) <input name="ancho" inputmode="decimal" required placeholder="120"></label>
       <label>Alto (cm) <input name="alto" inputmode="decimal" required placeholder="120"></label>
     </div>

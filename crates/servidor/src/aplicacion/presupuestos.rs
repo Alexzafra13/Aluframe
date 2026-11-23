@@ -16,7 +16,7 @@ use crate::bd::consultas::versiones_presupuesto::{self, FilaVersion};
 use crate::bd::consultas::{configuracion, tarifas};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
-use crate::fecha::{anio_de_madrid, fecha_de_madrid, formatear_utc};
+use crate::fecha::{anio_de_madrid, fecha_de_madrid, fechas_de_situacion, formatear_utc};
 
 pub struct FichaDePresupuesto {
     pub presupuesto: FilaPresupuesto,
@@ -216,6 +216,7 @@ pub async fn cambiar_estado(
         "rechazado" => "rechazar_presupuesto",
         _ => return Err(ErrorApp::NoEncontrado),
     };
+    let (hoy, archivar) = fechas_de_situacion(estado.ahora());
     cambiar(estado, actor, accion, move |tx, ahora| {
         let presupuesto = presupuestos::buscar(tx, id)?.ok_or(ErrorApp::NoEncontrado)?;
         let permitido = match nuevo {
@@ -227,6 +228,14 @@ pub async fn cambiar_estado(
                 "Un presupuesto {} no puede pasar a {nuevo}.",
                 presupuesto.estado
             )));
+        }
+        let validez = presupuesto.validez_hasta.as_deref();
+        let caducado =
+            situacion(&presupuesto.estado, validez, (&hoy, &archivar)) != Situacion::Borrador;
+        if nuevo == "enviado" && caducado {
+            return Err(ErrorApp::Validacion(
+                "Su validez ya pasó: renuévalo antes de enviarlo.".into(),
+            ));
         }
         presupuestos::cambiar_estado(tx, id, nuevo, ahora)?;
         Ok(((), id))

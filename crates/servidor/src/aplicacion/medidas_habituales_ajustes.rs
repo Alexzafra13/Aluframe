@@ -54,15 +54,22 @@ fn cargar(con: &Connection) -> Result<MedidasHabituales, ErrorApp> {
     let mut medidas = Vec::new();
     for (indice, m) in leer_de_la_base(con)?.into_iter().enumerate() {
         let cm = |dmm| Longitud::desde_decimas_de_mm(dmm).formatear_cm();
+        let clave = format!("{}|{}", m.serie, m.tipologia);
+        // El mismo nombre que en el desplegable; si la serie ya no la tiene, el del código.
+        let nombre = tipologias
+            .iter()
+            .find(|(valor, _)| *valor == clave)
+            .map(|(_, texto)| texto.clone())
+            .unwrap_or_else(|| {
+                format!(
+                    "{} · {}",
+                    nombre_legible(&m.serie),
+                    nombre_legible(&m.tipologia)
+                )
+            });
         medidas.push(MedidaEnPantalla {
             indice,
-            texto: format!(
-                "{} · {} · {} × {} cm",
-                nombre_legible(&m.serie),
-                nombre_legible(&m.tipologia),
-                cm(m.ancho_dmm),
-                cm(m.alto_dmm)
-            ),
+            texto: format!("{nombre} · {} × {} cm", cm(m.ancho_dmm), cm(m.alto_dmm)),
             aviso: piezas_de(con, &m)?.err(),
         });
     }
