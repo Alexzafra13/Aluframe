@@ -7,7 +7,10 @@ use dominio::nif::Nif;
 use serde::Deserialize;
 
 use crate::aplicacion::autorizar;
-use crate::aplicacion::poblaciones::{Poblacion, buscar_por_codigo_postal, buscar_por_localidad};
+use crate::aplicacion::poblaciones::{
+    Poblacion, SugerenciaDeLocalidad, buscar_por_codigo_postal, buscar_por_localidad,
+    sugerir_localidades,
+};
 use crate::errores::ErrorApp;
 use crate::http::extractores::ActorActual;
 use crate::vistas::{
@@ -77,4 +80,19 @@ pub async fn buscar_poblacion(
         buscar_por_codigo_postal(&cp)
     };
     Json(poblacion)
+}
+
+#[derive(Deserialize)]
+pub struct ConsultaDeSugerencias {
+    texto: Option<String>,
+}
+
+/// Las localidades más parecidas a lo que se va escribiendo, para la lista del campo.
+pub async fn sugerir_poblaciones(
+    ActorActual(_actor): ActorActual,
+    Query(consulta): Query<ConsultaDeSugerencias>,
+) -> Json<Vec<SugerenciaDeLocalidad>> {
+    Json(sugerir_localidades(
+        consulta.texto.as_deref().unwrap_or_default(),
+    ))
 }

@@ -14,6 +14,7 @@ pub mod formula;
 pub mod iban;
 pub mod imagen;
 pub mod informe;
+pub mod localidades;
 pub mod nif;
 pub mod precio;
 pub mod series;

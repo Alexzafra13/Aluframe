@@ -76,6 +76,23 @@ pub fn provincia_de_codigo_postal(texto: &str) -> Option<&'static str> {
     PROVINCIAS.get(numero.checked_sub(1)?).copied()
 }
 
+/// Los renglones válidos del listado: el código limpio y sus localidades (la primera, el municipio).
+pub(crate) fn renglones(texto: &str) -> impl Iterator<Item = (String, Vec<String>)> + '_ {
+    texto
+        .lines()
+        .filter(|r| !r.starts_with('#'))
+        .filter_map(|renglon| {
+            let (cp, nombres) = renglon.split_once('\t')?;
+            let nombres = nombres
+                .split('|')
+                .map(str::trim)
+                .filter(|n| !n.is_empty())
+                .map(str::to_owned)
+                .collect();
+            Some((limpiar_codigo_postal(cp)?, nombres))
+        })
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct IndiceDeCodigosPostales {
     localidades: BTreeMap<String, Vec<String>>,
@@ -87,19 +104,7 @@ impl IndiceDeCodigosPostales {
     /// Lee `código<TAB>localidad|localidad…`; las líneas con `#` y las mal formadas se saltan.
     pub fn leer(texto: &str) -> IndiceDeCodigosPostales {
         let mut indice = IndiceDeCodigosPostales::default();
-        for renglon in texto.lines().filter(|r| !r.starts_with('#')) {
-            let Some((cp, nombres)) = renglon.split_once('\t') else {
-                continue;
-            };
-            let Some(cp) = limpiar_codigo_postal(cp) else {
-                continue;
-            };
-            let nombres: Vec<String> = nombres
-                .split('|')
-                .map(str::trim)
-                .filter(|n| !n.is_empty())
-                .map(str::to_owned)
-                .collect();
+        for (cp, nombres) in renglones(texto) {
             for (posicion, nombre) in nombres.iter().enumerate() {
                 let entrada = indice.codigos.entry(normalizar_para_buscar(nombre));
                 let (municipio, otros) = entrada.or_default();

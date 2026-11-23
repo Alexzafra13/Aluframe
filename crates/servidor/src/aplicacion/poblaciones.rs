@@ -4,6 +4,7 @@
 use std::sync::OnceLock;
 
 use dominio::codigos_postales::{IndiceDeCodigosPostales, provincia_de_codigo_postal};
+use dominio::localidades::IndiceDeLocalidades;
 use serde::Serialize;
 
 const ARCHIVO: &str = include_str!("../../../../data/codigos_postales.tsv");
@@ -11,6 +12,37 @@ const ARCHIVO: &str = include_str!("../../../../data/codigos_postales.tsv");
 pub fn indice() -> &'static IndiceDeCodigosPostales {
     static INDICE: OnceLock<IndiceDeCodigosPostales> = OnceLock::new();
     INDICE.get_or_init(|| IndiceDeCodigosPostales::leer(ARCHIVO))
+}
+
+fn indice_de_localidades() -> &'static IndiceDeLocalidades {
+    static INDICE: OnceLock<IndiceDeLocalidades> = OnceLock::new();
+    INDICE.get_or_init(|| IndiceDeLocalidades::leer(ARCHIVO))
+}
+
+/// Las que caben en la lista del campo sin desplazarse mucho en la tablet.
+const SUGERENCIAS_MAXIMAS: usize = 8;
+
+/// Una opción de la lista de la localidad: al elegirla, la página escribe el código postal si
+/// solo hay uno; con varios, deja el campo vacío y los ofrece (ADR-0020).
+#[derive(Debug, Serialize, PartialEq, Eq)]
+pub struct SugerenciaDeLocalidad {
+    pub localidad: String,
+    pub provincia: String,
+    pub pais: String,
+    pub codigos_postales: Vec<String>,
+}
+
+pub fn sugerir_localidades(escrito: &str) -> Vec<SugerenciaDeLocalidad> {
+    indice_de_localidades()
+        .sugerir(escrito, SUGERENCIAS_MAXIMAS)
+        .into_iter()
+        .map(|s| SugerenciaDeLocalidad {
+            localidad: s.nombre.clone(),
+            provincia: s.provincia.to_owned(),
+            pais: "España".to_owned(),
+            codigos_postales: s.codigos_postales.clone(),
+        })
+        .collect()
 }
 
 /// La página rellena solo los campos vacíos; con varias localidades, las ofrece para elegir.
@@ -82,5 +114,18 @@ mod pruebas {
             buscar_por_localidad("Sitio Que No Existe"),
             Poblacion::default()
         );
+    }
+
+    #[test]
+    fn al_escribir_zaf_sugiere_primero_zafra_de_badajoz_con_su_codigo() {
+        let sugerencias = sugerir_localidades("zaf");
+        assert!(sugerencias.len() <= SUGERENCIAS_MAXIMAS);
+        let zafra = &sugerencias[0];
+        assert_eq!(zafra.localidad, "Zafra");
+        assert_eq!(zafra.provincia, "Badajoz");
+        assert_eq!(zafra.codigos_postales, ["06300"]);
+        let madrid = sugerir_localidades("madrid");
+        assert_eq!(madrid[0].provincia, "Madrid");
+        assert!(madrid[0].codigos_postales.len() > 10);
     }
 }

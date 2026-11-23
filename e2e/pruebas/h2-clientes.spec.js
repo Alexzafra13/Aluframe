@@ -31,12 +31,65 @@ test("el código postal rellena la localidad y la provincia sin adivinar", async
   await page.locator("#fiscal_cp").pressSequentially("04002");
   await expect(page.locator("#fiscal_provincia")).toHaveValue("Almería");
   await expect(page.locator("#fiscal_localidad")).toHaveValue("");
-  await expect(page.locator("#fiscal_localidad-opciones option")).toHaveCount(2);
+  await page.locator("#fiscal_localidad").focus();
+  await expect(page.locator("#fiscal_localidad-lista [role=option]")).toHaveCount(2);
+  await page.locator("#fiscal_localidad-lista [role=option]", { hasText: "El Palmer" }).click();
+  await expect(page.locator("#fiscal_localidad")).toHaveValue("El Palmer");
   // Lo escrito a mano no se sustituye.
   await page.locator("#d0_provincia").fill("Mi provincia");
   await page.locator("#d0_cp").pressSequentially("28001");
   await expect(page.locator("#d0_localidad")).toHaveValue("Madrid");
   await expect(page.locator("#d0_provincia")).toHaveValue("Mi provincia");
+});
+
+test("la localidad sugiere mientras se escribe y al elegirla pone su código postal", async ({ page }) => {
+  await entrarComoPropietario(page);
+  await page.goto("/clientes/nuevo");
+  await page.locator("#fiscal_localidad").pressSequentially("zaf");
+  const zafra = page.locator("#fiscal_localidad-lista [role=option]").first();
+  await expect(zafra).toContainText("Zafra");
+  await expect(zafra).toContainText("06300 · Badajoz");
+  await zafra.click();
+  await expect(page.locator("#fiscal_localidad")).toHaveValue("Zafra");
+  await expect(page.locator("#fiscal_cp")).toHaveValue("06300");
+  await expect(page.locator("#fiscal_provincia")).toHaveValue("Badajoz");
+  await expect(page.locator("#fiscal_pais")).toHaveValue("España");
+  // Salir del campo no cambia lo elegido (había una aldea Zafra en Ourense).
+  await page.locator("#fiscal_provincia").click();
+  await expect(page.locator("#fiscal_cp")).toHaveValue("06300");
+});
+
+test("una ciudad con varios códigos no se adivina: deja elegir el código", async ({ page }) => {
+  await entrarComoPropietario(page);
+  await page.goto("/clientes/nuevo");
+  await page.locator("#d0_localidad").pressSequentially("madrid");
+  await page.locator("#d0_localidad-lista [role=option]", { hasText: "Madrid" }).first().click();
+  await expect(page.locator("#d0_provincia")).toHaveValue("Madrid");
+  await expect(page.locator("#d0_cp")).toHaveValue("");
+  await page.locator("#d0_cp").focus();
+  const codigos = page.locator("#d0_cp-lista [role=option]");
+  expect(await codigos.count()).toBeGreaterThan(10);
+  await page.locator("#d0_cp").pressSequentially("2801");
+  await page.locator("#d0_cp-lista [role=option]", { hasText: "28015" }).click();
+  await expect(page.locator("#d0_cp")).toHaveValue("28015");
+});
+
+test("la lista de localidades se maneja con el teclado sin enviar el formulario", async ({ page }) => {
+  await entrarComoPropietario(page);
+  await page.goto("/clientes/nuevo");
+  const localidad = page.locator("#fiscal_localidad");
+  await localidad.pressSequentially("almendralej");
+  await expect(page.locator("#fiscal_localidad-lista [role=option]").first()).toContainText("Almendralejo");
+  await localidad.press("ArrowDown");
+  await localidad.press("Enter");
+  await expect(localidad).toHaveValue("Almendralejo");
+  await expect(page.locator("#fiscal_cp")).toHaveValue("06200");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Nuevo cliente");
+  await localidad.fill("");
+  await localidad.pressSequentially("zaf");
+  await expect(page.locator("#fiscal_localidad-lista")).toBeVisible();
+  await localidad.press("Escape");
+  await expect(page.locator("#fiscal_localidad-lista")).toHaveCount(0);
 });
 
 test("comprueba el NIF al escribirlo y guarda varias direcciones", async ({ page }) => {

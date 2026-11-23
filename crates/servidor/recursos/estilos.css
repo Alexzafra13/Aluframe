@@ -247,7 +247,13 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 /* H2: formularios de clientes y catálogo */
 .buscador-global { flex: 1; max-width: 520px; }
 .rejilla-campos { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0 1rem; }
-.campo { min-width: 0; }
+.campo { min-width: 0; position: relative; }
+/* Lista de sugerencias bajo un campo (poblacion.js): sin «top», queda justo debajo del campo. */
+.lista-sugerencias { position: absolute; left: 0; right: 0; z-index: 30; margin: 4px 0 0; padding: 4px; list-style: none; max-height: calc(var(--tactil) * 6.5); overflow-y: auto; background: var(--superficie); border: 1.5px solid var(--linea); border-radius: var(--radio); box-shadow: 0 8px 24px rgb(21 25 29 / .16); }
+.sugerencia { display: flex; flex-direction: column; justify-content: center; min-height: var(--tactil); padding: .3rem .65rem; border-radius: 7px; cursor: pointer; line-height: 1.25; }
+.sugerencia:hover, .sugerencia[aria-selected="true"] { background: var(--acero-tinte); }
+.sugerencia-titulo { font-weight: 500; }
+.sugerencia-detalle { font-family: var(--mono); font-size: .85rem; color: var(--apagado); }
 .error-campo { color: var(--aviso); font-size: .9rem; font-weight: 500; margin: .3rem 0 0; }
 .nif-correcto { color: var(--acero); font-size: .9rem; margin: .3rem 0 0; }
 input[aria-invalid="true"] { border-color: var(--aviso); background: var(--aviso-fondo); }

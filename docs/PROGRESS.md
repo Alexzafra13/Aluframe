@@ -1,6 +1,6 @@
 # Progreso
 
-Estado (2026-11-23): **H0–H7 terminados**; publicada la **v0.12.1**. Los datos se conservan al actualizar (migraciones, ADR-0021) y hay copias automáticas (ADR-0022).
+Estado (2026-11-23): **H0–H7 terminados**; publicada la **v0.12.2**. Los datos se conservan al actualizar (migraciones, ADR-0021) y hay copias automáticas (ADR-0022).
 
 **Siguiente tarea:** importar tarifas desde **Excel** (.xlsx, .xls, .ods, directo) y **PDF** (asistido: se extrae el texto, se proponen las columnas y el propietario revisa), entrando en la misma revisión en 3 pasos que ya usa el CSV (`aplicacion/importar_tarifa.rs`, ADR-0012). Necesita ADR de dependencia (por ejemplo `calamine` para hojas de cálculo; para PDF, valorar extracción de texto propia o una biblioteca) con las seis preguntas de `CLAUDE.md`. Proponer el plan y esperar aprobación. Después, el propietario simula con datos a mano y se pule la interfaz con su lista.
 
@@ -75,6 +75,7 @@ Tablas de DATOS 7.7, aceptar crea el trabajo con su copia congelada, hoja de tal
 | 0.6.0–0.6.1 | Ventana dibujada en el color del acabado, con superficie (brillo, mate, texturado, anodizado) y veta de madera (ADR-0019) |
 | 0.7.1 | Arreglo de la aplicación de Windows: no se apaga mientras la ventana siga abierta |
 | 0.7.2 | Editor: «Guardar ventana» vuelve al presupuesto; «+ Otro concepto» (antes línea libre); aviso de medida fuera de la serie solo cuando ocurre; menú lateral fijo y plegable; Aluprom 21 validada por el propietario |
+| 0.12.2 | La localidad sugiere mientras se escribe y, al elegirla, pone su código postal si es único; con varios deja elegir (ADR-0020, cambio del 2026-11-23) |
 | 0.12.1 | Arreglo: las bases creadas por las versiones de Windows 0.8–0.10 (huella con CRLF) se reconocen; `.gitattributes` con LF para `.sql` |
 | 0.12.0 | Campana de avisos en la barra superior; menú sin títulos de grupo |
 | 0.11.1–0.11.2 | Notificaciones bajo la barra superior; menú lateral completo en pantallas bajas, plegar solo con icono, tarjeta de usuario y Salir en rojo |

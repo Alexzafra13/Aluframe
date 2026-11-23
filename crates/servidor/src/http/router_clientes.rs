@@ -7,6 +7,7 @@ use crate::estado::EstadoApp;
 pub fn rutas_de_clientes() -> Router<EstadoApp> {
     Router::new()
         .merge(rutas_de_importacion())
+        .merge(rutas_de_poblaciones())
         .route("/clientes", get(clientes::mostrar_clientes))
         .route(
             "/clientes/nuevo",
@@ -16,7 +17,6 @@ pub fn rutas_de_clientes() -> Router<EstadoApp> {
             "/clientes/comprobar-nif",
             get(clientes_fragmentos::comprobar_nif),
         )
-        .route("/poblaciones", get(clientes_fragmentos::buscar_poblacion))
         .route(
             "/clientes/direccion-en-blanco",
             get(clientes_fragmentos::direccion_en_blanco),
@@ -57,5 +57,15 @@ fn rutas_de_importacion() -> Router<EstadoApp> {
         .route(
             "/clientes/importaciones/{id}/deshacer",
             post(importar_clientes::deshacer),
+        )
+}
+
+/// Para rellenar código postal, localidad y provincia en los formularios con dirección (ADR-0020).
+fn rutas_de_poblaciones() -> Router<EstadoApp> {
+    Router::new()
+        .route("/poblaciones", get(clientes_fragmentos::buscar_poblacion))
+        .route(
+            "/poblaciones/sugerencias",
+            get(clientes_fragmentos::sugerir_poblaciones),
         )
 }

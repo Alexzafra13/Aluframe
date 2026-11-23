@@ -30,7 +30,7 @@
   <p class="texto-apagado">En España escribe las 9 cifras, sin +34; para un número extranjero, empieza por su prefijo (+33…).</p>
   <input type="hidden" name="forma_de_pago" value="{{ valores.forma_de_pago }}">
   <h2>Dirección fiscal</h2>
-  <p class="texto-apagado pequeno">Con el código postal se rellenan la localidad, la provincia y el país.</p>
+  <p class="texto-apagado pequeno">Con el código postal se rellenan la localidad, la provincia y el país. Al escribir la localidad salen las más parecidas; al elegir una se pone su código postal.</p>
   <div class="rejilla-campos">
     {% call m::campo("fiscal_calle", "Calle y número", valores.fiscal_calle, errores.de("fiscal_calle"), "") %}{% endcall %}
     {% call m::campo("fiscal_cp", "Código postal", valores.fiscal_cp, errores.de("fiscal_cp"), "inputmode=\"numeric\" maxlength=\"10\" autocomplete=\"off\" data-cp-rellena data-localidad=\"fiscal_localidad\" data-provincia=\"fiscal_provincia\" data-pais=\"fiscal_pais\"") %}{% endcall %}
