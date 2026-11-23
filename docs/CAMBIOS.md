@@ -155,3 +155,10 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Debajo, botones grandes para el dedo: **Nuevo apunte** (destacado), **Apuntes** (con el número de pendientes), **Clientes** y, si el dueño se lo permite, **Presupuestos** y **Facturas**.
   - Después, sus tareas y sus ventanas. Antes esos accesos iban en la cabecera, que en el móvil se partía en dos líneas.
   - Icono nuevo «+» para el apunte nuevo.
+- **Auditoría (2026-11-23, segunda) y 0.16.1:** revisados dinero e IVA, facturas, cobros, permisos, fechas, stock y copias. Cuatro fallos corregidos, cada uno con una prueba que fallaba antes:
+  - **Una factura anulada con una rectificativa seguía «Vencida»** con todo su importe en la lista, en el Inicio y en la campana. Ahora lo pendiente es el total más sus rectificativas emitidas menos lo cobrado, y si queda a cero sale **«Anulada»**. La ficha dice qué rectificativas la corrigen y cuánto restan.
+  - **Los avisos de cobros vencidos y el filtro «Cobros pendientes»** salían de la lista de las 500 últimas facturas: una antigua sin cobrar acababa desapareciendo. Ahora salen de una consulta propia, sin límite.
+  - **«Nuevo presupuesto» y «Nueva factura libre» solo ofrecían los 50 primeros clientes:** con más, el que no salía parecía no existir y la pantalla invitaba a darlo de alta otra vez. Ahora salen todos los activos.
+  - **La fecha de la operación** se podía escribir en el borrador, pero no se congelaba ni se imprimía. Ahora va en la fotografía de la factura y la hoja la muestra cuando difiere de la de emisión (la normativa lo pide). Un desbordamiento de los totales al emitir ya no deja en silencio un total de 0 €.
+  - **El precio unitario de una ventana con descuento** se deducía del importe ya descontado al facturar el trabajo («Precio 900 €, Dto. 10 %, Importe 900 €»). Ahora es la venta unitaria aceptada, antes del descuento; el importe no cambiaba.
+  - Pregunta nueva para el propietario: cómo se vuelve a facturar un trabajo cuya factura se anuló con una rectificativa (`OPEN_QUESTIONS.md`).

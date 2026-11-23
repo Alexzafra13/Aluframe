@@ -32,6 +32,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] Margen: ¿sobre coste o sobre venta? Descuentos habituales. **Desde H3 es configurable en Ajustes > Presupuestos; mientras no se elija, ninguna línea tiene precio final. El propietario aún no lo ha decidido (2026-11-21).**
 - [ ] Tipos de IVA, casos especiales, y cómo se redondea la cuota (confirmar con el gestor). **Confirmado por el propietario (2026-11-21):** 21 % por defecto; las líneas y la base se muestran sin IVA y el IVA se suma al final (total con IVA).
 - [x] Documentos: presupuesto P-AAAA-NNNN, trabajo T-AAAA-NNNN, albarán A-AAAA-NNNN, factura F-AAAA-NNNN y rectificativa R-AAAA-NNNN, sin huecos en las facturas (H6). Pendiente que el gestor revise las menciones legales.
+- [ ] **Volver a facturar un trabajo tras anular su factura** (auditoría, 2026-11-23). Hoy un trabajo tiene una sola factura ordinaria: si se anula entera con una rectificativa, «Facturar» vuelve a abrir la anulada y la factura corregida solo puede hacerse libre, sin enlace al trabajo; las señales cobradas siguen apuntadas en la anulada. Propuesta: con la ordinaria anulada a cero, «Facturar» crea una nueva del trabajo y las señales pasan a ella. Hace falta que el propietario (y su gestor) lo confirmen, porque afecta a facturas y cobros.
 - [ ] Datos fiscales del taller y logotipo: se cargan en Ajustes > Empresa y precios; falta que el propietario los meta.
 
 ## Formato de datos

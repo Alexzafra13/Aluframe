@@ -3,7 +3,7 @@
 Este archivo permite retomar el trabajo en una conversación nueva sin perder lo decidido.
 
 ## Estado
-H0 a H3 terminados y publicada la v0.6.1 (2026-11-22): acceso, series, cálculo y plan de corte, clientes, catálogo y tarifas, presupuestos con dibujo en color, siluetas de perfiles, aplicación de Windows, versión móvil y exportar e importar datos. Siguiente: H4 (trabajos y orden de taller), con el plan propuesto a la espera del propietario. Para retomar: `docs/PROGRESS.md`; mensaje para pegar en `docs/PROMPT_INICIAL.md`.
+H0 a H7 terminados (2026-11-23): el MVP completo, del presupuesto a la factura, con stock, copias automáticas y migraciones que conservan los datos. El estado al día, la versión publicada y la siguiente tarea están siempre en `docs/PROGRESS.md` (este apartado no se repite para no quedarse viejo); mensaje para pegar en `docs/PROMPT_INICIAL.md`.
 
 ## Qué es
 AlumFrame: programa de gestión para el taller de cerrajería y ventanas de aluminio del padre de Alejandro (web developer en Zafra, Extremadura). Presupuestar ventanas con precio y dibujo, orden de taller con medidas de corte y cristal, stock con avisos y facturación. Se construirá con Claude Code a partir de `CLAUDE.md` y `SPEC.md`.
