@@ -83,6 +83,8 @@ jobs:
       VERSION: ${{ needs.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+      # Sin esto se publicó un instalador cuyas copias al pendrive fallaban en Windows.
+      - run: cargo test --workspace --locked
       - run: cargo build --release --locked -p servidor
       - name: Crear el instalador (Inno Setup)
         shell: pwsh

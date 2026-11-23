@@ -3,7 +3,7 @@ resolver = "3"
 members = ["crates/dominio", "crates/servidor"]
 
 [workspace.package]
-version = "0.13.0"
+version = "0.13.1"
 edition = "2024"
 rust-version = "1.97"
 license = "LicenseRef-privado"
@@ -23,10 +23,23 @@ cognitive_complexity = "warn"
 too_many_lines = "warn"
 too_many_arguments = "warn"
 
+# Optimizado por tamaño: 11,5 MB → unos 8,5 MB. Todo responde en milisegundos, así que no se
+# nota; salvo Argon2 (cada entrada) y SQLite, que siguen optimizados por velocidad.
+# Sin `panic = "abort"`: un fallo en una petición no debe tirar el programa entero.
 [profile.release]
-lto = "thin"
+lto = "fat"
+opt-level = "s"
 codegen-units = 1
 strip = true
+
+[profile.release.package.argon2]
+opt-level = 3
+
+[profile.release.package.blake2]
+opt-level = 3
+
+[profile.release.package.libsqlite3-sys]
+opt-level = 3
 
 [profile.dev.package.argon2]
 opt-level = 3

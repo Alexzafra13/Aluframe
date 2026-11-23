@@ -77,6 +77,10 @@ impl BaseDeDatos {
             let conexion = self.escritor.lock().map_err(|_| envenenado())?;
             return consulta(&conexion);
         }
+        // Primero uno libre; si todos están ocupados, se espera al que toca por turno.
+        if let Some(conexion) = self.lectores.iter().find_map(|l| l.try_lock().ok()) {
+            return consulta(&conexion);
+        }
         let indice = self.siguiente_lector.fetch_add(1, Ordering::Relaxed) % self.lectores.len();
         let lector = self.lectores.get(indice).ok_or_else(envenenado)?;
         let conexion = lector.lock().map_err(|_| envenenado())?;
