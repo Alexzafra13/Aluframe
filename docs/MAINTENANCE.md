@@ -72,6 +72,11 @@ Si el repositorio vuelve a ser privado, `curl` baja un archivo de 9 bytes («Not
 - **Taller:** al aceptar un presupuesto aparece su trabajo en Inicio y en Trabajos. En la ficha del trabajo se asigna el operario (y la fecha prevista), se imprime la orden de taller y se modifican medidas. Los pasos de cada ventana se cambian en Ajustes > Taller (valen para los trabajos nuevos).
 - **Presupuestos:** si cambia una tarifa, el presupuesto en borrador avisa y ofrece «Recalcular precios». Un presupuesto aceptado no se toca: se guarda congelado con su huella.
 
+## 6 bis. Demostración (ADR-0028)
+- **Para probar o aprender** sin tocar los datos: «Probar la demostración» en la pantalla de entrada (o en Ajustes > Datos). Se entra como «Dueño (demo)» con la contraseña `demostracion` o como «Juan (demo)» con el PIN `123456`. Se sale con el botón de la franja naranja.
+- Va en `demostracion/alumframe.db` dentro de la carpeta de datos, con su marca: no entra en las copias, no se exporta y no se puede importar en los datos de verdad. «Empezar de nuevo» (dueño de la demostración) la deja como al principio. Para borrarla del todo, con el programa parado, se borra esa subcarpeta; al volver a entrar se rellena otra vez.
+- Los datos se generan en `crates/servidor/src/aplicacion/demostracion/` con los mismos casos de uso del programa; la tarifa inventada está en `fixtures/demo/tarifa-demo-aluprom-21.csv`. Si un cambio rompe la demostración, falla `tests/demostracion.rs`.
+
 ## 7. Actualizar el toolchain y las dependencias
 Cada 6 meses o ante un aviso de seguridad:
 1. Cambia `rust-toolchain.toml` si procede.

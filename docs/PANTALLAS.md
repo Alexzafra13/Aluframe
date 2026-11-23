@@ -59,6 +59,7 @@ El diseño tiene 10 entradas. Propongo **8 para el MVP** y se decide al construi
 | Factura imprimible | `/facturas/{id}/imprimir` | H6 | A4 |
 | Albarán imprimible | `/albaranes/{id}/imprimir` | H6 | A4; se crea desde el trabajo y lo marca entregado |
 | Ajustes | `/ajustes` | H0 a H7 | Empresa, usuarios, taller, copias, registro de actividad (apartado 12) |
+| Demostración | `POST /demostracion/entrar`, `/demostracion/salir`, `/demostracion/empezar-de-nuevo` | 0.18.0 | Entrar desde la pantalla de entrada o Ajustes > Datos; franja con «Salir» y «Empezar de nuevo» en todas sus pantallas; su entrada enseña los usuarios y claves de prueba (ADR-0028) |
 | Estado | `/health` | H0 | Comprobación técnica |
 
 ## 4. Inicio
