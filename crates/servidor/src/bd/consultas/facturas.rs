@@ -1,7 +1,10 @@
 //! Facturas y sus líneas (DATOS 7.9). Lo emitido lo protegen los disparadores del esquema.
 
+use dominio::factura::ImportesDeFactura;
+use dominio::unidades::Dinero;
 use rusqlite::{Connection, OptionalExtension, Row, params};
 
+pub use super::lineas_factura::{FilaLineaFactura, insertar_linea, lineas, quitar_linea};
 use crate::errores::ErrorApp;
 
 #[derive(Debug, Clone)]
@@ -29,11 +32,21 @@ pub struct FilaFactura {
     pub creado_en: String,
     pub version: i64,
     pub cobrado_cent: i64,
+    /// La suma de las rectificativas emitidas que la corrigen (negativa si le quitan importe).
+    pub rectificado_cent: i64,
 }
 
 impl FilaFactura {
     pub fn codigo(&self) -> String {
         dominio::factura::codigo_de_factura(&self.serie, self.anio, self.numero)
+    }
+
+    pub fn importes(&self) -> ImportesDeFactura {
+        ImportesDeFactura {
+            total: Dinero::desde_centimos(self.total_cent),
+            rectificado: Dinero::desde_centimos(self.rectificado_cent),
+            cobrado: Dinero::desde_centimos(self.cobrado_cent),
+        }
     }
 }
 
@@ -42,7 +55,11 @@ const SELECCION: &str = "SELECT f.id, f.serie, f.anio, f.numero, f.tipo, f.recti
      f.fecha_emision, f.fecha_operacion, f.vencimiento, f.notas, f.descuento_bp, f.base_cent, \
      f.iva_cent, f.total_cent, f.snapshot_json, f.creado_en, f.version, \
      (SELECT ifnull(sum(importe_cent), 0) FROM cobro WHERE factura_id = f.id AND anulado = 0) \
-     FROM factura f JOIN cliente c ON c.id = f.cliente_id";
+     AS cobrado_cent, ifnull(r.suma, 0) AS rectificado_cent \
+     FROM factura f JOIN cliente c ON c.id = f.cliente_id \
+     LEFT JOIN (SELECT rectifica_factura_id AS id, sum(total_cent) AS suma FROM factura \
+     WHERE tipo = 'rectificativa' AND estado = 'emitida' GROUP BY rectifica_factura_id) r \
+     ON r.id = f.id";
 
 fn leer(f: &Row<'_>) -> rusqlite::Result<FilaFactura> {
     Ok(FilaFactura {
@@ -69,6 +86,7 @@ fn leer(f: &Row<'_>) -> rusqlite::Result<FilaFactura> {
         creado_en: f.get(20)?,
         version: f.get(21)?,
         cobrado_cent: f.get(22)?,
+        rectificado_cent: f.get(23)?,
     })
 }
 
@@ -84,6 +102,27 @@ pub fn listar(con: &Connection) -> Result<Vec<FilaFactura>, ErrorApp> {
     );
     let mut consulta = con.prepare(&sql)?;
     let filas = consulta.query_map([], leer)?;
+    Ok(filas.collect::<Result<_, _>>()?)
+}
+
+/// Las emitidas que aún deben algo, todas (sin el límite de la lista): de aquí salen el filtro
+/// «Pendientes» y los avisos de cobros vencidos.
+pub fn por_cobrar(con: &Connection) -> Result<Vec<FilaFactura>, ErrorApp> {
+    let sql = format!(
+        "SELECT * FROM ({SELECCION} WHERE f.estado = 'emitida' AND f.tipo = 'ordinaria') \
+         WHERE total_cent + rectificado_cent > cobrado_cent ORDER BY anio, numero"
+    );
+    let mut consulta = con.prepare(&sql)?;
+    let filas = consulta.query_map([], leer)?;
+    Ok(filas.collect::<Result<_, _>>()?)
+}
+
+/// Las rectificativas (emitidas o en borrador) que corrigen a una factura.
+pub fn rectificativas_de(con: &Connection, original: i64) -> Result<Vec<FilaFactura>, ErrorApp> {
+    let mut consulta = con.prepare(&format!(
+        "{SELECCION} WHERE f.rectifica_factura_id = ?1 ORDER BY f.id"
+    ))?;
+    let filas = consulta.query_map([original], leer)?;
     Ok(filas.collect::<Result<_, _>>()?)
 }
 
@@ -202,73 +241,6 @@ pub fn borrar_borrador(con: &Connection, id: i64) -> Result<(), ErrorApp> {
     con.execute(
         "DELETE FROM factura WHERE id = ?1 AND estado = 'borrador'",
         [id],
-    )?;
-    Ok(())
-}
-
-#[derive(Debug, Clone)]
-pub struct FilaLineaFactura {
-    pub id: i64,
-    pub orden: i64,
-    pub descripcion: String,
-    pub cantidad_mil: i64,
-    pub precio_unitario_pu: i64,
-    pub descuento_bp: i64,
-    pub tipo_iva_bp: i64,
-    pub base_cent: i64,
-}
-
-pub fn lineas(con: &Connection, factura: i64) -> Result<Vec<FilaLineaFactura>, ErrorApp> {
-    let mut consulta = con.prepare(
-        "SELECT id, orden, descripcion, cantidad_mil, precio_unitario_pu, descuento_bp, tipo_iva_bp, \
-         base_cent FROM linea_factura WHERE factura_id = ?1 ORDER BY orden",
-    )?;
-    let filas = consulta.query_map([factura], |f| {
-        Ok(FilaLineaFactura {
-            id: f.get(0)?,
-            orden: f.get(1)?,
-            descripcion: f.get(2)?,
-            cantidad_mil: f.get(3)?,
-            precio_unitario_pu: f.get(4)?,
-            descuento_bp: f.get(5)?,
-            tipo_iva_bp: f.get(6)?,
-            base_cent: f.get(7)?,
-        })
-    })?;
-    Ok(filas.collect::<Result<_, _>>()?)
-}
-
-pub fn insertar_linea(
-    con: &Connection,
-    factura: i64,
-    l: &FilaLineaFactura,
-) -> Result<(), ErrorApp> {
-    let orden: i64 = con.query_row(
-        "SELECT ifnull(max(orden), 0) + 1 FROM linea_factura WHERE factura_id = ?1",
-        [factura],
-        |f| f.get(0),
-    )?;
-    con.execute(
-        "INSERT INTO linea_factura (factura_id, orden, descripcion, cantidad_mil, precio_unitario_pu, \
-         descuento_bp, tipo_iva_bp, base_cent) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-        params![
-            factura,
-            orden,
-            l.descripcion,
-            l.cantidad_mil,
-            l.precio_unitario_pu,
-            l.descuento_bp,
-            l.tipo_iva_bp,
-            l.base_cent
-        ],
-    )?;
-    Ok(())
-}
-
-pub fn quitar_linea(con: &Connection, factura: i64, linea: i64) -> Result<(), ErrorApp> {
-    con.execute(
-        "DELETE FROM linea_factura WHERE id = ?2 AND factura_id = ?1",
-        params![factura, linea],
     )?;
     Ok(())
 }

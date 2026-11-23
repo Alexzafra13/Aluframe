@@ -3,7 +3,7 @@
 use askama::Template;
 use dominio::factura::estado_de_cobro;
 use dominio::stock::formatear_cantidad;
-use dominio::unidades::{Dinero, Porcentaje, PrecioUnitario};
+use dominio::unidades::{Porcentaje, PrecioUnitario};
 
 use super::{GrupoMenu, Opcion, UsuarioEnPantalla, euros, fecha_corta};
 use crate::aplicacion::facturas::FichaDeFactura;
@@ -15,12 +15,16 @@ pub fn estado_de_factura(f: &FilaFactura, hoy: &str) -> &'static str {
     match (f.estado.as_str(), f.tipo.as_str()) {
         ("borrador", _) => "Borrador",
         (_, "rectificativa") => "Rectificativa",
-        _ => estado_de_cobro(
-            Dinero::desde_centimos(f.total_cent),
-            Dinero::desde_centimos(f.cobrado_cent),
-            (f.vencimiento.as_deref(), hoy),
-        )
-        .nombre(),
+        _ => estado_de_cobro(f.importes(), (f.vencimiento.as_deref(), hoy)).nombre(),
+    }
+}
+
+/// Lo que falta por cobrar de una ordinaria emitida; un borrador o una rectificativa no se cobran.
+pub fn pendiente_de(f: &FilaFactura) -> i64 {
+    if f.estado == "emitida" && f.tipo == "ordinaria" {
+        f.importes().pendiente().centimos()
+    } else {
+        0
     }
 }
 
@@ -46,7 +50,7 @@ impl FilaFacturaEnLista {
             cliente: dominio::clientes::nombre_visible(f.cliente_id, f.cliente_nombre.as_deref()),
             fecha: fecha_corta(fecha),
             total: euros(f.total_cent),
-            pendiente: euros((f.total_cent - f.cobrado_cent).max(0)),
+            pendiente: euros(pendiente_de(f)),
             estado: estado_de_factura(f, hoy),
         }
     }
@@ -121,6 +125,10 @@ pub struct PaginaFactura {
     pub borrador: bool,
     pub rectificativa: bool,
     pub rectifica: Option<(i64, String)>,
+    /// Las rectificativas que la corrigen: id, código y si sigue en borrador.
+    pub rectificada_por: Vec<(i64, String, bool)>,
+    /// Lo que le restan (o suman) sus rectificativas emitidas; vacío si nada.
+    pub rectificado: String,
     pub motivo: String,
     pub estado: &'static str,
     pub fecha_operacion: String,
@@ -182,6 +190,22 @@ fn en_campo(centimos: i64) -> String {
     format!("{},{:02}", centimos / 100, centimos % 100)
 }
 
+fn rectificada_por(ficha: &FichaDeFactura) -> Vec<(i64, String, bool)> {
+    ficha
+        .rectificativas
+        .iter()
+        .map(|r| (r.id, r.codigo(), r.estado == "borrador"))
+        .collect()
+}
+
+fn rectificado(f: &FilaFactura) -> String {
+    if f.rectificado_cent == 0 {
+        String::new()
+    } else {
+        euros(f.rectificado_cent)
+    }
+}
+
 impl PaginaFactura {
     pub fn nueva(
         usuario: UsuarioEnPantalla,
@@ -189,7 +213,7 @@ impl PaginaFactura {
         (aviso, confirmacion): (Option<String>, Option<String>),
     ) -> PaginaFactura {
         let f = &ficha.factura;
-        let pendiente = (f.total_cent - f.cobrado_cent).max(0);
+        let pendiente = pendiente_de(f);
         PaginaFactura {
             usuario,
             menu: super::MENU,
@@ -203,6 +227,8 @@ impl PaginaFactura {
             borrador: f.estado == "borrador",
             rectificativa: f.tipo == "rectificativa",
             rectifica: ficha.rectifica.as_ref().map(|r| (r.id, r.codigo())),
+            rectificada_por: rectificada_por(ficha),
+            rectificado: rectificado(f),
             motivo: f.motivo_rectificacion.clone().unwrap_or_default(),
             estado: estado_de_factura(f, hoy),
             fecha_operacion: f.fecha_operacion.clone().unwrap_or_default(),

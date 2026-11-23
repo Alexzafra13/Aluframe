@@ -10,6 +10,7 @@ pub mod configuracion;
 pub mod direcciones;
 pub mod facturas;
 pub mod importaciones;
+pub mod lineas_factura;
 pub mod lineas_presupuesto;
 pub mod pasos;
 pub mod permisos;

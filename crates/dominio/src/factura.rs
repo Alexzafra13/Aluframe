@@ -23,6 +23,8 @@ pub enum EstadoDeCobro {
     Parcial,
     Pagada,
     Vencida,
+    /// Sus rectificativas emitidas la dejan a cero: ya no hay nada que cobrar.
+    Anulada,
 }
 
 impl EstadoDeCobro {
@@ -32,18 +34,51 @@ impl EstadoDeCobro {
             EstadoDeCobro::Parcial => "Parcial",
             EstadoDeCobro::Pagada => "Pagada",
             EstadoDeCobro::Vencida => "Vencida",
+            EstadoDeCobro::Anulada => "Anulada",
         }
     }
 }
 
-/// Se calcula siempre con los cobros, nunca se guarda (DATOS 3.8). Vence si pasó la fecha de
-/// vencimiento (AAAA-MM-DD, en Madrid) sin cobrarse entera.
+/// Lo que cuenta para cobrar una factura ordinaria emitida.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ImportesDeFactura {
+    pub total: Dinero,
+    /// La suma de sus rectificativas emitidas: negativa si le quitan importe.
+    pub rectificado: Dinero,
+    pub cobrado: Dinero,
+}
+
+impl ImportesDeFactura {
+    /// El total que se debe de verdad, una vez aplicadas sus rectificativas.
+    pub fn a_cobrar(self) -> Dinero {
+        Dinero::desde_centimos(
+            self.total
+                .centimos()
+                .saturating_add(self.rectificado.centimos()),
+        )
+    }
+
+    /// Lo que falta por cobrar; nunca negativo (lo cobrado de más se ve en la ficha).
+    pub fn pendiente(self) -> Dinero {
+        let falta = self
+            .a_cobrar()
+            .centimos()
+            .saturating_sub(self.cobrado.centimos());
+        Dinero::desde_centimos(falta.max(0))
+    }
+}
+
+/// Se calcula siempre con los cobros y las rectificativas, nunca se guarda (DATOS 3.8). Vence si
+/// pasó la fecha de vencimiento (AAAA-MM-DD, en Madrid) sin cobrarse entera.
 pub fn estado_de_cobro(
-    total: Dinero,
-    cobrado: Dinero,
+    importes: ImportesDeFactura,
     (vencimiento, hoy): (Option<&str>, &str),
 ) -> EstadoDeCobro {
-    if total.centimos() <= 0 || cobrado >= total {
+    let (a_cobrar, cobrado) = (importes.a_cobrar(), importes.cobrado);
+    if importes.rectificado.centimos() != 0 && a_cobrar.centimos() <= 0 {
+        return EstadoDeCobro::Anulada;
+    }
+    if a_cobrar.centimos() <= 0 || cobrado >= a_cobrar {
         return EstadoDeCobro::Pagada;
     }
     if vencimiento.is_some_and(|v| v < hoy) {
@@ -100,35 +135,73 @@ mod pruebas {
         );
     }
 
+    fn importes(total: i64, rectificado: i64, cobrado: i64) -> ImportesDeFactura {
+        ImportesDeFactura {
+            total: euros(total),
+            rectificado: euros(rectificado),
+            cobrado: euros(cobrado),
+        }
+    }
+
     #[test]
     fn el_estado_sale_de_lo_cobrado_y_del_vencimiento() {
         let hoy = "2026-11-22";
         assert_eq!(
-            estado_de_cobro(euros(100), euros(0), (None, hoy)),
+            estado_de_cobro(importes(100, 0, 0), (None, hoy)),
             EstadoDeCobro::Pendiente
         );
         assert_eq!(
-            estado_de_cobro(euros(100), euros(40), (None, hoy)),
+            estado_de_cobro(importes(100, 0, 40), (None, hoy)),
             EstadoDeCobro::Parcial
         );
         assert_eq!(
-            estado_de_cobro(euros(100), euros(100), (None, hoy)),
+            estado_de_cobro(importes(100, 0, 100), (None, hoy)),
             EstadoDeCobro::Pagada
         );
         assert_eq!(
-            estado_de_cobro(euros(100), euros(40), (Some("2026-11-21"), hoy)),
+            estado_de_cobro(importes(100, 0, 40), (Some("2026-11-21"), hoy)),
             EstadoDeCobro::Vencida
         );
         assert_eq!(
-            estado_de_cobro(euros(100), euros(40), (Some(hoy), hoy)),
+            estado_de_cobro(importes(100, 0, 40), (Some(hoy), hoy)),
             EstadoDeCobro::Parcial
         );
         assert_eq!(
-            estado_de_cobro(euros(-50), euros(0), (None, hoy)),
+            estado_de_cobro(importes(-50, 0, 0), (None, hoy)),
             EstadoDeCobro::Pagada,
             "una rectificativa no se cobra"
         );
         assert_eq!(EstadoDeCobro::Vencida.nombre(), "Vencida");
+    }
+
+    /// Fallo corregido: una factura anulada con una rectificativa seguía «Vencida» en el Inicio.
+    #[test]
+    fn las_rectificativas_emitidas_cuentan_al_cobrar() {
+        let vencida = (Some("2026-01-31"), "2026-11-22");
+        let anulada = importes(100, -100, 0);
+        assert_eq!(estado_de_cobro(anulada, vencida), EstadoDeCobro::Anulada);
+        assert_eq!(anulada.pendiente(), Dinero::CERO);
+        assert_eq!(
+            estado_de_cobro(importes(100, -100, 100), vencida),
+            EstadoDeCobro::Anulada,
+            "cobrada y después anulada: lo cobrado se ve en la ficha"
+        );
+        let rebajada = importes(100, -20, 0);
+        assert_eq!(rebajada.a_cobrar(), euros(80));
+        assert_eq!(rebajada.pendiente(), euros(80));
+        assert_eq!(estado_de_cobro(rebajada, vencida), EstadoDeCobro::Vencida);
+        assert_eq!(
+            estado_de_cobro(importes(100, -20, 80), vencida),
+            EstadoDeCobro::Pagada,
+            "lo que queda tras la rectificativa está cobrado"
+        );
+        assert_eq!(
+            importes(100, 30, 100).pendiente(),
+            euros(30),
+            "una rectificativa al alza aumenta lo que se debe"
+        );
+        assert_eq!(importes(100, 0, 150).pendiente(), Dinero::CERO);
+        assert_eq!(EstadoDeCobro::Anulada.nombre(), "Anulada");
     }
 
     #[test]

@@ -4,7 +4,7 @@ mod comun;
 
 use comun::Contexto;
 use comun::presupuestos::{SERIE_COMPLETA, elegir_reglas, preparar_demo, ventana};
-use dominio::factura::{EstadoDeCobro, estado_de_cobro};
+use dominio::factura::{EstadoDeCobro, ImportesDeFactura, estado_de_cobro};
 use dominio::unidades::{Dinero, Porcentaje, PrecioUnitario};
 use servidor::aplicacion::Actor;
 use servidor::aplicacion::aceptar_presupuesto::aceptar_presupuesto;
@@ -107,12 +107,13 @@ async fn la_senal_cuenta_al_emitir_y_los_cobros_parciales_la_dejan_pagada() {
         emitida.cobrado_cent, 10_000,
         "la señal cuenta como pagado a cuenta"
     );
-    let (total, cobrado) = (
-        Dinero::desde_centimos(emitida.total_cent),
-        Dinero::desde_centimos(10_000),
-    );
+    let importes = ImportesDeFactura {
+        total: Dinero::desde_centimos(emitida.total_cent),
+        rectificado: Dinero::CERO,
+        cobrado: Dinero::desde_centimos(10_000),
+    };
     assert_eq!(
-        estado_de_cobro(total, cobrado, (None, "2026-11-22")),
+        estado_de_cobro(importes, (None, "2026-11-22")),
         EstadoDeCobro::Parcial
     );
     let resto = emitida.total_cent - 10_000;

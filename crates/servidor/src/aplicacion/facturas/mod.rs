@@ -27,6 +27,8 @@ pub struct FichaDeFactura {
     pub cobros: Vec<FilaCobro>,
     /// La factura que corrige, si es una rectificativa.
     pub rectifica: Option<FilaFactura>,
+    /// Las rectificativas que la corrigen, si es ordinaria.
+    pub rectificativas: Vec<FilaFactura>,
 }
 
 pub fn cargar(con: &Connection, id: i64) -> Result<FichaDeFactura, ErrorApp> {
@@ -39,6 +41,7 @@ pub fn cargar(con: &Connection, id: i64) -> Result<FichaDeFactura, ErrorApp> {
         cliente: clientes::buscar(con, factura.cliente_id)?.ok_or(ErrorApp::NoEncontrado)?,
         lineas: facturas::lineas(con, id)?,
         cobros: cobros_de_factura(con, id)?,
+        rectificativas: facturas::rectificativas_de(con, id)?,
         rectifica,
         factura,
     })
@@ -59,6 +62,15 @@ pub async fn listar_facturas(
 ) -> Result<Vec<FilaFactura>, ErrorApp> {
     autorizar(actor, Accion::VerFacturas)?;
     estado.bd.leer(facturas::listar).await
+}
+
+/// Todas las emitidas que aún deben algo, por antiguas que sean (los avisos dependen de ellas).
+pub async fn listar_por_cobrar(
+    estado: &EstadoApp,
+    actor: &Actor,
+) -> Result<Vec<FilaFactura>, ErrorApp> {
+    autorizar(actor, Accion::VerFacturas)?;
+    estado.bd.leer(facturas::por_cobrar).await
 }
 
 /// Ejecuta `operacion` en una transacción y anota el cambio sobre la entidad que devuelve.

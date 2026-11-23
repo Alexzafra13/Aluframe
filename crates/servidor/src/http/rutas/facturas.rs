@@ -11,7 +11,9 @@ use crate::aplicacion::ajustes_presupuesto::leer_ajustes_de_presupuesto;
 use crate::aplicacion::clientes::{ConsultaDeClientes, listar_clientes};
 use crate::aplicacion::datos_de_empresa::CabeceraDeEmpresa;
 use crate::aplicacion::facturas::albaranes::buscar_albaran;
-use crate::aplicacion::facturas::{cargar_factura, hoja_de_factura, listar_facturas};
+use crate::aplicacion::facturas::{
+    cargar_factura, hoja_de_factura, listar_facturas, listar_por_cobrar,
+};
 use crate::aplicacion::logo_empresa::leer_logo_de_empresa;
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -52,14 +54,15 @@ pub async fn mostrar_facturas(
 ) -> Result<Response, ErrorApp> {
     let hoy = fecha_de_madrid(estado.ahora(), 0);
     let pendientes = filtro.pendientes.is_some();
-    let mut filas: Vec<FilaFacturaEnLista> = listar_facturas(&estado, &actor)
-        .await?
+    let facturas = if pendientes {
+        listar_por_cobrar(&estado, &actor).await?
+    } else {
+        listar_facturas(&estado, &actor).await?
+    };
+    let filas: Vec<FilaFacturaEnLista> = facturas
         .iter()
         .map(|f| FilaFacturaEnLista::de(f, &hoy))
         .collect();
-    if pendientes {
-        filas.retain(|f| matches!(f.estado, "Pendiente" | "Parcial" | "Vencida"));
-    }
     let pagina = PaginaFacturas {
         usuario: (&actor).into(),
         menu: MENU,

@@ -69,7 +69,7 @@
 .etiqueta-cobro-parcial { background: var(--acero-tinte); color: var(--acero); box-shadow: inset 0 0 0 1.5px var(--acero); }
 .etiqueta-cobro-pagada { background: var(--acero); color: #fff; }
 .etiqueta-cobro-vencida { background: var(--aviso-fondo); color: var(--aviso); }
-.etiqueta-cobro-rectificativa { background: rgb(21 25 29 / .07); color: var(--apagado); }
+.etiqueta-cobro-rectificativa, .etiqueta-cobro-anulada { background: rgb(21 25 29 / .07); color: var(--apagado); }
 .totales-factura { max-width: 320px; margin: 1rem 0 0 auto; }
 .total-factura { border-top: 2px solid var(--tinta); padding-top: .4rem; font-size: 1.2rem; font-weight: 600; }
 .tarjeta-interior { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--linea); }

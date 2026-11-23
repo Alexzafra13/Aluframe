@@ -8,7 +8,7 @@ use dominio::acceso::Accion;
 
 use crate::aplicacion::apuntes::apuntes_para_el_dueno;
 use crate::aplicacion::copias::pantalla::aviso_de_copias;
-use crate::aplicacion::facturas::listar_facturas;
+use crate::aplicacion::facturas::listar_por_cobrar;
 use crate::aplicacion::presupuestos::listar_presupuestos;
 use crate::aplicacion::stock::saldos;
 use crate::aplicacion::trabajos::consultar::listar_trabajos;
@@ -60,7 +60,7 @@ async fn avisos_de_cobro(
     actor: &Actor,
 ) -> Result<(Vec<AvisoDelTaller>, Vec<AvisoDelTaller>), ErrorApp> {
     let hoy = fecha_de_madrid(estado.ahora(), 0);
-    let vencidos = listar_facturas(estado, actor)
+    let vencidos = listar_por_cobrar(estado, actor)
         .await?
         .iter()
         .filter(|f| estado_de_factura(f, &hoy) == "Vencida")
@@ -69,7 +69,7 @@ async fn avisos_de_cobro(
                 "{} · {}: faltan {}",
                 f.codigo(),
                 dominio::clientes::nombre_visible(f.cliente_id, f.cliente_nombre.as_deref()),
-                euros(f.total_cent - f.cobrado_cent)
+                euros(f.importes().pendiente().centimos())
             ),
             enlace: format!("/facturas/{}", f.id),
         })

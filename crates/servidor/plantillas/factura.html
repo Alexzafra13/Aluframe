@@ -7,7 +7,7 @@
   <div>
     <p class="antetitulo"><a href="/facturas">Facturas</a>{% if let Some(t) = trabajo_id %}{% if usuario.es_propietario %} · <a href="/trabajos/{{ t }}">Trabajo</a>{% endif %}{% endif %}</p>
     <h1>{% if rectificativa %}Rectificativa {% else %}Factura {% endif %}<span class="mono">{{ codigo }}</span> <span class="etiqueta etiqueta-cobro-{{ estado|lower }}">{{ estado }}</span></h1>
-    <p><a href="/clientes/{{ cliente_id }}">{{ cliente }}</a>{% if let Some((r, c)) = rectifica %} · rectifica a <a href="/facturas/{{ r }}">{{ c }}</a>: {{ motivo }}{% endif %}</p>
+    <p><a href="/clientes/{{ cliente_id }}">{{ cliente }}</a>{% if let Some((r, c)) = rectifica %} · rectifica a <a href="/facturas/{{ r }}">{{ c }}</a>: {{ motivo }}{% endif %}{% for (r, c, borrador) in rectificada_por %} · rectificada por <a href="/facturas/{{ r }}">{% if *borrador %}una rectificativa en borrador{% else %}<span class="mono">{{ c }}</span>{% endif %}</a>{% endfor %}</p>
   </div>
   <a class="boton" href="/facturas/{{ id }}/imprimir">{% if borrador %}Ver la hoja (borrador){% else %}Imprimir o guardar PDF{% endif %}</a>
 </header>
@@ -70,7 +70,7 @@
     {% else if !borrador %}
     <section class="tarjeta" aria-labelledby="titulo-cobros">
       <h2 id="titulo-cobros">Cobros</h2>
-      <dl class="lista-datos"><div><dt>Cobrado</dt><dd class="mono">{{ cobrado }}</dd></div><div><dt>Pendiente</dt><dd class="mono">{{ pendiente }}</dd></div></dl>
+      <dl class="lista-datos">{% if !rectificado.is_empty() %}<div><dt>Rectificado</dt><dd class="mono">{{ rectificado }}</dd></div>{% endif %}<div><dt>Cobrado</dt><dd class="mono">{{ cobrado }}</dd></div><div><dt>Pendiente</dt><dd class="mono">{{ pendiente }}</dd></div></dl>
       {% include "lista_cobros.html" %}
       {% if !rectificativa && usuario.es_propietario %}
       <form method="post" action="/facturas/{{ id }}/cobros" class="pila">
