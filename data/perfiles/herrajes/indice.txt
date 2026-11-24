@@ -5,3 +5,4 @@
 cierre-embutido | Alualpha 267 i (ficha «Linha ECO», pág. 1, vista de frente) | vector: scripts/extraer_herraje.py ficha.pdf 1 83.2,189.4,114.8,392.0 cierre-embutido.svg --tumbado --grosor-minimo=14
 kit-plasticos   | Aluval, catálogo Aluprom 21, pág. 20, ref. 9426065 | imagen original del PDF (pdfimages -png, imagen 006) con scripts/imagen_de_herraje.py: el catálogo no la trae en vector
 rueda           | Aluval, catálogo Aluprom 21, pág. 21, ref. 9101027 (rueda fija chapa) | imagen original del PDF (pdfimages -png, imagen 015) con scripts/imagen_de_herraje.py
+tornillo        | Tornillo 4,8 × 25 de cabeza redonda y estrella, dibujo del propietario (2026-11-24) | imagen con scripts/imagen_de_herraje.py

@@ -70,7 +70,7 @@ async fn la_ventana_dice_su_tipo_y_su_serie_con_el_logotipo_de_la_marca() {
 #[tokio::test]
 async fn los_herrajes_llevan_su_dibujo_y_el_modelo_del_catalogo() {
     let html = calcular_con_el_cierre_en_el_catalogo().await;
-    for dibujo in ["cierre-embutido", "kit-plasticos", "rueda"] {
+    for dibujo in ["cierre-embutido", "kit-plasticos", "rueda", "tornillo"] {
         assert!(
             html.contains(&format!("src=\"/perfiles/herrajes/{dibujo}.svg\"")),
             "falta el dibujo {dibujo}"
