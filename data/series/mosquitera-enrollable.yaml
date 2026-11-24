@@ -12,7 +12,8 @@ redondeo: { precision: 0.1, sentido: abajo }   # la regla provisional del taller
 longitud_barra: CONFIRMAR
 
 parametros:
-  descuento_ancho: 2                  # cajón y terminal = ancho - 2 (propietario; a qué piezas, por confirmar)
+  descuento_ancho: 2                  # cajón = ancho - 2 (propietario)
+  descuento_guia_cajon_45: 4          # guía con cajón de 45 = alto - 4 (propietario, 2026-11-24)
   descuento_guia_cajon_50: 5          # guía con cajón de 50 = alto - 5 (propietario)
   alto_maximo_cajon_45: 140           # hasta 140 cm de alto, cajón de 45; por encima, de 50 (propietario)
 
@@ -22,7 +23,6 @@ referencias:
   CAJON_45:       { referencia: CONFIRMAR }
   CAJON_50:       { referencia: CONFIRMAR }
   GUIA_LATERAL:   { referencia: CONFIRMAR }
-  TERMINAL:       { referencia: CONFIRMAR }
   KIT_MOSQUITERA: { referencia: "KIT-MOSQUITERA" }
 
 tipologias:
@@ -34,9 +34,9 @@ tipologias:
     piezas:
       - { perfil: CAJON_45,     cantidad: "si(alto <= alto_maximo_cajon_45, 1, 0)", longitud: "ancho - descuento_ancho", corte: 90, posicion: marco_superior }
       - { perfil: CAJON_50,     cantidad: "si(alto > alto_maximo_cajon_45, 1, 0)",  longitud: "ancho - descuento_ancho", corte: 90, posicion: marco_superior }
-      - { perfil: GUIA_LATERAL, cantidad: "si(alto <= alto_maximo_cajon_45, 2, 0)", longitud: CONFIRMAR,                corte: 90, posicion: marco_lateral }   # con cajón de 45: descuento por confirmar
+      - { perfil: GUIA_LATERAL, cantidad: "si(alto <= alto_maximo_cajon_45, 2, 0)", longitud: "alto - descuento_guia_cajon_45", corte: 90, posicion: marco_lateral }
       - { perfil: GUIA_LATERAL, cantidad: "si(alto > alto_maximo_cajon_45, 2, 0)",  longitud: "alto - descuento_guia_cajon_50", corte: 90, posicion: marco_lateral }
-      - { perfil: TERMINAL,     cantidad: 1, longitud: "ancho - descuento_ancho", corte: 90, posicion: marco_inferior }
+      # El terminal no se corta: viene dentro del cabezal al cortarlo (propietario, 2026-11-24).
     # Sin vidrio: una mosquitera no lleva cristal. La malla: por confirmar si va en el kit o aparte.
     accesorios:
       - { articulo: KIT_MOSQUITERA, cantidad: 1 }

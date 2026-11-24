@@ -266,14 +266,24 @@ fn el_parteluces_se_dibuja_en_cada_hoja_con_su_chapa_y_su_cota() {
     assert!(svg.contains(">64,3<"), "la altura real: {svg}");
 }
 
-/// Mosquitera enrollable (ADR-0031): malla, cuatro tapas, tirador; el cajón de 50 más alto.
+/// Mosquitera enrollable (ADR-0031): malla, cuatro tapas, dos tiradores negros; el cajón de 50
+/// más alto.
 #[test]
 fn la_mosquitera_se_dibuja_con_su_malla_y_el_cajon_de_50_es_mas_alto() {
     let mut d = datos(TipoDibujo::Mosquitera, 1);
     let svg = dibujar_ventana(&d);
     assert_eq!(contar(&svg, r#"class="malla""#), 1);
     assert_eq!(contar(&svg, r#"class="tapa""#), 4);
-    assert_eq!(contar(&svg, r#"class="manilla""#), 1);
+    assert_eq!(
+        contar(&svg, r#"class="manilla tirador""#),
+        2,
+        "dos tiradores"
+    );
+    assert_eq!(
+        contar(&svg, r##"fill="#15191D"/>"##),
+        2,
+        "negros con cualquier color"
+    );
     assert_eq!(contar(&svg, r#"class="hoja""#), 0);
     let alto_del_cajon = |svg: &str| -> i64 {
         let resto = &svg[svg.find(r#"class="marco" x="0" y="0""#).unwrap()..];

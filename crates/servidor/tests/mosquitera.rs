@@ -35,26 +35,33 @@ fn perfiles(r: &ResultadoVentana) -> Vec<(u32, String)> {
 }
 
 #[test]
-fn hasta_140_de_alto_lleva_cajon_de_45_y_la_guia_espera_su_descuento() {
+fn hasta_140_de_alto_lleva_cajon_de_45_y_la_guia_mide_alto_menos_4() {
     let r = calcular(120, 140);
-    let esperados = ["CAJON_45", "GUIA_LATERAL", "TERMINAL"];
+    let esperados = ["CAJON_45", "GUIA_LATERAL"];
     let numeros: Vec<(u32, String)> = (1..).zip(esperados.map(String::from)).collect();
-    assert_eq!(
-        perfiles(&r),
-        numeros,
-        "números seguidos, sin el cajón de 50"
-    );
+    assert_eq!(perfiles(&r), numeros, "sin el cajón de 50 ni el terminal");
     let cajon = r.piezas.iter().find(|p| p.perfil == "CAJON_45").unwrap();
     assert_eq!(
         cajon.longitud,
         Longitud::desde_decimas_de_mm(11_800),
         "ancho - 2"
     );
-    assert!(
-        r.pendientes
-            .iter()
-            .any(|p| p.contains("Guía lateral: falta la medida de corte"))
+    let guia = r
+        .piezas
+        .iter()
+        .find(|p| p.perfil == "GUIA_LATERAL")
+        .unwrap();
+    assert_eq!(
+        (guia.cantidad, guia.longitud),
+        (2, Longitud::desde_decimas_de_mm(13_600))
     );
+}
+
+/// El terminal viene dentro del cabezal: no se corta (propietario, 2026-11-24).
+#[test]
+fn el_terminal_no_se_corta() {
+    let r = calcular(120, 180);
+    assert!(!perfiles(&r).iter().any(|(_, perfil)| perfil == "TERMINAL"));
 }
 
 #[test]

@@ -179,7 +179,7 @@ El dibujo se **calcula a partir de las mismas piezas y medidas** que la hoja de 
 - El dibujo es un esquema para entender la ventana, no un plano de fabricación.
 - Los números de las piezas del dibujo son los de la hoja de corte (diseño aprobado en `design/03-hoja-taller.png`).
 
-- `tipo: mosquitera` (ADR-0031): cajón arriba, guías, malla y terminal con tirador. El cajón se dibuja más alto si sale una pieza de cajón de 50 (`CAJON_50`). Los números van donde dice `posicion` (`marco_superior`, `marco_lateral`, `marco_inferior`).
+- `tipo: mosquitera` (ADR-0031): cajón arriba, guías, malla y terminal con dos tiradores negros (como vienen en los kits). El cajón se dibuja más alto si sale una pieza de cajón de 50 (`CAJON_50`). Los números van donde dice `posicion` (`marco_superior`, `marco_lateral`, `marco_inferior`).
 
 ## 10. Límites
 ```yaml

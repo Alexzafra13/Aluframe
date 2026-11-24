@@ -5,7 +5,7 @@
 use std::fmt::Write;
 
 use super::DatosDeDibujo;
-use super::acabado::{grupo_de_herrajes, perfil};
+use super::acabado::perfil;
 use super::geometria::{Plano, Rect};
 
 /// Cajón, guía y terminal en el dibujo (décimas de mm): el real (45 o 50, 25 y 30 mm) o, en
@@ -82,21 +82,24 @@ pub fn dibujar(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     perfil(s, color, ("marco", partes.cajon), p.cajon);
     perfil(s, color, ("terminal", partes.terminal), p.terminal);
     tapas(s, (partes.cajon, partes.guias), p.tapa);
-    s.push_str(&grupo_de_herrajes(color));
-    tirador(s, partes.terminal);
-    s.push_str("</g>");
+    tiradores(s, partes.terminal);
 }
 
-fn tirador(s: &mut String, terminal: Rect) {
-    let _ = write!(
-        s,
-        r#"<rect class="manilla" x="{}" y="{}" width="{}" height="{}" rx="{}"/>"#,
-        terminal.x + terminal.ancho / 2 - terminal.ancho / 10,
-        terminal.y + terminal.alto / 4,
-        terminal.ancho / 5,
-        terminal.alto / 2,
-        terminal.alto / 4
-    );
+/// Dos tiradores, siempre negros: así vienen en los kits, sea cual sea el color (propietario).
+fn tiradores(s: &mut String, terminal: Rect) {
+    let (ancho, alto) = (terminal.ancho / 7, terminal.alto / 2);
+    for centro in [
+        terminal.x + terminal.ancho / 3,
+        terminal.x + terminal.ancho * 2 / 3,
+    ] {
+        let _ = write!(
+            s,
+            r##"<rect class="manilla tirador" x="{}" y="{}" width="{ancho}" height="{alto}" rx="{}" fill="#15191D"/>"##,
+            centro - ancho / 2,
+            terminal.y + terminal.alto / 4,
+            alto / 2
+        );
+    }
 }
 
 /// La malla: un fondo gris claro con una trama fina, como una tela mosquitera.
