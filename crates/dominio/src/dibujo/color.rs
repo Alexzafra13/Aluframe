@@ -118,6 +118,17 @@ impl ColorDeDibujo {
         self.herrajes.hex()
     }
 
+    /// Blanco o casi (RAL 9016, 9010…): sirve para elegir lo que debe contrastar con él.
+    pub fn es_blanco(&self) -> bool {
+        let canal = |i: usize| {
+            self.perfil
+                .get(1 + 2 * i..3 + 2 * i)
+                .and_then(|h| u8::from_str_radix(h, 16).ok())
+                .unwrap_or(0)
+        };
+        !self.madera && (0..3).all(|i| canal(i) >= 0xE0)
+    }
+
     /// Las hojas, un punto más claras que el marco, para distinguirlas en el dibujo.
     pub fn hoja(&self) -> String {
         mezclar(&self.perfil, "#ffffff", 88)

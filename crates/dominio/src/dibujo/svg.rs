@@ -43,7 +43,7 @@ fn cuerpo_de_ventana(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
         dibujar_hoja(s, plano, (*rectangulo, indice), &datos.color);
     }
     persiana::dibujar_lamas(s, plano);
-    persiana::dibujar_cinta(s, plano);
+    persiana::dibujar_cinta(s, plano, datos);
     super::parteluces::dibujar(s, plano, datos);
     s.push_str(&grupo_de_herrajes(&datos.color));
     match plano.tipo {
