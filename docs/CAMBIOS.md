@@ -204,3 +204,10 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Pendiente del propietario (queda en `CONFIRMAR` y la ventana sale incompleta): medida de corte del parteluces, su altura real, ancho de la chapa, alto del cristal de arriba y cómo se cobra la chapa.
   - Al importar una serie se prueban todas las combinaciones de sus opciones (hasta 256), no solo cada una por separado: un error que solo sale combinando parteluces y Climalit se ve al importar.
   - Formato de series ampliado de forma general: opciones de medida usables en fórmulas, `solo_si` para partes que dependen de una opción, chapas y cristal con nombre. Sin parteluces, nada cambia; los resúmenes ya guardados se siguen leyendo.
+- **0.20.1 (propietario, tras probar la 0.20.0):**
+  - La medida de la chapa (o del cristal) de abajo se acota **dentro de su hueco**, en la primera hoja. La altura real del parteluces, cuando la serie la sepa, sigue a la derecha.
+  - Una pieza que la ventana lleva pero aún no tiene medida (el parteluces) sale en los perfiles a cortar con su número, su dibujo y «pendiente» (en la hoja de taller, «PENDIENTE»), y su número en el dibujo sobre la barra. No entra en el plan de corte hasta tener medida. Los avisos dicen exactamente qué falta («Parteluces: falta la medida de corte»).
+  - «Tornillo 4,8x25» con coma: en los nombres que salen del código, el guion bajo entre dos cifras es la coma decimal.
+  - La tarjeta de cada ventana del presupuesto y del trabajo muestra solo el tipo y las medidas; la serie, el color y las opciones están en «Ver detalles».
+  - Arreglo: la miniatura de la ventana en la lista salía cortada por abajo (en el móvil y en el PC; más en ventanas altas). La rejilla de la miniatura no tenía alto propio y el dibujo crecía con su ancho.
+  - En la tarjeta, el aviso de una pieza pendiente dice primero que falta la medida y después el ángulo.

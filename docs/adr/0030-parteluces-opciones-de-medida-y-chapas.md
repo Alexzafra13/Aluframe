@@ -11,9 +11,10 @@ Se amplía el formato de series de forma **general**, no como un caso especial d
 2. **`solo_si: { opcion: valor }`** en opciones, piezas, accesorios, piezas de vidrio, chapas y parteluces: la parte solo existe, y la opción solo se pregunta, si se cumplen las condiciones. Una medida que no se pregunta usa el valor de la serie, aunque quede algo escrito en el campo oculto.
 3. **Cristal partido:** cada pieza de vidrio puede llevar `nombre` («Arriba», «Abajo») y una medida en `CONFIRMAR` (esa pieza no sale y la ventana queda incompleta).
 4. **`chapas`**: paneles opacos con artículo, cantidad, ancho y alto (estos dos admiten `CONFIRMAR` y se muestran como «?»). Se dibujan **a escala con sus cotas** (dibujo técnico) en el editor, en «Mi día» y en la hoja de taller. **Mientras el propietario no decida cómo se cobra, una ventana con chapa no tiene precio final.**
-5. **`parteluces`** solo da el dibujo: una barra del color de la ventana en cada hoja, la chapa rayada en el color de la ventana (o el cristal) y una cota a la derecha con la altura real del parteluces. Sin la altura real (`CONFIRMAR`), la barra se coloca aproximada y la cota dice «chapa 50».
-6. **En pantalla**, las opciones que dependen de otra se muestran u ocultan en el navegador (`recursos/js/opciones.js`) sin volver a pedir la página: así no se pierde el cursor mientras se escribe la medida.
-7. El resumen guardado de cada línea añade las chapas y el nombre del cristal con valores por defecto, para que los resúmenes anteriores se sigan leyendo.
+5. **`parteluces`** solo da el dibujo: una barra del color de la ventana en cada hoja, la chapa rayada en el color de la ventana (o el cristal) con su medida acotada **dentro de su hueco** («chapa 50»), y a la derecha la altura real del parteluces cuando la serie la sepa. Sin ella, la barra se coloca aproximada (0.20.1, a petición del propietario).
+6. **Una pieza sin medida** (el parteluces mientras falte su corte) se lista con su número, su dibujo y «pendiente», y se numera en el dibujo; no entra en el plan de corte. Su número es su puesto en la tipología, así no cambia al llegar la medida.
+7. **En pantalla**, las opciones que dependen de otra se muestran u ocultan en el navegador (`recursos/js/opciones.js`) sin volver a pedir la página: así no se pierde el cursor mientras se escribe la medida.
+8. El resumen guardado de cada línea añade las chapas y el nombre del cristal con valores por defecto, para que los resúmenes anteriores se sigan leyendo.
 
 ## Consecuencias
 - Sin parteluces nada cambia: los fixtures reales dan lo mismo.
