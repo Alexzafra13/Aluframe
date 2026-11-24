@@ -74,16 +74,23 @@ dialog.hoja.cerrando::backdrop { animation: velo-sale 260ms ease forwards; }
 .cabecera-seccion { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; flex-wrap: wrap; }
 .cabecera-seccion h2 { margin: 0; }
 .tarjetas-linea { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
-.tarjeta-linea { position: relative; animation: aparecer var(--normal) var(--curva-suave) both; }
+.tarjeta-linea { position: relative; animation: aparecer var(--normal) var(--curva-suave) both; border-radius: 14px; background: var(--superficie); border: 1px solid var(--linea); transition: box-shadow var(--normal) ease; }
+.tarjeta-linea:hover { box-shadow: 0 6px 20px rgb(21 25 29 / .08); }
 .tarjeta-linea:nth-child(2) { animation-delay: 40ms; } .tarjeta-linea:nth-child(3) { animation-delay: 80ms; } .tarjeta-linea:nth-child(4) { animation-delay: 120ms; } .tarjeta-linea:nth-child(n+5) { animation-delay: 160ms; }
-.tarjeta-linea-enlace { display: grid; grid-template-columns: 112px 1fr auto; align-items: center; gap: 1rem; padding: .75rem 3.75rem .75rem .75rem; border-radius: 14px; background: var(--superficie); border: 1px solid var(--linea); color: var(--tinta); text-decoration: none; transition: transform var(--rapido) var(--curva-muelle), box-shadow var(--normal) ease; }
-.tarjeta-linea-enlace:hover { box-shadow: 0 6px 20px rgb(21 25 29 / .08); }
+.tarjeta-linea-enlace { display: grid; grid-template-columns: 112px 1fr auto; align-items: center; gap: 1rem; padding: .75rem 3.75rem .75rem .75rem; border-radius: 14px; color: var(--tinta); text-decoration: none; transition: transform var(--rapido) var(--curva-muelle); }
+/* El resto de la descripción (serie, color, opciones) se despliega bajo el título. */
+.detalles-linea { padding: 0 3.75rem .5rem calc(.75rem + 112px + 1rem); }
+.detalles-linea summary { display: inline-flex; align-items: center; min-height: 44px; color: var(--acero); font-weight: 500; cursor: pointer; }
+.detalles-linea .lista-simple, .detalles-ventana .lista-simple { margin: 0 0 .5rem; color: var(--apagado); font-size: .9rem; }
+.detalles-ventana summary { display: inline-flex; align-items: center; min-height: 44px; color: var(--acero); font-weight: 500; cursor: pointer; }
 .tarjeta-linea-enlace:active { transform: scale(.985); }
 .tarjeta-linea-texto { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
 .tarjeta-linea-titulo { font-weight: 600; }
 .tarjeta-linea-lado { display: flex; flex-direction: column; align-items: flex-end; gap: .35rem; }
-.quitar-linea { position: absolute; top: 50%; right: .6rem; transform: translateY(-50%); }
-.miniatura { display: grid; place-items: center; width: 112px; height: 84px; border-radius: 10px; background: var(--papel); overflow: hidden; }
+.quitar-linea { position: absolute; top: .6rem; right: .6rem; }
+/* La fila de la rejilla tiene el alto de la caja: sin eso el `height: 100%` del dibujo no se
+   aplica, el dibujo crece con su ancho y una ventana alta sale cortada por abajo. */
+.miniatura { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; width: 112px; height: 84px; border-radius: 10px; background: var(--papel); overflow: hidden; }
 .miniatura .dibujo-ventana { width: 100%; height: 100%; }
 .miniatura .capa-cotas, .miniatura .capa-piezas { display: none; }
 .miniatura-libre { font: 600 1.6rem var(--condensada); color: var(--apagado); }
@@ -145,6 +152,8 @@ span.silueta { background: transparent; }
 .numero-discreto { font: 500 .72rem var(--mono); color: var(--apagado); line-height: 1; }
 .cantidad-pieza { font-weight: 600; color: var(--tinta); }
 .lista-piezas .medida { text-align: right; font-size: 1.05rem; }
+/* Pieza que la ventana lleva pero aún sin medida de corte (ADR-0030). */
+.lista-piezas .medida-pendiente { font: 600 .8rem var(--condensada); color: var(--aviso); white-space: nowrap; }
 /* Herrajes: lo que no se corta (cierres, kits, ruedas, tornillos), aparte de los perfiles. */
 .tarjeta-piezas .lista-piezas + .antetitulo { margin-top: 1.25rem; }
 .modelo-herraje { display: block; font-size: .8rem; color: var(--apagado); }

@@ -15,6 +15,15 @@ pub struct PiezaCalculada {
     pub posicion: Option<String>,
 }
 
+/// Pieza que la ventana lleva pero aún no se puede cortar: falta su medida en la serie.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PiezaPendiente {
+    pub numero: u32,
+    pub perfil: String,
+    pub cantidad: Option<u32>,
+    pub posicion: Option<String>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AccesorioCalculado {
     pub articulo: String,
@@ -59,6 +68,8 @@ pub struct ResultadoVentana {
     pub ancho: Decimal,
     pub alto: Decimal,
     pub piezas: Vec<PiezaCalculada>,
+    /// Sin medida: se listan y se dibujan, pero no entran en el plan de corte.
+    pub piezas_pendientes: Vec<PiezaPendiente>,
     pub accesorios: Vec<AccesorioCalculado>,
     pub vidrio: Option<Vec<VidrioCalculado>>,
     pub chapas: Vec<ChapaCalculada>,

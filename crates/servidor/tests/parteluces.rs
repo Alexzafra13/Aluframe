@@ -73,6 +73,9 @@ async fn con_parteluces_sale_la_chapa_con_su_dibujo_y_la_cota_en_la_ventana() {
         "la cota dice la medida de la chapa"
     );
     assert!(html.contains("Chapa: falta decidir cómo se cobra"));
+    // El parteluces sale en los perfiles a cortar con su dibujo aunque falte su medida.
+    assert!(html.contains(r#"src="/perfiles/aluval/21564.svg""#));
+    assert!(html.contains(">pendiente<"));
 }
 
 #[tokio::test]

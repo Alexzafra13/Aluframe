@@ -151,11 +151,10 @@ async fn la_ficha_muestra_las_lineas_y_por_que_no_se_acepta() {
     )
     .await;
     assert!(ficha.contains("Guardado en el presupuesto."));
-    assert!(
-        ficha.contains(
-            "1 · DEMO corredera 2 hojas (ficticia) · Demo ficticia (Demo) · 150 × 120 cm"
-        )
-    );
+    // El título se queda con el tipo y las medidas; la serie y las opciones, en «Ver detalles».
+    assert!(ficha.contains("1 · DEMO corredera 2 hojas (ficticia) · 150 × 120 cm"));
+    assert!(ficha.contains("Ver detalles"));
+    assert!(ficha.contains("<li>Demo ficticia (Demo)</li>"));
     assert!(ficha.contains("2 · Instalación"));
     assert!(ficha.contains("No se puede aceptar todavía"));
 }

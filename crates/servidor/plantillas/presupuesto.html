@@ -41,7 +41,7 @@
         <a class="tarjeta-linea-enlace" href="{% if l.es_ventana && editable() %}/presupuestos/{{ ficha.presupuesto.id }}/lineas/{{ l.orden }}{% else %}#linea-{{ l.orden }}{% endif %}" id="linea-{{ l.orden }}">
           <span class="miniatura" aria-hidden="true">{% if l.es_ventana %}{{ l.dibujo|safe }}{% else %}<span class="miniatura-libre">€</span>{% endif %}</span>
           <span class="tarjeta-linea-texto">
-            <span class="tarjeta-linea-titulo">{{ l.orden }} · {{ l.descripcion }}</span>
+            <span class="tarjeta-linea-titulo">{{ l.orden }} · {{ l.titulo }}</span>
             <span class="texto-apagado pequeno">Cantidad {{ l.cantidad }}{% if !l.completa %} · {{ l.motivo }}{% endif %}</span>
           </span>
           <span class="tarjeta-linea-lado">
@@ -49,6 +49,12 @@
             {% if l.completa %}<span class="etiqueta etiqueta-azul">Completa</span>{% else %}<span class="etiqueta etiqueta-aviso">Incompleta</span>{% endif %}
           </span>
         </a>
+        {% if !l.detalles.is_empty() %}
+        <details class="detalles-linea">
+          <summary>Ver detalles</summary>
+          <ul class="lista-simple">{% for d in l.detalles %}<li>{{ d }}</li>{% endfor %}</ul>
+        </details>
+        {% endif %}
         {% if editable() %}
         <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/lineas/{{ l.orden }}/quitar" class="quitar-linea">
           <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">

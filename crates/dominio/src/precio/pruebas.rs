@@ -65,6 +65,7 @@ pub(super) fn resultado() -> ResultadoVentana {
         ancho: Decimal::desde_entero(150),
         alto: Decimal::desde_entero(120),
         piezas: Vec::new(),
+        piezas_pendientes: Vec::new(),
         accesorios: vec![accesorio("KIT", 1), accesorio("TORNILLO", 17)],
         vidrio: Some(vec![VidrioCalculado {
             tipo: "VIDRIO".into(),

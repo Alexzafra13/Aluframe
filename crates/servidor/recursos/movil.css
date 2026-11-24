@@ -103,6 +103,7 @@ code, .mono { overflow-wrap: anywhere; }
   .acciones > form .boton { width: 100%; }
   .lienzo { min-height: 260px; }
   .tarjeta-linea-enlace { grid-template-columns: 84px 1fr; padding-right: 3.5rem; }
+  .detalles-linea { padding-left: calc(.75rem + 84px + 1rem); padding-right: 1rem; }
   .tarjeta-linea-lado { grid-column: 2; align-items: flex-start; }
   .miniatura { width: 84px; height: 64px; }
   .pie-desglose { display: none; }

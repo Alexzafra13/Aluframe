@@ -45,6 +45,13 @@ fn posicion(plano: &Plano, perfil: &str) -> Option<(i64, i64)> {
             _ => (marco.x + medio_marco, marco.y + marco.alto * 72 / 100),
         });
     }
+    if let (true, Some(eje), Some(hoja)) = (
+        perfil.contains("PARTELUCES"),
+        plano.parteluces_eje,
+        plano.hojas.first(),
+    ) {
+        return Some((hoja.x + hoja.ancho * 62 / 100, eje));
+    }
     if perfil == "CENTRO" {
         // Donde se juntan las hojas centrales (el cierre 4 hojas de una corredera).
         let hoja = *plano.hojas.first()?;

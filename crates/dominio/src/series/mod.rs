@@ -18,8 +18,8 @@ pub use crate::informe::{Informe, Problema};
 pub use calculo::{ErrorCalculo, calcular_ventana, calcular_ventana_con_opciones};
 pub use modelo::*;
 pub use resultado::{
-    AccesorioCalculado, ChapaCalculada, ParteLucesCalculado, PiezaCalculada, ResultadoVentana,
-    VidrioCalculado,
+    AccesorioCalculado, ChapaCalculada, ParteLucesCalculado, PiezaCalculada, PiezaPendiente,
+    ResultadoVentana, VidrioCalculado,
 };
 pub use valor::{CONFIRMAR, Dato, Valor};
 

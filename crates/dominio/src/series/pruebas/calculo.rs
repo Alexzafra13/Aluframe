@@ -45,8 +45,8 @@ fn deja_fuera_lo_pendiente_y_lo_explica() {
     );
     let pendientes = resultado.pendientes.join(" | ");
     for texto in [
-        "INVERSOR: falta la cantidad",
-        "HOJA: falta el ángulo",
+        "Inversor: falta la cantidad",
+        "Hoja: falta el ángulo",
         "Vidrio",
         "PLETINA",
         "referencia del proveedor (y el precio) de: INVERSOR",

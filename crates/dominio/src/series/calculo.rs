@@ -4,10 +4,11 @@ use thiserror::Error;
 
 use super::resultado::MAXIMO_POR_PIEZA;
 use super::{
-    AccesorioCalculado, Dato, EstadoSerie, PiezaCalculada, ResultadoVentana, Serie, Tipologia,
-    UnidadCantidad,
+    AccesorioCalculado, Dato, EstadoSerie, PiezaCalculada, PiezaPendiente, ResultadoVentana, Serie,
+    Tipologia, UnidadCantidad,
 };
 use crate::formula::{ErrorFormula, Formula, Valores};
+use crate::texto::nombre_legible;
 use crate::unidades::{Decimal, Longitud};
 
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
@@ -57,7 +58,7 @@ pub fn calcular_ventana_con_opciones(
     let medidas = super::calculo_rellenos::medidas_de_linea(tipologia, opciones)?;
     calculo.valores.extend(medidas);
     let mut pendientes = pendientes_de_estado(serie, tipologia);
-    let piezas = calculo.piezas(tipologia, &mut pendientes)?;
+    let (piezas, piezas_pendientes) = calculo.piezas(tipologia, &mut pendientes)?;
     let vidrio = calculo.vidrio(tipologia, &mut pendientes)?;
     let chapas = calculo.chapas(tipologia, &mut pendientes)?;
     let parteluces = calculo.parteluces(tipologia, &mut pendientes)?;
@@ -74,6 +75,7 @@ pub fn calcular_ventana_con_opciones(
         ancho,
         alto,
         piezas,
+        piezas_pendientes,
         accesorios,
         vidrio,
         chapas,
@@ -81,6 +83,24 @@ pub fn calcular_ventana_con_opciones(
         pendientes,
         fuera_de_limites: super::validacion::comprobar_limites(tipologia, ancho, alto),
     })
+}
+
+/// Lo primero que se lee en la tarjeta de la línea es lo que más falta: la medida antes que
+/// el ángulo.
+fn lo_que_falta(pieza: &super::PiezaDeSerie) -> Vec<String> {
+    let nombre = nombre_legible(&pieza.perfil);
+    let medida = match (pieza.cantidad.es_confirmar(), pieza.longitud.es_confirmar()) {
+        (true, true) => Some("la cantidad y la medida de corte"),
+        (true, false) => Some("la cantidad"),
+        (false, true) => Some("la medida de corte"),
+        (false, false) => None,
+    };
+    let angulo = pieza.corte.es_confirmar().then_some("el ángulo de corte");
+    medida
+        .into_iter()
+        .chain(angulo)
+        .map(|falta| format!("{nombre}: falta {falta}."))
+        .collect()
 }
 
 fn comprobar_medidas(ancho: Decimal, alto: Decimal) -> Result<(), ErrorCalculo> {
@@ -156,22 +176,32 @@ impl<'a> Calculo<'a> {
             .ok_or_else(no_valida)
     }
 
+    /// Una pieza sin medida no se puede cortar, pero se lista como pendiente con su número: el
+    /// número es su puesto en la tipología, así no cambia cuando llegue la medida.
     fn piezas(
         &self,
         tipologia: &Tipologia,
         pendientes: &mut Vec<String>,
-    ) -> Result<Vec<PiezaCalculada>, ErrorCalculo> {
-        let mut piezas = Vec::new();
-        for pieza in &tipologia.piezas {
+    ) -> Result<(Vec<PiezaCalculada>, Vec<PiezaPendiente>), ErrorCalculo> {
+        let (mut piezas, mut sin_medida) = (Vec::new(), Vec::new());
+        for (indice, pieza) in tipologia.piezas.iter().enumerate() {
+            let numero = u32::try_from(indice + 1).unwrap_or(u32::MAX);
             let (Dato::Valor(cantidad), Dato::Valor(longitud)) = (&pieza.cantidad, &pieza.longitud)
             else {
-                pendientes.push(format!("{}: falta la cantidad o la medida.", pieza.perfil));
+                pendientes.extend(lo_que_falta(pieza));
+                let cantidad = match &pieza.cantidad {
+                    Dato::Valor(formula) => Some(self.cantidad(formula, &pieza.perfil)?),
+                    Dato::Confirmar => None,
+                };
+                sin_medida.push(PiezaPendiente {
+                    numero,
+                    perfil: pieza.perfil.clone(),
+                    cantidad,
+                    posicion: pieza.posicion.clone(),
+                });
                 continue;
             };
-            if pieza.corte.es_confirmar() {
-                pendientes.push(format!("{}: falta el ángulo de corte.", pieza.perfil));
-            }
-            let numero = u32::try_from(piezas.len() + 1).unwrap_or(u32::MAX);
+            pendientes.extend(lo_que_falta(pieza));
             piezas.push(PiezaCalculada {
                 numero,
                 perfil: pieza.perfil.clone(),
@@ -182,7 +212,7 @@ impl<'a> Calculo<'a> {
                 posicion: pieza.posicion.clone(),
             });
         }
-        Ok(piezas)
+        Ok((piezas, sin_medida))
     }
 
     fn accesorios(

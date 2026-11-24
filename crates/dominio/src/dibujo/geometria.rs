@@ -57,6 +57,8 @@ pub struct Plano {
     pub grosor_hoja: i64,
     pub margen: i64,
     pub tipo: TipoDibujo,
+    /// Altura (coordenada) del parteluces, para colocar el número de su pieza sobre la barra.
+    pub parteluces_eje: Option<i64>,
 }
 
 impl Plano {
@@ -74,14 +76,20 @@ impl Plano {
         };
         let interior = marco.dentro(grosor_marco);
         let hojas = repartir_hojas(interior, datos, grosor_hoja);
-        Plano {
+        let mut plano = Plano {
             marco,
             hojas,
             grosor_marco,
             grosor_hoja,
             margen: ancho.max(alto) / 7,
             tipo: datos.dibujo.tipo,
-        }
+            parteluces_eje: None,
+        };
+        plano.parteluces_eje = datos
+            .parteluces
+            .as_ref()
+            .map(|p| super::parteluces::eje(&plano, p));
+        plano
     }
 
     pub fn tamano_de_letra(&self) -> i64 {

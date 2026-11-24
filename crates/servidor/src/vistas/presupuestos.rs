@@ -78,7 +78,10 @@ pub struct PaginaPresupuestos {
 pub struct TarjetaDeLinea {
     pub orden: i64,
     pub es_ventana: bool,
-    pub descripcion: String,
+    /// Lo que identifica la ventana: tipo y medidas («Ventana corredera 2 hojas · 120 × 210 cm»).
+    pub titulo: String,
+    /// El resto de la descripción (serie, color, opciones), que se despliega.
+    pub detalles: Vec<String>,
     pub cantidad: String,
     pub precio: String,
     pub completa: bool,
@@ -93,10 +96,17 @@ impl From<&FilaLinea> for TarjetaDeLinea {
         if l.revisar_limites {
             motivo = "medida fuera de los límites de la serie: revísala".into();
         }
+        let es_ventana = l.tipo == "ventana";
+        let (titulo, detalles) = if es_ventana {
+            partir_descripcion(&l.descripcion)
+        } else {
+            (l.descripcion.clone(), Vec::new())
+        };
         TarjetaDeLinea {
             orden: l.orden,
-            es_ventana: l.tipo == "ventana",
-            descripcion: l.descripcion.clone(),
+            es_ventana,
+            titulo,
+            detalles,
             cantidad: dominio::unidades::formatear_es(i128::from(l.cantidad_mil), 3, 0),
             precio: euros(l.precio_cent),
             completa: !l.incompleta && !l.revisar_limites,
@@ -104,6 +114,22 @@ impl From<&FilaLinea> for TarjetaDeLinea {
             dibujo: ResumenDeVentana::leer(l.resultado_json.as_deref()).dibujo,
         }
     }
+}
+
+/// La descripción de una ventana es «tipo · serie · medidas · color · opciones…»: el título se
+/// queda con el tipo y las medidas, que es lo que se busca de un vistazo.
+pub fn partir_descripcion(descripcion: &str) -> (String, Vec<String>) {
+    let tramos: Vec<&str> = descripcion.split(" · ").collect();
+    let es_medida = |t: &str| t.contains(" × ") && t.ends_with(" cm");
+    let medidas = tramos.iter().copied().find(|t| es_medida(t));
+    let titulo: Vec<&str> = tramos.iter().copied().take(1).chain(medidas).collect();
+    let detalles = tramos
+        .iter()
+        .skip(1)
+        .filter(|t| !es_medida(t))
+        .map(|t| (*t).to_owned())
+        .collect();
+    (titulo.join(" · "), detalles)
 }
 
 /// Perfiles, cristal, accesorios y mano de obra del pie fijo (costes, solo para el propietario).

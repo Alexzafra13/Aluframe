@@ -139,8 +139,17 @@ fn sin_parteluces_la_ventana_no_cambia() {
 #[test]
 fn con_parteluces_lleva_su_perfil_la_chapa_y_queda_pendiente_lo_que_falta() {
     let r = calcular(&[("parteluces", "si")]);
-    // Sin medida de corte no se puede cortar: no entra en la lista y queda como pendiente.
+    // Sin medida de corte no se puede cortar: va aparte, con su número y su cantidad.
     assert!(!r.piezas.iter().any(|p| p.perfil == "PARTELUCES"));
+    let pendiente = &r.piezas_pendientes[0];
+    assert_eq!(
+        (
+            pendiente.perfil.as_str(),
+            pendiente.numero,
+            pendiente.cantidad
+        ),
+        ("PARTELUCES", 3, Some(2))
+    );
     assert_eq!(r.chapas.len(), 1);
     let chapa = &r.chapas[0];
     assert_eq!((chapa.cantidad, chapa.ancho), (2, None));
@@ -150,7 +159,7 @@ fn con_parteluces_lleva_su_perfil_la_chapa_y_queda_pendiente_lo_que_falta() {
     assert_eq!(parteluces.altura, None);
     assert!(r.es_incompleta());
     for falta in [
-        "PARTELUCES",
+        "Parteluces: falta la medida de corte",
         "Vidrio arriba",
         "Chapa de abajo",
         "Parteluces",
@@ -258,5 +267,28 @@ fn detecta_al_importar_un_error_que_solo_sale_combinando_opciones() {
             .iter()
             .any(|e| e.to_string().contains("acristalamiento = climalit")),
         "{errores:?}"
+    );
+}
+
+/// La tarjeta de la línea enseña el primer aviso: que falte la medida importa más que el ángulo.
+#[test]
+fn avisa_antes_de_la_medida_que_del_angulo() {
+    let mut valor = serie_con_parteluces();
+    let Valor::Lista(mut piezas) = piezas_con_parteluces() else {
+        panic!("las piezas son una lista")
+    };
+    if let Some(Valor::Mapa(campos)) = piezas.last_mut() {
+        campos.retain(|(k, _)| k != "corte");
+        campos.push(("corte".into(), t(CONFIRMAR)));
+    }
+    let ruta = ["tipologias", "corredera", "piezas"];
+    cambiar(&mut valor, &ruta, Some(Valor::Lista(piezas)));
+    let (serie, _) = importar_serie(&valor).unwrap();
+    let pares = elegir(&[("parteluces", "si")]);
+    let r =
+        calcular_ventana_con_opciones(&serie, "corredera", (d("150"), d("120")), &pares).unwrap();
+    let posicion = |texto: &str| r.pendientes.iter().position(|p| p.contains(texto)).unwrap();
+    assert!(
+        posicion("Parteluces: falta la medida de corte") < posicion("Parteluces: falta el ángulo")
     );
 }

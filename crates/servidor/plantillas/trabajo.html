@@ -28,6 +28,7 @@
           <div>
             <p class="antetitulo">Ventana {{ v.orden }}{% if v.revision > 1 %} · revisión {{ v.revision }}{% endif %}</p>
             <p class="tarjeta-linea-titulo">{{ v.descripcion }}</p>
+            {% if !v.detalles.is_empty() %}<details class="detalles-ventana"><summary>Ver detalles</summary><ul class="lista-simple">{% for d in v.detalles %}<li>{{ d }}</li>{% endfor %}</ul></details>{% endif %}
             <p class="texto-apagado pequeno">{{ v.hechos }} de {{ v.pasos.len() }} pasos hechos</p>
             {% if let Some(f) = v.falta_algo %}<p class="etiqueta etiqueta-aviso">Falta algo: {{ f }}</p>{% endif %}
           </div>

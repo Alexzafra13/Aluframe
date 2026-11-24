@@ -50,6 +50,24 @@ fn chapa_en_hoja(c: &crate::aplicacion::resumen_de_linea::ChapaResumida) -> (Str
     (texto, dibujo)
 }
 
+/// Las pendientes salen con su número y «PENDIENTE» en la medida: el operario sabe que esa
+/// pieza va, aunque no pueda cortarla todavía.
+fn piezas_en_hoja(r: &crate::aplicacion::resumen_de_linea::ResumenDeVentana) -> Vec<PiezaEnHoja> {
+    let pendientes = r.piezas_pendientes.iter().map(|p| PiezaEnHoja {
+        medida: "PENDIENTE".into(),
+        corte: String::new(),
+        ..pieza_en_hoja(p)
+    });
+    let mut piezas: Vec<PiezaEnHoja> = r
+        .piezas
+        .iter()
+        .map(pieza_en_hoja)
+        .chain(pendientes)
+        .collect();
+    piezas.sort_by_key(|p| p.numero);
+    piezas
+}
+
 pub struct HojaDeVentana {
     pub titulo: String,
     pub serie: String,
@@ -74,7 +92,7 @@ impl HojaDeVentana {
             acabado: c.acabado.clone(),
             medidas: format!("{} × {}", mm(c.ancho_dmm), mm(c.alto_dmm)),
             dibujo: r.dibujo.clone(),
-            piezas: r.piezas.iter().map(pieza_en_hoja).collect(),
+            piezas: piezas_en_hoja(r),
             cristal: r
                 .vidrios
                 .iter()

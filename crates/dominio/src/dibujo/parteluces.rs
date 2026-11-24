@@ -1,5 +1,6 @@
 //! El parteluces en el dibujo (ADR-0030): una barra en cada hoja, la chapa de abajo rayada en
-//! el color de la ventana (o el cristal) y la cota de su altura a la derecha.
+//! el color de la ventana (o el cristal), su medida acotada dentro del hueco y, cuando se sabe,
+//! la altura real del parteluces a la derecha.
 
 use std::fmt::Write;
 
@@ -28,6 +29,11 @@ fn altura_del_eje(plano: &Plano, p: &ParteLucesEnDibujo) -> i64 {
     p.altura.map_or_else(aproximada, Longitud::decimas_de_mm)
 }
 
+/// Coordenada vertical del eje en el plano (para la barra y para el número de su pieza).
+pub fn eje(plano: &Plano, p: &ParteLucesEnDibujo) -> i64 {
+    plano.marco.abajo() - altura_del_eje(plano, p)
+}
+
 fn grosor_de_barra(plano: &Plano) -> i64 {
     (plano.grosor_hoja * 7 / 10).max(1)
 }
@@ -35,7 +41,7 @@ fn grosor_de_barra(plano: &Plano) -> i64 {
 pub fn dibujar(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     let Some(p) = &datos.parteluces else { return };
     let barra = grosor_de_barra(plano);
-    let eje = plano.marco.abajo() - altura_del_eje(plano, p);
+    let eje = eje(plano, p);
     if p.con_chapa {
         rayado(s, &datos.color.borde(), (plano.grosor_hoja / 3).max(2));
     }
@@ -80,25 +86,53 @@ fn rayado(s: &mut String, borde: &str, paso: i64) {
     );
 }
 
-/// A la derecha, de abajo de la ventana al eje del parteluces de la última hoja.
+/// Dentro del hueco de abajo de la primera hoja, su medida («chapa 50»): es lo que se corta.
+/// A la derecha, solo si la serie la sabe, la altura real del parteluces desde abajo.
 pub fn cota(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     let Some(p) = &datos.parteluces else { return };
+    let Some(hoja) = plano.hojas.first() else {
+        return;
+    };
+    let letra = plano.tamano_de_letra();
+    let hueco = hoja.dentro(plano.grosor_hoja);
+    let barra = grosor_de_barra(plano);
+    let arriba = eje(plano, p).clamp(hueco.y + barra, hueco.abajo() - barra) + barra / 2;
+    let abajo = hueco.abajo();
+    let x = hueco.x + hueco.ancho / 5;
+    let relleno = if p.con_chapa { "chapa" } else { "cristal" };
+    let texto = format!("{relleno} {}", p.abajo.formatear_cm());
+    let (xt, yt) = (x + letra / 2, (arriba + abajo) / 2 + letra * 35 / 100);
+    let ancho_texto = letra * i64::try_from(texto.chars().count()).unwrap_or(10) * 62 / 100;
+    let _ = write!(
+        s,
+        r##"<g class="capa-cotas"><path class="cota" d="M{x} {arriba} V{abajo} M{} {arriba} H{} M{} {abajo} H{}"/><rect x="{}" y="{}" width="{}" height="{}" rx="{}" fill="#FBFAF6" fill-opacity=".9"/><text class="texto-cota" x="{xt}" y="{yt}" font-size="{letra}">{texto}</text></g>"##,
+        x - letra / 3,
+        x + letra / 3,
+        x - letra / 3,
+        x + letra / 3,
+        xt - letra / 5,
+        yt - letra,
+        ancho_texto + letra * 2 / 5,
+        letra * 13 / 10,
+        letra / 4,
+    );
+    if let Some(altura) = p.altura {
+        cota_de_altura(s, plano, eje(plano, p), altura);
+    }
+}
+
+fn cota_de_altura(s: &mut String, plano: &Plano, eje: i64, altura: Longitud) {
     let letra = plano.tamano_de_letra();
     let x = plano.marco.derecha() + plano.margen / 3;
     let abajo = plano.marco.abajo();
-    let eje = abajo - altura_del_eje(plano, p);
-    let texto = match p.altura {
-        Some(altura) => altura.formatear_cm(),
-        None if p.con_chapa => format!("chapa {}", p.abajo.formatear_cm()),
-        None => format!("cristal {}", p.abajo.formatear_cm()),
-    };
     let (xt, yt) = (x + letra, (abajo + eje) / 2);
     let _ = write!(
         s,
-        r#"<g class="capa-cotas"><path class="cota" d="M{x} {eje} V{abajo} M{} {eje} H{} M{} {abajo} H{}"/><text class="texto-cota" x="{xt}" y="{yt}" font-size="{letra}" text-anchor="middle" transform="rotate(-90 {xt} {yt})">{texto}</text></g>"#,
+        r#"<g class="capa-cotas"><path class="cota" d="M{x} {eje} V{abajo} M{} {eje} H{} M{} {abajo} H{}"/><text class="texto-cota" x="{xt}" y="{yt}" font-size="{letra}" text-anchor="middle" transform="rotate(-90 {xt} {yt})">{}</text></g>"#,
         x - letra / 2,
         x + letra / 2,
         x - letra / 2,
         x + letra / 2,
+        altura.formatear_cm()
     );
 }

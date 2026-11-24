@@ -149,7 +149,9 @@ pub struct VentanaEnPantalla {
     pub id: i64,
     pub orden: i64,
     pub titulo: String,
+    /// Tipo y medidas; el resto (serie, color, opciones) en `detalles`, que se despliega.
     pub descripcion: String,
+    pub detalles: Vec<String>,
     pub dibujo: String,
     pub pasos: Vec<PasoEnPantalla>,
     pub hechos: usize,
@@ -187,11 +189,13 @@ fn describir_repetida(r: &crate::bd::consultas::repetidas::FilaRepetida) -> Stri
 
 impl From<&VentanaDeTrabajo> for VentanaEnPantalla {
     fn from(v: &VentanaDeTrabajo) -> Self {
+        let (descripcion, detalles) = super::partir_descripcion(&v.fila.descripcion);
         VentanaEnPantalla {
             id: v.fila.id,
             orden: v.fila.orden,
             titulo: titulo_y_medidas(&v.fila.descripcion).0,
-            descripcion: v.fila.descripcion.clone(),
+            descripcion,
+            detalles,
             dibujo: v.congelado.resumen.dibujo.clone(),
             pasos: v.pasos.iter().map(PasoEnPantalla::from).collect(),
             hechos: v.hechos(),

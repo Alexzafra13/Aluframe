@@ -130,6 +130,26 @@ fn pieza_en_pantalla(serie: &Serie, p: &dominio::series::PiezaCalculada) -> Piez
     }
 }
 
+/// Las que se cortan y las que aún no tienen medida («pendiente»), por su número.
+fn piezas_en_pantalla(c: &CalculoDeVentana) -> Vec<PiezaEnPantalla> {
+    let r = &c.resultado;
+    let mut piezas: Vec<PiezaEnPantalla> = r
+        .piezas
+        .iter()
+        .map(|p| pieza_en_pantalla(&c.serie, p))
+        .collect();
+    piezas.extend(r.piezas_pendientes.iter().map(|p| PiezaEnPantalla {
+        silueta: url_de_silueta(&c.serie, &p.perfil),
+        numero: p.numero,
+        nombre: nombre_legible(&p.perfil),
+        cantidad: p.cantidad.unwrap_or_default(),
+        medida: "pendiente".into(),
+        corte: String::new(),
+    }));
+    piezas.sort_by_key(|p| p.numero);
+    piezas
+}
+
 fn vidrios(c: &CalculoDeVentana) -> Vec<String> {
     let piezas = c.resultado.vidrio.iter().flatten();
     piezas
@@ -161,12 +181,7 @@ impl From<&CalculoDeVentana> for VistaCalculo {
         };
         VistaCalculo {
             dibujo: c.dibujo.clone(),
-            piezas: c
-                .resultado
-                .piezas
-                .iter()
-                .map(|p| pieza_en_pantalla(&c.serie, p))
-                .collect(),
+            piezas: piezas_en_pantalla(c),
             vidrios: vidrios(c),
             ficha: Some(FichaDeSerie::desde(c)),
             herrajes: herrajes_en_pantalla(c),

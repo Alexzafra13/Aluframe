@@ -69,7 +69,7 @@ impl DatosDeDibujo {
             valor.as_deref().and_then(Lado::desde_texto)
         });
         DatosDeDibujo {
-            piezas: resultado.piezas.iter().map(clave_de_posicion).collect(),
+            piezas: claves_de_posicion(resultado),
             titulo: format!(
                 "{} de {} × {} cm",
                 tipologia.nombre,
@@ -96,10 +96,20 @@ fn parteluces_en_dibujo(resultado: &ResultadoVentana) -> Option<ParteLucesEnDibu
     })
 }
 
-/// El número va donde dice `posicion` si la serie la declara; si no, se deduce del nombre.
-fn clave_de_posicion(pieza: &crate::series::PiezaCalculada) -> (u32, String) {
-    let clave = pieza.posicion.as_ref().unwrap_or(&pieza.perfil);
-    (pieza.numero, clave.clone())
+/// El número va donde dice `posicion` si la serie la declara; si no, se deduce del nombre. Las
+/// piezas aún sin medida también se numeran en el dibujo, como en la lista.
+fn claves_de_posicion(resultado: &ResultadoVentana) -> Vec<(u32, String)> {
+    let calculadas = resultado
+        .piezas
+        .iter()
+        .map(|p| (p.numero, p.posicion.as_ref().unwrap_or(&p.perfil).clone()));
+    let pendientes = resultado
+        .piezas_pendientes
+        .iter()
+        .map(|p| (p.numero, p.posicion.as_ref().unwrap_or(&p.perfil).clone()));
+    let mut todas: Vec<(u32, String)> = calculadas.chain(pendientes).collect();
+    todas.sort_by_key(|(numero, _)| *numero);
+    todas
 }
 
 /// El SVG de la ventana. Nunca falla: con medidas absurdas dibuja lo que puede.

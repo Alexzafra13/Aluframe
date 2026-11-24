@@ -36,12 +36,31 @@ pub fn nombre_legible(codigo: &str) -> String {
     if codigo == "si" {
         return "Sí".to_owned();
     }
-    let texto = codigo.replace('_', " ").to_lowercase();
+    let texto = separar_palabras(codigo).to_lowercase();
     let mut letras = texto.chars();
     letras
         .next()
         .map(|p| p.to_uppercase().chain(letras).collect())
         .unwrap_or_default()
+}
+
+/// El guion bajo separa palabras, salvo entre dos cifras, donde es la coma decimal que un código
+/// no puede llevar: `TORNILLO_4_8x25` es «Tornillo 4,8x25».
+fn separar_palabras(codigo: &str) -> String {
+    let letras: Vec<char> = codigo.chars().collect();
+    let es_cifra = |i: Option<usize>| {
+        i.and_then(|i| letras.get(i))
+            .is_some_and(char::is_ascii_digit)
+    };
+    letras
+        .iter()
+        .enumerate()
+        .map(|(i, &c)| match c {
+            '_' if es_cifra(i.checked_sub(1)) && es_cifra(Some(i + 1)) => ',',
+            '_' => ' ',
+            otra => otra,
+        })
+        .collect()
 }
 
 fn quitar_tilde(letra: char) -> char {
@@ -73,6 +92,8 @@ mod tests {
         assert_eq!(nombre_legible("ALUPROM_21"), "Aluprom 21");
         assert_eq!(nombre_legible("climalit"), "Climalit");
         assert_eq!(nombre_legible("si"), "Sí");
+        assert_eq!(nombre_legible("TORNILLO_4_8x25"), "Tornillo 4,8x25");
+        assert_eq!(nombre_legible("CIERRE_4_HOJAS"), "Cierre 4 hojas");
         assert_eq!(nombre_legible(""), "");
     }
 

@@ -43,6 +43,9 @@ pub struct ResumenDeVentana {
     pub tipologia: String,
     pub dibujo: String,
     pub piezas: Vec<PiezaResumida>,
+    /// Piezas sin medida aún (el parteluces mientras falte su corte). No existían antes de la 0.20.1.
+    #[serde(default)]
+    pub piezas_pendientes: Vec<PiezaResumida>,
     pub vidrios: Vec<VidrioResumido>,
     /// Los resúmenes guardados antes de la 0.20.0 no tienen chapas: sin esto no se leerían.
     #[serde(default)]
@@ -71,6 +74,17 @@ impl From<&CalculoDeVentana> for ResumenDeVentana {
                 .unwrap_or_default(),
             dibujo: c.dibujo.clone(),
             piezas: r.piezas.iter().map(pieza).collect(),
+            piezas_pendientes: r
+                .piezas_pendientes
+                .iter()
+                .map(|p| PiezaResumida {
+                    numero: p.numero,
+                    perfil: p.perfil.clone(),
+                    cantidad: p.cantidad.unwrap_or_default(),
+                    longitud_dmm: 0,
+                    corte: None,
+                })
+                .collect(),
             vidrios: r.vidrio.iter().flatten().map(vidrio).collect(),
             chapas: r.chapas.iter().map(chapa).collect(),
             accesorios: r
