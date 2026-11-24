@@ -58,7 +58,7 @@ tipologias:
 | Campo | Obligatorio | Contenido |
 |---|---|---|
 | `serie` | sí | Código único: `[A-Z0-9_]`, hasta 40 caracteres. |
-| `fabricante` | sí | Texto libre en mayúsculas (Aluval, Sopena). |
+| `fabricante` | sí | Texto libre en mayúsculas (Aluval, Sopena). Si existe `data/marcas/<fabricante en minúsculas>.png`, su logotipo sale junto al nombre de la serie (ADR-0029). |
 | `proveedor` | sí | Código del proveedor del taller o `CONFIRMAR`. Enlaza con la tarifa importada. |
 | `estado` | sí | `borrador`, `validada` o `demo`. Solo `validada` permite precio final; `demo` solo se carga en pruebas. |
 | `unidades` | sí | `cm` o `mm`. Se admiten decimales (4,85 se escribe `4.85`). |
@@ -114,7 +114,7 @@ referencias:
 - `referencia: CONFIRMAR` o una referencia que no aparece en la tarifa **no es un error**: la línea sale incompleta con el aviso "falta el precio de MARCO_LATERAL".
 - Una misma serie puede usar referencias de más de un proveedor: se añade `proveedor` dentro de la entrada (`{ referencia: "...", proveedor: OTRO }`).
 - El **color** no cambia la referencia: el acabado aplica su recargo sobre el precio del blanco (`docs/DATOS.md`, apartado 3.3).
-- `silueta` (opcional, ADR-0017): el dibujo de la sección del perfil, `fabricante/archivo` en minúsculas (`aluval/21210` es `data/perfiles/aluval/21210.svg`). Sale junto al número de la pieza para reconocerla. **No interviene en el precio**: se puede poner aunque la `referencia` siga en `CONFIRMAR`.
+- `silueta` (opcional, ADR-0017): el dibujo de la sección del perfil, `fabricante/archivo` en minúsculas (`aluval/21210` es `data/perfiles/aluval/21210.svg`). Sale junto al número de la pieza para reconocerla. **No interviene en el precio**: se puede poner aunque la `referencia` siga en `CONFIRMAR`. También sirve para los herrajes, con los dibujos genéricos de `data/perfiles/herrajes/` (`herrajes/cierre-embutido`, ADR-0029); el modelo concreto lo dice el artículo del catálogo.
 
 ## 6. Vidrio
 ```yaml
