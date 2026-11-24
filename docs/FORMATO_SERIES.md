@@ -97,7 +97,7 @@ Las fórmulas usan solo lo que permite el evaluador (`docs/BACKEND.md`, apartado
 - `minimo` y `maximo` admiten 2 o más argumentos; `redondear`, `techo` y `suelo` tienen 1 y redondean a un número entero de la unidad de la serie (al más cercano, hacia arriba y hacia abajo).
 - Un campo con un nombre que no está en este documento es un error (evita erratas como `acesorios`).
 
-No se admiten texto, variables nuevas ni funciones propias. Una fórmula con un nombre desconocido es un **error de importación**, no se interpreta. Las opciones de línea (apartado 8) **no** se pueden usar dentro de las fórmulas en el MVP: cambian el dibujo, los textos y, con `perfil_segun`, qué perfil lleva una pieza, no las cuentas. Si una opción tiene que cambiar una cantidad o una medida, se amplía el evaluador con una decisión explícita.
+No se admiten texto, variables nuevas ni funciones propias. Una fórmula con un nombre desconocido es un **error de importación**, no se interpreta. Las opciones de lista (apartado 8) no se usan dentro de las fórmulas: deciden qué partes existen (`solo_si`) y qué perfil lleva una pieza (`perfil_segun`). Las **opciones de medida** sí: su código es una variable más de las fórmulas de su tipología (ADR-0030).
 
 Precisión: se calcula con enteros en décimas de milímetro. `ancho / 2 - 2` con `ancho = 150` da 73; con `ancho = 151` da 73,5; con `(ancho - 4.85) / 2` se aplica el redondeo de la serie al final.
 
@@ -125,7 +125,8 @@ vidrio:
 ```
 - Cada entrada de `piezas` es un tipo de cristal distinto; `cantidad`, `ancho` y `alto` son fórmulas.
 - El **tipo de vidrio** (simple, doble, espesor) se elige en la línea del presupuesto; el de la serie es el valor por defecto.
-- Mientras falte el descuento, se escribe `vidrio: { estado: CONFIRMAR }`.
+- Mientras falte el descuento, se escribe `vidrio: { estado: CONFIRMAR }`. Si solo falta una medida de una pieza (el alto del cristal de arriba de un parteluces), esa medida puede ir en `CONFIRMAR`: la pieza no sale y la ventana queda incompleta.
+- Opcionales en cada pieza (ADR-0030): `nombre` («Arriba», «Abajo») y `solo_si` (apartado 8).
 - El vidrio se pide a medida y no se optimiza. El precio es `m² × precio/m²`, con la superficie mínima facturable del proveedor si la hay (por confirmar).
 
 ## 7. Accesorios y kits
@@ -145,7 +146,21 @@ opciones:
 ```
 - Aparecen como un selector en la línea del presupuesto, se congelan al aceptar y se ven en el dibujo, la hoja de corte y la orden del operario.
 - `valores` son textos cerrados. `por_defecto` es obligatorio.
-- En el MVP solo afectan al dibujo y a los textos (apartado 4).
+- Una opción de lista cambia el perfil de una pieza (`perfil_segun`, ADR-0018) y decide qué partes existen (`solo_si`, abajo).
+- **Opción de medida** (ADR-0030): `tipo: medida`, con `por_defecto`, `min` y `max` en la unidad de la serie. Se escribe en la línea (en cm) y se usa en las fórmulas de su tipología por su `codigo`, como `ancho` y `alto`. Fuera de `min`–`max` el cálculo da error.
+  ```yaml
+  - { codigo: medida_abajo, nombre: "Medida de abajo", tipo: medida, por_defecto: 50, min: 10, max: 200, solo_si: { parteluces: si } }
+  ```
+- **`solo_si: { opcion: valor, … }`** (ADR-0030) en una opción, una pieza, un accesorio, una pieza de vidrio, una chapa o el `parteluces`: solo existe (y solo se pregunta) si se cumplen todas las condiciones. Solo vale con opciones de lista. Al importar se calcula también con cada valor de cada opción, para que una fórmula que solo se usa con una opción no falle al presupuestar.
+
+### Chapas y parteluces (ADR-0030)
+```yaml
+chapas:     # paneles opacos; ancho y alto admiten CONFIRMAR (se ve «?» y la ventana queda incompleta)
+  - { articulo: CHAPA_LACADA_2_CARAS, nombre: "Chapa de abajo", cantidad: 2, ancho: CONFIRMAR, alto: "medida_abajo", solo_si: { parteluces: si, relleno_abajo: chapa } }
+parteluces: { solo_si: { parteluces: si }, abajo: "medida_abajo", altura: CONFIRMAR }
+```
+- `chapas`: el `articulo` es un código de `referencias`; se dibuja a escala con sus cotas en el editor y en la hoja de taller. Mientras no se decida cómo se cobra, una ventana con chapa no tiene precio final.
+- `parteluces` solo da el dibujo: una barra en cada hoja. `abajo` es la medida escrita de lo de abajo; `altura`, la del eje desde abajo de la ventana. Sin `altura`, la barra se coloca aproximada y la cota dice «chapa 50». Su perfil, cristales y chapas se declaran en `piezas`, `vidrio` y `chapas` con el mismo `solo_si`.
 
 ## 9. Dibujo
 El dibujo se **calcula a partir de las mismas piezas y medidas** que la hoja de corte, así que no puede contradecirlas. Cada tipología declara el tipo de dibujo y los datos que necesita:
