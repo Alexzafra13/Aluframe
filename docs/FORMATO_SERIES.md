@@ -173,6 +173,7 @@ persiana: { solo_si: { persiana: si }, guia: 4, cajon: CONFIRMAR, cinta: cinta }
 - `cajon: CONFIRMAR`: lo que dependa de `alto` sale pendiente y la ventana, incompleta. En general, una fórmula con un nombre sin valor deja su pieza pendiente.
 - `cinta` es el código de una opción de lista con los valores `derecha` e `izquierda`.
 - La persiana se pide: va en `accesorios` con el mismo `solo_si`.
+- **`montaje: pared`** (ADR-0033, por defecto `ventana`): persiana suelta con guías de L. La medida escrita es el hueco y no se le quita nada; `guia` (el ala de la L) y `cajon` admiten `CONFIRMAR` y entonces la línea sale incompleta. Se usa con `dibujo: { tipo: persiana }` y `piezas: []` (nada que cortar; sin piezas no hace falta `longitud_barra`).
 
 ## 9. Dibujo
 El dibujo se **calcula a partir de las mismas piezas y medidas** que la hoja de corte, así que no puede contradecirlas. Cada tipología declara el tipo de dibujo y los datos que necesita:
@@ -189,6 +190,7 @@ El dibujo se **calcula a partir de las mismas piezas y medidas** que la hoja de 
 - Los números de las piezas del dibujo son los de la hoja de corte (diseño aprobado en `design/03-hoja-taller.png`).
 
 - Con `persiana` (ADR-0032), la corredera lleva el cajón arriba, una guía a cada lado, las lamas detrás del cristal y la cinta por fuera en el lado elegido; se acotan el conjunto y el marco.
+- `tipo: persiana` (ADR-0033): persiana suelta en pared; cajón y guías de L por fuera del hueco, lamas con la lama final y su asa, tornillos y la cinta con su recogedor. Se acota el hueco y, cuando se saben guía y cajón, el total.
 - `tipo: mosquitera` (ADR-0031): cajón arriba, guías, malla y terminal con dos tiradores negros (como vienen en los kits). El cajón se dibuja más alto si sale una pieza de cajón de 50 (`CAJON_50`). Los números van donde dice `posicion` (`marco_superior`, `marco_lateral`, `marco_inferior`).
 
 ## 10. Límites

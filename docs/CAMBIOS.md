@@ -229,3 +229,9 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Dibujo como la foto del propietario: cajón y guías alineados (las tapas del cajón, del ancho de la guía), lamas detrás del cristal y la cinta por dentro de la guía hasta el recogedor, gris con ventana blanca y negra con color; cotas del conjunto y del marco.
   - Cierre embutido de las correderas redibujado como la foto del propietario: placa alargada con el pie redondeado, ranura negra y un punto. El recogedor, una caja alargada al pie de la guía con la boca por donde entra la cinta (tejida) y un tornillo.
   - Formato de series: bloque `persiana`; una fórmula con un nombre sin valor deja su pieza pendiente en vez de fallar.
+- **0.23.0 (propietario): persiana suelta en pared** (ADR-0033).
+  - Serie nueva «Persiana en pared», en borrador: se elige en «Serie y tipología», se escribe la medida del hueco y va al presupuesto con su dibujo, sola o con la ventana. No tiene nada que cortar: la persiana se pide hecha y sale en los herrajes como «Persiana».
+  - Dibujo como el plano del propietario: cajón y guías de L por fuera del hueco, lamas con relieve, lama final con el asa, tornillos y la cinta con su recogedor en el lado elegido. Se acota el hueco; el total, cuando se sepan la guía y el cajón.
+  - Pendiente del propietario: el ala de la guía de L (80 o 100 mm), los cajones, la medida de pedido y cómo se cobra. Mientras, sale incompleta y sin precio final.
+  - El botón del presupuesto pasa a «+ Ventana, mosquitera o persiana».
+  - Formato de series: `montaje: pared` en el bloque `persiana`, dibujo `persiana` y series sin piezas (sin longitud de barra).

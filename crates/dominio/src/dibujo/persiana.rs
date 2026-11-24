@@ -1,17 +1,21 @@
 //! Persiana en la ventana (ADR-0032), como en la foto que aportó el propietario: el cajón arriba
 //! a todo el ancho, una guía a cada lado, la persiana medio bajada con las lamas detrás del
-//! cristal y la cinta por fuera, en el lado elegido. Cajón y guías, en el color de la ventana.
+//! cristal y la cinta por la guía del lado elegido. Cajón y guías, en el color de la ventana.
+//! Suelta en pared (ADR-0033), cajón y guías de L van por fuera del hueco.
 
 use std::fmt::Write;
 
 use super::DatosDeDibujo;
 use super::acabado::perfil;
 use super::geometria::{Lado, Plano, Rect};
+use crate::series::MontajeDePersiana;
 use crate::unidades::Longitud;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PersianaEnDibujo {
-    pub guia: Longitud,
+    pub montaje: MontajeDePersiana,
+    /// Sin el ancho de la guía (el ala de la L en pared), el dibujo lo aproxima y no lo acota.
+    pub guia: Option<Longitud>,
     /// Sin el alto del cajón, el dibujo lo aproxima y no lo acota.
     pub cajon: Option<Longitud>,
     pub cinta: Lado,
@@ -30,21 +34,39 @@ pub struct PersianaEnPlano {
 /// Lo que se ve de persiana bajada: la parte de arriba del hueco, como en la foto.
 const BAJADA_POR_CIEN: i64 = 30;
 
-/// Reparte el contorno entre la persiana y el marco de la ventana.
-pub fn repartir(contorno: Rect, p: &PersianaEnDibujo) -> (PersianaEnPlano, Rect) {
-    let guia = p.guia.decimas_de_mm().clamp(1, contorno.ancho / 4);
-    let aproximado = contorno.alto * 15 / 100;
-    let cajon = p
-        .cajon
-        .map_or(aproximado, Longitud::decimas_de_mm)
-        .clamp(1, contorno.alto / 2);
+/// Solo para dibujar mientras falte el dato, sin cota: el ala de la guía de L (80 o 100 mm).
+const GUIA_APROXIMADA: i64 = 800;
+
+/// Reparte la medida escrita. En la ventana es el conjunto: guías y cajón quedan dentro y el
+/// resto es el marco. En pared es el hueco: guías y cajón quedan por fuera y el contorno crece.
+/// Devuelve (partes, hueco o marco, contorno).
+pub fn repartir(medida: Rect, p: &PersianaEnDibujo) -> (PersianaEnPlano, Rect, Rect) {
+    let aproximado = medida.alto * 15 / 100;
+    let cajon = p.cajon.map_or(aproximado, Longitud::decimas_de_mm);
+    let guia = p.guia.map_or(GUIA_APROXIMADA, Longitud::decimas_de_mm);
+    let (contorno, guia, cajon) = match p.montaje {
+        MontajeDePersiana::Ventana => (
+            medida,
+            guia.clamp(1, medida.ancho / 4),
+            cajon.clamp(1, medida.alto / 2),
+        ),
+        MontajeDePersiana::Pared => {
+            let (guia, cajon) = (guia.clamp(1, medida.ancho), cajon.clamp(1, medida.alto));
+            let contorno = Rect {
+                ancho: medida.ancho + 2 * guia,
+                alto: medida.alto + cajon,
+                ..medida
+            };
+            (contorno, guia, cajon)
+        }
+    };
     let guia_en = |x| Rect {
         x,
         y: contorno.y + cajon,
         ancho: guia,
         alto: contorno.alto - cajon,
     };
-    let marco = Rect {
+    let dentro = Rect {
         x: contorno.x + guia,
         y: contorno.y + cajon,
         ancho: contorno.ancho - 2 * guia,
@@ -58,7 +80,7 @@ pub fn repartir(contorno: Rect, p: &PersianaEnDibujo) -> (PersianaEnPlano, Rect)
         guias: [guia_en(contorno.x), guia_en(contorno.derecha() - guia)],
         cinta: p.cinta,
     };
-    (partes, marco)
+    (partes, dentro, contorno)
 }
 
 /// Cajón y guías, antes que el marco: la ventana va entre ellos. Las tapas del cajón tienen el

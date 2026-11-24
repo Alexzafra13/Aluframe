@@ -122,12 +122,25 @@ pub struct Tipologia {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PersianaDeSerie {
     pub solo_si: SoloSi,
-    /// Ancho de cada guía lateral; se evalúa con la medida del conjunto.
-    pub guia: Formula,
+    pub montaje: MontajeDePersiana,
+    /// Ancho de cada guía lateral; se evalúa con la medida escrita. En la ventana es obligatorio;
+    /// en pared (el ala de la guía de L) puede quedar en `CONFIRMAR`.
+    pub guia: Dato<Formula>,
     /// Alto del cajón según la medida del conjunto; `CONFIRMAR` hasta tener el dato.
     pub cajon: Dato<Formula>,
     /// Opción de la línea que dice en qué lado va la cinta (`derecha` o `izquierda`).
     pub cinta: String,
+}
+
+/// Dónde se monta la persiana (ADR-0032 y ADR-0033).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MontajeDePersiana {
+    /// En la ventana: la medida escrita es la del conjunto y el marco sale de quitarle guías y
+    /// cajón.
+    Ventana,
+    /// Suelta, en la pared con guías de L: la medida escrita es la del hueco y no se le quita
+    /// nada; guías y cajón quedan por fuera. Se pide hecha.
+    Pared,
 }
 
 /// Condición `solo_si: { opcion: valor }`: la parte solo existe si se cumplen todas.
@@ -240,6 +253,8 @@ pub enum TipoDibujo {
     Fija,
     /// Mosquitera enrollable: cajón, guías, malla y terminal (ADR-0031).
     Mosquitera,
+    /// Persiana suelta en pared: cajón, guías de L y lamas (ADR-0033).
+    Persiana,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

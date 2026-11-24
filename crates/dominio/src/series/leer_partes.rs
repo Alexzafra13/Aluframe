@@ -209,10 +209,12 @@ fn leer_tipo_de_dibujo(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option
         "abatible" => Some(TipoDibujo::Abatible),
         "fija" => Some(TipoDibujo::Fija),
         "mosquitera" => Some(TipoDibujo::Mosquitera),
+        "persiana" => Some(TipoDibujo::Persiana),
         _ => {
-            lector
-                .informe
-                .error(ruta, "debe ser corredera, abatible, fija o mosquitera");
+            lector.informe.error(
+                ruta,
+                "debe ser corredera, abatible, fija, mosquitera o persiana",
+            );
             None
         }
     }

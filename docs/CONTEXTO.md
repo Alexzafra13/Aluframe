@@ -57,6 +57,11 @@ Todo se maneja en cm (un decimal de cm = 1 mm). Redondeo provisional: a 0,1 cm h
 - El terminal no se corta y la malla no se cuenta: vienen dentro del cajón al cortarlo. Un kit de plástico aparte por mosquitera. Dos tiradores, siempre negros. Mismos colores que las ventanas.
 - Se vende suelta; con las persianas podrá ir dentro de la ventana. Pendiente: referencias, proveedor, longitud de barra, cortes a 90° y límites.
 
+**Persianas (propietario, 2026-11-24; ADR-0032 y ADR-0033).** No se fabrican: se piden hechas.
+- **En la ventana** (correderas de Aluprom 21): la medida escrita es la del conjunto; guía de 4 cm a cada lado (el marco, 8 cm menos de ancho); el alto del marco, el conjunto menos el cajón. Cinta a la derecha por defecto.
+- **Suelta en pared** con guías de L (perfil plano, canal de 53 mm y ala de 80 o 100, por confirmar): se escribe el hueco; va al presupuesto con su dibujo, sola o con la ventana.
+- Pendiente: alturas de los cajones, medida que se da al proveedor y cómo se cobran.
+
 **Herrajes (propietario, 2026-11-24; ADR-0029):** cierre de embutir que se usa hoy, Alualpha 267 i (2 por corredera de 2 hojas, 4 por la de 4); kit de plásticos Al21 de Aluval (9426065); tornillo 4,8 × 25 de cabeza redonda y estrella. El modelo concreto lo dice el artículo del catálogo; la serie usa referencias genéricas.
 
 **Sopena V-94, ventana europea abatible de 2 hojas (borrador)**

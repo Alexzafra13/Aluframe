@@ -1,16 +1,31 @@
-//! Cotas del dibujo: el ancho abajo y el alto a la izquierda. Con persiana (ADR-0032), fuera va
-//! la medida del conjunto y dentro la del marco, que es lo que se corta.
+//! Cotas del dibujo: el ancho abajo y el alto a la izquierda. Con persiana en la ventana
+//! (ADR-0032), fuera va la medida del conjunto y dentro la del marco, que es lo que se corta. En
+//! pared (ADR-0033), dentro el hueco y fuera el total cuando se sabe.
 
 use std::fmt::Write;
 
-use super::DatosDeDibujo;
 use super::geometria::Plano;
+use super::{DatosDeDibujo, PersianaEnDibujo};
+use crate::series::MontajeDePersiana;
 
 pub fn escribir(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
+    s.push_str(r#"<g class="capa-cotas">"#);
+    match datos
+        .persiana
+        .as_ref()
+        .filter(|p| p.montaje == MontajeDePersiana::Pared)
+    {
+        Some(p) => de_persiana_en_pared(s, plano, (datos, p)),
+        None => de_ventana(s, plano, datos),
+    }
+    s.push_str("</g>");
+}
+
+/// Sin persiana, la medida escrita. Con persiana en la ventana, además la del marco.
+fn de_ventana(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     let c = plano.contorno;
     let m = plano.margen;
     let letra = plano.tamano_de_letra();
-    s.push_str(r#"<g class="capa-cotas">"#);
     let fila_del_conjunto = match &datos.persiana {
         Some(_) => c.abajo() + m * 2 / 3,
         None => c.abajo() + m / 3,
@@ -38,7 +53,40 @@ pub fn escribir(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
             vertical(s, (marco.y, marco.abajo(), x), &texto, letra);
         }
     }
-    s.push_str("</g>");
+}
+
+/// En pared (ADR-0033), dentro el hueco, que es lo que se escribe; fuera el total con guías y
+/// cajón, solo cuando la serie los sepa.
+fn de_persiana_en_pared(
+    s: &mut String,
+    plano: &Plano,
+    (datos, p): (&DatosDeDibujo, &PersianaEnDibujo),
+) {
+    let (c, hueco) = (plano.contorno, plano.marco);
+    let (m, letra) = (plano.margen, plano.tamano_de_letra());
+    let texto = |l: crate::unidades::Longitud| format!("hueco {}", l.formatear_cm());
+    let fila = c.abajo() + m / 3;
+    horizontal(
+        s,
+        (hueco.x, hueco.derecha(), fila),
+        &texto(datos.ancho),
+        letra,
+    );
+    vertical(
+        s,
+        (hueco.y, hueco.abajo(), c.x - m / 3),
+        &texto(datos.alto),
+        letra,
+    );
+    let Some(guia) = p.guia else { return };
+    if let Some(total) = datos.ancho.sumar(guia).and_then(|a| a.sumar(guia)) {
+        let fila = c.abajo() + m * 2 / 3;
+        horizontal(s, (c.x, c.derecha(), fila), &total.formatear_cm(), letra);
+    }
+    if let Some(total) = p.cajon.and_then(|cajon| datos.alto.sumar(cajon)) {
+        let x = c.derecha() + m * 6 / 10;
+        vertical(s, (c.y, c.abajo(), x), &total.formatear_cm(), letra);
+    }
 }
 
 fn horizontal(s: &mut String, (desde, hasta, y): (i64, i64, i64), texto: &str, letra: i64) {

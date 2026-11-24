@@ -41,14 +41,24 @@ async fn una_instalacion_nueva_trae_las_series_sin_importarlas_a_mano() {
     let cargas = cargar_series_incluidas(&contexto.estado).await.unwrap();
     assert_eq!(
         codigos_cargados(&cargas),
-        vec!["ALUPROM_21 v1", "MOSQUITERA_ENROLLABLE v1", "SOPENA_V94 v1"]
+        vec![
+            "ALUPROM_21 v1",
+            "MOSQUITERA_ENROLLABLE v1",
+            "PERSIANA_PARED v1",
+            "SOPENA_V94 v1"
+        ]
     );
     let (_, actor) = contexto.con_propietario().await;
     let series = listar_series(&contexto.estado, &actor).await.unwrap();
     let codigos: Vec<&str> = series.iter().map(|s| s.serie.codigo.as_str()).collect();
     assert_eq!(
         codigos,
-        vec!["ALUPROM_21", "MOSQUITERA_ENROLLABLE", "SOPENA_V94"]
+        vec![
+            "ALUPROM_21",
+            "MOSQUITERA_ENROLLABLE",
+            "PERSIANA_PARED",
+            "SOPENA_V94"
+        ]
     );
 }
 

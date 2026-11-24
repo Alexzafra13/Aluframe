@@ -69,18 +69,18 @@ impl Plano {
     pub fn nuevo(datos: &DatosDeDibujo) -> Plano {
         let ancho = datos.ancho.decimas_de_mm().clamp(100, 1_000_000);
         let alto = datos.alto.decimas_de_mm().clamp(100, 1_000_000);
-        let contorno = Rect {
+        let medida = Rect {
             x: 0,
             y: 0,
             ancho,
             alto,
         };
-        let (persiana, marco) = match &datos.persiana {
+        let (persiana, marco, contorno) = match &datos.persiana {
             Some(p) => {
-                let (partes, marco) = super::persiana::repartir(contorno, p);
-                (Some(partes), marco)
+                let (partes, marco, contorno) = super::persiana::repartir(medida, p);
+                (Some(partes), marco, contorno)
             }
-            None => (None, contorno),
+            None => (None, medida, medida),
         };
         let menor = marco.ancho.min(marco.alto);
         let grosor_marco = (menor / 16).max(1);
@@ -93,7 +93,7 @@ impl Plano {
             hojas,
             grosor_marco,
             grosor_hoja,
-            margen: ancho.max(alto) / 7,
+            margen: contorno.ancho.max(contorno.alto) / 7,
             tipo: datos.dibujo.tipo,
             parteluces_eje: None,
             persiana,
@@ -113,7 +113,10 @@ impl Plano {
 /// Las correderas se solapan en el encuentro; las abatibles reparten el hueco sin solape.
 fn repartir_hojas(interior: Rect, datos: &DatosDeDibujo, grosor_hoja: i64) -> Vec<Rect> {
     let n = i64::from(datos.dibujo.hojas.max(1));
-    if matches!(datos.dibujo.tipo, TipoDibujo::Fija | TipoDibujo::Mosquitera) {
+    if matches!(
+        datos.dibujo.tipo,
+        TipoDibujo::Fija | TipoDibujo::Mosquitera | TipoDibujo::Persiana
+    ) {
         return vec![interior];
     }
     let solape = if datos.dibujo.tipo == TipoDibujo::Corredera {

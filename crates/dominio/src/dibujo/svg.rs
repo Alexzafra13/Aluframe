@@ -25,6 +25,8 @@ pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
     );
     if plano.tipo == TipoDibujo::Mosquitera {
         super::mosquitera::dibujar(&mut s, plano, datos);
+    } else if plano.tipo == TipoDibujo::Persiana {
+        super::persiana_pared::dibujar(&mut s, plano, datos);
     } else {
         cuerpo_de_ventana(&mut s, plano, datos);
     }
@@ -49,7 +51,7 @@ fn cuerpo_de_ventana(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     match plano.tipo {
         TipoDibujo::Corredera => flechas_de_corredera(s, plano, datos),
         TipoDibujo::Abatible => herrajes_de_abatible(s, plano, datos),
-        TipoDibujo::Fija | TipoDibujo::Mosquitera => {}
+        TipoDibujo::Fija | TipoDibujo::Mosquitera | TipoDibujo::Persiana => {}
     }
     s.push_str("</g>");
 }

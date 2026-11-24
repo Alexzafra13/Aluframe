@@ -67,7 +67,8 @@ pub fn calcular_ventana_con_opciones(
     pendientes.extend(super::validacion::referencias_sin_confirmar(
         serie, tipologia,
     ));
-    if serie.longitud_barra.es_confirmar() {
+    // Sin perfiles a cortar (una persiana que se pide hecha) no hace falta la barra.
+    if serie.longitud_barra.es_confirmar() && !tipologia.piezas.is_empty() {
         pendientes.push("Falta la longitud de barra de la serie.".into());
     }
     Ok(ResultadoVentana {

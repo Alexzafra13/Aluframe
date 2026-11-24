@@ -1,17 +1,20 @@
 //! Persiana en la ventana (ADR-0032): la medida escrita es la del conjunto y la ventana se
-//! calcula con la de su marco, sin las dos guías y sin el cajón.
+//! calcula con la de su marco, sin las dos guías y sin el cajón. Suelta en pared (ADR-0033): la
+//! medida es la del hueco y no se le quita nada.
 
 use std::collections::BTreeMap;
 
 use super::calculo::{Calculo, ErrorCalculo};
-use super::{Dato, PersianaCalculada, Tipologia};
+use super::{Dato, MontajeDePersiana, PersianaCalculada, Tipologia};
+use crate::formula::Formula;
 use crate::unidades::Decimal;
 
 const LADO_DE_LA_CINTA_POR_DEFECTO: &str = "derecha";
 
 impl Calculo<'_> {
-    /// Cambia `ancho` y `alto` por los del marco. Sin el alto del cajón, `alto` se queda sin
-    /// valor: lo que dependa de él sale pendiente y la ventana, incompleta.
+    /// En la ventana cambia `ancho` y `alto` por los del marco; sin el alto del cajón, `alto` se
+    /// queda sin valor y lo que dependa de él sale pendiente. En pared no cambia nada: la medida
+    /// es la del hueco y la persiana se pide hecha.
     pub(super) fn aplicar_persiana(
         &mut self,
         tipologia: &Tipologia,
@@ -21,11 +24,48 @@ impl Calculo<'_> {
         let Some(persiana) = &tipologia.persiana else {
             return Ok(None);
         };
-        let guia = self.evaluar(&persiana.guia, "Persiana (guía)")?;
-        let cajon = match &persiana.cajon {
-            Dato::Valor(formula) => Some(self.evaluar(formula, "Persiana (cajón)")?),
-            Dato::Confirmar => None,
+        let guia = self.dato_opcional(&persiana.guia, "Persiana (guía)")?;
+        let cajon = self.dato_opcional(&persiana.cajon, "Persiana (cajón)")?;
+        let (ancho, alto) = match persiana.montaje {
+            MontajeDePersiana::Ventana => self.medidas_del_marco(guia, cajon, pendientes)?,
+            MontajeDePersiana::Pared => self.medidas_del_hueco(guia, cajon, pendientes),
         };
+        let cinta = tipologia
+            .valor_de_opcion(&persiana.cinta, opciones)
+            .unwrap_or_else(|| LADO_DE_LA_CINTA_POR_DEFECTO.into());
+        let longitud = |valor: Option<Decimal>, donde: &str| {
+            valor.map(|v| self.a_longitud(v, donde)).transpose()
+        };
+        Ok(Some(PersianaCalculada {
+            montaje: persiana.montaje,
+            guia: longitud(guia, "Persiana (guía)")?,
+            cajon: longitud(cajon, "Persiana (cajón)")?,
+            ancho_ventana: self.a_longitud(ancho, "Persiana (ancho)")?,
+            alto_ventana: longitud(alto, "Persiana (alto)")?,
+            cinta,
+        }))
+    }
+
+    fn dato_opcional(
+        &self,
+        dato: &Dato<Formula>,
+        donde: &str,
+    ) -> Result<Option<Decimal>, ErrorCalculo> {
+        match dato {
+            Dato::Valor(formula) => self.evaluar(formula, donde).map(Some),
+            Dato::Confirmar => Ok(None),
+        }
+    }
+
+    /// Persiana en la ventana: el marco es el conjunto sin las dos guías y sin el cajón.
+    fn medidas_del_marco(
+        &mut self,
+        guia: Option<Decimal>,
+        cajon: Option<Decimal>,
+        pendientes: &mut Vec<String>,
+    ) -> Result<(Decimal, Option<Decimal>), ErrorCalculo> {
+        // Al leer la serie ya se exige la guía en la ventana.
+        let guia = guia.ok_or_else(|| no_valida("Persiana (guía)", Decimal::CERO))?;
         let dos_guias = guia
             .multiplicar(Decimal::desde_entero(2))
             .map_err(|_| no_valida("Persiana (guía)", guia))?;
@@ -34,20 +74,24 @@ impl Calculo<'_> {
             .map(|cajon| self.restar_de("alto", cajon, "alto"))
             .transpose()?;
         self.fijar_medidas_del_marco(ancho, alto, pendientes);
-        let cinta = tipologia
-            .valor_de_opcion(&persiana.cinta, opciones)
-            .unwrap_or_else(|| LADO_DE_LA_CINTA_POR_DEFECTO.into());
-        Ok(Some(PersianaCalculada {
-            guia: self.a_longitud(guia, "Persiana (guía)")?,
-            cajon: cajon
-                .map(|c| self.a_longitud(c, "Persiana (cajón)"))
-                .transpose()?,
-            ancho_ventana: self.a_longitud(ancho, "Persiana (ancho de la ventana)")?,
-            alto_ventana: alto
-                .map(|a| self.a_longitud(a, "Persiana (alto de la ventana)"))
-                .transpose()?,
-            cinta,
-        }))
+        Ok((ancho, alto))
+    }
+
+    /// Persiana en pared: la medida es el hueco; lo que falte solo impide el precio final.
+    fn medidas_del_hueco(
+        &self,
+        guia: Option<Decimal>,
+        cajon: Option<Decimal>,
+        pendientes: &mut Vec<String>,
+    ) -> (Decimal, Option<Decimal>) {
+        if guia.is_none() {
+            pendientes.push("Persiana: falta el ancho de la guía de L (80 o 100 mm).".into());
+        }
+        if cajon.is_none() {
+            pendientes.push("Persiana: falta el alto del cajón.".into());
+        }
+        let medida = |nombre: &str| self.valores.get(nombre).copied().unwrap_or(Decimal::CERO);
+        (medida("ancho"), Some(medida("alto")))
     }
 
     fn fijar_medidas_del_marco(

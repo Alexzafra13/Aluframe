@@ -1,4 +1,4 @@
-use super::{AplicaA, UnidadCantidad};
+use super::{AplicaA, MontajeDePersiana, UnidadCantidad};
 use crate::corte::PiezaACortar;
 use crate::unidades::{Decimal, Longitud};
 
@@ -64,11 +64,13 @@ pub struct ParteLucesCalculado {
 /// Persiana en la ventana (ADR-0032): lo que se quita a la medida del conjunto para el marco.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PersianaCalculada {
-    /// Ancho de cada guía lateral.
-    pub guia: Longitud,
+    pub montaje: MontajeDePersiana,
+    /// Ancho de cada guía lateral, si la serie ya lo sabe (en la ventana, siempre).
+    pub guia: Option<Longitud>,
     /// Alto del cajón, si la serie ya lo sabe.
     pub cajon: Option<Longitud>,
-    /// Medida del marco de la ventana: el conjunto sin las dos guías y sin el cajón.
+    /// En la ventana, la medida del marco: el conjunto sin las dos guías y sin el cajón. En
+    /// pared, la del hueco, tal cual se escribió.
     pub ancho_ventana: Longitud,
     pub alto_ventana: Option<Longitud>,
     /// Lado de la cinta: `derecha` o `izquierda`.

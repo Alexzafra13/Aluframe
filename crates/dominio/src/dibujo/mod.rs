@@ -11,6 +11,7 @@ mod marcadores;
 mod mosquitera;
 mod parteluces;
 mod persiana;
+mod persiana_pared;
 mod recogedor;
 mod svg;
 
@@ -114,6 +115,7 @@ fn lleva_cajon_de_50(resultado: &ResultadoVentana) -> bool {
 
 fn persiana_en_dibujo(resultado: &ResultadoVentana) -> Option<PersianaEnDibujo> {
     resultado.persiana.as_ref().map(|p| PersianaEnDibujo {
+        montaje: p.montaje,
         guia: p.guia,
         cajon: p.cajon,
         cinta: Lado::desde_texto(&p.cinta).unwrap_or(Lado::Derecha),

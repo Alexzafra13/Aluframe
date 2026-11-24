@@ -27,13 +27,13 @@
       <h2 id="titulo-lineas">Ventanas y otros conceptos</h2>
       {% if editable() %}
       <div class="acciones">
-        <a class="boton primario" href="/presupuestos/{{ ficha.presupuesto.id }}/lineas/nueva">+ Ventana o mosquitera</a>
+        <a class="boton primario" href="/presupuestos/{{ ficha.presupuesto.id }}/lineas/nueva">+ Ventana, mosquitera o persiana</a>
         <button class="boton" type="button" data-abrir-hoja="hoja-libre">+ Otro concepto</button>
       </div>
       {% endif %}
     </div>
     {% if lineas.is_empty() %}
-    <p class="vacio tarjeta">Todavía no hay nada. <strong>Ventana o mosquitera</strong>: se dibuja y se calcula sola con la serie. <strong>Otro concepto</strong>: lo que no se calcula y lleva su precio a mano (mosquitera, persiana, instalación, portes, cerrajería…).</p>
+    <p class="vacio tarjeta">Todavía no hay nada. <strong>Ventana, mosquitera o persiana</strong>: se dibuja y se calcula sola con la serie. <strong>Otro concepto</strong>: lo que no se calcula y lleva su precio a mano (instalación, portes, cerrajería…).</p>
     {% endif %}
     <ol class="tarjetas-linea" role="list">
       {% for l in lineas %}

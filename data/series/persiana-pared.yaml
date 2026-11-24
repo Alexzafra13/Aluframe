@@ -1,0 +1,31 @@
+# Persiana suelta para montar en pared con guías de L (propietario, 2026-11-24; ADR-0033). No se
+# fabrica: se pide hecha y se pone en el presupuesto con su dibujo, como una ventana más.
+# La medida que se escribe es la del HUECO; las guías y el cajón van por fuera.
+# EN BORRADOR: faltan datos del propietario y sale sin precio final (OPEN_QUESTIONS).
+# Lo que está en CONFIRMAR es un dato que aún no existe. No inventar valores.
+
+serie: PERSIANA_PARED
+fabricante: SIN_MARCA                          # aún no se sabe de qué proveedor ni de qué marca
+proveedor: CONFIRMAR
+estado: borrador
+unidades: cm
+redondeo: { precision: 0.1, sentido: abajo }
+longitud_barra: CONFIRMAR                      # no se corta nada: no hace falta
+
+# La persiana se pide entera (lamas, cajón y guías). Cómo se pide (qué medida se da al proveedor)
+# y cómo se cobra: por confirmar.
+referencias:
+  PERSIANA: { referencia: CONFIRMAR }
+
+tipologias:
+  persiana_pared:
+    nombre: "Persiana en pared"
+    dibujo: { tipo: persiana, hojas: 1 }
+    opciones:
+      - { codigo: cinta, nombre: "Cinta", valores: [derecha, izquierda], por_defecto: derecha }
+    # Guía de L (perfil plano): canal de 53 mm y ala de 80 o 100 mm, por confirmar (el plano del
+    # propietario dice 60). El alto del cajón depende del alto: por confirmar.
+    persiana: { montaje: pared, guia: CONFIRMAR, cajon: CONFIRMAR, cinta: cinta }
+    piezas: []
+    accesorios:
+      - { articulo: PERSIANA, cantidad: 1 }
