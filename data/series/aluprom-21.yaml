@@ -43,7 +43,7 @@ referencias:
   KIT_CORREDERA:    { referencia: "KIT-CORREDERA", silueta: herrajes/kit-plasticos }
   CIERRE_EMBUTIDO:  { referencia: "CIERRE-EMBUTIDO", silueta: herrajes/cierre-embutido }   # genérico: hoy, Alualpha 267 i (el modelo va en el artículo)
   RUEDA_CORREDERA:  { referencia: "RUEDA-CORREDERA", silueta: herrajes/rueda }
-  TORNILLO_4_8x25:  { referencia: "TORNILLO-4,8X25", silueta: herrajes/tornillo }
+  TORNILLO_4_8x25:  { referencia: "TORNILLO-4,8X25" }   # sin dibujo hasta tener uno técnico
   # El cristal se cobra por m² con el artículo de referencia «CRISTAL»; en cada ventana se puede elegir otro.
   CRISTAL:          { referencia: "CRISTAL" }
 

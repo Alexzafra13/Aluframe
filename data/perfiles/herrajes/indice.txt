@@ -1,7 +1,7 @@
-# Dibujos propios de herrajes, genéricos (no de una marca): sirven para reconocer el herraje
-# en pantalla, como las siluetas de los perfiles. Se citan en las series como `silueta: herrajes/<nombre>`.
-# El modelo concreto que se compra lo dice el artículo del catálogo (ADR-0029).
-cierre-embutido | Cierre de embutir: frente y perfil del pestillo
-kit-plasticos   | Kit de plásticos de corredera: tapetas, cortavientos y topes
-rueda           | Rueda de corredera en su carro
-tornillo        | Tornillo
+# Dibujos técnicos de herrajes que aportó el propietario (2026-11-24), recortados del catálogo y
+# puestos en el color de tinta sobre fondo transparente. Son imágenes dentro de un SVG: no hubo
+# forma de pasarlos a trazos. Se citan en las series como `silueta: herrajes/<nombre>` (ADR-0029).
+# El dibujo es genérico: el modelo concreto que se compra lo dice el artículo del catálogo.
+cierre-embutido | Cierre embutido (catálogo de Aluval, 9104537), tumbado para que quepa
+kit-plasticos   | Kit de plásticos Al21 (catálogo de Aluval, 9426065)
+rueda           | Rueda fija de chapa (catálogo de Aluval, 9101027)
