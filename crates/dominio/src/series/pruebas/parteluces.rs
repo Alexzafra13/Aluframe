@@ -225,3 +225,38 @@ fn una_medida_desconocida_en_una_formula_es_un_error_de_importacion() {
         "la medida solo vale en su tipología: {errores:?}"
     );
 }
+
+/// Una fórmula que solo falla con dos opciones a la vez (parteluces y Climalit) se detecta al
+/// importar, no al presupuestar.
+#[test]
+fn detecta_al_importar_un_error_que_solo_sale_combinando_opciones() {
+    let mut valor = serie_con_parteluces();
+    let ruta = |campo: &'static str| ["tipologias", "corredera", campo];
+    let Valor::Lista(mut lista) = opciones() else {
+        panic!("las opciones son una lista")
+    };
+    lista.push(m(vec![
+        ("codigo", t("acristalamiento")),
+        ("nombre", t("Acristalamiento")),
+        ("valores", Valor::Lista(vec![t("normal"), t("climalit")])),
+        ("por_defecto", t("normal")),
+    ]));
+    cambiar(&mut valor, &ruta("opciones"), Some(Valor::Lista(lista)));
+    let mut solo_si = si_parteluces();
+    cambiar(&mut solo_si, &["acristalamiento"], Some(t("climalit")));
+    let chapa = m(vec![
+        ("articulo", t("CHAPA")),
+        ("cantidad", n("4")),
+        ("ancho", t("ancho / (alto - 100)")),
+        ("alto", t("medida_abajo")),
+        ("solo_si", solo_si),
+    ]);
+    cambiar(&mut valor, &ruta("chapas"), Some(Valor::Lista(vec![chapa])));
+    let errores = importar_serie(&valor).unwrap_err().errores;
+    assert!(
+        errores
+            .iter()
+            .any(|e| e.to_string().contains("acristalamiento = climalit")),
+        "{errores:?}"
+    );
+}

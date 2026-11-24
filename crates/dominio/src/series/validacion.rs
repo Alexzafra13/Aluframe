@@ -133,22 +133,59 @@ fn condiciones(t: &Tipologia) -> Vec<(String, String)> {
     todas
 }
 
-/// Además de los valores por defecto, se calcula con cada valor de cada opción (y lo que su
-/// pregunta exige), para que una fórmula que solo se usa con parteluces no falle al presupuestar.
+/// Combinaciones de opciones que se prueban al importar, como mucho. Una serie real tiene pocas
+/// (Aluprom 21: 2 × 2 × 2 = 8); por encima, solo se prueba cada valor por separado.
+const MAXIMO_DE_COMBINACIONES: usize = 256;
+
+/// Además de los valores por defecto, se calcula con cada combinación de opciones de lista, para
+/// que una fórmula que solo se usa con parteluces y Climalit no falle al presupuestar.
 fn validar_cada_opcion(serie: &Serie, tipologia: &Tipologia, ruta: &str, informe: &mut Informe) {
     let cien = Decimal::desde_entero(100);
-    for opcion in tipologia.opciones.iter().filter(|o| o.medida.is_none()) {
-        for valor in &opcion.valores {
-            let mut elegidas: BTreeMap<String, String> = opcion.solo_si.iter().cloned().collect();
-            elegidas.insert(opcion.codigo.clone(), valor.clone());
-            let calculo =
-                calcular_ventana_con_opciones(serie, &tipologia.codigo, (cien, cien), &elegidas);
-            if let Err(error) = calculo {
-                let caso = format!("con {} = {valor}, ancho = 100 y alto = 100", opcion.codigo);
-                informe.error(ruta, format!("{caso}: {error}"));
-            }
+    for elegidas in combinaciones(tipologia) {
+        let calculo =
+            calcular_ventana_con_opciones(serie, &tipologia.codigo, (cien, cien), &elegidas);
+        if let Err(error) = calculo {
+            let caso: Vec<String> = elegidas.iter().map(|(k, v)| format!("{k} = {v}")).collect();
+            let caso = format!("con {}, ancho = 100 y alto = 100", caso.join(", "));
+            informe.error(ruta, format!("{caso}: {error}"));
+            return;
         }
     }
+}
+
+fn combinaciones(tipologia: &Tipologia) -> Vec<BTreeMap<String, String>> {
+    let listas: Vec<_> = tipologia
+        .opciones
+        .iter()
+        .filter(|o| o.medida.is_none())
+        .collect();
+    let total = listas
+        .iter()
+        .try_fold(1_usize, |n, o| n.checked_mul(o.valores.len().max(1)));
+    if total.is_none_or(|n| n > MAXIMO_DE_COMBINACIONES) {
+        let sueltas = listas.iter().flat_map(|o| {
+            o.valores.iter().map(|v| {
+                let mut elegidas: BTreeMap<String, String> = o.solo_si.iter().cloned().collect();
+                elegidas.insert(o.codigo.clone(), v.clone());
+                elegidas
+            })
+        });
+        return sueltas.collect();
+    }
+    let mut todas = vec![BTreeMap::new()];
+    for opcion in listas {
+        todas = todas
+            .into_iter()
+            .flat_map(|base| {
+                opcion.valores.iter().map(move |valor| {
+                    let mut elegidas = base.clone();
+                    elegidas.insert(opcion.codigo.clone(), valor.clone());
+                    elegidas
+                })
+            })
+            .collect();
+    }
+    todas
 }
 
 fn validar_opciones(tipologia: &Tipologia, ruta: &str, informe: &mut Informe) {

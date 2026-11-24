@@ -202,4 +202,5 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Dibujo: la barra en cada hoja, la chapa rayada debajo y la cota de la altura del parteluces a la derecha (dice «chapa 50» mientras falte su altura real). Cada chapa tiene su dibujo técnico a escala con cotas en el editor, en «Mi día» y en la hoja de taller.
   - Con cristal abajo, el cristal se parte en «Arriba» y «Abajo»; el de abajo mide lo escrito.
   - Pendiente del propietario (queda en `CONFIRMAR` y la ventana sale incompleta): medida de corte del parteluces, su altura real, ancho de la chapa, alto del cristal de arriba y cómo se cobra la chapa.
+  - Al importar una serie se prueban todas las combinaciones de sus opciones (hasta 256), no solo cada una por separado: un error que solo sale combinando parteluces y Climalit se ve al importar.
   - Formato de series ampliado de forma general: opciones de medida usables en fórmulas, `solo_si` para partes que dependen de una opción, chapas y cristal con nombre. Sin parteluces, nada cambia; los resúmenes ya guardados se siguen leyendo.

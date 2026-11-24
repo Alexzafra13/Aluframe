@@ -151,7 +151,7 @@ opciones:
   ```yaml
   - { codigo: medida_abajo, nombre: "Medida de abajo", tipo: medida, por_defecto: 50, min: 10, max: 200, solo_si: { parteluces: si } }
   ```
-- **`solo_si: { opcion: valor, … }`** (ADR-0030) en una opción, una pieza, un accesorio, una pieza de vidrio, una chapa o el `parteluces`: solo existe (y solo se pregunta) si se cumplen todas las condiciones. Solo vale con opciones de lista. Al importar se calcula también con cada valor de cada opción, para que una fórmula que solo se usa con una opción no falle al presupuestar.
+- **`solo_si: { opcion: valor, … }`** (ADR-0030) en una opción, una pieza, un accesorio, una pieza de vidrio, una chapa o el `parteluces`: solo existe (y solo se pregunta) si se cumplen todas las condiciones. Solo vale con opciones de lista. Al importar se calcula también con **cada combinación** de opciones de lista (hasta 256; por encima, cada valor por separado), para que una fórmula que solo se usa con una combinación (parteluces y Climalit) no falle al presupuestar.
 
 ### Chapas y parteluces (ADR-0030)
 ```yaml
