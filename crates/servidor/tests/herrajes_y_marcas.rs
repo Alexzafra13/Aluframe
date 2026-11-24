@@ -13,18 +13,14 @@ use servidor::aplicacion::catalogo::{crear_articulo, crear_proveedor};
 use servidor::aplicacion::clientes::crear_cliente;
 use servidor::aplicacion::series_incluidas::cargar_series_incluidas;
 
-/// Calcula en vivo una corredera Aluprom 21 de 4 hojas, con el cierre embutido dado de alta
-/// en el catálogo como el modelo que hoy usa el taller.
-async fn calcular_con_el_cierre_en_el_catalogo() -> String {
-    let contexto = Contexto::nuevo().await;
-    let (token, actor) = contexto.con_propietario().await;
-    cargar_series_incluidas(&contexto.estado).await.unwrap();
+/// Da de alta el cierre embutido en el catálogo como el modelo que hoy usa el taller.
+async fn dar_de_alta_el_cierre(contexto: &Contexto, actor: &servidor::aplicacion::Actor) {
     let proveedor = validar_proveedor(&EntradaDeProveedor {
         nombre: "Ferretería".into(),
         ..EntradaDeProveedor::default()
     })
     .unwrap();
-    let proveedor = crear_proveedor(&contexto.estado, &actor, proveedor)
+    let proveedor = crear_proveedor(&contexto.estado, actor, proveedor)
         .await
         .unwrap();
     let cierre = validar_articulo(&EntradaDeArticulo {
@@ -35,9 +31,17 @@ async fn calcular_con_el_cierre_en_el_catalogo() -> String {
         ..EntradaDeArticulo::default()
     })
     .unwrap();
-    crear_articulo(&contexto.estado, &actor, proveedor, cierre)
+    crear_articulo(&contexto.estado, actor, proveedor, cierre)
         .await
         .unwrap();
+}
+
+/// Calcula en vivo una corredera Aluprom 21 de 4 hojas con el cierre en el catálogo.
+async fn calcular_con_el_cierre_en_el_catalogo() -> String {
+    let contexto = Contexto::nuevo().await;
+    let (token, actor) = contexto.con_propietario().await;
+    cargar_series_incluidas(&contexto.estado).await.unwrap();
+    dar_de_alta_el_cierre(&contexto, &actor).await;
     let cliente = validar_cliente(&EntradaDeCliente::default()).unwrap();
     crear_cliente(&contexto.estado, &actor, cliente, vec![])
         .await

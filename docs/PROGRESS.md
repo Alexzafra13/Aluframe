@@ -30,6 +30,7 @@ cargo build --release --locked -p servidor
 cd e2e && npm ci && ALUMFRAME_BIN=../target/release/alumframe npx playwright test --trace off
 ```
 - La comprobación de tamaño (300 líneas) la pasa CI aunque clippy no la vea: ya rompió una publicación.
+- Pasa clippy **después** de `cargo fmt`: el formateador alarga funciones y una prueba de 38 líneas pasó a 42, y CI falló (0.19.0). El flujo de publicar no pasa clippy, así que la versión sale igualmente y solo CI queda en rojo.
 - CI también prueba en **Windows**: cuidado con lo que dependa de finales de línea (los `.sql` van con LF por `.gitattributes`; una huella de un archivo de texto puede cambiar con CRLF) o de rutas con `/`.
 - Si cambias la versión, primero `cargo build --offline` (actualiza `Cargo.lock`) y después la compilación `--locked`, o fallará.
 - Revisa con capturas de Playwright lo visual que cambies (PC a 1366 × 768 y 1366 × 620, e iPhone 13); espera ~1 s a que terminen las animaciones antes de capturar.
