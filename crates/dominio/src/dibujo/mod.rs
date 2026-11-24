@@ -3,6 +3,7 @@
 
 mod acabado;
 mod chapa;
+mod cierre;
 mod color;
 mod cotas;
 mod geometria;
@@ -10,6 +11,7 @@ mod marcadores;
 mod mosquitera;
 mod parteluces;
 mod persiana;
+mod recogedor;
 mod svg;
 
 #[cfg(test)]

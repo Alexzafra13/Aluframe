@@ -227,4 +227,5 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - La medida que se escribe es la del conjunto. Con persiana, el marco tiene 8 cm menos de ancho (4 por guía) y el alto del conjunto menos el cajón. Mientras falten los cajones, lo que depende del alto sale pendiente y la ventana, incompleta.
   - La persiana se pide: sale en los herrajes como «Persiana», pendiente de saber cómo se pide y se cobra.
   - Dibujo como la foto del propietario: cajón y guías alineados (las tapas del cajón, del ancho de la guía), lamas detrás del cristal y la cinta por dentro de la guía hasta el recogedor, gris con ventana blanca y negra con color; cotas del conjunto y del marco.
+  - Cierre embutido de las correderas redibujado como la foto del propietario: placa alargada con el pie redondeado, ranura negra y un punto. El recogedor, una caja alargada al pie de la guía con la boca por donde entra la cinta (tejida) y un tornillo.
   - Formato de series: bloque `persiana`; una fórmula con un nombre sin valor deja su pieza pendiente en vez de fallar.

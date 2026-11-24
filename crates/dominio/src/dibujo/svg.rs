@@ -43,7 +43,7 @@ fn cuerpo_de_ventana(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
         dibujar_hoja(s, plano, (*rectangulo, indice), &datos.color);
     }
     persiana::dibujar_lamas(s, plano);
-    persiana::dibujar_cinta(s, plano, datos);
+    super::recogedor::dibujar(s, plano, datos);
     super::parteluces::dibujar(s, plano, datos);
     s.push_str(&grupo_de_herrajes(&datos.color));
     match plano.tipo {
@@ -155,7 +155,7 @@ fn cierre_en_el_lado(s: &mut String, plano: &Plano, hoja: Rect, derecho: bool) {
     } else {
         hoja.x + cuarto
     };
-    manilla(s, x, hoja.centro_y(), plano.grosor_hoja);
+    super::cierre::dibujar(s, x, hoja.centro_y(), plano.grosor_hoja);
 }
 
 /// Las centrales se dibujan solapadas, pero en el taller se juntan en el centro con el cierre
@@ -164,13 +164,13 @@ fn cierres_del_centro(s: &mut String, plano: &Plano, centro_y: i64) {
     let centro = plano.marco.x + plano.marco.ancho / 2;
     let hueco = (plano.grosor_hoja / 4).max(1);
     let ancho_manilla = (plano.grosor_hoja / 2).max(1);
-    manilla(
+    super::cierre::dibujar(
         s,
         centro - hueco - ancho_manilla,
         centro_y,
         plano.grosor_hoja,
     );
-    manilla(s, centro + hueco, centro_y, plano.grosor_hoja);
+    super::cierre::dibujar(s, centro + hueco, centro_y, plano.grosor_hoja);
 }
 
 fn manilla(s: &mut String, x: i64, centro_y: i64, grosor: i64) {

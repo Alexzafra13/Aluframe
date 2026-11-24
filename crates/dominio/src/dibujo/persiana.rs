@@ -30,9 +30,6 @@ pub struct PersianaEnPlano {
 /// Lo que se ve de persiana bajada: la parte de arriba del hueco, como en la foto.
 const BAJADA_POR_CIEN: i64 = 30;
 
-const COLOR_CINTA_GRIS: &str = "#8B939B";
-const COLOR_CINTA_NEGRA: &str = "#15191D";
-
 /// Reparte el contorno entre la persiana y el marco de la ventana.
 pub fn repartir(contorno: Rect, p: &PersianaEnDibujo) -> (PersianaEnPlano, Rect) {
     let guia = p.guia.decimas_de_mm().clamp(1, contorno.ancho / 4);
@@ -132,45 +129,4 @@ pub fn dibujar_lamas(s: &mut String, plano: &Plano) {
         );
     }
     s.push_str("</g>");
-}
-
-/// La cinta baja por dentro de la guía del lado elegido hasta el recogedor. Gris con la ventana
-/// blanca y negra con color, para que se distinga (propietario).
-pub fn dibujar_cinta(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
-    let Some(p) = &plano.persiana else { return };
-    let guia = match p.cinta {
-        Lado::Derecha => p.guias[1],
-        Lado::Izquierda => p.guias[0],
-    };
-    let ancho = (guia.ancho / 4).max(1);
-    let x = guia.x + (guia.ancho - ancho) / 2;
-    // Por debajo del número del marco lateral, que va al 72 % del alto.
-    let alto = guia.ancho * 3;
-    let recogedor = Rect {
-        x: guia.x - guia.ancho / 10,
-        y: (plano.contorno.y + plano.contorno.alto * 82 / 100)
-            .min(guia.abajo() - alto - guia.ancho / 2),
-        ancho: guia.ancho * 12 / 10,
-        alto,
-    };
-    let cinta = if datos.color.es_blanco() {
-        COLOR_CINTA_GRIS
-    } else {
-        COLOR_CINTA_NEGRA
-    };
-    let _ = write!(
-        s,
-        r##"<rect class="persiana-cinta" x="{x}" y="{}" width="{ancho}" height="{}" fill="{cinta}"/><rect class="persiana-recogedor" x="{}" y="{}" width="{}" height="{}" rx="{}" fill="{}" stroke="{}"/><rect x="{x}" y="{}" width="{ancho}" height="{}" fill="{cinta}"/>"##,
-        guia.y,
-        recogedor.y - guia.y,
-        recogedor.x,
-        recogedor.y,
-        recogedor.ancho,
-        recogedor.alto,
-        (guia.ancho / 6).max(1),
-        datos.color.hoja(),
-        datos.color.borde(),
-        recogedor.y + recogedor.alto / 4,
-        recogedor.alto / 5
-    );
 }
