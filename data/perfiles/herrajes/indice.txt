@@ -1,7 +1,7 @@
-# Dibujos técnicos de herrajes que aportó el propietario (2026-11-24), recortados del catálogo y
-# puestos en el color de tinta sobre fondo transparente. Son imágenes dentro de un SVG: no hubo
-# forma de pasarlos a trazos. Se citan en las series como `silueta: herrajes/<nombre>` (ADR-0029).
-# El dibujo es genérico: el modelo concreto que se compra lo dice el artículo del catálogo.
-cierre-embutido | Cierre embutido (catálogo de Aluval, 9104537), tumbado para que quepa
-kit-plasticos   | Kit de plásticos Al21 (catálogo de Aluval, 9426065)
-rueda           | Rueda fija de chapa (catálogo de Aluval, 9101027)
+# Dibujos técnicos de herrajes, sacados de los catálogos que aportó el propietario (2026-11-24).
+# Se citan en las series como `silueta: herrajes/<nombre>` (ADR-0029). El dibujo es genérico:
+# el modelo concreto que se compra lo dice el artículo del catálogo.
+# nombre | origen | cómo
+cierre-embutido | Alualpha 267 i (ficha «Linha ECO», pág. 1, vista de frente) | vector: scripts/extraer_herraje.py ficha.pdf 1 83.2,189.4,114.8,392.0 cierre-embutido.svg --tumbado --grosor-minimo=14
+kit-plasticos   | Aluval, catálogo Aluprom 21, pág. 20, ref. 9426065 | imagen original del PDF (pdfimages -png, imagen 006) con scripts/imagen_de_herraje.py: el catálogo no la trae en vector
+rueda           | Aluval, catálogo Aluprom 21, pág. 21, ref. 9101027 (rueda fija chapa) | imagen original del PDF (pdfimages -png, imagen 015) con scripts/imagen_de_herraje.py
