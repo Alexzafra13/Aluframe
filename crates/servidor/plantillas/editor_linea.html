@@ -14,10 +14,10 @@
     {% for p in pestanas %}
     <a class="pestana-linea{% if p.orden == orden %} actual{% endif %}" href="/presupuestos/{{ id }}/lineas/{{ p.orden }}"{% if p.orden == orden %} aria-current="page"{% endif %}>{{ p.orden }} · {{ p.titulo }}{% if !p.completa %} <span class="etiqueta etiqueta-aviso">Incompleta</span>{% endif %}</a>
     {% endfor %}
-    {% if orden == 0 %}<span class="pestana-linea actual" aria-current="page">Ventana nueva</span>{% endif %}
-    <a class="pestana-linea anadir" href="/presupuestos/{{ id }}/lineas/nueva">+ Otra ventana</a>
+    {% if orden == 0 %}<span class="pestana-linea actual" aria-current="page">Nueva</span>{% endif %}
+    <a class="pestana-linea anadir" href="/presupuestos/{{ id }}/lineas/nueva" aria-label="Añadir otra ventana o mosquitera">+ Otra</a>
   </nav>
-  <button class="boton primario" type="submit" form="form-linea">Guardar ventana</button>
+  <button class="boton primario" type="submit" form="form-linea">Guardar</button>
 </div>
 <div class="editor">
   <section class="tarjeta tarjeta-dibujo" aria-labelledby="titulo-dibujo-tarjeta">
@@ -59,7 +59,7 @@
       </details>
       <div class="acciones pie-formulario">
         <a class="boton" href="/presupuestos/{{ id }}">Volver sin guardar</a>
-        <button class="boton primario" type="submit">Guardar ventana</button>
+        <button class="boton primario" type="submit">Guardar</button>
       </div>
     </form>
     <section id="piezas" class="tarjeta tarjeta-piezas">{% include "editor_piezas.html" %}</section>

@@ -221,6 +221,8 @@ pub enum TipoDibujo {
     Corredera,
     Abatible,
     Fija,
+    /// Mosquitera enrollable: cajón, guías, malla y terminal (ADR-0031).
+    Mosquitera,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

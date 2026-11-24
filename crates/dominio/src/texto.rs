@@ -32,16 +32,31 @@ pub fn limpiar_opcional(texto: &str) -> Option<String> {
 
 /// Un código de los datos como se lee en pantalla: «MARCO_LATERAL» es «Marco lateral».
 pub fn nombre_legible(codigo: &str) -> String {
-    // Los valores de las series van sin tildes (ASCII); «si» se lee «Sí».
-    if codigo == "si" {
-        return "Sí".to_owned();
-    }
     let texto = separar_palabras(codigo).to_lowercase();
+    let texto = texto
+        .split(' ')
+        .map(con_tilde)
+        .collect::<Vec<_>>()
+        .join(" ");
     let mut letras = texto.chars();
     letras
         .next()
         .map(|p| p.to_uppercase().chain(letras).collect())
         .unwrap_or_default()
+}
+
+/// Los códigos van sin tildes (ASCII, `CLAUDE.md`); estas palabras del taller la recuperan al
+/// mostrarse. Una palabra nueva con tilde en un código se añade aquí.
+fn con_tilde(palabra: &str) -> &str {
+    match palabra {
+        "si" => "sí",
+        "cajon" => "cajón",
+        "guia" => "guía",
+        "camara" => "cámara",
+        "angulo" => "ángulo",
+        "union" => "unión",
+        otra => otra,
+    }
 }
 
 /// El guion bajo separa palabras, salvo entre dos cifras, donde es la coma decimal que un código
@@ -92,6 +107,8 @@ mod tests {
         assert_eq!(nombre_legible("ALUPROM_21"), "Aluprom 21");
         assert_eq!(nombre_legible("climalit"), "Climalit");
         assert_eq!(nombre_legible("si"), "Sí");
+        assert_eq!(nombre_legible("GUIA_LATERAL"), "Guía lateral");
+        assert_eq!(nombre_legible("CAJON_50"), "Cajón 50");
         assert_eq!(nombre_legible("TORNILLO_4_8x25"), "Tornillo 4,8x25");
         assert_eq!(nombre_legible("CIERRE_4_HOJAS"), "Cierre 4 hojas");
         assert_eq!(nombre_legible(""), "");

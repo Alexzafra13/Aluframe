@@ -47,7 +47,9 @@ fn codigos_usados(tipologia: &Tipologia) -> Vec<String> {
     codigos.extend(variantes.map(|v| v.perfil.clone()));
     codigos.extend(tipologia.accesorios.iter().map(|a| a.articulo.clone()));
     codigos.extend(tipologia.chapas.iter().map(|c| c.articulo.clone()));
-    if let Dato::Valor(vidrio) = &tipologia.vidrio {
+    if let Dato::Valor(vidrio) = &tipologia.vidrio
+        && !vidrio.tipo.is_empty()
+    {
         codigos.push(vidrio.tipo.clone());
     }
     codigos.sort();
@@ -139,16 +141,21 @@ const MAXIMO_DE_COMBINACIONES: usize = 256;
 
 /// Además de los valores por defecto, se calcula con cada combinación de opciones de lista, para
 /// que una fórmula que solo se usa con parteluces y Climalit no falle al presupuestar.
+/// También a 200 de alto: una pieza que solo lleva una ventana alta (el cajón de 50 de una
+/// mosquitera, ADR-0031) se prueba igual.
 fn validar_cada_opcion(serie: &Serie, tipologia: &Tipologia, ruta: &str, informe: &mut Informe) {
     let cien = Decimal::desde_entero(100);
-    for elegidas in combinaciones(tipologia) {
-        let calculo =
-            calcular_ventana_con_opciones(serie, &tipologia.codigo, (cien, cien), &elegidas);
-        if let Err(error) = calculo {
-            let caso: Vec<String> = elegidas.iter().map(|(k, v)| format!("{k} = {v}")).collect();
-            let caso = format!("con {}, ancho = 100 y alto = 100", caso.join(", "));
-            informe.error(ruta, format!("{caso}: {error}"));
-            return;
+    for alto in [cien, Decimal::desde_entero(200)] {
+        for elegidas in combinaciones(tipologia) {
+            let calculo =
+                calcular_ventana_con_opciones(serie, &tipologia.codigo, (cien, alto), &elegidas);
+            if let Err(error) = calculo {
+                let caso: Vec<String> =
+                    elegidas.iter().map(|(k, v)| format!("{k} = {v}")).collect();
+                let caso = format!("con {}, ancho = 100 y alto = {alto}", caso.join(", "));
+                informe.error(ruta, format!("{caso}: {error}"));
+                return;
+            }
         }
     }
 }

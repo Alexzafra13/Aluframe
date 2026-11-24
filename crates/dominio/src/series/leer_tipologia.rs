@@ -98,9 +98,14 @@ fn leer_cuerpo(lector: &mut Lector, campos: &Campos, ruta: &str) -> Cuerpo {
     let piezas = lector
         .obligatorio(campos, "piezas", ruta)
         .and_then(|v| leer_piezas(lector, v, &r("piezas")));
-    let vidrio = lector
-        .obligatorio(campos, "vidrio", ruta)
-        .and_then(|v| leer_vidrio(lector, v, &r("vidrio")));
+    // Sin `vidrio`, la tipología no lleva cristal (una mosquitera, ADR-0031).
+    let vidrio = match opcional(campos, "vidrio") {
+        Some(v) => leer_vidrio(lector, v, &r("vidrio")),
+        None => Some(Dato::Valor(Vidrio {
+            tipo: String::new(),
+            piezas: Vec::new(),
+        })),
+    };
     let accesorios = lector
         .obligatorio(campos, "accesorios", ruta)
         .and_then(|v| leer_accesorios(lector, v, &r("accesorios")));

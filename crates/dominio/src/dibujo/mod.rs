@@ -6,6 +6,7 @@ mod chapa;
 mod color;
 mod geometria;
 mod marcadores;
+mod mosquitera;
 mod parteluces;
 mod svg;
 
@@ -36,6 +37,8 @@ pub struct DatosDeDibujo {
     /// El del acabado de la línea; blanco si no se eligió.
     pub color: ColorDeDibujo,
     pub parteluces: Option<ParteLucesEnDibujo>,
+    /// Mosquitera: el cajón de 50 se dibuja más alto que el de 45 (ADR-0031).
+    pub cajon_de_50: bool,
 }
 
 impl DatosDeDibujo {
@@ -83,8 +86,22 @@ impl DatosDeDibujo {
             hoja_cremona,
             color: ColorDeDibujo::default(),
             parteluces: parteluces_en_dibujo(resultado),
+            cajon_de_50: lleva_cajon_de_50(resultado),
         }
     }
+}
+
+/// La serie elige el cajón con la cantidad de cada perfil (ADR-0031); el dibujo lo reconoce por
+/// el nombre del perfil que salió, como los números de pieza.
+fn lleva_cajon_de_50(resultado: &ResultadoVentana) -> bool {
+    let calculadas = resultado.piezas.iter().map(|p| p.perfil.as_str());
+    let pendientes = resultado
+        .piezas_pendientes
+        .iter()
+        .map(|p| p.perfil.as_str());
+    calculadas
+        .chain(pendientes)
+        .any(|perfil| perfil.contains("CAJON") && perfil.contains("50"))
 }
 
 /// Va chapa abajo si el cálculo tiene chapas; si no, cristal.

@@ -100,7 +100,7 @@ impl Plano {
 /// Las correderas se solapan en el encuentro; las abatibles reparten el hueco sin solape.
 fn repartir_hojas(interior: Rect, datos: &DatosDeDibujo, grosor_hoja: i64) -> Vec<Rect> {
     let n = i64::from(datos.dibujo.hojas.max(1));
-    if datos.dibujo.tipo == TipoDibujo::Fija {
+    if matches!(datos.dibujo.tipo, TipoDibujo::Fija | TipoDibujo::Mosquitera) {
         return vec![interior];
     }
     let solape = if datos.dibujo.tipo == TipoDibujo::Corredera {

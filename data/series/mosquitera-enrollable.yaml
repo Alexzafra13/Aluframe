@@ -1,0 +1,42 @@
+# Mosquitera enrollable de aluminio (propietario, 2026-11-24; ADR-0031). Se presupuesta suelta, como
+# una ventana más; cuando haya persianas se podrá incluir en la ventana.
+# EN BORRADOR: faltan datos del propietario y la mosquitera sale sin precio final (OPEN_QUESTIONS).
+# Lo que está en CONFIRMAR es un dato que aún no existe. No inventar valores.
+
+serie: MOSQUITERA_ENROLLABLE
+fabricante: SIN_MARCA                          # aún no se sabe de qué proveedor ni de qué marca
+proveedor: CONFIRMAR
+estado: borrador                                # sin validar con mosquiteras reales
+unidades: cm
+redondeo: { precision: 0.1, sentido: abajo }   # la regla provisional del taller
+longitud_barra: CONFIRMAR
+
+parametros:
+  descuento_ancho: 2                  # cajón y terminal = ancho - 2 (propietario; a qué piezas, por confirmar)
+  descuento_guia_cajon_50: 5          # guía con cajón de 50 = alto - 5 (propietario)
+  alto_maximo_cajon_45: 140           # hasta 140 cm de alto, cajón de 45; por encima, de 50 (propietario)
+
+# Perfiles: referencias y proveedor por confirmar. El kit va con referencia genérica del taller,
+# como los de las correderas: se da de alta el artículo «KIT-MOSQUITERA» con el modelo que se compre.
+referencias:
+  CAJON_45:       { referencia: CONFIRMAR }
+  CAJON_50:       { referencia: CONFIRMAR }
+  GUIA_LATERAL:   { referencia: CONFIRMAR }
+  TERMINAL:       { referencia: CONFIRMAR }
+  KIT_MOSQUITERA: { referencia: "KIT-MOSQUITERA" }
+
+tipologias:
+  mosquitera_enrollable:
+    nombre: "Mosquitera enrollable"
+    dibujo: { tipo: mosquitera, hojas: 1 }
+    # El cajón y la guía dependen del alto: con cantidad 0 una pieza no va (ADR-0031). Así sale el
+    # cajón que toca sin elegirlo. Cortes a 90°: supuesto (serie en borrador).
+    piezas:
+      - { perfil: CAJON_45,     cantidad: "si(alto <= alto_maximo_cajon_45, 1, 0)", longitud: "ancho - descuento_ancho", corte: 90, posicion: marco_superior }
+      - { perfil: CAJON_50,     cantidad: "si(alto > alto_maximo_cajon_45, 1, 0)",  longitud: "ancho - descuento_ancho", corte: 90, posicion: marco_superior }
+      - { perfil: GUIA_LATERAL, cantidad: "si(alto <= alto_maximo_cajon_45, 2, 0)", longitud: CONFIRMAR,                corte: 90, posicion: marco_lateral }   # con cajón de 45: descuento por confirmar
+      - { perfil: GUIA_LATERAL, cantidad: "si(alto > alto_maximo_cajon_45, 2, 0)",  longitud: "alto - descuento_guia_cajon_50", corte: 90, posicion: marco_lateral }
+      - { perfil: TERMINAL,     cantidad: 1, longitud: "ancho - descuento_ancho", corte: 90, posicion: marco_inferior }
+    # Sin vidrio: una mosquitera no lleva cristal. La malla: por confirmar si va en el kit o aparte.
+    accesorios:
+      - { articulo: KIT_MOSQUITERA, cantidad: 1 }

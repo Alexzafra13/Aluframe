@@ -40,7 +40,7 @@ async function ventana(page, ancho, alto) {
   await page.getByLabel("Alto (cm)").fill(alto);
   await expect(page.locator("#dibujo svg.dibujo-ventana")).toBeVisible();
   await expect(page.locator("#dibujo .texto-cota").first()).toHaveText(ancho);
-  await page.locator("#form-linea").getByRole("button", { name: "Guardar ventana" }).click();
+  await page.locator("#form-linea").getByRole("button", { name: "Guardar", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText("Guardado en el presupuesto.");
 }
 

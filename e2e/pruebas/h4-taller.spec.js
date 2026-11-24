@@ -28,7 +28,7 @@ test("aceptar un presupuesto crea el trabajo y se asigna a un operario", async (
   await page.getByLabel("Ancho (cm)").fill("150");
   await page.getByLabel("Alto (cm)").fill("120");
   await expect(page.locator("#dibujo .texto-cota").first()).toHaveText("150");
-  await page.locator("#form-linea").getByRole("button", { name: "Guardar ventana" }).click();
+  await page.locator("#form-linea").getByRole("button", { name: "Guardar", exact: true }).click();
   await page.getByRole("button", { name: "Aceptar presupuesto" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "Aceptar presupuesto" }).click();
   await page.getByRole("link", { name: "Ver el trabajo en el taller" }).click();

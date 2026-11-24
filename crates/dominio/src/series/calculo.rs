@@ -155,6 +155,19 @@ impl<'a> Calculo<'a> {
             })
     }
 
+    /// Una pieza con cantidad 0 no la lleva esta medida (ADR-0031): con `si()` la serie elige
+    /// entre dos perfiles, como el cajón de 45 o de 50 de una mosquitera según el alto.
+    fn cantidad_o_ninguna(
+        &self,
+        formula: &Formula,
+        donde: &str,
+    ) -> Result<Option<u32>, ErrorCalculo> {
+        if self.evaluar(formula, donde)? == Decimal::CERO {
+            return Ok(None);
+        }
+        self.cantidad(formula, donde).map(Some)
+    }
+
     /// El redondeo de la serie se aplica una sola vez, al resultado de la fórmula.
     pub(super) fn longitud(
         &self,
@@ -176,23 +189,27 @@ impl<'a> Calculo<'a> {
             .ok_or_else(no_valida)
     }
 
-    /// Una pieza sin medida no se puede cortar, pero se lista como pendiente con su número: el
-    /// número es su puesto en la tipología, así no cambia cuando llegue la medida.
+    /// Una pieza sin medida no se puede cortar, pero se lista como pendiente con su número. Se
+    /// numeran las piezas que lleva esta medida, también las pendientes: así el número no cambia
+    /// cuando llegue la medida, y no salta cuando una pieza no va (cantidad 0).
     fn piezas(
         &self,
         tipologia: &Tipologia,
         pendientes: &mut Vec<String>,
     ) -> Result<(Vec<PiezaCalculada>, Vec<PiezaPendiente>), ErrorCalculo> {
         let (mut piezas, mut sin_medida) = (Vec::new(), Vec::new());
-        for (indice, pieza) in tipologia.piezas.iter().enumerate() {
-            let numero = u32::try_from(indice + 1).unwrap_or(u32::MAX);
-            let (Dato::Valor(cantidad), Dato::Valor(longitud)) = (&pieza.cantidad, &pieza.longitud)
-            else {
-                pendientes.extend(lo_que_falta(pieza));
-                let cantidad = match &pieza.cantidad {
-                    Dato::Valor(formula) => Some(self.cantidad(formula, &pieza.perfil)?),
-                    Dato::Confirmar => None,
-                };
+        let mut numero = 0;
+        for pieza in &tipologia.piezas {
+            let cantidad = match &pieza.cantidad {
+                Dato::Valor(formula) => match self.cantidad_o_ninguna(formula, &pieza.perfil)? {
+                    Some(n) => Some(n),
+                    None => continue,
+                },
+                Dato::Confirmar => None,
+            };
+            numero += 1;
+            pendientes.extend(lo_que_falta(pieza));
+            let (Some(cantidad), Dato::Valor(longitud)) = (cantidad, &pieza.longitud) else {
                 sin_medida.push(PiezaPendiente {
                     numero,
                     perfil: pieza.perfil.clone(),
@@ -201,11 +218,10 @@ impl<'a> Calculo<'a> {
                 });
                 continue;
             };
-            pendientes.extend(lo_que_falta(pieza));
             piezas.push(PiezaCalculada {
                 numero,
                 perfil: pieza.perfil.clone(),
-                cantidad: self.cantidad(cantidad, &pieza.perfil)?,
+                cantidad,
                 longitud: self.longitud(longitud, &pieza.perfil)?,
                 corte: pieza.corte.valor().copied(),
                 formula: longitud.texto().to_owned(),

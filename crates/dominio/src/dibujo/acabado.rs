@@ -30,7 +30,7 @@ pub fn definiciones(color: &ColorDeDibujo) -> String {
 /// Un perfil por capas. `clase` es `marco` u `hoja`; el marco además proyecta sombra.
 pub fn perfil(s: &mut String, color: &ColorDeDibujo, (clase, r): (&str, Rect), grosor: i64) {
     let id = identificador(color);
-    let es_hoja = clase == "hoja" || clase == "parteluces";
+    let es_hoja = matches!(clase, "hoja" | "parteluces" | "terminal");
     if !es_hoja {
         let sombra = Rect {
             y: r.y + (grosor / 5).max(1),

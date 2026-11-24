@@ -22,28 +22,32 @@ pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
         escapar(&datos.titulo),
         definiciones(&datos.color)
     );
-    perfil(
-        &mut s,
-        &datos.color,
-        ("marco", plano.marco),
-        plano.grosor_marco,
-    );
-    for (indice, rectangulo) in plano.hojas.iter().enumerate() {
-        dibujar_hoja(&mut s, plano, (*rectangulo, indice), &datos.color);
+    if plano.tipo == TipoDibujo::Mosquitera {
+        super::mosquitera::dibujar(&mut s, plano, datos);
+    } else {
+        cuerpo_de_ventana(&mut s, plano, datos);
     }
-    super::parteluces::dibujar(&mut s, plano, datos);
-    s.push_str(&grupo_de_herrajes(&datos.color));
-    match plano.tipo {
-        TipoDibujo::Corredera => flechas_de_corredera(&mut s, plano, datos),
-        TipoDibujo::Abatible => herrajes_de_abatible(&mut s, plano, datos),
-        TipoDibujo::Fija => {}
-    }
-    s.push_str("</g>");
     cotas(&mut s, plano, datos);
     super::parteluces::cota(&mut s, plano, datos);
     numeros_de_pieza(&mut s, plano, datos);
     s.push_str("</svg>");
     s
+}
+
+/// Marco, hojas, parteluces y herrajes de una ventana.
+fn cuerpo_de_ventana(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
+    perfil(s, &datos.color, ("marco", plano.marco), plano.grosor_marco);
+    for (indice, rectangulo) in plano.hojas.iter().enumerate() {
+        dibujar_hoja(s, plano, (*rectangulo, indice), &datos.color);
+    }
+    super::parteluces::dibujar(s, plano, datos);
+    s.push_str(&grupo_de_herrajes(&datos.color));
+    match plano.tipo {
+        TipoDibujo::Corredera => flechas_de_corredera(s, plano, datos),
+        TipoDibujo::Abatible => herrajes_de_abatible(s, plano, datos),
+        TipoDibujo::Fija | TipoDibujo::Mosquitera => {}
+    }
+    s.push_str("</g>");
 }
 
 fn rect(s: &mut String, clase: &str, r: Rect) {
