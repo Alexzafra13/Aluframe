@@ -183,3 +183,12 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - En la franja naranja, «Cambiar de usuario» lleva a la entrada de la demostración, donde se elige con quién entrar con un toque (dueño u operario), sin clave.
   - Arreglo: la pantalla del operario («Mi día» y la ventana) no llevaba la franja, y desde ahí no se podía salir de la demostración.
   - Los datos de verdad siguen pidiendo contraseña y PIN siempre; hay una prueba que lo comprueba (ADR-0028, punto 7).
+
+## 2026-11-24
+- **0.19.0 (propietario): correderas de Aluprom 21 completas.** Datos del propietario con fotos del catálogo de Aluval.
+  - Corredera de 4 hojas: perfil nuevo **cierre 4 hojas (21344)**, una pieza que mide lo mismo que el alto de la hoja (`alto − 5,3`), a 90°, con su silueta; su número va en el centro del dibujo (`posicion: centro`, nueva).
+  - Dibujo de la 4 hojas corregido: se abren las cuatro (las de los lados hacia el centro y las centrales hacia fuera), con un cierre en cada lateral y dos en el centro, uno en cada hoja central. Antes había tres cierres en los encuentros de las hojas.
+  - **Cierres embutidos**: 2 en la de 2 hojas y 4 en la de 4, con la referencia genérica `CIERRE-EMBUTIDO` (en Aluval, el 9104537), porque pueden comprarse de otra marca.
+  - El **kit de corredera** es el kit de plásticos (tapetas, cortavientos y juntas; en Aluval, el 9426065): 1 en la de 2 hojas y 2 en la de 4, como ya estaba. Sigue con la referencia genérica `KIT-CORREDERA`.
+  - Pantallas: los perfiles a cortar y los **herrajes** (cierres, kits, ruedas, tornillos) van en apartados separados: en el editor de la ventana (nuevo), en la hoja de taller, en «Mi día» y en «Probar ventana». «Accesorios» pasa a llamarse «Herrajes» también en el desglose del precio. Al terminar una orden se descuentan del stock como hasta ahora, si el artículo existe en el catálogo.
+  - Fixtures reales de las dos correderas actualizados con estos datos del propietario (el de 4 hojas, con la pieza nueva y los 4 cierres; el de 2 hojas, con los 2 cierres). La tarifa y el stock de la demostración llevan el cierre 4 hojas y el cierre embutido, con precio inventado.

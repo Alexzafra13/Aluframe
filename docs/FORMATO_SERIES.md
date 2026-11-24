@@ -87,7 +87,7 @@ Cada pieza es `{ perfil, cantidad, longitud, corte }` y, si hace falta, `posicio
 - `longitud`: fórmula en la unidad de la serie.
 - `corte`: grados (`90`, `45`) o `CONFIRMAR`. Un corte distinto de 90 se dibuja y se imprime en la hoja de corte.
 - `perfil_segun` (opcional, ADR-0018): otro perfil cuando una opción de la línea toma un valor. `perfil_segun: { acristalamiento: { climalit: HOJA_LATERAL_CLIMALIT } }` usa ese perfil si en la línea se elige «climalit» y `perfil` en cualquier otro caso. La opción y el valor deben existir en la tipología y el perfil, en `referencias`. Cambia el perfil (y con él la referencia, el precio y la silueta), no la cantidad ni la medida, y la pieza conserva su número.
-- `posicion` (opcional, ADR-0017): dónde va el número de la pieza en el dibujo cuando su nombre no lo dice: `marco_lateral`, `marco_superior`, `marco_inferior`, `hoja_lateral`, `hoja_central`, `hoja_superior` o `hoja_inferior`. Sin ella se deduce del nombre (`MARCO_SUPERIOR`, `HOJA_RODAMIENTO`…). Ejemplo: la `HOJA_CIERRE` de Aluval va en el centro de la corredera, `posicion: hoja_central`.
+- `posicion` (opcional, ADR-0017): dónde va el número de la pieza en el dibujo cuando su nombre no lo dice: `marco_lateral`, `marco_superior`, `marco_inferior`, `hoja_lateral`, `hoja_central`, `hoja_superior`, `hoja_inferior` o `centro` (donde se juntan las hojas centrales de una corredera de 4, para el cierre 4 hojas). Sin ella se deduce del nombre (`MARCO_SUPERIOR`, `HOJA_RODAMIENTO`…). Ejemplo: la `HOJA_CIERRE` de Aluval va en el centro de la corredera, `posicion: hoja_central`.
 
 Las fórmulas usan solo lo que permite el evaluador (`docs/BACKEND.md`, apartado 5.1):
 - variables `ancho` y `alto` y los `parametros` de la serie;

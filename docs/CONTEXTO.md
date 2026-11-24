@@ -41,10 +41,10 @@ Todo se maneja en cm (un decimal de cm = 1 mm). Redondeo provisional: a 0,1 cm h
 
 **Aluprom 21 (fabricante Aluval), corredera de 2 hojas**
 - Marco lateral: `alto`. Marco superior e inferior: `ancho − 4,1`. Hoja de cierre y hoja central: `alto − 5,3` (2 y 2). Hoja de rodamiento: `ancho/2 − 2` (4 piezas). Todos los cortes a 90°. Barras de 640 cm.
-- Accesorios: kit de corredera (1, un único artículo), 4 ruedas, 17 tornillos 4,8 × 25 (9 en el marco y 8 en las hojas).
+- Accesorios (herrajes): kit de plásticos de corredera (1, un único artículo), 2 cierres embutidos (uno en cada lateral), 4 ruedas, 17 tornillos 4,8 × 25 (9 en el marco y 8 en las hojas).
 
 **Aluprom 21, corredera de 4 hojas (borrador)**
-- Igual que la de 2 hojas salvo la hoja de rodamiento: `(ancho − 3) / 4` (primero se resta y luego se divide). El doble de hojas: 4 de cierre, 4 centrales y 8 de rodamiento. 2 kits iguales.
+- Igual que la de 2 hojas salvo la hoja de rodamiento: `(ancho − 3) / 4` (primero se resta y luego se divide). El doble de hojas: 4 de cierre, 4 centrales y 8 de rodamiento. Además, 1 cierre 4 hojas (21344) con el alto de la hoja (`alto − 5,3`). 2 kits iguales y 4 cierres embutidos (dos en los laterales y dos en el centro).
 - Supuestos por confirmar: 8 ruedas y 25 tornillos (9 en el marco y 16 en las hojas). Cristal pendiente del descuento.
 
 **Sopena V-94, ventana europea abatible de 2 hojas (borrador)**

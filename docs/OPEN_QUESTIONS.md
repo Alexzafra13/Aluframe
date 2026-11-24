@@ -8,7 +8,7 @@ Marca cada una cuando se resuelva e indica dónde queda recogida la respuesta.
 - [ ] ¿Marco superior, lateral e inferior salen del mismo perfil o de perfiles distintos?
 - [x] Los cortes se optimizan **por trabajo** (decisión 2 de H4) y los retales del stock se usan antes que barras nuevas; al terminar la orden se revisan los que entran (H5).
 - [ ] Grosor de sierra: **2 mm provisional** (el propietario lo comprobará); recorte de extremos sin dato (se usa 0); retal mínimo 0 por decisión del propietario. Se cambian en Ajustes > Taller.
-- [ ] Aluprom 21 de 4 hojas: confirmar ruedas (8) y tornillos (9 + 16), que son supuestos. Otras tipologías (fija, puertas). ¿Lleva el perfil «cierre 4 hojas» 21344?
+- [ ] Aluprom 21 de 4 hojas: confirmar ruedas (8) y tornillos (9 + 16), que son supuestos. Otras tipologías (fija, puertas). Resuelto (propietario, 2026-11-24): lleva el «cierre 4 hojas» 21344, una pieza con el alto de la hoja, y 4 cierres embutidos (la de 2 hojas, 2); ver `docs/CAMBIOS.md`.
 - [x] Nombres de las hojas de Aluprom 21: los del catálogo de Aluval, HOJA LATERAL y HOJA CIERRE (propietario, 2026-11-22; ADR-0017).
 - [x] Hojas de Aluprom 21 según el cristal (propietario, 2026-11-22): sencillo → 21310, 21340, 21350; doble (Climalit) → 21312, 21341, 21351. Se elige en la línea con la opción «Acristalamiento» (ADR-0018).
 - [ ] Climalit: ¿cambian los descuentos de las hojas o del cristal respecto al sencillo? (hoy se suponen iguales). Tipo de Climalit y cámara: cómo se piden y si cambian algo más (lo concretará el propietario).
