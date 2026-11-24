@@ -1,8 +1,8 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use axum::Form;
 use axum::extract::{Path, State};
-use axum::http::{HeaderMap, StatusCode};
+use axum::http::StatusCode;
 use axum::response::{IntoResponse, Redirect, Response};
 
 use super::editor_formulario::{
@@ -54,7 +54,6 @@ async fn calcular_vista(
 pub async fn calcular(
     State(estado): State<EstadoApp>,
     ActorActual(actor): ActorActual,
-    cabeceras: HeaderMap,
     Form(pares): Form<Vec<(String, String)>>,
 ) -> Result<Response, ErrorApp> {
     let valores = valores_del_formulario(&Campos::de(pares.clone()));
@@ -66,16 +65,14 @@ pub async fn calcular(
         Err(ErrorApp::Validacion(aviso)) => (None, Some(aviso)),
         Err(otro) => return Err(otro),
     };
-    let cambio_de_serie = cabeceras
-        .get("hx-trigger-name")
-        .is_some_and(|n| n == "seleccion");
-    let opciones = if cambio_de_serie {
-        let datos =
-            cargar_datos_del_editor(&estado, &actor, leer_seleccion(&valores.seleccion)).await?;
-        Some(opciones_en_pantalla(&datos.opciones, &BTreeMap::new()))
-    } else {
-        None
-    };
+    // Si las opciones que llegan no son las de la serie elegida, se ha cambiado de serie y se
+    // vuelven a pintar; si son las mismas no se tocan, para no perder el cursor al escribir.
+    let elegidas = opciones_elegidas(&pares);
+    let datos =
+        cargar_datos_del_editor(&estado, &actor, leer_seleccion(&valores.seleccion)).await?;
+    let de_la_serie: BTreeSet<&String> = datos.opciones.iter().map(|o| &o.codigo).collect();
+    let opciones = (elegidas.keys().collect::<BTreeSet<_>>() != de_la_serie)
+        .then(|| opciones_en_pantalla(&datos.opciones, &elegidas));
     Ok(renderizar(&FragmentoCalculo {
         calculo,
         aviso,

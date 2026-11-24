@@ -11,8 +11,9 @@ El propietario quiere presupuestar **mosquiteras enrollables de aluminio** como 
 3. **`vidrio` es opcional:** sin él la tipología no lleva cristal y no se pide.
 4. **Dibujo `tipo: mosquitera`:** cajón arriba (más alto si sale el perfil del cajón de 50), guías, malla con trama, terminal con dos tiradores negros (así vienen en los kits, sea cual sea el color) y tapas; los perfiles en el color del acabado. Los números de pieza van con `posicion` (`marco_superior`, `marco_lateral`, `marco_inferior`). Dibujo propio a partir de la imagen que aportó el propietario.
 5. **Al importar** se calcula también a 200 cm de alto, para probar las piezas que solo lleva una medida alta.
-6. **Interfaz:** «+ Ventana o mosquitera»; en el editor, «Nueva», «+ Otra» y «Guardar».
-7. Los nombres de pantalla recuperan la tilde de las palabras del taller que la llevan (`CAJON` → «Cajón», `GUIA` → «Guía»), porque los códigos van sin tildes.
+6. **Sin cristal en pantalla:** el editor oculta el campo «Vidrio», la capa «Cristal» y su importe; las opciones de la corredera (acristalamiento, parteluces) no salen porque la mosquitera no las tiene y el editor las cambia al cambiar de serie.
+7. **Interfaz:** «+ Ventana o mosquitera»; en el editor, «Nueva», «+ Otra» y «Guardar».
+8. Los nombres de pantalla recuperan la tilde de las palabras del taller que la llevan (`CAJON` → «Cajón», `GUIA` → «Guía»), porque los códigos van sin tildes.
 
 ## Consecuencias
 - Cuando el propietario dé el descuento de la guía con cajón de 45, las referencias, el proveedor y la longitud de barra, se rellenan en la serie y se pasa a `validada`.

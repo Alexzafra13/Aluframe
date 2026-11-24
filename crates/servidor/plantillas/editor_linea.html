@@ -44,7 +44,7 @@
       <div class="rejilla-dos">
         <div class="campo"><label for="ancho">Ancho (cm)</label><input class="campo-medida" id="ancho" name="ancho" value="{{ valores.ancho }}" inputmode="decimal" required autocomplete="off"></div>
         <div class="campo"><label for="alto">Alto (cm)</label><input class="campo-medida" id="alto" name="alto" value="{{ valores.alto }}" inputmode="decimal" required autocomplete="off"></div>
-        <div class="campo"><label for="vidrio">Vidrio</label><select id="vidrio" name="vidrio"><option value="">El de la serie</option>{% for v in vidrios %}<option value="{{ v.valor }}"{% if v.valor == valores.vidrio %} selected{% endif %}>{{ v.texto }}</option>{% endfor %}</select></div>
+        <div class="campo" id="campo-vidrio"><label for="vidrio">Vidrio</label><select id="vidrio" name="vidrio"><option value="">El de la serie</option>{% for v in vidrios %}<option value="{{ v.valor }}"{% if v.valor == valores.vidrio %} selected{% endif %}>{{ v.texto }}</option>{% endfor %}</select></div>
         <div class="campo"><label for="acabado">Color</label><select id="acabado" name="acabado"><option value="">Sin indicar (blanco)</option>{% for a in acabados %}<option value="{{ a.valor }}"{% if a.valor == valores.acabado %} selected{% endif %}>{{ a.texto }}</option>{% endfor %}</select></div>
       </div>
       <div id="opciones" class="rejilla-campos">{% let lista = opciones %}{% include "editor_opciones.html" %}</div>

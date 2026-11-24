@@ -1,5 +1,6 @@
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 {% if let Some(c) = calculo %}
+{% if c.sin_vidrio %}<span data-sin-vidrio hidden></span>{% endif %}
 <figure class="lienzo-figura">{{ c.dibujo|safe }}
   {% if !c.vidrios.is_empty() %}<figcaption class="capa-texto-cristal pequeno">Cristal: {{ c.vidrios.join(" · ") }}</figcaption>{% endif %}
 </figure>

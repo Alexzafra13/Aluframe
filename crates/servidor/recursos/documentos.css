@@ -126,6 +126,8 @@ body.con-pie-fijo .contenido { padding-bottom: 130px; }
 .tarjeta-dibujo { padding: 1.25rem; }
 .cabecera-dibujo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; flex-wrap: wrap; }
 .cabecera-dibujo .antetitulo { margin: 0; }
+/* Sin cristal (una mosquitera, ADR-0031): fuera el vidrio, la capa «Cristal» y su importe. */
+body:has([data-sin-vidrio]) :is(#campo-vidrio, #capa-cristal, label[for="capa-cristal"], .pie-cristal) { display: none; }
 /* Qué ventana es: tipo, y debajo la serie con el logotipo de su fabricante (ADR-0029). */
 .ficha-tipo { margin: .15rem 0 0; font: 600 1.25rem var(--condensada); color: var(--tinta); }
 .ficha-serie { display: flex; align-items: center; gap: .5rem; margin: .2rem 0 0; }

@@ -92,8 +92,8 @@ fn no_lleva_cristal_ni_lo_pide() {
     );
 }
 
-#[tokio::test]
-async fn se_presupuesta_como_una_ventana_y_sale_su_dibujo() {
+/// Con las series del programa, un cliente y un presupuesto vacío: (contexto, sesión, csrf).
+async fn presupuesto_abierto() -> (Contexto, String, String) {
     let contexto = Contexto::nuevo().await;
     let (token, actor) = contexto.con_propietario().await;
     cargar_series_incluidas(&contexto.estado).await.unwrap();
@@ -106,6 +106,14 @@ async fn se_presupuesta_como_una_ventana_y_sale_su_dibujo() {
     contexto
         .pedir(post("/presupuestos", Some(&token), &cuerpo))
         .await;
+    let csrf = actor.token_csrf.clone();
+    (contexto, token, csrf)
+}
+
+#[tokio::test]
+async fn se_presupuesta_como_una_ventana_y_sale_su_dibujo() {
+    let (contexto, token, csrf) = presupuesto_abierto().await;
+    let csrf = csrf.as_str();
     let editor = texto(
         contexto
             .pedir(get("/presupuestos/1/lineas/nueva", Some(&token)))
@@ -119,12 +127,16 @@ async fn se_presupuesta_como_una_ventana_y_sale_su_dibujo() {
     let inicio = editor[..fin].rfind('"').unwrap() + 1;
     let seleccion = format!("{}|mosquitera_enrollable", &editor[inicio..fin]);
     assert!(editor.contains("Mosquitera enrollable (Sin marca) · Mosquitera enrollable"));
+    // Lo que envía el navegador al pasar de una corredera a la mosquitera: aún lleva las
+    // opciones de la corredera, que la mosquitera no tiene.
     let ventana = formulario(&[
         ("_csrf", csrf),
         ("seleccion", &seleccion),
         ("ancho", "120"),
         ("alto", "160"),
         ("iva", "2100"),
+        ("opcion.acristalamiento", "cristal_normal"),
+        ("opcion.parteluces", "no"),
     ]);
     let ruta = "/presupuestos/1/lineas/calcular";
     let html = texto(contexto.pedir(post(ruta, Some(&token), &ventana)).await).await;
@@ -133,4 +145,31 @@ async fn se_presupuesta_como_una_ventana_y_sale_su_dibujo() {
     assert!(html.contains("Kit mosquitera"));
     assert!(html.contains(r#"src="/perfiles/mosquitera/cajon.svg""#));
     assert!(html.contains(r#"src="/perfiles/mosquitera/guia-lateral.svg""#));
+    // Ni vidrio ni parteluces: las opciones se vuelven a pintar (vacías) y se marca sin cristal.
+    assert!(html.contains(r#"<div id="opciones" class="rejilla-campos" hx-swap-oob="true">"#));
+    assert!(!html.contains("opcion.parteluces"));
+    assert!(html.contains("data-sin-vidrio"));
+}
+
+/// Mientras no se cambia de serie, las opciones no se vuelven a pintar: así no se pierde el
+/// cursor al escribir la medida de abajo del parteluces.
+#[tokio::test]
+async fn con_la_misma_serie_las_opciones_no_se_vuelven_a_pintar() {
+    let (contexto, token, csrf) = presupuesto_abierto().await;
+    let csrf = csrf.as_str();
+    let ventana = formulario(&[
+        ("_csrf", csrf),
+        ("seleccion", "1|corredera_2_hojas"),
+        ("ancho", "150"),
+        ("alto", "120"),
+        ("iva", "2100"),
+        ("opcion.acristalamiento", "cristal_normal"),
+        ("opcion.parteluces", "si"),
+        ("opcion.relleno_abajo", "chapa"),
+        ("opcion.medida_abajo", "5"),
+    ]);
+    let ruta = "/presupuestos/1/lineas/calcular";
+    let html = texto(contexto.pedir(post(ruta, Some(&token), &ventana)).await).await;
+    assert!(!html.contains(r#"id="opciones""#), "{html}");
+    assert!(!html.contains("data-sin-vidrio"));
 }

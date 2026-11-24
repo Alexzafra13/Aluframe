@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use askama::Template;
-use dominio::series::{OpcionDeLinea, Serie};
+use dominio::series::{Dato, OpcionDeLinea, Serie};
 use dominio::unidades::Longitud;
 
 use super::{
@@ -99,6 +99,8 @@ pub struct VistaCalculo {
     pub piezas: Vec<PiezaEnPantalla>,
     pub vidrios: Vec<String>,
     pub ficha: Option<FichaDeSerie>,
+    /// La tipología no lleva cristal (una mosquitera): se ocultan el vidrio y sus capas.
+    pub sin_vidrio: bool,
     /// Lo que no se corta: cierres, kits, ruedas, tornillos…
     pub herrajes: Vec<HerrajeEnPantalla>,
     pub chapas: Vec<ChapaEnPantalla>,
@@ -184,6 +186,10 @@ impl From<&CalculoDeVentana> for VistaCalculo {
             piezas: piezas_en_pantalla(c),
             vidrios: vidrios(c),
             ficha: Some(FichaDeSerie::desde(c)),
+            sin_vidrio: c
+                .serie
+                .tipologia(&c.resultado.tipologia)
+                .is_some_and(|t| matches!(&t.vidrio, Dato::Valor(v) if v.tipo.is_empty())),
             herrajes: herrajes_en_pantalla(c),
             chapas: chapas_en_pantalla(c),
             faltan: c.precio.faltan.clone(),

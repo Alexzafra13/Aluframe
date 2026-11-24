@@ -1,7 +1,7 @@
 {% if let Some(c) = calculo %}
 <dl class="pie-desglose">
   <div><dt>Perfiles</dt><dd title="{{ c.alternativa }}">{{ c.perfiles }}</dd></div>
-  <div><dt>Cristal</dt><dd>{{ c.cristal }}</dd></div>
+  <div class="pie-cristal"><dt>Cristal</dt><dd>{{ c.cristal }}</dd></div>
   <div><dt>Herrajes</dt><dd>{{ c.accesorios }}</dd></div>
   <div><dt>Mano de obra</dt><dd>{{ c.mano_de_obra }}</dd></div>
 </dl>
