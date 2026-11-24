@@ -101,6 +101,8 @@ No se admiten texto, variables nuevas ni funciones propias. Una fórmula con un 
 
 Precisión: se calcula con enteros en décimas de milímetro. `ancho / 2 - 2` con `ancho = 150` da 73; con `ancho = 151` da 73,5; con `(ancho - 4.85) / 2` se aplica el redondeo de la serie al final.
 
+- **Cantidad 0 = la pieza no va** con esa medida (ADR-0031). Con `si()` se elige entre dos perfiles según la medida: `cantidad: "si(alto <= 140, 1, 0)"` y `cantidad: "si(alto > 140, 1, 0)"`. Las piezas se numeran entre las que van.
+
 ## 5. Referencias: el enlace con la tarifa
 La tabla `referencias` traduce cada **código de la serie** (`MARCO_LATERAL`, `BISAGRA`) a la **referencia real del proveedor** (la que aparece en su tarifa).
 
@@ -125,6 +127,7 @@ vidrio:
 ```
 - Cada entrada de `piezas` es un tipo de cristal distinto; `cantidad`, `ancho` y `alto` son fórmulas.
 - El **tipo de vidrio** (simple, doble, espesor) se elige en la línea del presupuesto; el de la serie es el valor por defecto.
+- Sin el apartado `vidrio`, la tipología no lleva cristal (una mosquitera, ADR-0031).
 - Mientras falte el descuento, se escribe `vidrio: { estado: CONFIRMAR }`. Si solo falta una medida de una pieza (el alto del cristal de arriba de un parteluces), esa medida puede ir en `CONFIRMAR`: la pieza no sale y la ventana queda incompleta.
 - Opcionales en cada pieza (ADR-0030): `nombre` («Arriba», «Abajo») y `solo_si` (apartado 8).
 - El vidrio se pide a medida y no se optimiza. El precio es `m² × precio/m²`, con la superficie mínima facturable del proveedor si la hay (por confirmar).
@@ -175,6 +178,8 @@ El dibujo se **calcula a partir de las mismas piezas y medidas** que la hoja de 
 - Tipos nuevos de dibujo son código y exigen una decisión; una tipología nueva de un tipo ya dibujado es solo datos.
 - El dibujo es un esquema para entender la ventana, no un plano de fabricación.
 - Los números de las piezas del dibujo son los de la hoja de corte (diseño aprobado en `design/03-hoja-taller.png`).
+
+- `tipo: mosquitera` (ADR-0031): cajón arriba, guías, malla y terminal con tirador. El cajón se dibuja más alto si sale una pieza de cajón de 50 (`CAJON_50`). Los números van donde dice `posicion` (`marco_superior`, `marco_lateral`, `marco_inferior`).
 
 ## 10. Límites
 ```yaml

@@ -211,3 +211,8 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - La tarjeta de cada ventana del presupuesto y del trabajo muestra solo el tipo y las medidas; la serie, el color y las opciones están en «Ver detalles».
   - Arreglo: la miniatura de la ventana en la lista salía cortada por abajo (en el móvil y en el PC; más en ventanas altas). La rejilla de la miniatura no tenía alto propio y el dibujo crecía con su ancho.
   - En la tarjeta, el aviso de una pieza pendiente dice primero que falta la medida y después el ángulo.
+- **0.21.0 (propietario): mosquitera enrollable** (ADR-0031).
+  - Nueva serie «Mosquitera enrollable», en borrador: se elige en «Serie y tipología», se dibuja (cajón, guías, malla, terminal con tirador) en el color elegido y se calcula como una ventana.
+  - El cajón se elige solo: de 45 hasta 140 cm de alto, de 50 por encima (más alto en el dibujo). Guía con cajón de 50: alto − 5. Cajón y terminal: ancho − 2. Un kit de mosquitera. Lo que falta queda pendiente y la mosquitera no tiene precio final hasta confirmarlo.
+  - Formato de series: una pieza con cantidad 0 no va (para elegir perfil según la medida); el vidrio es opcional; dibujo `mosquitera`; al importar se prueba también a 200 cm de alto. Las piezas se numeran seguidas entre las que lleva cada medida.
+  - Textos: «+ Ventana o mosquitera»; en el editor, «Nueva», «+ Otra» y «Guardar». Los nombres recuperan la tilde de las palabras del taller («Cajón», «Guía»).
