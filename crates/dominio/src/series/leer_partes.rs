@@ -1,6 +1,9 @@
-use super::lector::{Lector, leer_lista, opcional, ruta_hija};
+use super::lector::{Campos, Lector, leer_lista, opcional, ruta_hija};
 use super::leer_serie::es_codigo_valido;
-use super::{Dibujo, Limites, OpcionDeLinea, Rango, TipoDibujo, Valor, VarianteDePerfil};
+use super::{
+    Dibujo, Limites, OpcionDeLinea, Rango, RangoDeMedida, SoloSi, TipoDibujo, Valor,
+    VarianteDePerfil,
+};
 
 pub fn leer_limites(
     lector: &mut Lector,
@@ -52,18 +55,60 @@ pub fn leer_opciones(
 
 fn leer_opcion(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<OpcionDeLinea> {
     let campos = lector.mapa(elemento, ruta)?;
-    lector.solo_campos(
-        campos,
-        &["codigo", "nombre", "valores", "por_defecto"],
-        ruta,
-    );
     let r = |campo: &str| ruta_hija(ruta, campo);
+    let es_medida = match opcional(campos, "tipo") {
+        None => false,
+        Some(v) => leer_tipo_de_opcion(lector, v, &r("tipo"))?,
+    };
     let codigo = lector
         .obligatorio(campos, "codigo", ruta)
         .and_then(|v| lector.texto(v, &r("codigo")));
     let nombre = lector
         .obligatorio(campos, "nombre", ruta)
         .and_then(|v| lector.texto(v, &r("nombre")));
+    let solo_si = leer_solo_si(lector, opcional(campos, "solo_si"), &r("solo_si"));
+    let (valores, por_defecto, medida) = if es_medida {
+        leer_medida(lector, campos, ruta)?
+    } else {
+        leer_valores(lector, campos, ruta)?
+    };
+    Some(OpcionDeLinea {
+        codigo: codigo?,
+        nombre: nombre?,
+        valores,
+        por_defecto,
+        medida,
+        solo_si: solo_si?,
+    })
+}
+
+type ValoresDeOpcion = (Vec<String>, String, Option<RangoDeMedida>);
+
+fn leer_tipo_de_opcion(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<bool> {
+    match lector.texto(valor, ruta)?.as_str() {
+        "lista" => Some(false),
+        "medida" => Some(true),
+        _ => {
+            lector.informe.error(ruta, "debe ser lista o medida");
+            None
+        }
+    }
+}
+
+fn leer_valores(lector: &mut Lector, campos: &Campos, ruta: &str) -> Option<ValoresDeOpcion> {
+    let r = |campo: &str| ruta_hija(ruta, campo);
+    lector.solo_campos(
+        campos,
+        &[
+            "codigo",
+            "nombre",
+            "tipo",
+            "valores",
+            "por_defecto",
+            "solo_si",
+        ],
+        ruta,
+    );
     let valores = lector
         .obligatorio(campos, "valores", ruta)
         .and_then(|v| leer_lista(lector, v, &r("valores"), |l, v, r| l.texto(v, r)));
@@ -78,12 +123,52 @@ fn leer_opcion(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<Opci
         );
         return None;
     }
-    Some(OpcionDeLinea {
-        codigo: codigo?,
-        nombre: nombre?,
-        valores,
-        por_defecto,
-    })
+    Some((valores, por_defecto, None))
+}
+
+/// `tipo: medida`: un número que se escribe al presupuestar, entre `min` y `max`.
+fn leer_medida(lector: &mut Lector, campos: &Campos, ruta: &str) -> Option<ValoresDeOpcion> {
+    let r = |campo: &str| ruta_hija(ruta, campo);
+    lector.solo_campos(
+        campos,
+        &[
+            "codigo",
+            "nombre",
+            "tipo",
+            "por_defecto",
+            "min",
+            "max",
+            "solo_si",
+        ],
+        ruta,
+    );
+    let mut numero = |campo: &str| {
+        let valor = lector.obligatorio(campos, campo, ruta)?;
+        lector.decimal(valor, &r(campo))
+    };
+    let (por_defecto, minimo, maximo) = (numero("por_defecto")?, numero("min")?, numero("max")?);
+    if !(minimo.es_positivo() && minimo <= por_defecto && por_defecto <= maximo) {
+        lector
+            .informe
+            .error(ruta, "la medida necesita 0 < min <= por_defecto <= max");
+        return None;
+    }
+    let rango = RangoDeMedida { minimo, maximo };
+    Some((Vec::new(), por_defecto.to_string(), Some(rango)))
+}
+
+/// `solo_si: { opcion: valor }`. Que la opción y el valor existan se comprueba después, con la
+/// tipología entera (`validacion`).
+pub fn leer_solo_si(lector: &mut Lector, valor: Option<&Valor>, ruta: &str) -> Option<SoloSi> {
+    let Some(valor) = valor else {
+        return Some(Vec::new());
+    };
+    let mut condicion = Vec::new();
+    for (opcion, valor) in lector.mapa(valor, ruta)? {
+        let valor = lector.texto(valor, &ruta_hija(ruta, opcion))?;
+        condicion.push((opcion.clone(), valor));
+    }
+    Some(condicion)
 }
 
 pub fn leer_dibujo(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<Dibujo> {

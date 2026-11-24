@@ -31,6 +31,7 @@ pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
     for (indice, rectangulo) in plano.hojas.iter().enumerate() {
         dibujar_hoja(&mut s, plano, (*rectangulo, indice), &datos.color);
     }
+    super::parteluces::dibujar(&mut s, plano, datos);
     s.push_str(&grupo_de_herrajes(&datos.color));
     match plano.tipo {
         TipoDibujo::Corredera => flechas_de_corredera(&mut s, plano, datos),
@@ -39,6 +40,7 @@ pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
     }
     s.push_str("</g>");
     cotas(&mut s, plano, datos);
+    super::parteluces::cota(&mut s, plano, datos);
     numeros_de_pieza(&mut s, plano, datos);
     s.push_str("</svg>");
     s

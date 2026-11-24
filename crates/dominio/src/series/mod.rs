@@ -1,7 +1,9 @@
 mod calculo;
+mod calculo_rellenos;
 mod lector;
 mod leer_partes;
 mod leer_posicion;
+mod leer_rellenos;
 mod leer_serie;
 mod leer_tipologia;
 mod modelo;
@@ -15,7 +17,10 @@ mod pruebas;
 pub use crate::informe::{Informe, Problema};
 pub use calculo::{ErrorCalculo, calcular_ventana, calcular_ventana_con_opciones};
 pub use modelo::*;
-pub use resultado::{AccesorioCalculado, PiezaCalculada, ResultadoVentana, VidrioCalculado};
+pub use resultado::{
+    AccesorioCalculado, ChapaCalculada, ParteLucesCalculado, PiezaCalculada, ResultadoVentana,
+    VidrioCalculado,
+};
 pub use valor::{CONFIRMAR, Dato, Valor};
 
 /// Lee y valida un archivo de serie: con errores no hay serie; los avisos acompañan a la serie.

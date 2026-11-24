@@ -32,6 +32,10 @@ pub fn limpiar_opcional(texto: &str) -> Option<String> {
 
 /// Un código de los datos como se lee en pantalla: «MARCO_LATERAL» es «Marco lateral».
 pub fn nombre_legible(codigo: &str) -> String {
+    // Los valores de las series van sin tildes (ASCII); «si» se lee «Sí».
+    if codigo == "si" {
+        return "Sí".to_owned();
+    }
     let texto = codigo.replace('_', " ").to_lowercase();
     let mut letras = texto.chars();
     letras
@@ -68,6 +72,7 @@ mod tests {
     fn lee_los_codigos_de_los_datos_como_nombres() {
         assert_eq!(nombre_legible("ALUPROM_21"), "Aluprom 21");
         assert_eq!(nombre_legible("climalit"), "Climalit");
+        assert_eq!(nombre_legible("si"), "Sí");
         assert_eq!(nombre_legible(""), "");
     }
 

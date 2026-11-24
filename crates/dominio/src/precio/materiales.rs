@@ -60,6 +60,12 @@ pub fn calcular_coste_de_materiales(
     };
     coste.cristal = coste_de_cristal(resultado, catalogo, recargo, &mut coste.faltan);
     coste.accesorios = coste_de_accesorios(resultado, catalogo, recargo, &mut coste.faltan);
+    if !resultado.chapas.is_empty() {
+        // Pendiente del propietario (2026-11-24): aún no sabe cómo se cobra la chapa.
+        coste
+            .faltan
+            .push("Chapa: falta decidir cómo se cobra.".into());
+    }
     coste.faltan.dedup();
     coste
 }

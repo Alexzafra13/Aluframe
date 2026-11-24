@@ -5,6 +5,14 @@
   <li><span class="pieza-silueta" aria-hidden="true">{% if let Some(url) = p.silueta %}<img class="silueta" src="{{ url }}" alt="" width="56" height="42" loading="lazy">{% else %}<span class="silueta"></span>{% endif %}<span class="numero-discreto">{{ p.numero }}</span></span><span class="nombre-pieza"><span class="oculto">Pieza {{ p.numero }} del dibujo: </span>{{ p.nombre }} <span class="texto-apagado pequeno">{{ p.corte }}</span></span><span class="mono cantidad-pieza">×{{ p.cantidad }}</span><span class="mono medida">{{ p.medida }}</span></li>
   {% endfor %}
 </ol>
+{% if !c.chapas.is_empty() %}
+<h2 class="antetitulo">Chapas</h2>
+<ul class="lista-piezas lista-chapas" role="list">
+  {% for ch in c.chapas %}
+  <li><span class="pieza-chapa" aria-hidden="true">{{ ch.dibujo|safe }}</span><span class="nombre-pieza">{{ ch.nombre }}{% if let Some(m) = ch.modelo %}<span class="modelo-herraje">{{ m }}</span>{% endif %}</span><span class="mono cantidad-pieza">×{{ ch.cantidad }}</span><span class="mono medida">{{ ch.medida }}</span></li>
+  {% endfor %}
+</ul>
+{% endif %}
 {% if !c.herrajes.is_empty() %}
 <h2 class="antetitulo">Herrajes</h2>
 <ul class="lista-piezas lista-herrajes" role="list">

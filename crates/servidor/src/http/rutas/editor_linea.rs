@@ -21,8 +21,8 @@ use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
 use crate::http::formulario::Campos;
 use crate::vistas::{
-    FragmentoCalculo, MENU, Opcion, OpcionEnPantalla, PaginaEditorLinea, PestanaDeLinea,
-    ValoresDeVentana, VistaCalculo, renderizar,
+    FragmentoCalculo, MENU, Opcion, PaginaEditorLinea, PestanaDeLinea, ValoresDeVentana,
+    VistaCalculo, opciones_en_pantalla, renderizar,
 };
 
 fn opciones(pares: Vec<(String, String)>) -> Vec<Opcion> {
@@ -72,13 +72,7 @@ pub async fn calcular(
     let opciones = if cambio_de_serie {
         let datos =
             cargar_datos_del_editor(&estado, &actor, leer_seleccion(&valores.seleccion)).await?;
-        Some(
-            datos
-                .opciones
-                .iter()
-                .map(|o| OpcionEnPantalla::de(o, None))
-                .collect(),
-        )
+        Some(opciones_en_pantalla(&datos.opciones, &BTreeMap::new()))
     } else {
         None
     };
@@ -142,11 +136,7 @@ async fn pagina_del_editor(
         cliente: ficha.cliente.nombre_visible(),
         orden: e.orden,
         pestanas: pestanas(&ficha),
-        opciones: datos
-            .opciones
-            .iter()
-            .map(|o| OpcionEnPantalla::de(o, e.opciones.get(&o.codigo)))
-            .collect(),
+        opciones: opciones_en_pantalla(&datos.opciones, &e.opciones),
         series: opciones(datos.series),
         acabados: opciones(datos.acabados),
         vidrios: opciones(datos.vidrios),

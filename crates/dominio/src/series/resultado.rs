@@ -26,9 +26,30 @@ pub struct AccesorioCalculado {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VidrioCalculado {
     pub tipo: String,
+    /// «Arriba», «Abajo» cuando hay parteluces.
+    pub nombre: Option<String>,
     pub cantidad: u32,
     pub ancho: Longitud,
     pub alto: Longitud,
+}
+
+/// Una chapa (panel opaco). El ancho o el alto faltan mientras la serie los tenga en `CONFIRMAR`:
+/// se muestra lo que se sabe y la ventana queda incompleta.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChapaCalculada {
+    pub articulo: String,
+    pub nombre: Option<String>,
+    pub cantidad: u32,
+    pub ancho: Option<Longitud>,
+    pub alto: Option<Longitud>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ParteLucesCalculado {
+    /// Medida de la chapa o del cristal de abajo, la que se escribió.
+    pub abajo: Longitud,
+    /// Altura real del parteluces desde abajo de la ventana, si la serie ya la sabe calcular.
+    pub altura: Option<Longitud>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -40,6 +61,8 @@ pub struct ResultadoVentana {
     pub piezas: Vec<PiezaCalculada>,
     pub accesorios: Vec<AccesorioCalculado>,
     pub vidrio: Option<Vec<VidrioCalculado>>,
+    pub chapas: Vec<ChapaCalculada>,
+    pub parteluces: Option<ParteLucesCalculado>,
     pub pendientes: Vec<String>,
     pub fuera_de_limites: Vec<String>,
 }

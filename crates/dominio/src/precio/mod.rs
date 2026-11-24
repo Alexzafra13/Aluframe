@@ -9,6 +9,8 @@ mod venta;
 
 #[cfg(test)]
 mod pruebas;
+#[cfg(test)]
+mod pruebas_chapa;
 
 use crate::tarifa::UnidadDeVenta;
 use crate::unidades::{Dinero, Longitud, Porcentaje, PrecioUnitario};

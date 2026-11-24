@@ -1,7 +1,10 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use super::lector::ruta_hija;
-use super::{Dato, Informe, Serie, TipoDibujo, Tipologia, calcular_ventana};
+use super::{
+    Dato, Informe, Serie, SoloSi, TipoDibujo, Tipologia, calcular_ventana,
+    calcular_ventana_con_opciones,
+};
 use crate::unidades::Decimal;
 
 /// Comprobaciones entre partes del archivo (FORMATO_SERIES.md, apartado 11).
@@ -18,6 +21,7 @@ pub fn validar_serie(serie: &Serie, informe: &mut Informe) {
         validar_dibujo(tipologia, &ruta, informe);
         validar_opciones(tipologia, &ruta, informe);
         validar_variantes(tipologia, &ruta, informe);
+        validar_cada_opcion(serie, tipologia, &ruta, informe);
         if tipologia.limites.is_none() {
             informe.aviso(
                 &ruta,
@@ -42,6 +46,7 @@ fn codigos_usados(tipologia: &Tipologia) -> Vec<String> {
     let variantes = tipologia.piezas.iter().flat_map(|p| &p.perfil_segun);
     codigos.extend(variantes.map(|v| v.perfil.clone()));
     codigos.extend(tipologia.accesorios.iter().map(|a| a.articulo.clone()));
+    codigos.extend(tipologia.chapas.iter().map(|c| c.articulo.clone()));
     if let Dato::Valor(vidrio) = &tipologia.vidrio {
         codigos.push(vidrio.tipo.clone());
     }
@@ -91,23 +96,57 @@ fn validar_dibujo(tipologia: &Tipologia, ruta: &str, informe: &mut Informe) {
     }
 }
 
+/// Cada `perfil_segun` y `solo_si` nombra una opción de lista de la tipología y uno de sus valores.
 fn validar_variantes(tipologia: &Tipologia, ruta: &str, informe: &mut Informe) {
-    let ruta = ruta_hija(ruta, "piezas");
-    for variante in tipologia.piezas.iter().flat_map(|p| &p.perfil_segun) {
-        match tipologia
-            .opciones
-            .iter()
-            .find(|o| o.codigo == variante.opcion)
-        {
+    for (opcion, valor) in condiciones(tipologia) {
+        match tipologia.opciones.iter().find(|o| o.codigo == opcion) {
             None => informe.error(
-                &ruta,
-                format!("«{}» no es una opción de esta tipología", variante.opcion),
+                ruta,
+                format!("«{opcion}» no es una opción de esta tipología"),
             ),
-            Some(opcion) if !opcion.valores.contains(&variante.valor) => informe.error(
-                &ruta,
-                format!("«{}» no es un valor de «{}»", variante.valor, opcion.codigo),
+            Some(o) if o.medida.is_some() => informe.error(
+                ruta,
+                format!("«{opcion}» es una medida: no sirve de condición"),
             ),
+            Some(o) if !o.valores.contains(&valor) => {
+                informe.error(ruta, format!("«{valor}» no es un valor de «{opcion}»"));
+            }
             Some(_) => {}
+        }
+    }
+}
+
+fn condiciones(t: &Tipologia) -> Vec<(String, String)> {
+    let variantes = t.piezas.iter().flat_map(|p| &p.perfil_segun);
+    let mut todas: Vec<(String, String)> = variantes
+        .map(|v| (v.opcion.clone(), v.valor.clone()))
+        .collect();
+    let mut anadir = |solo_si: &SoloSi| todas.extend(solo_si.iter().cloned());
+    t.piezas.iter().for_each(|p| anadir(&p.solo_si));
+    t.accesorios.iter().for_each(|a| anadir(&a.solo_si));
+    t.chapas.iter().for_each(|c| anadir(&c.solo_si));
+    t.opciones.iter().for_each(|o| anadir(&o.solo_si));
+    t.parteluces.iter().for_each(|p| anadir(&p.solo_si));
+    if let Dato::Valor(vidrio) = &t.vidrio {
+        vidrio.piezas.iter().for_each(|p| anadir(&p.solo_si));
+    }
+    todas
+}
+
+/// Además de los valores por defecto, se calcula con cada valor de cada opción (y lo que su
+/// pregunta exige), para que una fórmula que solo se usa con parteluces no falle al presupuestar.
+fn validar_cada_opcion(serie: &Serie, tipologia: &Tipologia, ruta: &str, informe: &mut Informe) {
+    let cien = Decimal::desde_entero(100);
+    for opcion in tipologia.opciones.iter().filter(|o| o.medida.is_none()) {
+        for valor in &opcion.valores {
+            let mut elegidas: BTreeMap<String, String> = opcion.solo_si.iter().cloned().collect();
+            elegidas.insert(opcion.codigo.clone(), valor.clone());
+            let calculo =
+                calcular_ventana_con_opciones(serie, &tipologia.codigo, (cien, cien), &elegidas);
+            if let Err(error) = calculo {
+                let caso = format!("con {} = {valor}, ancho = 100 y alto = 100", opcion.codigo);
+                informe.error(ruta, format!("{caso}: {error}"));
+            }
         }
     }
 }

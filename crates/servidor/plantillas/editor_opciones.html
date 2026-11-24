@@ -1,8 +1,12 @@
 {% for o in lista %}
-<div class="campo">
-  <label for="opcion-{{ o.codigo }}">{{ o.nombre }}</label>
+<div class="campo"{% if !o.solo_si.is_empty() %} data-solo-si="{{ o.solo_si }}"{% endif %}{% if !o.visible %} hidden{% endif %}>
+  <label for="opcion-{{ o.codigo }}">{{ o.nombre }}{% if o.es_medida %} (cm){% endif %}</label>
+  {% if o.es_medida %}
+  <input class="campo-medida" id="opcion-{{ o.codigo }}" name="opcion.{{ o.codigo }}" value="{{ o.elegido }}" inputmode="decimal" autocomplete="off">
+  {% else %}
   <select id="opcion-{{ o.codigo }}" name="opcion.{{ o.codigo }}">
     {% for (valor, texto) in o.valores %}<option value="{{ valor }}"{% if *valor == o.elegido %} selected{% endif %}>{{ texto }}</option>{% endfor %}
   </select>
+  {% endif %}
 </div>
 {% endfor %}

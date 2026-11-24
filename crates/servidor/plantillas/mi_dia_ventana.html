@@ -56,6 +56,8 @@
     <h2 class="antetitulo">Cristal</h2>
     {% if hoja.cristal.is_empty() %}<p><strong>PENDIENTE de medir</strong></p>{% endif %}
     {% for c in hoja.cristal %}<p class="mono">{{ c }}</p>{% endfor %}
+    {% if !hoja.chapas.is_empty() %}<h2 class="antetitulo">Chapas</h2>
+    {% for (texto, dibujo) in hoja.chapas %}<div class="taller-chapa">{{ dibujo|safe }}<p class="mono">{{ texto }}</p></div>{% endfor %}{% endif %}
     <h2 class="antetitulo">Herrajes</h2>
     <ul class="lista-simple mono">{% for (a, n) in hoja.accesorios %}<li>{{ a }} ×{{ n }}</li>{% endfor %}</ul>
   </section>

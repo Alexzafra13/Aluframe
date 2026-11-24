@@ -32,6 +32,24 @@ fn pieza_en_hoja(p: &crate::aplicacion::resumen_de_linea::PiezaResumida) -> Piez
     }
 }
 
+/// La hoja de taller va en mm, como las piezas; lo que falta en la serie sale «?».
+fn chapa_en_hoja(c: &crate::aplicacion::resumen_de_linea::ChapaResumida) -> (String, String) {
+    let medida = |dmm: Option<i64>| dmm.map_or_else(|| "?".to_owned(), mm);
+    let nombre = c
+        .nombre
+        .clone()
+        .unwrap_or_else(|| nombre_legible(&c.articulo));
+    let texto = format!(
+        "{nombre}: {} × {} × {} mm",
+        c.cantidad,
+        medida(c.ancho_dmm),
+        medida(c.alto_dmm)
+    );
+    let longitud = |dmm: Option<i64>| dmm.map(dominio::unidades::Longitud::desde_decimas_de_mm);
+    let dibujo = dominio::dibujo::dibujar_chapa(longitud(c.ancho_dmm), longitud(c.alto_dmm));
+    (texto, dibujo)
+}
+
 pub struct HojaDeVentana {
     pub titulo: String,
     pub serie: String,
@@ -41,6 +59,8 @@ pub struct HojaDeVentana {
     pub piezas: Vec<PiezaEnHoja>,
     /// Vacío mientras la serie no tenga la medida del cristal: se imprime «PENDIENTE de medir».
     pub cristal: Vec<String>,
+    /// Chapas del parteluces: (texto, dibujo técnico a escala).
+    pub chapas: Vec<(String, String)>,
     pub accesorios: Vec<(String, String)>,
     pub opciones: Vec<String>,
 }
@@ -60,13 +80,18 @@ impl HojaDeVentana {
                 .iter()
                 .map(|v| {
                     format!(
-                        "{} × {} × {} mm",
+                        "{}{} × {} × {} mm",
+                        v.nombre
+                            .as_ref()
+                            .map(|n| format!("{n}: "))
+                            .unwrap_or_default(),
                         v.cantidad,
                         mm(v.ancho_dmm),
                         mm(v.alto_dmm)
                     )
                 })
                 .collect(),
+            chapas: r.chapas.iter().map(chapa_en_hoja).collect(),
             accesorios: r
                 .accesorios
                 .iter()

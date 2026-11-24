@@ -13,7 +13,7 @@ use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
 use crate::http::extractores::ActorActual;
 use crate::http::formulario::Campos;
-use crate::vistas::{Comparacion, MENU, OpcionEnPantalla, PaginaMedidas, renderizar};
+use crate::vistas::{Comparacion, MENU, PaginaMedidas, opciones_en_pantalla, renderizar};
 
 struct FormularioDeMedidas {
     version: i64,
@@ -65,11 +65,7 @@ async fn pagina_de_medidas(
         revision: r.ventana.fila.revision,
         ancho: formulario.map_or_else(|| cm_texto(c.ancho_dmm), |m| m.ancho.clone()),
         alto: formulario.map_or_else(|| cm_texto(c.alto_dmm), |m| m.alto.clone()),
-        opciones: r
-            .opciones
-            .iter()
-            .map(|o| OpcionEnPantalla::de(o, elegidas.get(&o.codigo)))
-            .collect(),
+        opciones: opciones_en_pantalla(&r.opciones, elegidas),
         motivo: formulario.map(|m| m.motivo.clone()).unwrap_or_default(),
         reiniciar: formulario.is_some_and(|m| m.reiniciar_pasos),
         pasos_hechos: r.pasos_hechos,

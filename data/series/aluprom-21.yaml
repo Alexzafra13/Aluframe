@@ -36,6 +36,13 @@ referencias:
   HOJA_RODAMIENTO_CLIMALIT: { referencia: "21351", silueta: aluval/21351 }
   # Solo en la de 4 hojas: une las dos hojas centrales (propietario, 2026-11-23). Igual con cualquier cristal.
   CIERRE_4_HOJAS:   { referencia: "21344", silueta: aluval/21344 }
+  # Parteluces: travesaño horizontal en cada hoja (propietario, 2026-11-24; ADR-0030).
+  PARTELUCES:          { referencia: "21564", silueta: aluval/21564 }
+  PARTELUCES_CLIMALIT: { referencia: "21565", silueta: aluval/21565 }
+  # Chapa de abajo, del color de la ventana (propietario): con cristal normal, una por hoja lacada
+  # por las dos caras; con Climalit, dos por hoja, de preferencia lacadas por una cara.
+  CHAPA_LACADA_2_CARAS: { referencia: "CHAPA-LACADA-2-CARAS" }
+  CHAPA_LACADA_1_CARA:  { referencia: "CHAPA-LACADA-1-CARA" }
   # Referencias genéricas del taller, no del proveedor (propietario, 2026-11-22: «de momento, un kit de corredera
   # y ruedas»). Se da de alta el artículo con esta referencia en Catálogo > Artículos y la ventana toma su precio.
   # KIT_CORREDERA es el kit de plásticos (tapetas de las hojas, cortavientos y juntas de estanqueidad adhesivas;
@@ -53,6 +60,11 @@ tipologias:
     dibujo: { tipo: corredera, hojas: 2, hoja_movil: ambas }     # se abren las dos; cierre en cada lateral, como Aluval (propietario)
     opciones:                      # el tipo y la cámara del Climalit se concretarán más adelante
       - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [cristal_normal, climalit], por_defecto: cristal_normal }
+      # Parteluces (ADR-0030): se escribe la medida de la chapa (o del cristal) de abajo; 50 cm se
+      # aprovecha bien de la plancha. Mínimo y máximo: solo evitan errores al teclear.
+      - { codigo: parteluces, nombre: "Parteluces", valores: [no, si], por_defecto: no }
+      - { codigo: relleno_abajo, nombre: "Abajo", valores: [chapa, cristal], por_defecto: chapa, solo_si: { parteluces: si } }
+      - { codigo: medida_abajo, nombre: "Medida de abajo", tipo: medida, por_defecto: 50, min: 10, max: 200, solo_si: { parteluces: si } }
     piezas:
       - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
       - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
@@ -60,13 +72,24 @@ tipologias:
       - { perfil: HOJA_LATERAL,    perfil_segun: { acristalamiento: { climalit: HOJA_LATERAL_CLIMALIT } }, cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90 }
       - { perfil: HOJA_CIERRE,     perfil_segun: { acristalamiento: { climalit: HOJA_CIERRE_CLIMALIT } }, cantidad: 2, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }
       - { perfil: HOJA_RODAMIENTO, perfil_segun: { acristalamiento: { climalit: HOJA_RODAMIENTO_CLIMALIT } }, cantidad: 4, longitud: "ancho / 2 - descuento_hoja_horizontal",   corte: 90 }
+      # Uno por hoja. Medida de corte y ángulo: los dará el propietario.
+      - { perfil: PARTELUCES,      perfil_segun: { acristalamiento: { climalit: PARTELUCES_CLIMALIT } }, cantidad: 2, longitud: CONFIRMAR, corte: CONFIRMAR, solo_si: { parteluces: si } }
     vidrio:
       # Dos cristales, uno por hoja (propietario, 2026-11-22). Ancho: ancho / 2 - 9,8 (el propietario, y el
       # plano de Aluval: (L/2) - 98 mm). Alto: PROVISIONAL, alto de la hoja (alto - 5,3) menos los 7,8 cm que
       # pierde el cristal en el ancho; el plano no lo acota. Comprobar con un cristal real.
       tipo: CRISTAL
       piezas:
-        - { cantidad: 2, ancho: "ancho / 2 - 9.8", alto: "alto - 13.1" }
+        - { cantidad: 2, ancho: "ancho / 2 - 9.8", alto: "alto - 13.1", solo_si: { parteluces: no } }
+        # Con parteluces el cristal se parte en alto; el ancho no cambia (el parteluces es horizontal;
+        # por confirmar). El de arriba espera el descuento; el de abajo mide lo que se escribe.
+        - { nombre: Arriba, cantidad: 2, ancho: "ancho / 2 - 9.8", alto: CONFIRMAR, solo_si: { parteluces: si } }
+        - { nombre: Abajo,  cantidad: 2, ancho: "ancho / 2 - 9.8", alto: "medida_abajo", solo_si: { parteluces: si, relleno_abajo: cristal } }
+    chapas:
+      - { articulo: CHAPA_LACADA_2_CARAS, nombre: "Chapa de abajo", cantidad: 2, ancho: CONFIRMAR, alto: "medida_abajo", solo_si: { parteluces: si, relleno_abajo: chapa, acristalamiento: cristal_normal } }
+      - { articulo: CHAPA_LACADA_1_CARA,  nombre: "Chapa de abajo", cantidad: 4, ancho: CONFIRMAR, alto: "medida_abajo", solo_si: { parteluces: si, relleno_abajo: chapa, acristalamiento: climalit } }
+    # Dibujo: la altura real del parteluces desde abajo de la ventana, cuando se sepa el descuento.
+    parteluces: { solo_si: { parteluces: si }, abajo: "medida_abajo", altura: CONFIRMAR }
     accesorios:
       - { articulo: KIT_CORREDERA,   cantidad: 1 }                  # kit de plásticos; un único artículo
       - { articulo: CIERRE_EMBUTIDO, cantidad: 2 }                  # uno en cada lateral (propietario, 2026-11-23)
@@ -79,6 +102,11 @@ tipologias:
     dibujo: { tipo: corredera, hojas: 4 }          # se abren las cuatro: cierre en cada lateral y dos en el centro (propietario)
     opciones:                      # el tipo y la cámara del Climalit se concretarán más adelante
       - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [cristal_normal, climalit], por_defecto: cristal_normal }
+      # Parteluces (ADR-0030): se escribe la medida de la chapa (o del cristal) de abajo; 50 cm se
+      # aprovecha bien de la plancha. Mínimo y máximo: solo evitan errores al teclear.
+      - { codigo: parteluces, nombre: "Parteluces", valores: [no, si], por_defecto: no }
+      - { codigo: relleno_abajo, nombre: "Abajo", valores: [chapa, cristal], por_defecto: chapa, solo_si: { parteluces: si } }
+      - { codigo: medida_abajo, nombre: "Medida de abajo", tipo: medida, por_defecto: 50, min: 10, max: 200, solo_si: { parteluces: si } }
     # Igual que la de 2 hojas salvo la hoja de rodamiento y las cantidades (el doble de hojas).
     piezas:
       - { perfil: MARCO_LATERAL,   cantidad: 2, longitud: "alto",                                    corte: 90 }
@@ -89,8 +117,13 @@ tipologias:
       - { perfil: HOJA_RODAMIENTO, perfil_segun: { acristalamiento: { climalit: HOJA_RODAMIENTO_CLIMALIT } }, cantidad: 8, longitud: "(ancho - descuento_hoja_4_hojas) / 4",    corte: 90 }  # el doble; primero se resta y luego se divide
       # Mide lo mismo que el alto de la hoja (propietario, 2026-11-23): una pieza donde se juntan las centrales.
       - { perfil: CIERRE_4_HOJAS,  cantidad: 1, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: centro }
+      - { perfil: PARTELUCES,      perfil_segun: { acristalamiento: { climalit: PARTELUCES_CLIMALIT } }, cantidad: 4, longitud: CONFIRMAR, corte: CONFIRMAR, solo_si: { parteluces: si } }  # uno por hoja
     vidrio:
       estado: CONFIRMAR            # el usuario dará la medida cuando sepa el descuento
+    chapas:
+      - { articulo: CHAPA_LACADA_2_CARAS, nombre: "Chapa de abajo", cantidad: 4, ancho: CONFIRMAR, alto: "medida_abajo", solo_si: { parteluces: si, relleno_abajo: chapa, acristalamiento: cristal_normal } }
+      - { articulo: CHAPA_LACADA_1_CARA,  nombre: "Chapa de abajo", cantidad: 8, ancho: CONFIRMAR, alto: "medida_abajo", solo_si: { parteluces: si, relleno_abajo: chapa, acristalamiento: climalit } }
+    parteluces: { solo_si: { parteluces: si }, abajo: "medida_abajo", altura: CONFIRMAR }
     accesorios:
       - { articulo: KIT_CORREDERA,   cantidad: 2 }                  # confirmado por el usuario: 2 kits iguales
       - { articulo: CIERRE_EMBUTIDO, cantidad: 4 }                  # dos en los laterales y dos en el centro (propietario, 2026-11-23)

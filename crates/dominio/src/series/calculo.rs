@@ -5,7 +5,7 @@ use thiserror::Error;
 use super::resultado::MAXIMO_POR_PIEZA;
 use super::{
     AccesorioCalculado, Dato, EstadoSerie, PiezaCalculada, ResultadoVentana, Serie, Tipologia,
-    UnidadCantidad, VidrioCalculado,
+    UnidadCantidad,
 };
 use crate::formula::{ErrorFormula, Formula, Valores};
 use crate::unidades::{Decimal, Longitud};
@@ -22,6 +22,12 @@ pub enum ErrorCalculo {
     CantidadNoValida { donde: String, valor: String },
     #[error("{donde}: la medida sale {valor} y debe ser mayor que cero.")]
     MedidaNoValida { donde: String, valor: String },
+    #[error("{nombre}: escribe una medida entre {minimo} y {maximo}.")]
+    MedidaDeOpcion {
+        nombre: String,
+        minimo: String,
+        maximo: String,
+    },
 }
 
 /// Con los valores por defecto de las opciones de la línea.
@@ -46,15 +52,15 @@ pub fn calcular_ventana_con_opciones(
         .ok_or_else(|| ErrorCalculo::TipologiaDesconocida(codigo_tipologia.to_owned()))?
         .con_opciones(opciones);
     let tipologia = &tipologia;
-    for (nombre, medida) in [("ancho", ancho), ("alto", alto)] {
-        if !medida.es_positivo() {
-            return Err(ErrorCalculo::MedidaNoPositiva(nombre));
-        }
-    }
-    let calculo = Calculo::new(serie, ancho, alto);
+    comprobar_medidas(ancho, alto)?;
+    let mut calculo = Calculo::new(serie, ancho, alto);
+    let medidas = super::calculo_rellenos::medidas_de_linea(tipologia, opciones)?;
+    calculo.valores.extend(medidas);
     let mut pendientes = pendientes_de_estado(serie, tipologia);
     let piezas = calculo.piezas(tipologia, &mut pendientes)?;
     let vidrio = calculo.vidrio(tipologia, &mut pendientes)?;
+    let chapas = calculo.chapas(tipologia, &mut pendientes)?;
+    let parteluces = calculo.parteluces(tipologia, &mut pendientes)?;
     let accesorios = calculo.accesorios(tipologia, &mut pendientes)?;
     pendientes.extend(super::validacion::referencias_sin_confirmar(
         serie, tipologia,
@@ -70,9 +76,20 @@ pub fn calcular_ventana_con_opciones(
         piezas,
         accesorios,
         vidrio,
+        chapas,
+        parteluces,
         pendientes,
         fuera_de_limites: super::validacion::comprobar_limites(tipologia, ancho, alto),
     })
+}
+
+fn comprobar_medidas(ancho: Decimal, alto: Decimal) -> Result<(), ErrorCalculo> {
+    for (nombre, medida) in [("ancho", ancho), ("alto", alto)] {
+        if !medida.es_positivo() {
+            return Err(ErrorCalculo::MedidaNoPositiva(nombre));
+        }
+    }
+    Ok(())
 }
 
 fn pendientes_de_estado(serie: &Serie, tipologia: &Tipologia) -> Vec<String> {
@@ -84,7 +101,7 @@ fn pendientes_de_estado(serie: &Serie, tipologia: &Tipologia) -> Vec<String> {
     }
 }
 
-struct Calculo<'a> {
+pub(super) struct Calculo<'a> {
     serie: &'a Serie,
     valores: Valores,
 }
@@ -97,7 +114,7 @@ impl<'a> Calculo<'a> {
         Calculo { serie, valores }
     }
 
-    fn evaluar(&self, formula: &Formula, donde: &str) -> Result<Decimal, ErrorCalculo> {
+    pub(super) fn evaluar(&self, formula: &Formula, donde: &str) -> Result<Decimal, ErrorCalculo> {
         formula
             .evaluar(&self.valores)
             .map_err(|error| ErrorCalculo::Formula {
@@ -106,7 +123,7 @@ impl<'a> Calculo<'a> {
             })
     }
 
-    fn cantidad(&self, formula: &Formula, donde: &str) -> Result<u32, ErrorCalculo> {
+    pub(super) fn cantidad(&self, formula: &Formula, donde: &str) -> Result<u32, ErrorCalculo> {
         let valor = self.evaluar(formula, donde)?;
         valor
             .a_entero()
@@ -119,7 +136,11 @@ impl<'a> Calculo<'a> {
     }
 
     /// El redondeo de la serie se aplica una sola vez, al resultado de la fórmula.
-    fn longitud(&self, formula: &Formula, donde: &str) -> Result<Longitud, ErrorCalculo> {
+    pub(super) fn longitud(
+        &self,
+        formula: &Formula,
+        donde: &str,
+    ) -> Result<Longitud, ErrorCalculo> {
         let valor = self.evaluar(formula, donde)?;
         let no_valida = || ErrorCalculo::MedidaNoValida {
             donde: donde.to_owned(),
@@ -162,28 +183,6 @@ impl<'a> Calculo<'a> {
             });
         }
         Ok(piezas)
-    }
-
-    fn vidrio(
-        &self,
-        tipologia: &Tipologia,
-        pendientes: &mut Vec<String>,
-    ) -> Result<Option<Vec<VidrioCalculado>>, ErrorCalculo> {
-        let Dato::Valor(vidrio) = &tipologia.vidrio else {
-            pendientes.push("Vidrio: falta el descuento del cristal.".into());
-            return Ok(None);
-        };
-        let mut piezas = Vec::new();
-        for (indice, pieza) in vidrio.piezas.iter().enumerate() {
-            let donde = format!("Vidrio {}", indice + 1);
-            piezas.push(VidrioCalculado {
-                tipo: vidrio.tipo.clone(),
-                cantidad: self.cantidad(&pieza.cantidad, &donde)?,
-                ancho: self.longitud(&pieza.ancho, &format!("{donde} (ancho)"))?,
-                alto: self.longitud(&pieza.alto, &format!("{donde} (alto)"))?,
-            });
-        }
-        Ok(Some(piezas))
     }
 
     fn accesorios(

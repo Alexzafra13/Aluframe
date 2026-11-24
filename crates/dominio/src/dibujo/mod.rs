@@ -2,9 +2,11 @@
 //! corte (FORMATO_SERIES, apartado 9). Se usa en pantalla y en las hojas impresas.
 
 mod acabado;
+mod chapa;
 mod color;
 mod geometria;
 mod marcadores;
+mod parteluces;
 mod svg;
 
 #[cfg(test)]
@@ -15,8 +17,10 @@ use std::collections::BTreeMap;
 use crate::series::{Dibujo, ResultadoVentana, Tipologia};
 use crate::unidades::Longitud;
 
+pub use chapa::dibujar_chapa;
 pub use color::{BLANCO_9016, ColorDeDibujo, Herrajes, Superficie, leer_color_hex};
 pub use geometria::Lado;
+pub use parteluces::ParteLucesEnDibujo;
 
 /// Lo que necesita el dibujo, ya resuelto a partir de la serie, la línea y el cálculo.
 #[derive(Debug, Clone)]
@@ -31,6 +35,7 @@ pub struct DatosDeDibujo {
     pub titulo: String,
     /// El del acabado de la línea; blanco si no se eligió.
     pub color: ColorDeDibujo,
+    pub parteluces: Option<ParteLucesEnDibujo>,
 }
 
 impl DatosDeDibujo {
@@ -77,8 +82,18 @@ impl DatosDeDibujo {
             bisagras_por_hoja: bisagras,
             hoja_cremona,
             color: ColorDeDibujo::default(),
+            parteluces: parteluces_en_dibujo(resultado),
         }
     }
+}
+
+/// Va chapa abajo si el cálculo tiene chapas; si no, cristal.
+fn parteluces_en_dibujo(resultado: &ResultadoVentana) -> Option<ParteLucesEnDibujo> {
+    resultado.parteluces.map(|p| ParteLucesEnDibujo {
+        abajo: p.abajo,
+        altura: p.altura,
+        con_chapa: !resultado.chapas.is_empty(),
+    })
 }
 
 /// El número va donde dice `posicion` si la serie la declara; si no, se deduce del nombre.

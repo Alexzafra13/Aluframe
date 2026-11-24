@@ -16,7 +16,7 @@ fn euros(centimos: i64) -> Dinero {
     Dinero::desde_centimos(centimos)
 }
 
-fn bp(valor: i64) -> Porcentaje {
+pub(super) fn bp(valor: i64) -> Porcentaje {
     Porcentaje::desde_puntos_basicos(valor)
 }
 
@@ -33,7 +33,7 @@ fn articulo(referencia: &str, unidad: UnidadDeVenta, precio: &str) -> ArticuloCo
     }
 }
 
-fn catalogo() -> BTreeMap<String, ArticuloConPrecio> {
+pub(super) fn catalogo() -> BTreeMap<String, ArticuloConPrecio> {
     let mut perfil = articulo("P", UnidadDeVenta::Barra, "20");
     perfil.con_acabado = true;
     let mut kit = articulo("K", UnidadDeVenta::Unidad, "9");
@@ -58,7 +58,7 @@ fn accesorio(codigo: &str, cantidad: i64) -> AccesorioCalculado {
     }
 }
 
-fn resultado() -> ResultadoVentana {
+pub(super) fn resultado() -> ResultadoVentana {
     ResultadoVentana {
         serie: "S".into(),
         tipologia: "T".into(),
@@ -68,16 +68,19 @@ fn resultado() -> ResultadoVentana {
         accesorios: vec![accesorio("KIT", 1), accesorio("TORNILLO", 17)],
         vidrio: Some(vec![VidrioCalculado {
             tipo: "VIDRIO".into(),
+            nombre: None,
             cantidad: 2,
             ancho: Longitud::desde_decimas_de_mm(6_800),
             alto: Longitud::desde_decimas_de_mm(11_100),
         }]),
+        chapas: Vec::new(),
+        parteluces: None,
         pendientes: Vec::new(),
         fuera_de_limites: Vec::new(),
     }
 }
 
-fn perfiles() -> BTreeMap<String, PerfilUsado> {
+pub(super) fn perfiles() -> BTreeMap<String, PerfilUsado> {
     let usado = PerfilUsado {
         barras: 2,
         longitud_barra: Longitud::desde_decimas_de_mm(60_000),

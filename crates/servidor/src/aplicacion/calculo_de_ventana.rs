@@ -134,16 +134,35 @@ fn describir(
         format!("{} × {} cm", ancho.formatear_cm(), alto.formatear_cm()),
     ];
     tramos.extend(color.map(|(_, nombre)| nombre.clone()));
-    tramos.extend(tipologia.opciones.iter().map(|o| {
-        let elegido = entrada.opciones.get(&o.codigo).unwrap_or(&o.por_defecto);
-        format!(
-            "{}: {}",
-            nombre_sin_aclaracion(&o.nombre),
-            nombre_legible(elegido)
-        )
-    }));
+    tramos.extend(texto_de_opciones(tipologia, &entrada.opciones));
     tramos.extend(vidrio.map(|v| format!("Cristal: {v}")));
     tramos.join(" · ")
+}
+
+/// Lo que no se pregunta no se escribe, ni un «No» (sin parteluces): solo lo que lleva la ventana.
+fn texto_de_opciones(
+    tipologia: &dominio::series::Tipologia,
+    elegidas: &std::collections::BTreeMap<String, String>,
+) -> Vec<String> {
+    let mut textos = Vec::new();
+    for o in tipologia
+        .opciones
+        .iter()
+        .filter(|o| tipologia.se_pregunta(o, elegidas))
+    {
+        let elegido = tipologia
+            .valor_de_opcion(&o.codigo, elegidas)
+            .unwrap_or_default();
+        let valor = if o.medida.is_some() {
+            format!("{} cm", elegido.replace('.', ","))
+        } else if elegido == "no" {
+            continue;
+        } else {
+            nombre_legible(&elegido)
+        };
+        textos.push(format!("{}: {valor}", nombre_sin_aclaracion(&o.nombre)));
+    }
+    textos
 }
 
 /// «Hoja de la cremona (vista desde dentro)» se imprime «Hoja de la cremona».

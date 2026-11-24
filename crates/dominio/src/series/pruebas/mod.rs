@@ -1,5 +1,6 @@
 mod calculo;
 mod importacion;
+mod parteluces;
 mod siluetas;
 mod variantes;
 

@@ -1,13 +1,16 @@
 use super::lector::{Campos, Lector, leer_lista, opcional, ruta_hija};
-use super::leer_partes::{leer_dibujo, leer_limites, leer_opciones, leer_perfil_segun};
+use super::leer_partes::{
+    leer_dibujo, leer_limites, leer_opciones, leer_perfil_segun, leer_solo_si,
+};
 use super::leer_posicion::leer_posicion;
+use super::leer_rellenos::{leer_chapas, leer_parteluces, leer_vidrio};
 use super::leer_serie::{es_codigo_valido, leer_estado};
 use super::{
-    AccesorioDeSerie, AplicaA, Dato, EstadoSerie, PiezaDeSerie, PiezaDeVidrio, Tipologia,
-    UnidadCantidad, Valor, VarianteDePerfil, Vidrio,
+    AccesorioDeSerie, AplicaA, Dato, Dibujo, EstadoSerie, ParteLucesDeSerie, PiezaDeChapa,
+    PiezaDeSerie, Tipologia, UnidadCantidad, Valor, VarianteDePerfil, Vidrio,
 };
 
-const CAMPOS_DE_TIPOLOGIA: [&str; 8] = [
+const CAMPOS_DE_TIPOLOGIA: [&str; 10] = [
     "nombre",
     "estado",
     "limites",
@@ -16,6 +19,8 @@ const CAMPOS_DE_TIPOLOGIA: [&str; 8] = [
     "piezas",
     "vidrio",
     "accesorios",
+    "chapas",
+    "parteluces",
 ];
 
 pub fn leer_tipologias(lector: &mut Lector, valor: &Valor) -> Option<Vec<Tipologia>> {
@@ -53,18 +58,13 @@ fn leer_tipologia(lector: &mut Lector, codigo: &str, valor: &Valor) -> Option<Ti
     let estado = leer_estado_opcional(lector, opcional(campos, "estado"), &r("estado"));
     let limites = leer_limites(lector, opcional(campos, "limites"), &r("limites"));
     let opciones = leer_opciones(lector, opcional(campos, "opciones"), &r("opciones"));
-    let dibujo = lector
-        .obligatorio(campos, "dibujo", &ruta)
-        .and_then(|v| leer_dibujo(lector, v, &r("dibujo")));
-    let piezas = lector
-        .obligatorio(campos, "piezas", &ruta)
-        .and_then(|v| leer_piezas(lector, v, &r("piezas")));
-    let vidrio = lector
-        .obligatorio(campos, "vidrio", &ruta)
-        .and_then(|v| leer_vidrio(lector, v, &r("vidrio")));
-    let accesorios = lector
-        .obligatorio(campos, "accesorios", &ruta)
-        .and_then(|v| leer_accesorios(lector, v, &r("accesorios")));
+    // Las medidas de la línea (ADR-0030) son variables de las fórmulas de esta tipología.
+    let variables_de_la_serie = lector.variables.clone();
+    let medidas = opciones.iter().flatten().filter(|o| o.medida.is_some());
+    lector.variables.extend(medidas.map(|o| o.codigo.clone()));
+    let (dibujo, piezas, vidrio, accesorios, chapas, parteluces) =
+        leer_cuerpo(lector, campos, &ruta);
+    lector.variables = variables_de_la_serie;
     Some(Tipologia {
         codigo: codigo.to_owned(),
         nombre: nombre?,
@@ -75,7 +75,38 @@ fn leer_tipologia(lector: &mut Lector, codigo: &str, valor: &Valor) -> Option<Ti
         piezas: piezas?,
         vidrio: vidrio?,
         accesorios: accesorios?,
+        chapas: chapas?,
+        parteluces: parteluces?,
     })
+}
+
+type Cuerpo = (
+    Option<Dibujo>,
+    Option<Vec<PiezaDeSerie>>,
+    Option<Dato<Vidrio>>,
+    Option<Vec<AccesorioDeSerie>>,
+    Option<Vec<PiezaDeChapa>>,
+    Option<Option<ParteLucesDeSerie>>,
+);
+
+/// Todo lo que se calcula: se lee entero aunque algo falle, para dar todos los errores juntos.
+fn leer_cuerpo(lector: &mut Lector, campos: &Campos, ruta: &str) -> Cuerpo {
+    let r = |campo: &str| ruta_hija(ruta, campo);
+    let dibujo = lector
+        .obligatorio(campos, "dibujo", ruta)
+        .and_then(|v| leer_dibujo(lector, v, &r("dibujo")));
+    let piezas = lector
+        .obligatorio(campos, "piezas", ruta)
+        .and_then(|v| leer_piezas(lector, v, &r("piezas")));
+    let vidrio = lector
+        .obligatorio(campos, "vidrio", ruta)
+        .and_then(|v| leer_vidrio(lector, v, &r("vidrio")));
+    let accesorios = lector
+        .obligatorio(campos, "accesorios", ruta)
+        .and_then(|v| leer_accesorios(lector, v, &r("accesorios")));
+    let chapas = leer_chapas(lector, opcional(campos, "chapas"), &r("chapas"));
+    let parteluces = leer_parteluces(lector, opcional(campos, "parteluces"), &r("parteluces"));
+    (dibujo, piezas, vidrio, accesorios, chapas, parteluces)
 }
 
 fn leer_estado_opcional(
@@ -104,6 +135,7 @@ fn leer_pieza(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<Pieza
             "longitud",
             "corte",
             "posicion",
+            "solo_si",
         ],
         ruta,
     );
@@ -121,7 +153,9 @@ fn leer_pieza(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<Pieza
         .obligatorio(campos, "corte", ruta)
         .and_then(|v| leer_corte(lector, v, &r("corte")));
     let (posicion, perfil_segun) = leer_extras_de_pieza(lector, campos, ruta)?;
+    let solo_si = leer_solo_si(lector, opcional(campos, "solo_si"), &r("solo_si"))?;
     Some(PiezaDeSerie {
+        solo_si,
         perfil: perfil?,
         perfil_segun,
         cantidad: cantidad?,
@@ -156,56 +190,6 @@ fn leer_corte(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<Dato<u16
     u16::try_from(grados).ok().map(Dato::Valor)
 }
 
-fn leer_vidrio(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<Dato<Vidrio>> {
-    let campos = lector.mapa(valor, ruta)?;
-    if opcional(campos, "estado").is_some_and(Valor::es_confirmar) {
-        lector.solo_campos(campos, &["estado"], ruta);
-        lector.anotar_confirmar(ruta);
-        return Some(Dato::Confirmar);
-    }
-    lector.solo_campos(campos, &["tipo", "piezas"], ruta);
-    let tipo = lector
-        .obligatorio(campos, "tipo", ruta)
-        .and_then(|v| lector.texto(v, &ruta_hija(ruta, "tipo")));
-    let lista = lector.obligatorio(campos, "piezas", ruta)?;
-    let piezas = leer_lista(
-        lector,
-        lista,
-        &ruta_hija(ruta, "piezas"),
-        leer_pieza_de_vidrio,
-    );
-    Some(Dato::Valor(Vidrio {
-        tipo: tipo?,
-        piezas: piezas?,
-    }))
-}
-
-fn leer_pieza_de_vidrio(
-    lector: &mut Lector,
-    elemento: &Valor,
-    ruta: &str,
-) -> Option<PiezaDeVidrio> {
-    let campos = lector.mapa(elemento, ruta)?;
-    lector.solo_campos(campos, &["cantidad", "ancho", "alto"], ruta);
-    let mut leer = |campo: &str| {
-        let valor = lector.obligatorio(campos, campo, ruta)?;
-        let ruta_campo = ruta_hija(ruta, campo);
-        match lector.formula(valor, &ruta_campo)? {
-            Dato::Valor(formula) => Some(formula),
-            Dato::Confirmar => {
-                lector.informe.error(&ruta_campo, "en un vidrio definido no se admite CONFIRMAR; usa vidrio: { estado: CONFIRMAR }");
-                None
-            }
-        }
-    };
-    let (cantidad, ancho, alto) = (leer("cantidad"), leer("ancho"), leer("alto"));
-    Some(PiezaDeVidrio {
-        cantidad: cantidad?,
-        ancho: ancho?,
-        alto: alto?,
-    })
-}
-
 fn leer_accesorios(
     lector: &mut Lector,
     valor: &Valor,
@@ -218,7 +202,13 @@ fn leer_accesorio(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<A
     let campos = lector.mapa(elemento, ruta)?;
     lector.solo_campos(
         campos,
-        &["articulo", "cantidad", "aplica_a", "unidad_cantidad"],
+        &[
+            "articulo",
+            "cantidad",
+            "aplica_a",
+            "unidad_cantidad",
+            "solo_si",
+        ],
         ruta,
     );
     let r = |campo: &str| ruta_hija(ruta, campo);
@@ -234,7 +224,9 @@ fn leer_accesorio(lector: &mut Lector, elemento: &Valor, ruta: &str) -> Option<A
         opcional(campos, "unidad_cantidad"),
         &r("unidad_cantidad"),
     );
+    let solo_si = leer_solo_si(lector, opcional(campos, "solo_si"), &r("solo_si"))?;
     Some(AccesorioDeSerie {
+        solo_si,
         articulo: articulo?,
         cantidad: cantidad?,
         aplica_a: aplica_a?,

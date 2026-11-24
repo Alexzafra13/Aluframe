@@ -74,3 +74,6 @@ body.hoja-impresa { background: #D9D6CD; }
 .taller-grupo { margin-bottom: 7mm; break-inside: avoid; }
 .taller-barra { margin-bottom: 3mm; }
 .barra-corte { display: block; width: 100%; height: auto; }
+/* Chapa del parteluces: su dibujo técnico a escala junto a la medida (ADR-0030). */
+.taller-chapa { display: flex; align-items: center; gap: 8px; }
+.taller-chapa .dibujo-chapa { width: 32mm; height: auto; flex: none; }

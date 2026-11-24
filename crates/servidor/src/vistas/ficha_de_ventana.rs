@@ -4,7 +4,9 @@
 use crate::aplicacion::calculo_de_ventana::CalculoDeVentana;
 use crate::series::marcas::url_de_logo;
 use crate::series::siluetas::url_de_silueta;
+use dominio::dibujo::dibujar_chapa;
 use dominio::texto::nombre_legible;
+use dominio::unidades::Longitud;
 
 pub struct FichaDeSerie {
     /// «Ventana corredera 4 hojas».
@@ -50,6 +52,49 @@ pub fn herrajes_en_pantalla(c: &CalculoDeVentana) -> Vec<HerrajeEnPantalla> {
             modelo: c.articulos.get(&codigo).cloned(),
             cantidad: cantidad.to_string().replace('.', ","),
             silueta: url_de_silueta(&c.serie, &codigo),
+        })
+        .collect()
+}
+
+/// Una chapa con su dibujo técnico a escala y sus medidas («?» lo que falta en la serie).
+pub struct ChapaEnPantalla {
+    pub nombre: String,
+    pub modelo: Option<String>,
+    pub cantidad: u32,
+    pub medida: String,
+    pub dibujo: String,
+}
+
+pub fn texto_de_medida(ancho: Option<i64>, alto: Option<i64>) -> String {
+    let cm = |dmm: Option<i64>| {
+        dmm.map_or_else(
+            || "?".to_owned(),
+            |d| Longitud::desde_decimas_de_mm(d).formatear_cm(),
+        )
+    };
+    format!("{} × {}", cm(ancho), cm(alto))
+}
+
+pub fn chapas_en_pantalla(c: &CalculoDeVentana) -> Vec<ChapaEnPantalla> {
+    c.resultado
+        .chapas
+        .iter()
+        .map(|chapa| ChapaEnPantalla {
+            nombre: chapa
+                .nombre
+                .clone()
+                .unwrap_or_else(|| nombre_legible(&chapa.articulo)),
+            modelo: c
+                .articulos
+                .get(&chapa.articulo)
+                .cloned()
+                .or_else(|| Some(nombre_legible(&chapa.articulo))),
+            cantidad: chapa.cantidad,
+            medida: texto_de_medida(
+                chapa.ancho.map(Longitud::decimas_de_mm),
+                chapa.alto.map(Longitud::decimas_de_mm),
+            ),
+            dibujo: dibujar_chapa(chapa.ancho, chapa.alto),
         })
         .collect()
 }

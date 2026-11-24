@@ -148,6 +148,9 @@ span.silueta { background: transparent; }
 /* Herrajes: lo que no se corta (cierres, kits, ruedas, tornillos), aparte de los perfiles. */
 .tarjeta-piezas .lista-piezas + .antetitulo { margin-top: 1.25rem; }
 .modelo-herraje { display: block; font-size: .8rem; color: var(--apagado); }
+/* Chapa del parteluces: su dibujo técnico a escala, más ancho que una silueta (ADR-0030). */
+.lista-chapas li { grid-template-columns: 96px 1fr auto 6rem; }
+.pieza-chapa .dibujo-chapa { display: block; width: 96px; height: auto; }
 
 /* El dibujo: colores en CSS para pantalla e impresión. */
 .dibujo-ventana { display: block; width: 100%; height: auto; max-height: 64vh; overflow: visible; }
@@ -158,7 +161,8 @@ span.silueta { background: transparent; }
    style). La hoja de estilos solo pinta los dibujos guardados antes, que no los llevan. */
 .dibujo-ventana .marco { stroke-width: 1.5; }
 .dibujo-ventana .marco:not([fill]) { fill: #D3D7DB; stroke: #8B939B; }
-.dibujo-ventana .hoja { stroke-width: 1.2; }
+.dibujo-ventana .hoja, .dibujo-ventana .parteluces { stroke-width: 1.2; }
+.dibujo-ventana .chapa { stroke: #8B939B; stroke-width: 1; }
 .dibujo-ventana .hoja:not([fill]) { fill: #E7E9EC; stroke: #8B939B; }
 .dibujo-ventana .cristal { fill: #D9E6F2; stroke: #8B939B; stroke-width: 1; transition: fill var(--normal) ease; }
 .dibujo-ventana .reflejo { fill: #fff; opacity: .45; }

@@ -84,3 +84,6 @@
 .acceso-principal { background: var(--acero); border-color: var(--acero); color: #fff; }
 .acceso-principal .icono { color: #fff; }
 .titulo-seccion { margin: 2rem 0 1rem; }
+/* Chapa del parteluces en «Mi día»: el dibujo técnico junto a la medida (ADR-0030). */
+.taller-chapa { display: flex; align-items: center; gap: .75rem; }
+.taller-chapa .dibujo-chapa { width: 120px; height: auto; flex: none; }

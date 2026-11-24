@@ -30,6 +30,7 @@ fn datos(tipo: TipoDibujo, hojas: u8) -> DatosDeDibujo {
         hoja_cremona: None,
         titulo: "Corredera 2 hojas <prueba>".into(),
         color: ColorDeDibujo::default(),
+        parteluces: None,
     }
 }
 
@@ -237,4 +238,29 @@ fn cada_superficie_tiene_su_luz_y_el_texturado_su_grano() {
     assert!(anodizado.contains(r#"<linearGradient id="luz-373f43a""#));
     assert!(!anodizado.contains("textura"));
     assert_ne!(pintar(Superficie::Brillo), pintar(Superficie::Mate));
+}
+
+/// Parteluces (ADR-0030): una barra por hoja, la chapa rayada debajo y la cota a la derecha;
+/// sin la altura real, la cota dice la medida escrita de la chapa.
+#[test]
+fn el_parteluces_se_dibuja_en_cada_hoja_con_su_chapa_y_su_cota() {
+    let mut d = datos(TipoDibujo::Corredera, 2);
+    d.parteluces = Some(ParteLucesEnDibujo {
+        abajo: cm(50),
+        altura: None,
+        con_chapa: true,
+    });
+    let svg = dibujar_ventana(&d);
+    assert_eq!(contar(&svg, r#"class="parteluces""#), 2);
+    assert_eq!(contar(&svg, r#"class="chapa""#), 2);
+    assert!(svg.contains(">chapa 50<"), "{svg}");
+
+    d.parteluces = Some(ParteLucesEnDibujo {
+        abajo: cm(50),
+        altura: Some(Longitud::desde_decimas_de_mm(6_430)),
+        con_chapa: false,
+    });
+    let svg = dibujar_ventana(&d);
+    assert_eq!(contar(&svg, r#"class="chapa""#), 0);
+    assert!(svg.contains(">64,3<"), "la altura real: {svg}");
 }

@@ -23,6 +23,8 @@
       <p class="a4-etiqueta">Cristal</p>
       {% if h.hoja.cristal.is_empty() %}<p><strong>PENDIENTE de medir</strong></p>{% endif %}
       {% for c in h.hoja.cristal %}<p class="mono">{{ c }}</p>{% endfor %}
+      {% if !h.hoja.chapas.is_empty() %}<p class="a4-etiqueta">Chapas</p>
+      {% for (texto, dibujo) in h.hoja.chapas %}<div class="taller-chapa">{{ dibujo|safe }}<p class="mono">{{ texto }}</p></div>{% endfor %}{% endif %}
       <p class="a4-etiqueta">Herrajes</p>
       {% for (a, n) in h.hoja.accesorios %}<p class="mono">{{ a }} ×{{ n }}</p>{% endfor %}
     </div>
