@@ -2,6 +2,7 @@ use super::lector::{Campos, Lector, leer_lista, opcional, ruta_hija};
 use super::leer_partes::{
     leer_dibujo, leer_limites, leer_opciones, leer_perfil_segun, leer_solo_si,
 };
+use super::leer_persiana::leer_persiana;
 use super::leer_posicion::leer_posicion;
 use super::leer_rellenos::{leer_chapas, leer_parteluces, leer_vidrio};
 use super::leer_serie::{es_codigo_valido, leer_estado};
@@ -10,7 +11,7 @@ use super::{
     PiezaDeSerie, Tipologia, UnidadCantidad, Valor, VarianteDePerfil, Vidrio,
 };
 
-const CAMPOS_DE_TIPOLOGIA: [&str; 10] = [
+const CAMPOS_DE_TIPOLOGIA: [&str; 11] = [
     "nombre",
     "estado",
     "limites",
@@ -21,6 +22,7 @@ const CAMPOS_DE_TIPOLOGIA: [&str; 10] = [
     "accesorios",
     "chapas",
     "parteluces",
+    "persiana",
 ];
 
 pub fn leer_tipologias(lector: &mut Lector, valor: &Valor) -> Option<Vec<Tipologia>> {
@@ -64,6 +66,7 @@ fn leer_tipologia(lector: &mut Lector, codigo: &str, valor: &Valor) -> Option<Ti
     lector.variables.extend(medidas.map(|o| o.codigo.clone()));
     let (dibujo, piezas, vidrio, accesorios, chapas, parteluces) =
         leer_cuerpo(lector, campos, &ruta);
+    let persiana = leer_persiana(lector, opcional(campos, "persiana"), &r("persiana"));
     lector.variables = variables_de_la_serie;
     Some(Tipologia {
         codigo: codigo.to_owned(),
@@ -77,6 +80,7 @@ fn leer_tipologia(lector: &mut Lector, codigo: &str, valor: &Valor) -> Option<Ti
         accesorios: accesorios?,
         chapas: chapas?,
         parteluces: parteluces?,
+        persiana: persiana?,
     })
 }
 

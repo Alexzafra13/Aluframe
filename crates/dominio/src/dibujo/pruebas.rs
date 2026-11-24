@@ -32,6 +32,7 @@ fn datos(tipo: TipoDibujo, hojas: u8) -> DatosDeDibujo {
         color: ColorDeDibujo::default(),
         parteluces: None,
         cajon_de_50: false,
+        persiana: None,
     }
 }
 

@@ -4,10 +4,12 @@
 mod acabado;
 mod chapa;
 mod color;
+mod cotas;
 mod geometria;
 mod marcadores;
 mod mosquitera;
 mod parteluces;
+mod persiana;
 mod svg;
 
 #[cfg(test)]
@@ -22,6 +24,7 @@ pub use chapa::dibujar_chapa;
 pub use color::{BLANCO_9016, ColorDeDibujo, Herrajes, Superficie, leer_color_hex};
 pub use geometria::Lado;
 pub use parteluces::ParteLucesEnDibujo;
+pub use persiana::PersianaEnDibujo;
 
 /// Lo que necesita el dibujo, ya resuelto a partir de la serie, la línea y el cálculo.
 #[derive(Debug, Clone)]
@@ -39,6 +42,8 @@ pub struct DatosDeDibujo {
     pub parteluces: Option<ParteLucesEnDibujo>,
     /// Mosquitera: el cajón de 50 se dibuja más alto que el de 45 (ADR-0031).
     pub cajon_de_50: bool,
+    /// Persiana en la ventana (ADR-0032): `ancho` y `alto` son entonces los del conjunto.
+    pub persiana: Option<PersianaEnDibujo>,
 }
 
 impl DatosDeDibujo {
@@ -87,6 +92,7 @@ impl DatosDeDibujo {
             color: ColorDeDibujo::default(),
             parteluces: parteluces_en_dibujo(resultado),
             cajon_de_50: lleva_cajon_de_50(resultado),
+            persiana: persiana_en_dibujo(resultado),
         }
     }
 }
@@ -102,6 +108,16 @@ fn lleva_cajon_de_50(resultado: &ResultadoVentana) -> bool {
     calculadas
         .chain(pendientes)
         .any(|perfil| perfil.contains("CAJON") && perfil.contains("50"))
+}
+
+fn persiana_en_dibujo(resultado: &ResultadoVentana) -> Option<PersianaEnDibujo> {
+    resultado.persiana.as_ref().map(|p| PersianaEnDibujo {
+        guia: p.guia,
+        cajon: p.cajon,
+        cinta: Lado::desde_texto(&p.cinta).unwrap_or(Lado::Derecha),
+        ancho_ventana: p.ancho_ventana,
+        alto_ventana: p.alto_ventana,
+    })
 }
 
 /// Va chapa abajo si el cálculo tiene chapas; si no, cristal.

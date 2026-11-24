@@ -76,6 +76,7 @@ pub(super) fn resultado() -> ResultadoVentana {
         }]),
         chapas: Vec::new(),
         parteluces: None,
+        persiana: None,
         pendientes: Vec::new(),
         fuera_de_limites: Vec::new(),
     }

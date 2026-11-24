@@ -1,4 +1,5 @@
 use super::DatosDeDibujo;
+use super::persiana::PersianaEnPlano;
 use crate::series::TipoDibujo;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -51,6 +52,8 @@ impl Rect {
 
 /// Proporciones fijas: es un esquema para entender la ventana, no un plano de fabricación.
 pub struct Plano {
+    /// La medida escrita: con persiana, el conjunto; sin ella, el propio marco.
+    pub contorno: Rect,
     pub marco: Rect,
     pub hojas: Vec<Rect>,
     pub grosor_marco: i64,
@@ -59,24 +62,33 @@ pub struct Plano {
     pub tipo: TipoDibujo,
     /// Altura (coordenada) del parteluces, para colocar el número de su pieza sobre la barra.
     pub parteluces_eje: Option<i64>,
+    pub persiana: Option<PersianaEnPlano>,
 }
 
 impl Plano {
     pub fn nuevo(datos: &DatosDeDibujo) -> Plano {
         let ancho = datos.ancho.decimas_de_mm().clamp(100, 1_000_000);
         let alto = datos.alto.decimas_de_mm().clamp(100, 1_000_000);
-        let menor = ancho.min(alto);
-        let grosor_marco = (menor / 16).max(1);
-        let grosor_hoja = (menor / 22).max(1);
-        let marco = Rect {
+        let contorno = Rect {
             x: 0,
             y: 0,
             ancho,
             alto,
         };
+        let (persiana, marco) = match &datos.persiana {
+            Some(p) => {
+                let (partes, marco) = super::persiana::repartir(contorno, p);
+                (Some(partes), marco)
+            }
+            None => (None, contorno),
+        };
+        let menor = marco.ancho.min(marco.alto);
+        let grosor_marco = (menor / 16).max(1);
+        let grosor_hoja = (menor / 22).max(1);
         let interior = marco.dentro(grosor_marco);
         let hojas = repartir_hojas(interior, datos, grosor_hoja);
         let mut plano = Plano {
+            contorno,
             marco,
             hojas,
             grosor_marco,
@@ -84,6 +96,7 @@ impl Plano {
             margen: ancho.max(alto) / 7,
             tipo: datos.dibujo.tipo,
             parteluces_eje: None,
+            persiana,
         };
         plano.parteluces_eje = datos
             .parteluces
@@ -93,7 +106,7 @@ impl Plano {
     }
 
     pub fn tamano_de_letra(&self) -> i64 {
-        (self.marco.ancho.max(self.marco.alto) / 30).max(1)
+        (self.contorno.ancho.max(self.contorno.alto) / 30).max(1)
     }
 }
 

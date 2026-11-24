@@ -61,10 +61,25 @@ pub struct ParteLucesCalculado {
     pub altura: Option<Longitud>,
 }
 
+/// Persiana en la ventana (ADR-0032): lo que se quita a la medida del conjunto para el marco.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PersianaCalculada {
+    /// Ancho de cada guía lateral.
+    pub guia: Longitud,
+    /// Alto del cajón, si la serie ya lo sabe.
+    pub cajon: Option<Longitud>,
+    /// Medida del marco de la ventana: el conjunto sin las dos guías y sin el cajón.
+    pub ancho_ventana: Longitud,
+    pub alto_ventana: Option<Longitud>,
+    /// Lado de la cinta: `derecha` o `izquierda`.
+    pub cinta: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResultadoVentana {
     pub serie: String,
     pub tipologia: String,
+    /// La medida escrita: con persiana, la del conjunto (ADR-0032).
     pub ancho: Decimal,
     pub alto: Decimal,
     pub piezas: Vec<PiezaCalculada>,
@@ -74,6 +89,7 @@ pub struct ResultadoVentana {
     pub vidrio: Option<Vec<VidrioCalculado>>,
     pub chapas: Vec<ChapaCalculada>,
     pub parteluces: Option<ParteLucesCalculado>,
+    pub persiana: Option<PersianaCalculada>,
     pub pendientes: Vec<String>,
     pub fuera_de_limites: Vec<String>,
 }

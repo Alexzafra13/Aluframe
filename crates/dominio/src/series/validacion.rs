@@ -129,8 +129,13 @@ fn condiciones(t: &Tipologia) -> Vec<(String, String)> {
     t.chapas.iter().for_each(|c| anadir(&c.solo_si));
     t.opciones.iter().for_each(|o| anadir(&o.solo_si));
     t.parteluces.iter().for_each(|p| anadir(&p.solo_si));
+    t.persiana.iter().for_each(|p| anadir(&p.solo_si));
     if let Dato::Valor(vidrio) = &t.vidrio {
         vidrio.piezas.iter().for_each(|p| anadir(&p.solo_si));
+    }
+    // El lado de la cinta (ADR-0032) es una opción de lista con los dos lados.
+    if let Some(p) = &t.persiana {
+        todas.extend(["derecha", "izquierda"].map(|lado| (p.cinta.clone(), lado.to_owned())));
     }
     todas
 }

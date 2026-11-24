@@ -46,8 +46,10 @@ impl Calculo<'_> {
         donde: &str,
     ) -> Result<Option<Longitud>, ErrorCalculo> {
         match dato {
-            Dato::Valor(formula) => self.longitud(formula, donde).map(Some),
-            Dato::Confirmar => Ok(None),
+            Dato::Valor(formula) if !self.falta_dato(formula) => {
+                self.longitud(formula, donde).map(Some)
+            }
+            _ => Ok(None),
         }
     }
 
@@ -94,7 +96,7 @@ impl Calculo<'_> {
                 .nombre
                 .clone()
                 .unwrap_or_else(|| chapa.articulo.clone());
-            let Dato::Valor(cantidad) = &chapa.cantidad else {
+            let Some(cantidad) = chapa.cantidad.valor().filter(|f| !self.falta_dato(f)) else {
                 pendientes.push(format!("{donde}: falta la cantidad."));
                 continue;
             };

@@ -1,7 +1,9 @@
 mod calculo;
+mod calculo_persiana;
 mod calculo_rellenos;
 mod lector;
 mod leer_partes;
+mod leer_persiana;
 mod leer_posicion;
 mod leer_rellenos;
 mod leer_serie;
@@ -18,8 +20,8 @@ pub use crate::informe::{Informe, Problema};
 pub use calculo::{ErrorCalculo, calcular_ventana, calcular_ventana_con_opciones};
 pub use modelo::*;
 pub use resultado::{
-    AccesorioCalculado, ChapaCalculada, ParteLucesCalculado, PiezaCalculada, PiezaPendiente,
-    ResultadoVentana, VidrioCalculado,
+    AccesorioCalculado, ChapaCalculada, ParteLucesCalculado, PersianaCalculada, PiezaCalculada,
+    PiezaPendiente, ResultadoVentana, VidrioCalculado,
 };
 pub use valor::{CONFIRMAR, Dato, Valor};
 

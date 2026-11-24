@@ -58,6 +58,7 @@ pub fn calcular_ventana_con_opciones(
     let medidas = super::calculo_rellenos::medidas_de_linea(tipologia, opciones)?;
     calculo.valores.extend(medidas);
     let mut pendientes = pendientes_de_estado(serie, tipologia);
+    let persiana = calculo.aplicar_persiana(tipologia, opciones, &mut pendientes)?;
     let (piezas, piezas_pendientes) = calculo.piezas(tipologia, &mut pendientes)?;
     let vidrio = calculo.vidrio(tipologia, &mut pendientes)?;
     let chapas = calculo.chapas(tipologia, &mut pendientes)?;
@@ -80,6 +81,7 @@ pub fn calcular_ventana_con_opciones(
         vidrio,
         chapas,
         parteluces,
+        persiana,
         pendientes,
         fuera_de_limites: super::validacion::comprobar_limites(tipologia, ancho, alto),
     })
@@ -123,7 +125,7 @@ fn pendientes_de_estado(serie: &Serie, tipologia: &Tipologia) -> Vec<String> {
 
 pub(super) struct Calculo<'a> {
     serie: &'a Serie,
-    valores: Valores,
+    pub(super) valores: Valores,
 }
 
 impl<'a> Calculo<'a> {
@@ -141,6 +143,15 @@ impl<'a> Calculo<'a> {
                 donde: donde.to_owned(),
                 error,
             })
+    }
+
+    /// Una fórmula con un nombre sin valor: el `alto` de una ventana con persiana mientras falte
+    /// el alto del cajón (ADR-0032). Lo que la use queda pendiente, sin inventar la medida.
+    pub(super) fn falta_dato(&self, formula: &Formula) -> bool {
+        formula
+            .variables()
+            .iter()
+            .any(|nombre| !self.valores.contains_key(nombre))
     }
 
     pub(super) fn cantidad(&self, formula: &Formula, donde: &str) -> Result<u32, ErrorCalculo> {
@@ -175,6 +186,10 @@ impl<'a> Calculo<'a> {
         donde: &str,
     ) -> Result<Longitud, ErrorCalculo> {
         let valor = self.evaluar(formula, donde)?;
+        self.a_longitud(valor, donde)
+    }
+
+    pub(super) fn a_longitud(&self, valor: Decimal, donde: &str) -> Result<Longitud, ErrorCalculo> {
         let no_valida = || ErrorCalculo::MedidaNoValida {
             donde: donde.to_owned(),
             valor: valor.to_string(),
@@ -201,6 +216,7 @@ impl<'a> Calculo<'a> {
         let mut numero = 0;
         for pieza in &tipologia.piezas {
             let cantidad = match &pieza.cantidad {
+                Dato::Valor(formula) if self.falta_dato(formula) => None,
                 Dato::Valor(formula) => match self.cantidad_o_ninguna(formula, &pieza.perfil)? {
                     Some(n) => Some(n),
                     None => continue,
@@ -209,7 +225,8 @@ impl<'a> Calculo<'a> {
             };
             numero += 1;
             pendientes.extend(lo_que_falta(pieza));
-            let (Some(cantidad), Dato::Valor(longitud)) = (cantidad, &pieza.longitud) else {
+            let longitud = pieza.longitud.valor().filter(|f| !self.falta_dato(f));
+            let (Some(cantidad), Some(longitud)) = (cantidad, longitud) else {
                 sin_medida.push(PiezaPendiente {
                     numero,
                     perfil: pieza.perfil.clone(),
@@ -238,7 +255,7 @@ impl<'a> Calculo<'a> {
     ) -> Result<Vec<AccesorioCalculado>, ErrorCalculo> {
         let mut accesorios = Vec::new();
         for accesorio in &tipologia.accesorios {
-            let Dato::Valor(formula) = &accesorio.cantidad else {
+            let Some(formula) = accesorio.cantidad.valor().filter(|f| !self.falta_dato(f)) else {
                 pendientes.push(format!("{}: falta la cantidad.", accesorio.articulo));
                 continue;
             };

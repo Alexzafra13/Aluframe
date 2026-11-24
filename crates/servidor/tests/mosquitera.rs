@@ -168,6 +168,8 @@ async fn con_la_misma_serie_las_opciones_no_se_vuelven_a_pintar() {
         ("opcion.parteluces", "si"),
         ("opcion.relleno_abajo", "chapa"),
         ("opcion.medida_abajo", "5"),
+        ("opcion.persiana", "no"),
+        ("opcion.cinta", "derecha"),
     ]);
     let ruta = "/presupuestos/1/lineas/calcular";
     let html = texto(contexto.pedir(post(ruta, Some(&token), &ventana)).await).await;

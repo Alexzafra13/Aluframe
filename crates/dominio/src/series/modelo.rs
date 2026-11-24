@@ -83,6 +83,7 @@ impl Tipologia {
             vidrio.piezas.retain(|p| cumple(&p.solo_si));
         }
         resuelta.parteluces = resuelta.parteluces.filter(|p| cumple(&p.solo_si));
+        resuelta.persiana = resuelta.persiana.filter(|p| cumple(&p.solo_si));
         for pieza in &mut resuelta.piezas {
             let elegida = pieza
                 .perfil_segun
@@ -111,6 +112,22 @@ pub struct Tipologia {
     /// Paneles opacos (la chapa de abajo de un parteluces), ADR-0030.
     pub chapas: Vec<PiezaDeChapa>,
     pub parteluces: Option<ParteLucesDeSerie>,
+    /// Persiana en la ventana (ADR-0032): la medida escrita es la del conjunto.
+    pub persiana: Option<PersianaDeSerie>,
+}
+
+/// Persiana montada en la ventana (ADR-0032). La medida que se escribe es la de todo el conjunto;
+/// las fórmulas de la tipología ven en `ancho` y `alto` la del marco, que sale de quitar una guía
+/// a cada lado y el cajón arriba. La persiana se pide: va en `accesorios`, no se corta.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PersianaDeSerie {
+    pub solo_si: SoloSi,
+    /// Ancho de cada guía lateral; se evalúa con la medida del conjunto.
+    pub guia: Formula,
+    /// Alto del cajón según la medida del conjunto; `CONFIRMAR` hasta tener el dato.
+    pub cajon: Dato<Formula>,
+    /// Opción de la línea que dice en qué lado va la cinta (`derecha` o `izquierda`).
+    pub cinta: String,
 }
 
 /// Condición `solo_si: { opcion: valor }`: la parte solo existe si se cumplen todas.

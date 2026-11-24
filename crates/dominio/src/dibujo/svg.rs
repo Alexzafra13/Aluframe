@@ -3,6 +3,7 @@ use std::fmt::Write;
 use super::acabado::{definiciones, grupo_de_herrajes, perfil};
 use super::geometria::{Lado, Plano, Rect};
 use super::marcadores::{colocar, radio};
+use super::persiana;
 use super::{ColorDeDibujo, DatosDeDibujo};
 use crate::series::TipoDibujo;
 
@@ -10,7 +11,7 @@ use crate::series::TipoDibujo;
 /// propio dibujo (`acabado.rs`). Así sirven en pantalla y al imprimir.
 pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
     let m = plano.margen;
-    let (ancho, alto) = (plano.marco.ancho, plano.marco.alto);
+    let (ancho, alto) = (plano.contorno.ancho, plano.contorno.alto);
     let mut s = String::with_capacity(4_096);
     let _ = write!(
         s,
@@ -27,19 +28,22 @@ pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
     } else {
         cuerpo_de_ventana(&mut s, plano, datos);
     }
-    cotas(&mut s, plano, datos);
+    super::cotas::escribir(&mut s, plano, datos);
     super::parteluces::cota(&mut s, plano, datos);
     numeros_de_pieza(&mut s, plano, datos);
     s.push_str("</svg>");
     s
 }
 
-/// Marco, hojas, parteluces y herrajes de una ventana.
+/// Persiana, marco, hojas, parteluces y herrajes de una ventana.
 fn cuerpo_de_ventana(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
+    persiana::dibujar_cajon_y_guias(s, plano, datos);
     perfil(s, &datos.color, ("marco", plano.marco), plano.grosor_marco);
     for (indice, rectangulo) in plano.hojas.iter().enumerate() {
         dibujar_hoja(s, plano, (*rectangulo, indice), &datos.color);
     }
+    persiana::dibujar_lamas(s, plano);
+    persiana::dibujar_cinta(s, plano);
     super::parteluces::dibujar(s, plano, datos);
     s.push_str(&grupo_de_herrajes(&datos.color));
     match plano.tipo {
@@ -234,38 +238,6 @@ fn bisagras(s: &mut String, hoja: Rect, x: i64, (cuantas, grosor): (u32, i64)) {
             (grosor / 2).max(1)
         );
     }
-}
-
-fn cotas(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
-    let (ancho, alto) = (plano.marco.ancho, plano.marco.alto);
-    let m = plano.margen;
-    let letra = plano.tamano_de_letra();
-    let (yc, xc) = (alto + m / 3, -m / 3);
-    let _ = write!(
-        s,
-        r#"<g class="capa-cotas"><path class="cota" d="M0 {yc} H{ancho} M0 {} V{} M{ancho} {} V{} M{xc} 0 V{alto} M{} 0 H{} M{} {alto} H{}"/>"#,
-        yc - letra / 2,
-        yc + letra / 2,
-        yc - letra / 2,
-        yc + letra / 2,
-        xc - letra / 2,
-        xc + letra / 2,
-        xc - letra / 2,
-        xc + letra / 2
-    );
-    let _ = write!(
-        s,
-        r#"<text class="texto-cota" x="{}" y="{}" font-size="{letra}" text-anchor="middle">{}</text>"#,
-        ancho / 2,
-        yc + letra * 13 / 10,
-        datos.ancho.formatear_cm()
-    );
-    let (xt, yt) = (xc - letra / 2, alto / 2);
-    let _ = write!(
-        s,
-        r#"<text class="texto-cota" x="{xt}" y="{yt}" font-size="{letra}" text-anchor="middle" transform="rotate(-90 {xt} {yt})">{}</text></g>"#,
-        datos.alto.formatear_cm()
-    );
 }
 
 fn numeros_de_pieza(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {

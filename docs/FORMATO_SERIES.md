@@ -165,6 +165,15 @@ parteluces: { solo_si: { parteluces: si }, abajo: "medida_abajo", altura: CONFIR
 - `chapas`: el `articulo` es un código de `referencias`; se dibuja a escala con sus cotas en el editor y en la hoja de taller. Mientras no se decida cómo se cobra, una ventana con chapa no tiene precio final.
 - `parteluces` solo da el dibujo: una barra en cada hoja. `abajo` es la medida escrita de lo de abajo; `altura`, la del eje desde abajo de la ventana. Sin `altura`, la barra se coloca aproximada y la cota dice «chapa 50». Su perfil, cristales y chapas se declaran en `piezas`, `vidrio` y `chapas` con el mismo `solo_si`.
 
+### Persiana en la ventana (ADR-0032)
+```yaml
+persiana: { solo_si: { persiana: si }, guia: 4, cajon: CONFIRMAR, cinta: cinta }
+```
+- La medida escrita es la del conjunto. Con `persiana`, las fórmulas de la tipología ven en `ancho` y `alto` la del **marco**: conjunto − 2 × `guia` y conjunto − `cajon`. `guia` y `cajon` se evalúan con la medida del conjunto (el cajón podrá depender del alto con `si()`).
+- `cajon: CONFIRMAR`: lo que dependa de `alto` sale pendiente y la ventana, incompleta. En general, una fórmula con un nombre sin valor deja su pieza pendiente.
+- `cinta` es el código de una opción de lista con los valores `derecha` e `izquierda`.
+- La persiana se pide: va en `accesorios` con el mismo `solo_si`.
+
 ## 9. Dibujo
 El dibujo se **calcula a partir de las mismas piezas y medidas** que la hoja de corte, así que no puede contradecirlas. Cada tipología declara el tipo de dibujo y los datos que necesita:
 
@@ -179,6 +188,7 @@ El dibujo se **calcula a partir de las mismas piezas y medidas** que la hoja de 
 - El dibujo es un esquema para entender la ventana, no un plano de fabricación.
 - Los números de las piezas del dibujo son los de la hoja de corte (diseño aprobado en `design/03-hoja-taller.png`).
 
+- Con `persiana` (ADR-0032), la corredera lleva el cajón arriba, una guía a cada lado, las lamas detrás del cristal y la cinta por fuera en el lado elegido; se acotan el conjunto y el marco.
 - `tipo: mosquitera` (ADR-0031): cajón arriba, guías, malla y terminal con dos tiradores negros (como vienen en los kits). El cajón se dibuja más alto si sale una pieza de cajón de 50 (`CAJON_50`). Los números van donde dice `posicion` (`marco_superior`, `marco_lateral`, `marco_inferior`).
 
 ## 10. Límites
