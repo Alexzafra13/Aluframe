@@ -1,5 +1,6 @@
 use dominio::acceso::Accion;
 use dominio::series::{OpcionDeLinea, Serie};
+use dominio::texto::nombre_legible;
 use rusqlite::Connection;
 
 use super::ajustes_presupuesto::{self, AjustesDePresupuesto};
@@ -49,6 +50,15 @@ pub async fn cargar_datos_del_editor(
     estado.bd.leer(move |con| leer_datos(con, seleccion)).await
 }
 
+/// «Aluprom 21 (Aluval) · Ventana corredera 2 hojas».
+fn texto_de_tipologia(serie: &Serie, tipologia: &str) -> String {
+    format!(
+        "{} ({}) · {tipologia}",
+        nombre_legible(&serie.codigo),
+        nombre_legible(&serie.fabricante)
+    )
+}
+
 fn leer_datos(
     con: &Connection,
     seleccion: Option<(i64, String)>,
@@ -60,7 +70,7 @@ fn leer_datos(
         for t in &serie.tipologias {
             series.push((
                 valor_de_seleccion(*id, &t.codigo),
-                format!("{} · {}", serie.codigo, t.nombre),
+                texto_de_tipologia(serie, &t.nombre),
             ));
             if seleccion.as_ref() == Some(&(*id, t.codigo.clone())) {
                 opciones.clone_from(&t.opciones);

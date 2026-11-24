@@ -16,6 +16,9 @@ pub struct Enlace {
     pub catalogo: BTreeMap<String, ArticuloConPrecio>,
     pub tarifas: BTreeSet<i64>,
     pub avisos: Vec<String>,
+    /// Descripción del artículo de cada código: dice el modelo concreto que se compra
+    /// (el cierre embutido genérico de la serie es, por ejemplo, un Alualpha 267 i).
+    pub descripciones: BTreeMap<String, String>,
 }
 
 /// Códigos que usa el cálculo: perfiles, vidrio y accesorios.
@@ -36,6 +39,7 @@ pub fn enlazar(
         catalogo: BTreeMap::new(),
         tarifas: BTreeSet::new(),
         avisos: Vec::new(),
+        descripciones: BTreeMap::new(),
     };
     let codigo_vidrio: BTreeSet<&str> = resultado
         .vidrio
@@ -49,6 +53,9 @@ pub fn enlazar(
             None => buscar_por_serie(con, serie, &codigo, &mut enlace.avisos)?,
         };
         let Some(articulo) = encontrado else { continue };
+        enlace
+            .descripciones
+            .insert(codigo.clone(), articulo.descripcion.clone());
         if let Some(convertido) = convertir(&articulo) {
             enlace.tarifas.extend(articulo.tarifa_id);
             enlace.catalogo.insert(codigo, convertido);

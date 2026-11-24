@@ -1,0 +1,7 @@
+# Dibujos propios de herrajes, genéricos (no de una marca): sirven para reconocer el herraje
+# en pantalla, como las siluetas de los perfiles. Se citan en las series como `silueta: herrajes/<nombre>`.
+# El modelo concreto que se compra lo dice el artículo del catálogo (ADR-0029).
+cierre-embutido | Cierre de embutir: frente y perfil del pestillo
+kit-plasticos   | Kit de plásticos de corredera: tapetas, cortavientos y topes
+rueda           | Rueda de corredera en su carro
+tornillo        | Tornillo

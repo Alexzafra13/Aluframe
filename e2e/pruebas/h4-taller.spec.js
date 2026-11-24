@@ -24,7 +24,7 @@ test("aceptar un presupuesto crea el trabajo y se asigna a un operario", async (
   await page.getByRole("link", { name: "Clientes" }).click();
   await page.getByRole("link", { name: "Construcciones Peña" }).click();
   await page.getByRole("button", { name: "Nuevo presupuesto" }).click();
-  await page.getByLabel("Serie y tipología").selectOption({ label: "PRUEBA_COMPLETA · DEMO corredera 2 hojas (ficticia)" });
+  await page.getByLabel("Serie y tipología").selectOption({ label: "Prueba completa (Demo) · DEMO corredera 2 hojas (ficticia)" });
   await page.getByLabel("Ancho (cm)").fill("150");
   await page.getByLabel("Alto (cm)").fill("120");
   await expect(page.locator("#dibujo .texto-cota").first()).toHaveText("150");

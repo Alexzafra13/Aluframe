@@ -19,6 +19,18 @@ pub async fn servir_recurso(Path(ruta): Path<String>, RawQuery(consulta): RawQue
     (cabeceras, archivo.data.into_owned()).into_response()
 }
 
+/// Logotipos de los fabricantes: como las siluetas, un día en el navegador.
+pub async fn servir_logo(Path(archivo): Path<String>) -> Response {
+    let Some(datos) = crate::series::marcas::leer_logo(&archivo) else {
+        return StatusCode::NOT_FOUND.into_response();
+    };
+    let cabeceras = [
+        (CONTENT_TYPE, "image/png"),
+        (CACHE_CONTROL, "public, max-age=86400"),
+    ];
+    (cabeceras, datos).into_response()
+}
+
 /// Siluetas de perfiles: no cambian dentro de una versión, se guardan un día en el navegador.
 pub async fn servir_silueta(Path(ruta): Path<String>) -> Response {
     let Some(datos) = crate::series::siluetas::leer_silueta(&ruta) else {

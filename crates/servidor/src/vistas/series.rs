@@ -9,6 +9,7 @@ use dominio::series::{PiezaCalculada, VidrioCalculado};
 pub struct FilaSerie {
     pub codigo: String,
     pub fabricante: String,
+    pub logo: Option<String>,
     pub estado: &'static str,
     pub version: i64,
     pub avisos: i64,
@@ -22,6 +23,7 @@ impl From<&SerieGuardada> for FilaSerie {
         FilaSerie {
             codigo: serie.codigo.clone(),
             fabricante: serie.fabricante.clone(),
+            logo: crate::series::marcas::url_de_logo(&serie.fabricante),
             estado: texto_de_estado(serie.estado),
             version: guardada.numero_version,
             avisos: guardada.avisos,

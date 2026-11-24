@@ -2,7 +2,9 @@ use askama::Template;
 use dominio::series::{OpcionDeLinea, Serie};
 use dominio::unidades::Longitud;
 
-use super::{GrupoMenu, Opcion, UsuarioEnPantalla};
+use super::{
+    FichaDeSerie, GrupoMenu, HerrajeEnPantalla, Opcion, UsuarioEnPantalla, herrajes_en_pantalla,
+};
 use crate::aplicacion::calculo_de_ventana::CalculoDeVentana;
 use crate::series::siluetas::url_de_silueta;
 
@@ -68,8 +70,9 @@ pub struct VistaCalculo {
     pub dibujo: String,
     pub piezas: Vec<PiezaEnPantalla>,
     pub vidrios: Vec<String>,
-    /// Lo que no se corta: cierres, kits, ruedas, tornillos… (nombre y cantidad).
-    pub herrajes: Vec<(String, String)>,
+    pub ficha: Option<FichaDeSerie>,
+    /// Lo que no se corta: cierres, kits, ruedas, tornillos…
+    pub herrajes: Vec<HerrajeEnPantalla>,
     pub faltan: Vec<String>,
     pub fuera_de_limites: Vec<String>,
     pub perfiles: String,
@@ -132,12 +135,8 @@ impl From<&CalculoDeVentana> for VistaCalculo {
                 .map(|p| pieza_en_pantalla(&c.serie, p))
                 .collect(),
             vidrios: vidrios(c),
-            herrajes: c
-                .resultado
-                .accesorios_sumados()
-                .into_iter()
-                .map(|(a, n)| (nombre_legible(&a), n.to_string().replace('.', ",")))
-                .collect(),
+            ficha: Some(FichaDeSerie::desde(c)),
+            herrajes: herrajes_en_pantalla(c),
             faltan: c.precio.faltan.clone(),
             fuera_de_limites: c.resultado.fuera_de_limites.clone(),
             perfiles: m.perfiles.formatear(),

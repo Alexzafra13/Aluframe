@@ -22,7 +22,7 @@
 <div class="editor">
   <section class="tarjeta tarjeta-dibujo" aria-labelledby="titulo-dibujo-tarjeta">
     <div class="cabecera-dibujo">
-      <h2 class="antetitulo" id="titulo-dibujo-tarjeta">Dibujo · medidas en cm</h2>
+      <div id="ficha-ventana" class="ficha-ventana">{% if let Some(c) = calculo %}{% include "editor_ficha.html" %}{% else %}<h2 class="antetitulo" id="titulo-dibujo-tarjeta">Dibujo · medidas en cm</h2>{% endif %}</div>
       <div class="segmentado-control" role="radiogroup" aria-label="Qué resaltar en el dibujo">
         <input type="radio" id="capa-cotas" name="capa" value="cotas" checked><label for="capa-cotas">Cotas</label>
         <input type="radio" id="capa-piezas" name="capa" value="piezas"><label for="capa-piezas">Piezas</label>

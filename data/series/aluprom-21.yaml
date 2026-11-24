@@ -20,7 +20,8 @@ parametros:
 # Qué referencia del proveedor corresponde a cada código de este archivo. Mientras una referencia esté en CONFIRMAR,
 # las piezas se calculan igualmente pero la línea no tiene precio final. Se rellenan al importar la tarifa real.
 # Los nombres de las hojas son los del catálogo de Aluval (decisión del propietario, 2026-11-22).
-# `silueta`: dibujo de la sección (data/perfiles/aluval), solo para reconocer la pieza; no fija el precio.
+# `silueta`: dibujo de la sección (data/perfiles/aluval) o del herraje (data/perfiles/herrajes, dibujos propios y
+# genéricos), solo para reconocer la pieza; no fija el precio ni el modelo, que los da el artículo del catálogo.
 # Hojas según el acristalamiento (confirmado por el propietario, 2026-11-22): cristal normal -> 21310, 21340, 21350;
 # Climalit (doble) -> 21312, 21341, 21351. Se elige en la línea con la opción «acristalamiento» (ADR-0018).
 referencias:
@@ -39,10 +40,10 @@ referencias:
   # y ruedas»). Se da de alta el artículo con esta referencia en Catálogo > Artículos y la ventana toma su precio.
   # KIT_CORREDERA es el kit de plásticos (tapetas de las hojas, cortavientos y juntas de estanqueidad adhesivas;
   # en Aluval, el 9426065), con referencia genérica porque puede comprarse de otra marca (propietario, 2026-11-23).
-  KIT_CORREDERA:    { referencia: "KIT-CORREDERA" }
-  CIERRE_EMBUTIDO:  { referencia: "CIERRE-EMBUTIDO" }   # en Aluval, el 9104537; genérico por el mismo motivo
-  RUEDA_CORREDERA:  { referencia: "RUEDA-CORREDERA" }
-  TORNILLO_4_8x25:  { referencia: "TORNILLO-4,8X25" }
+  KIT_CORREDERA:    { referencia: "KIT-CORREDERA", silueta: herrajes/kit-plasticos }
+  CIERRE_EMBUTIDO:  { referencia: "CIERRE-EMBUTIDO", silueta: herrajes/cierre-embutido }   # genérico: hoy, Alualpha 267 i (el modelo va en el artículo)
+  RUEDA_CORREDERA:  { referencia: "RUEDA-CORREDERA", silueta: herrajes/rueda }
+  TORNILLO_4_8x25:  { referencia: "TORNILLO-4,8X25", silueta: herrajes/tornillo }
   # El cristal se cobra por m² con el artículo de referencia «CRISTAL»; en cada ventana se puede elegir otro.
   CRISTAL:          { referencia: "CRISTAL" }
 

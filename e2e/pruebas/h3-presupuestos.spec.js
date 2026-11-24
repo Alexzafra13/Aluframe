@@ -35,7 +35,7 @@ test("prepara la serie y la tarifa ficticias y las reglas de precio", async ({ p
 // Guardar vuelve al presupuesto, desde donde se añade la siguiente con «+ Ventana».
 async function ventana(page, ancho, alto) {
   await page.getByRole("link", { name: "+ Ventana" }).click();
-  await page.getByLabel("Serie y tipología").selectOption({ label: "DEMO_FICTICIA · DEMO corredera 2 hojas (ficticia)" });
+  await page.getByLabel("Serie y tipología").selectOption({ label: "Demo ficticia (Demo) · DEMO corredera 2 hojas (ficticia)" });
   await page.getByLabel("Ancho (cm)").fill(ancho);
   await page.getByLabel("Alto (cm)").fill(alto);
   await expect(page.locator("#dibujo svg.dibujo-ventana")).toBeVisible();

@@ -32,7 +32,7 @@ async fn crea_el_presupuesto_desde_el_cliente_y_abre_el_editor() {
             .await,
     )
     .await;
-    assert!(editor.contains("DEMO_FICTICIA · DEMO corredera 2 hojas (ficticia)"));
+    assert!(editor.contains("Demo ficticia (Demo) · DEMO corredera 2 hojas (ficticia)"));
     assert!(editor.contains("Escribe el ancho y el alto"));
 }
 

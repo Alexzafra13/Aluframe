@@ -119,6 +119,12 @@ body.con-pie-fijo .contenido { padding-bottom: 130px; }
 .tarjeta-dibujo { padding: 1.25rem; }
 .cabecera-dibujo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; flex-wrap: wrap; }
 .cabecera-dibujo .antetitulo { margin: 0; }
+/* Qué ventana es: tipo, y debajo la serie con el logotipo de su fabricante (ADR-0029). */
+.ficha-tipo { margin: .15rem 0 0; font: 600 1.25rem var(--condensada); color: var(--tinta); }
+.ficha-serie { display: flex; align-items: center; gap: .5rem; margin: .2rem 0 0; }
+.logo-marca { display: block; height: 16px; width: auto; }
+.ficha-modelo { font: 500 .95rem var(--condensada); color: var(--apagado); }
+.ficha-serie .logo-marca + .ficha-modelo { padding-left: .5rem; border-left: 1px solid var(--linea); }
 .lienzo { min-height: 420px; border-radius: 10px; display: grid; place-items: center; padding: 1rem; background-color: #F6F4EE; background-image: linear-gradient(var(--linea) 1px, transparent 1px), linear-gradient(90deg, var(--linea) 1px, transparent 1px); background-size: 28px 28px; transition: opacity var(--normal) ease; }
 .lienzo-figura { margin: 0; width: 100%; animation: aparecer var(--rapido) ease both; }
 .lienzo-vacio { color: var(--apagado); text-align: center; }
@@ -141,7 +147,7 @@ span.silueta { background: transparent; }
 .lista-piezas .medida { text-align: right; font-size: 1.05rem; }
 /* Herrajes: lo que no se corta (cierres, kits, ruedas, tornillos), aparte de los perfiles. */
 .tarjeta-piezas .lista-piezas + .antetitulo { margin-top: 1.25rem; }
-.lista-herrajes li { display: flex; justify-content: space-between; gap: .75rem; padding: .35rem 0; border-bottom: 1px solid var(--linea); }
+.modelo-herraje { display: block; font-size: .8rem; color: var(--apagado); }
 
 /* El dibujo: colores en CSS para pantalla e impresión. */
 .dibujo-ventana { display: block; width: 100%; height: auto; max-height: 64vh; overflow: visible; }

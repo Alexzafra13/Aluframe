@@ -6,7 +6,7 @@ use axum::routing::{get, post};
 use super::middleware::{
     anadir_cabeceras_de_seguridad, cargar_sesion, exigir_configuracion, proteger_csrf,
 };
-use super::recursos::{servir_recurso, servir_silueta};
+use super::recursos::{servir_logo, servir_recurso, servir_silueta};
 use super::rutas::{
     acceso, ajustes, ajustes_presupuestos, copias, datos, demostracion, escritorio,
     primer_arranque, salud, taller,
@@ -57,6 +57,7 @@ fn rutas_de_acceso() -> Router<EstadoApp> {
         .route("/health", get(salud::comprobar_salud))
         .route("/recursos/{*ruta}", get(servir_recurso))
         .route("/perfiles/{*ruta}", get(servir_silueta))
+        .route("/marcas/{archivo}", get(servir_logo))
         .route(
             "/primer-arranque",
             get(primer_arranque::mostrar_primer_arranque)

@@ -42,6 +42,8 @@ pub struct CalculoDeVentana {
     pub tarifas: BTreeSet<i64>,
     pub descripcion: String,
     pub barras: BTreeMap<String, u32>,
+    /// Descripción en el catálogo de cada código de la serie que tiene artículo.
+    pub articulos: BTreeMap<String, String>,
 }
 
 pub fn calcular(
@@ -74,16 +76,15 @@ pub fn calcular(
     );
     let vidrio = descripcion_de_articulo(con, entrada.vidrio_articulo_id)?;
     let color = acabado.map(|a| (color_de_dibujo(&a), a.nombre));
-    let descripcion = describir(&serie, &tipologia, entrada, (color.as_ref(), vidrio));
-    let dibujo = dibujar(&tipologia, &resultado, (entrada, serie.unidad), color);
     Ok(CalculoDeVentana {
-        descripcion,
-        dibujo,
+        descripcion: describir(&serie, &tipologia, entrada, (color.as_ref(), vidrio)),
+        dibujo: dibujar(&tipologia, &resultado, (entrada, serie.unidad), color),
         barras: perfiles
             .iter()
             .map(|(p, u)| (p.clone(), u.barras))
             .collect(),
         tarifas: enlace.tarifas,
+        articulos: enlace.descripciones,
         serie,
         resultado,
         materiales,

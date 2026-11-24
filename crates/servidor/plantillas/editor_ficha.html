@@ -1,0 +1,4 @@
+{% if let Some(f) = c.ficha %}<p class="antetitulo">Dibujo · medidas en cm</p>
+<h2 class="ficha-tipo" id="titulo-dibujo-tarjeta">{{ f.tipo }}</h2>
+<p class="ficha-serie">{% if let Some(logo) = f.logo %}<img class="logo-marca" src="{{ logo }}" alt="{{ f.fabricante }}" height="16">{% else %}<span class="texto-apagado">{{ f.fabricante }}</span>{% endif %}<span class="ficha-modelo">{{ f.modelo }}</span></p>
+{% else %}<h2 class="antetitulo" id="titulo-dibujo-tarjeta">Dibujo · medidas en cm</h2>{% endif %}

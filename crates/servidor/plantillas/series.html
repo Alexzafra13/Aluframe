@@ -20,7 +20,7 @@
       {% for s in series %}
       <tr>
         <td class="mono">{{ s.codigo }}</td>
-        <td>{{ s.fabricante }}</td>
+        <td>{% if let Some(logo) = s.logo %}<img class="logo-marca" src="{{ logo }}" alt="{{ s.fabricante }}" height="16">{% else %}{{ s.fabricante }}{% endif %}</td>
         <td><span class="etiqueta {% if s.estado == "validada" %}etiqueta-azul{% else %}etiqueta-aviso{% endif %}">{{ s.estado }}</span></td>
         <td class="mono">v{{ s.version }}</td>
         <td data-etiqueta="Datos pendientes:">{{ s.avisos }}</td>
