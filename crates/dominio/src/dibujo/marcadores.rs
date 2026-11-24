@@ -45,6 +45,11 @@ fn posicion(plano: &Plano, perfil: &str) -> Option<(i64, i64)> {
             _ => (marco.x + medio_marco, marco.y + marco.alto * 72 / 100),
         });
     }
+    if perfil == "CENTRO" {
+        // Donde se juntan las hojas centrales (el cierre 4 hojas de una corredera).
+        let hoja = *plano.hojas.first()?;
+        return Some((marco.x + marco.ancho / 2, hoja.y + hoja.alto * 78 / 100));
+    }
     let hoja = *plano.hojas.first()?;
     posicion_en_hoja(hoja, plano.grosor_hoja / 2, perfil)
 }

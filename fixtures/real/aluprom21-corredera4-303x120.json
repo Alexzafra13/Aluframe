@@ -1,7 +1,7 @@
 {
   "id": "aluprom21-corredera4-303x120",
   "validado": true,
-  "nota": "Valores derivados de las fórmulas del usuario para ancho=303 cm y alto=120 cm (303 da una hoja de rodamiento de 75 cm exactos). Las cantidades de hojas, ruedas y tornillos son el doble que en la de 2 hojas por lógica del usuario (supuesto). Pendiente de contrastar con una hoja de corte real. Medidas de corte confirmadas por el propietario el 2026-11-22 tras probarlas (sigue incompleto: falta la fórmula del cristal).",
+  "nota": "Valores derivados de las fórmulas del usuario para ancho=303 cm y alto=120 cm (303 da una hoja de rodamiento de 75 cm exactos). Las cantidades de hojas, ruedas y tornillos son el doble que en la de 2 hojas por lógica del usuario (supuesto). Pendiente de contrastar con una hoja de corte real. Medidas de corte confirmadas por el propietario el 2026-11-22 tras probarlas (sigue incompleto: falta la fórmula del cristal). El 2026-11-23 el propietario añade el cierre 4 hojas 21344 (una pieza, alto de la hoja) y 4 cierres embutidos.",
   "serie": "ALUPROM_21",
   "tipologia": "corredera_4_hojas",
   "entrada": { "ancho": 303, "alto": 120, "unidad": "cm" },
@@ -13,10 +13,12 @@
       { "perfil": "MARCO_INFERIOR",  "cantidad": 1, "longitud": 298.9, "corte": 90 },
       { "perfil": "HOJA_LATERAL",    "cantidad": 4, "longitud": 114.7, "corte": 90 },
       { "perfil": "HOJA_CIERRE",     "cantidad": 4, "longitud": 114.7, "corte": 90 },
-      { "perfil": "HOJA_RODAMIENTO", "cantidad": 8, "longitud": 75,    "corte": 90 }
+      { "perfil": "HOJA_RODAMIENTO", "cantidad": 8, "longitud": 75,    "corte": 90 },
+      { "perfil": "CIERRE_4_HOJAS",  "cantidad": 1, "longitud": 114.7, "corte": 90 }
     ],
     "accesorios": [
       { "articulo": "KIT_CORREDERA",   "cantidad": 2 },
+      { "articulo": "CIERRE_EMBUTIDO", "cantidad": 4 },
       { "articulo": "RUEDA_CORREDERA", "cantidad": 8 },
       { "articulo": "TORNILLO_4_8x25", "cantidad": 25 }
     ],

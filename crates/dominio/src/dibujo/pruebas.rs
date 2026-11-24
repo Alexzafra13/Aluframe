@@ -88,12 +88,21 @@ fn la_corredera_de_dos_hojas_lleva_el_cierre_en_los_laterales() {
     assert!(x.len() == 1 && x[0] > 13_000, "solo la hoja derecha: {x:?}");
 }
 
+/// Propietario (2026-11-23): se abren las cuatro hojas; un cierre en cada lateral y dos en el
+/// centro, uno en cada hoja central.
 #[test]
-fn la_corredera_de_cuatro_hojas_mueve_las_centrales() {
+fn la_corredera_de_cuatro_hojas_lleva_cierres_en_los_laterales_y_dos_en_el_centro() {
     let svg = dibujar_ventana(&datos(TipoDibujo::Corredera, 4));
     assert_eq!(contar(&svg, r#"class="hoja""#), 4);
-    assert_eq!(contar(&svg, r#"class="flecha""#), 2);
-    assert_eq!(contar(&svg, r#"class="manilla""#), 3);
+    assert_eq!(contar(&svg, r#"class="flecha""#), 4);
+    let x = posiciones_de_manillas(&svg);
+    assert_eq!(x.len(), 4, "{x:?}");
+    let centro = 7_500;
+    assert!(x[0] < 2_000 && x[3] > 13_000, "laterales: {x:?}");
+    assert!(
+        (x[1] - centro).abs() < 1_000 && (x[2] - centro).abs() < 1_000 && x[1] < x[2],
+        "dos en el centro: {x:?}"
+    );
 }
 
 #[test]
@@ -135,6 +144,20 @@ fn los_numeros_no_se_pisan_y_los_desconocidos_no_se_pierden() {
             );
         }
     }
+}
+
+/// El cierre 4 hojas (`posicion: centro`) lleva su número donde se juntan las hojas centrales.
+#[test]
+fn la_pieza_del_centro_se_numera_en_el_centro_de_la_ventana() {
+    let mut d = datos(TipoDibujo::Corredera, 4);
+    d.piezas = vec![(1, "CENTRO".into())];
+    let plano = geometria::Plano::nuevo(&d);
+    let colocados = marcadores::colocar(&plano, &d.piezas);
+    let x = colocados[0].1;
+    assert!(
+        (x - plano.marco.x - plano.marco.ancho / 2).abs() < 10,
+        "{x}"
+    );
 }
 
 /// Un número con dos signos menos (`--5`) delata una cuenta mal hecha; las variables CSS

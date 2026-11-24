@@ -1,7 +1,7 @@
 {
   "id": "aluprom21-corredera2-150x120",
   "validado": true,
-  "nota": "Medidas de corte confirmadas por el propietario el 2026-11-22. Cristal: dos de (ancho / 2 - 9,8) x (alto - 13,1); el ancho lo da el propietario (y el plano de Aluval), el alto es PROVISIONAL hasta comprobarlo con un cristal real.",
+  "nota": "Medidas de corte confirmadas por el propietario el 2026-11-22. Cristal: dos de (ancho / 2 - 9,8) x (alto - 13,1); el ancho lo da el propietario (y el plano de Aluval), el alto es PROVISIONAL hasta comprobarlo con un cristal real. El 2026-11-23 el propietario añade 2 cierres embutidos.",
   "serie": "ALUPROM_21",
   "tipologia": "corredera_2_hojas",
   "entrada": { "ancho": 150, "alto": 120, "unidad": "cm" },
@@ -17,6 +17,7 @@
     ],
     "accesorios": [
       { "articulo": "KIT_CORREDERA",   "cantidad": 1 },
+      { "articulo": "CIERRE_EMBUTIDO", "cantidad": 2 },
       { "articulo": "RUEDA_CORREDERA", "cantidad": 4 },
       { "articulo": "TORNILLO_4_8x25", "cantidad": 17 }
     ],

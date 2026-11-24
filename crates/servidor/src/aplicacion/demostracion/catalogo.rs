@@ -47,7 +47,7 @@ const AJUSTES: [(&str, &str); 19] = [
 ];
 
 /// Barras enteras y retales (largo en cm) del inventario inicial, y los mínimos.
-const STOCK: [(&str, &str, &str); 11] = [
+const STOCK: [(&str, &str, &str); 13] = [
     ("21210", "", "6"),
     ("21210", "180", "1"),
     ("21220", "", "4"),
@@ -56,7 +56,9 @@ const STOCK: [(&str, &str, &str); 11] = [
     ("21340", "", "6"),
     ("21350", "", "8"),
     ("21350", "300", "1"),
+    ("21344", "", "2"),
     ("KIT-CORREDERA", "", "10"),
+    ("CIERRE-EMBUTIDO", "", "20"),
     ("RUEDA-CORREDERA", "", "40"),
     ("TORNILLO-4,8X25", "", "300"),
 ];

@@ -1,6 +1,7 @@
 mod calculo;
 mod lector;
 mod leer_partes;
+mod leer_posicion;
 mod leer_serie;
 mod leer_tipologia;
 mod modelo;

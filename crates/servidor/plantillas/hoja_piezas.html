@@ -1,5 +1,5 @@
 <table class="tabla tabla-piezas">
-  <caption class="antetitulo">Piezas a cortar (mm)</caption>
+  <caption class="antetitulo">Perfiles a cortar (mm)</caption>
   <thead><tr><th scope="col">N.º</th><th scope="col">Pieza</th><th scope="col" class="numero">Cant.</th><th scope="col" class="numero">Medida</th><th scope="col" class="numero">Corte</th></tr></thead>
   <tbody>
     {% for p in hoja.piezas %}<tr><td><span class="numero-pieza">{{ p.numero }}</span></td><td>{{ p.nombre }}</td><td class="numero mono">×{{ p.cantidad }}</td><td class="numero mono medida-grande">{{ p.medida }}</td><td class="numero mono">{{ p.corte }}</td></tr>{% endfor %}

@@ -23,11 +23,11 @@
       <p class="a4-etiqueta">Cristal</p>
       {% if h.hoja.cristal.is_empty() %}<p><strong>PENDIENTE de medir</strong></p>{% endif %}
       {% for c in h.hoja.cristal %}<p class="mono">{{ c }}</p>{% endfor %}
-      <p class="a4-etiqueta">Accesorios</p>
+      <p class="a4-etiqueta">Herrajes</p>
       {% for (a, n) in h.hoja.accesorios %}<p class="mono">{{ a }} ×{{ n }}</p>{% endfor %}
     </div>
   </div>
-  <p class="a4-etiqueta">Piezas a cortar (mm)</p>
+  <p class="a4-etiqueta">Perfiles a cortar (mm)</p>
   <table class="taller-piezas">
     <tbody>
       {% for p in h.hoja.piezas %}<tr><td><span class="numero-circulo">{{ p.numero }}</span></td><td>{{ p.nombre }}</td><td class="mono numero">×{{ p.cantidad }}</td><td class="mono numero">{{ p.medida }}</td><td class="mono numero">{{ p.corte }}</td><td class="numero"><span class="casilla-papel" aria-hidden="true"></span></td></tr>{% endfor %}

@@ -107,39 +107,60 @@ fn flecha(s: &mut String, hoja: Rect, hacia_la_derecha: bool) {
 }
 
 /// En 2 hojas se abren la indicada o `ambas` (por defecto la derecha): flecha hacia el centro y
-/// cierre en su lateral, contra el marco, como en el catálogo de Aluval. En 4, las centrales
-/// hacia fuera, con los cierres donde se encuentran las hojas.
+/// cierre en su lateral, contra el marco, como en el catálogo de Aluval. En 4 se abren las cuatro
+/// (propietario, 2026-11-23): las de los lados hacia el centro y las centrales hacia fuera, con un
+/// cierre en cada lateral y dos en el centro, uno en cada hoja central.
 fn flechas_de_corredera(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     let hojas = &plano.hojas;
-    if hojas.len() == 4 {
-        if let (Some(segunda), Some(tercera)) = (hojas.get(1), hojas.get(2)) {
-            flecha(s, *segunda, false);
-            flecha(s, *tercera, true);
+    if let [primera, segunda, tercera, cuarta] = hojas.as_slice() {
+        for (hoja, hacia_la_derecha) in [
+            (primera, true),
+            (segunda, false),
+            (tercera, true),
+            (cuarta, false),
+        ] {
+            flecha(s, *hoja, hacia_la_derecha);
         }
-        for par in hojas.windows(2) {
-            if let [a, b] = par {
-                let x = (a.derecha() + b.x) / 2 - plano.grosor_hoja / 4;
-                manilla(s, x, a.centro_y(), plano.grosor_hoja);
-            }
-        }
+        cierre_en_el_lado(s, plano, *primera, false);
+        cierres_del_centro(s, plano, segunda.centro_y());
+        cierre_en_el_lado(s, plano, *cuarta, true);
         return;
     }
     let movil = datos.dibujo.hoja_movil.as_deref().unwrap_or("derecha");
-    let cuarto = plano.grosor_hoja / 4;
     if let Some(izquierda) = hojas.first().filter(|_| movil != "derecha") {
         flecha(s, *izquierda, true);
-        manilla(
-            s,
-            izquierda.x + cuarto,
-            izquierda.centro_y(),
-            plano.grosor_hoja,
-        );
+        cierre_en_el_lado(s, plano, *izquierda, false);
     }
     if let Some(derecha) = hojas.last().filter(|_| movil != "izquierda") {
         flecha(s, *derecha, false);
-        let x = derecha.derecha() - cuarto - (plano.grosor_hoja / 2).max(1);
-        manilla(s, x, derecha.centro_y(), plano.grosor_hoja);
+        cierre_en_el_lado(s, plano, *derecha, true);
     }
+}
+
+/// El cierre va en el canto de la hoja contrario al sentido en que se abre.
+fn cierre_en_el_lado(s: &mut String, plano: &Plano, hoja: Rect, derecho: bool) {
+    let cuarto = plano.grosor_hoja / 4;
+    let x = if derecho {
+        hoja.derecha() - cuarto - (plano.grosor_hoja / 2).max(1)
+    } else {
+        hoja.x + cuarto
+    };
+    manilla(s, x, hoja.centro_y(), plano.grosor_hoja);
+}
+
+/// Las centrales se dibujan solapadas, pero en el taller se juntan en el centro con el cierre
+/// 4 hojas: un cierre a cada lado de la junta.
+fn cierres_del_centro(s: &mut String, plano: &Plano, centro_y: i64) {
+    let centro = plano.marco.x + plano.marco.ancho / 2;
+    let hueco = (plano.grosor_hoja / 4).max(1);
+    let ancho_manilla = (plano.grosor_hoja / 2).max(1);
+    manilla(
+        s,
+        centro - hueco - ancho_manilla,
+        centro_y,
+        plano.grosor_hoja,
+    );
+    manilla(s, centro + hueco, centro_y, plano.grosor_hoja);
 }
 
 fn manilla(s: &mut String, x: i64, centro_y: i64, grosor: i64) {

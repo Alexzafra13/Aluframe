@@ -33,9 +33,14 @@ referencias:
   HOJA_LATERAL_CLIMALIT:    { referencia: "21312", silueta: aluval/21312 }
   HOJA_CIERRE_CLIMALIT:     { referencia: "21341", silueta: aluval/21341 }
   HOJA_RODAMIENTO_CLIMALIT: { referencia: "21351", silueta: aluval/21351 }
+  # Solo en la de 4 hojas: une las dos hojas centrales (propietario, 2026-11-23). Igual con cualquier cristal.
+  CIERRE_4_HOJAS:   { referencia: "21344", silueta: aluval/21344 }
   # Referencias genéricas del taller, no del proveedor (propietario, 2026-11-22: «de momento, un kit de corredera
   # y ruedas»). Se da de alta el artículo con esta referencia en Catálogo > Artículos y la ventana toma su precio.
+  # KIT_CORREDERA es el kit de plásticos (tapetas de las hojas, cortavientos y juntas de estanqueidad adhesivas;
+  # en Aluval, el 9426065), con referencia genérica porque puede comprarse de otra marca (propietario, 2026-11-23).
   KIT_CORREDERA:    { referencia: "KIT-CORREDERA" }
+  CIERRE_EMBUTIDO:  { referencia: "CIERRE-EMBUTIDO" }   # en Aluval, el 9104537; genérico por el mismo motivo
   RUEDA_CORREDERA:  { referencia: "RUEDA-CORREDERA" }
   TORNILLO_4_8x25:  { referencia: "TORNILLO-4,8X25" }
   # El cristal se cobra por m² con el artículo de referencia «CRISTAL»; en cada ventana se puede elegir otro.
@@ -62,14 +67,15 @@ tipologias:
       piezas:
         - { cantidad: 2, ancho: "ancho / 2 - 9.8", alto: "alto - 13.1" }
     accesorios:
-      - { articulo: KIT_CORREDERA,   cantidad: 1 }                  # kit de accesorios de montaje; un único artículo
+      - { articulo: KIT_CORREDERA,   cantidad: 1 }                  # kit de plásticos; un único artículo
+      - { articulo: CIERRE_EMBUTIDO, cantidad: 2 }                  # uno en cada lateral (propietario, 2026-11-23)
       - { articulo: RUEDA_CORREDERA, cantidad: 4 }
       - { articulo: TORNILLO_4_8x25, cantidad: 9, aplica_a: marco }
       - { articulo: TORNILLO_4_8x25, cantidad: 8, aplica_a: hojas } # 8 en total para las dos hojas
 
   corredera_4_hojas:
     nombre: "Ventana corredera 4 hojas"
-    dibujo: { tipo: corredera, hojas: 4 }
+    dibujo: { tipo: corredera, hojas: 4 }          # se abren las cuatro: cierre en cada lateral y dos en el centro (propietario)
     opciones:                      # el tipo y la cámara del Climalit se concretarán más adelante
       - { codigo: acristalamiento, nombre: "Acristalamiento", valores: [cristal_normal, climalit], por_defecto: cristal_normal }
     # Igual que la de 2 hojas salvo la hoja de rodamiento y las cantidades (el doble de hojas).
@@ -78,12 +84,15 @@ tipologias:
       - { perfil: MARCO_SUPERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
       - { perfil: MARCO_INFERIOR,  cantidad: 1, longitud: "ancho - descuento_marco_horizontal",      corte: 90 }
       - { perfil: HOJA_LATERAL,    perfil_segun: { acristalamiento: { climalit: HOJA_LATERAL_CLIMALIT } }, cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90 }  # el doble que en la de 2 hojas
-      - { perfil: HOJA_CIERRE,     perfil_segun: { acristalamiento: { climalit: HOJA_CIERRE_CLIMALIT } }, cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }  # el doble; ¿lleva el «cierre 4 hojas» 21344? por confirmar
+      - { perfil: HOJA_CIERRE,     perfil_segun: { acristalamiento: { climalit: HOJA_CIERRE_CLIMALIT } }, cantidad: 4, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: hoja_central }  # el doble
       - { perfil: HOJA_RODAMIENTO, perfil_segun: { acristalamiento: { climalit: HOJA_RODAMIENTO_CLIMALIT } }, cantidad: 8, longitud: "(ancho - descuento_hoja_4_hojas) / 4",    corte: 90 }  # el doble; primero se resta y luego se divide
+      # Mide lo mismo que el alto de la hoja (propietario, 2026-11-23): una pieza donde se juntan las centrales.
+      - { perfil: CIERRE_4_HOJAS,  cantidad: 1, longitud: "alto - descuento_hoja_vertical",          corte: 90, posicion: centro }
     vidrio:
       estado: CONFIRMAR            # el usuario dará la medida cuando sepa el descuento
     accesorios:
       - { articulo: KIT_CORREDERA,   cantidad: 2 }                  # confirmado por el usuario: 2 kits iguales
+      - { articulo: CIERRE_EMBUTIDO, cantidad: 4 }                  # dos en los laterales y dos en el centro (propietario, 2026-11-23)
       - { articulo: RUEDA_CORREDERA, cantidad: 8 }                  # el doble que en la de 2 hojas (confirmado, 2026-11-22)
       - { articulo: TORNILLO_4_8x25, cantidad: 9,  aplica_a: marco }  # el marco no cambia (confirmado)
       - { articulo: TORNILLO_4_8x25, cantidad: 16, aplica_a: hojas }  # el doble que en la de 2 hojas (confirmado)

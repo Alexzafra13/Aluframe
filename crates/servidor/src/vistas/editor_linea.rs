@@ -68,6 +68,8 @@ pub struct VistaCalculo {
     pub dibujo: String,
     pub piezas: Vec<PiezaEnPantalla>,
     pub vidrios: Vec<String>,
+    /// Lo que no se corta: cierres, kits, ruedas, tornillos… (nombre y cantidad).
+    pub herrajes: Vec<(String, String)>,
     pub faltan: Vec<String>,
     pub fuera_de_limites: Vec<String>,
     pub perfiles: String,
@@ -130,6 +132,12 @@ impl From<&CalculoDeVentana> for VistaCalculo {
                 .map(|p| pieza_en_pantalla(&c.serie, p))
                 .collect(),
             vidrios: vidrios(c),
+            herrajes: c
+                .resultado
+                .accesorios_sumados()
+                .into_iter()
+                .map(|(a, n)| (nombre_legible(&a), n.to_string().replace('.', ",")))
+                .collect(),
             faltan: c.precio.faltan.clone(),
             fuera_de_limites: c.resultado.fuera_de_limites.clone(),
             perfiles: m.perfiles.formatear(),

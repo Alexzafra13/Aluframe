@@ -1,5 +1,6 @@
 use super::lector::{Campos, Lector, leer_lista, opcional, ruta_hija};
 use super::leer_partes::{leer_dibujo, leer_limites, leer_opciones, leer_perfil_segun};
+use super::leer_posicion::leer_posicion;
 use super::leer_serie::{es_codigo_valido, leer_estado};
 use super::{
     AccesorioDeSerie, AplicaA, Dato, EstadoSerie, PiezaDeSerie, PiezaDeVidrio, Tipologia,
@@ -144,29 +145,6 @@ fn leer_extras_de_pieza(lector: &mut Lector, campos: &Campos, ruta: &str) -> Opt
         None => Vec::new(),
     };
     Some((posicion, perfil_segun))
-}
-
-/// Sitios del dibujo donde puede ir el número de una pieza (`dibujo::marcadores`).
-const POSICIONES: [&str; 7] = [
-    "marco_lateral",
-    "marco_superior",
-    "marco_inferior",
-    "hoja_lateral",
-    "hoja_central",
-    "hoja_superior",
-    "hoja_inferior",
-];
-
-fn leer_posicion(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<String> {
-    let texto = lector.texto(valor, ruta)?;
-    if POSICIONES.contains(&texto.as_str()) {
-        return Some(texto.to_uppercase());
-    }
-    lector.informe.error(
-        ruta,
-        format!("posición no válida; usa una de: {}", POSICIONES.join(", ")),
-    );
-    None
 }
 
 fn leer_corte(lector: &mut Lector, valor: &Valor, ruta: &str) -> Option<Dato<u16>> {

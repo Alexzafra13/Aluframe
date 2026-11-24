@@ -125,7 +125,7 @@ async fn con_todos_los_permisos_ve_el_presupuesto_sin_costes_ni_acciones() {
     for oculto in [
         "<dt>Perfiles</dt>",
         "<dt>Cristal</dt>",
-        "<dt>Accesorios</dt>",
+        "<dt>Herrajes</dt>",
         "<dt>Mano de obra</dt>",
         "Aceptar presupuesto",
         "Marcar como enviado",

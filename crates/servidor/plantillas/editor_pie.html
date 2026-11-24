@@ -2,7 +2,7 @@
 <dl class="pie-desglose">
   <div><dt>Perfiles</dt><dd title="{{ c.alternativa }}">{{ c.perfiles }}</dd></div>
   <div><dt>Cristal</dt><dd>{{ c.cristal }}</dd></div>
-  <div><dt>Accesorios</dt><dd>{{ c.accesorios }}</dd></div>
+  <div><dt>Herrajes</dt><dd>{{ c.accesorios }}</dd></div>
   <div><dt>Mano de obra</dt><dd>{{ c.mano_de_obra }}</dd></div>
 </dl>
 <div class="pie-total">
@@ -10,6 +10,6 @@
   <div><span class="pie-total-titulo">Línea sin IVA</span><span class="pie-total-importe mono">{% if c.completa %}{{ c.precio }}{% else %}<span class="provisional">{{ c.precio }}</span>{% endif %}</span></div>
 </div>
 {% else %}
-<dl class="pie-desglose"><div><dt>Perfiles</dt><dd>—</dd></div><div><dt>Cristal</dt><dd>—</dd></div><div><dt>Accesorios</dt><dd>—</dd></div><div><dt>Mano de obra</dt><dd>—</dd></div></dl>
+<dl class="pie-desglose"><div><dt>Perfiles</dt><dd>—</dd></div><div><dt>Cristal</dt><dd>—</dd></div><div><dt>Herrajes</dt><dd>—</dd></div><div><dt>Mano de obra</dt><dd>—</dd></div></dl>
 <div class="pie-total"><div><span class="pie-total-titulo">Línea sin IVA</span><span class="pie-total-importe mono">—</span></div></div>
 {% endif %}
