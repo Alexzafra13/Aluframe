@@ -7,6 +7,11 @@ sin pérdida, con `pdfimages -png -f N -l N catalogo.pdf /tmp/img` y se elige la
 
 Uso:
   scripts/imagen_de_herraje.py /tmp/img-015.png data/perfiles/herrajes/rueda.svg
+  scripts/imagen_de_herraje.py plano.jpg data/perfiles/mosquitera/cajon.svg --recorte 150,88,610,690 --quitar-azul
+
+`--recorte x0,y0,x1,y1` se queda con esa zona (en píxeles) antes de recortar el blanco: sirve para
+dejar fuera cotas y textos. `--quitar-azul` borra las líneas de cota azules de los planos.
+También vale para siluetas de perfiles cuando el fabricante solo da una imagen.
 
 Recorta el fondo blanco, pasa cada gris a tinta con transparencia y refuerza las líneas finas
 (`CONTRASTE`) para que se lean en el hueco de 56 × 42 px de la lista.
@@ -28,8 +33,21 @@ def alfa(gris):
     return max(0, min(255, (FONDO - gris) * 255 // CONTRASTE))
 
 
-def convertir(origen):
-    gris = Image.open(origen).convert("L")
+def es_azul(r, g, b):
+    return b > r + 40 and b > g + 20
+
+
+def preparar(origen, recorte, quitar_azul):
+    imagen = Image.open(origen).convert("RGB")
+    if recorte:
+        imagen = imagen.crop(recorte)
+    if quitar_azul:
+        imagen.putdata([(255, 255, 255) if es_azul(*p) else p for p in imagen.getdata()])
+    return imagen
+
+
+def convertir(origen, recorte=None, quitar_azul=False):
+    gris = preparar(origen, recorte, quitar_azul).convert("L")
     caja = gris.point(lambda g: 255 if g < FONDO - 5 else 0).getbbox()
     gris = gris.crop(caja)
     mascara = gris.point(alfa)
@@ -38,19 +56,34 @@ def convertir(origen):
     return salida
 
 
+def leer_opciones(argumentos):
+    recorte, quitar_azul, rutas = None, False, []
+    pendientes = list(argumentos)
+    while pendientes:
+        arg = pendientes.pop(0)
+        if arg == "--recorte" and pendientes:
+            recorte = tuple(int(v) for v in pendientes.pop(0).split(","))
+        elif arg == "--quitar-azul":
+            quitar_azul = True
+        else:
+            rutas.append(arg)
+    return rutas, recorte, quitar_azul
+
+
 def main():
-    if len(sys.argv) != 3:
+    rutas, recorte, quitar_azul = leer_opciones(sys.argv[1:])
+    if len(rutas) != 2:
         sys.exit(__doc__)
-    imagen = convertir(sys.argv[1])
+    imagen = convertir(rutas[0], recorte, quitar_azul)
     datos = io.BytesIO()
     imagen.save(datos, "PNG", optimize=True)
     ancho, alto = imagen.size
     codificada = base64.b64encode(datos.getvalue()).decode()
-    Path(sys.argv[2]).write_text(
+    Path(rutas[1]).write_text(
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {ancho} {alto}">'
         f'<image width="{ancho}" height="{alto}" href="data:image/png;base64,{codificada}"/></svg>\n'
     )
-    print(f"{sys.argv[2]}: {ancho} × {alto} px")
+    print(f"{rutas[1]}: {ancho} × {alto} px")
 
 
 if __name__ == "__main__":

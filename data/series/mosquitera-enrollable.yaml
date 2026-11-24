@@ -17,12 +17,13 @@ parametros:
   descuento_guia_cajon_50: 5          # guía con cajón de 50 = alto - 5 (propietario)
   alto_maximo_cajon_45: 140           # hasta 140 cm de alto, cajón de 45; por encima, de 50 (propietario)
 
-# Perfiles: referencias y proveedor por confirmar. El kit va con referencia genérica del taller,
-# como los de las correderas: se da de alta el artículo «KIT-MOSQUITERA» con el modelo que se compre.
+# Perfiles: referencias y proveedor por confirmar. El kit se compra aparte, uno por mosquitera
+# (propietario); va con referencia genérica del taller, como los de las correderas.
+# Siluetas de los planos del propietario; el cajón de 45 y el de 50 comparten dibujo.
 referencias:
-  CAJON_45:       { referencia: CONFIRMAR }
-  CAJON_50:       { referencia: CONFIRMAR }
-  GUIA_LATERAL:   { referencia: CONFIRMAR }
+  CAJON_45:       { referencia: CONFIRMAR, silueta: mosquitera/cajon }
+  CAJON_50:       { referencia: CONFIRMAR, silueta: mosquitera/cajon }
+  GUIA_LATERAL:   { referencia: CONFIRMAR, silueta: mosquitera/guia-lateral }
   KIT_MOSQUITERA: { referencia: "KIT-MOSQUITERA" }
 
 tipologias:
@@ -37,6 +38,7 @@ tipologias:
       - { perfil: GUIA_LATERAL, cantidad: "si(alto <= alto_maximo_cajon_45, 2, 0)", longitud: "alto - descuento_guia_cajon_45", corte: 90, posicion: marco_lateral }
       - { perfil: GUIA_LATERAL, cantidad: "si(alto > alto_maximo_cajon_45, 2, 0)",  longitud: "alto - descuento_guia_cajon_50", corte: 90, posicion: marco_lateral }
       # El terminal no se corta: viene dentro del cabezal al cortarlo (propietario, 2026-11-24).
-    # Sin vidrio: una mosquitera no lleva cristal. La malla: por confirmar si va en el kit o aparte.
+    # Sin vidrio: una mosquitera no lleva cristal. La malla viene dentro del cajón al cortarlo: no
+    # se cuenta aparte (propietario, 2026-11-24).
     accesorios:
       - { articulo: KIT_MOSQUITERA, cantidad: 1 }

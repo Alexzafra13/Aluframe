@@ -3,7 +3,7 @@
 **Estado:** aceptado (2026-11-24, planteamiento aprobado por el propietario).
 
 ## Contexto
-El propietario quiere presupuestar **mosquiteras enrollables de aluminio** como un producto más: al escribir la medida sale el dibujo, con los mismos colores que las ventanas. Ahora se venden sueltas; más adelante irán dentro de las ventanas con persiana. Lleva un cajón de 45 mm hasta 140 cm de alto y de 50 mm por encima, dos guías laterales, un terminal con tirador y un kit. Datos del propietario: guía = alto − 4 con cajón de 45 y alto − 5 con cajón de 50; cajón = ancho − 2 cm; el terminal no se corta, viene dentro del cabezal; dos tiradores, siempre negros. Faltan las referencias, el proveedor y la longitud de barra.
+El propietario quiere presupuestar **mosquiteras enrollables de aluminio** como un producto más: al escribir la medida sale el dibujo, con los mismos colores que las ventanas. Ahora se venden sueltas; más adelante irán dentro de las ventanas con persiana. Lleva un cajón de 45 mm hasta 140 cm de alto y de 50 mm por encima, dos guías laterales, un terminal con tirador y un kit. Datos del propietario: guía = alto − 4 con cajón de 45 y alto − 5 con cajón de 50; cajón = ancho − 2 cm; el terminal no se corta y la malla no se cuenta: vienen dentro del cabezal (cajón) al cortarlo; el kit va aparte, uno por mosquitera; dos tiradores, siempre negros. Faltan las referencias, el proveedor y la longitud de barra.
 
 ## Decisión
 1. **La mosquitera es una serie** (`data/series/mosquitera-enrollable.yaml`), con su tipología. Se presupuesta, se acepta, se corta y se descuenta del stock como una ventana, sin código propio fuera del dibujo. Va **en borrador**: se dibuja y se calcula, pero no tiene precio final hasta confirmar los datos.

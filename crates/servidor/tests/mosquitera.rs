@@ -131,4 +131,6 @@ async fn se_presupuesta_como_una_ventana_y_sale_su_dibujo() {
     assert!(html.contains(r#"class="malla""#));
     assert!(html.contains("Cajón 50"), "{html}");
     assert!(html.contains("Kit mosquitera"));
+    assert!(html.contains(r#"src="/perfiles/mosquitera/cajon.svg""#));
+    assert!(html.contains(r#"src="/perfiles/mosquitera/guia-lateral.svg""#));
 }

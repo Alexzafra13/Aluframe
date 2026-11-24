@@ -1,0 +1,6 @@
+# Siluetas de la mosquitera enrollable, de los planos que aportó el propietario (2026-11-24).
+# Sin cotas (el propietario avisa de que pueden estar mal) y en tinta sobre transparente, con
+# scripts/imagen_de_herraje.py. Se citan en la serie como `silueta: mosquitera/<nombre>`.
+# nombre | qué es | cómo
+guia-lateral | Guía lateral con cepillos | imagen_de_herraje.py plano-guia.jpg guia-lateral.svg --recorte 278,62,790,912 --quitar-azul
+cajon        | Cajón (cassette) con el rodillo, sin la guía de debajo | imagen_de_herraje.py plano-cajon.jpg cajon.svg --recorte 152,120,612,694 --quitar-azul
