@@ -24,7 +24,7 @@ referencias:
   CAJON_45:       { referencia: CONFIRMAR, silueta: mosquitera/cajon }
   CAJON_50:       { referencia: CONFIRMAR, silueta: mosquitera/cajon }
   GUIA_LATERAL:   { referencia: CONFIRMAR, silueta: mosquitera/guia-lateral }
-  KIT_MOSQUITERA: { referencia: "KIT-MOSQUITERA" }
+  KIT_MOSQUITERA: { referencia: "KIT-MOSQUITERA", silueta: herrajes/kit-mosquitera }
 
 tipologias:
   mosquitera_enrollable:

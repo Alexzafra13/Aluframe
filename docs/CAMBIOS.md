@@ -221,3 +221,4 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
 - **0.21.3 (propietario):** en una mosquitera no salen el vidrio ni el parteluces.
   - Arreglo (venía de antes): al cambiar de serie en el editor, las opciones se quedaban las de la serie anterior. El servidor detectaba el cambio con una cabecera que el navegador no enviaba en este formulario. Ahora compara las opciones que llegan con las de la serie elegida y, si no coinciden, las vuelve a pintar; si coinciden no las toca, para no perder el cursor al escribir.
   - Una tipología sin cristal oculta el campo «Vidrio», la capa «Cristal» del dibujo y el «Cristal» del pie.
+- **0.21.4 (propietario):** dibujo del kit de la mosquitera junto al kit en los herrajes, de la foto del propietario, sin los tornillos ni los tacos. `scripts/imagen_de_herraje.py` admite `--borrar` para quitar zonas de una foto.

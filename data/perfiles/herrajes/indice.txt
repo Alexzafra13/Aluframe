@@ -6,3 +6,4 @@ cierre-embutido | Alualpha 267 i (ficha «Linha ECO», pág. 1, vista de frente)
 kit-plasticos   | Aluval, catálogo Aluprom 21, pág. 20, ref. 9426065 | imagen original del PDF (pdfimages -png, imagen 006) con scripts/imagen_de_herraje.py: el catálogo no la trae en vector
 rueda           | Aluval, catálogo Aluprom 21, pág. 21, ref. 9101027 (rueda fija chapa) | imagen original del PDF (pdfimages -png, imagen 015) con scripts/imagen_de_herraje.py
 tornillo        | Tornillo 4,8 × 25 de cabeza redonda y estrella, dibujo del propietario (2026-11-24) | imagen con scripts/imagen_de_herraje.py
+kit-mosquitera  | Kit de plástico de la mosquitera enrollable (eje, cordón, soportes y topes), foto del propietario (2026-11-24) sin tornillos ni tacos | imagen_de_herraje.py foto-kit.jpg kit-mosquitera.svg --recorte 95,60,1195,615 --borrar 305,505,445,605 --borrar 825,505,970,605

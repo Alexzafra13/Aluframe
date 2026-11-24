@@ -11,6 +11,8 @@ Uso:
 
 `--recorte x0,y0,x1,y1` se queda con esa zona (en píxeles) antes de recortar el blanco: sirve para
 dejar fuera cotas y textos. `--quitar-azul` borra las líneas de cota azules de los planos.
+`--borrar x0,y0,x1,y1` (se puede repetir) pinta de blanco una zona, en píxeles de la imagen
+original: para quitar lo que no forma parte del dibujo, como los tornillos de un kit.
 También vale para siluetas de perfiles cuando el fabricante solo da una imagen.
 
 Recorta el fondo blanco, pasa cada gris a tinta con transparencia y refuerza las líneas finas
@@ -37,8 +39,10 @@ def es_azul(r, g, b):
     return b > r + 40 and b > g + 20
 
 
-def preparar(origen, recorte, quitar_azul):
+def preparar(origen, recorte, quitar_azul, borrar=()):
     imagen = Image.open(origen).convert("RGB")
+    for zona in borrar:
+        imagen.paste((255, 255, 255), zona)
     if recorte:
         imagen = imagen.crop(recorte)
     if quitar_azul:
@@ -46,8 +50,8 @@ def preparar(origen, recorte, quitar_azul):
     return imagen
 
 
-def convertir(origen, recorte=None, quitar_azul=False):
-    gris = preparar(origen, recorte, quitar_azul).convert("L")
+def convertir(origen, recorte=None, quitar_azul=False, borrar=()):
+    gris = preparar(origen, recorte, quitar_azul, borrar).convert("L")
     caja = gris.point(lambda g: 255 if g < FONDO - 5 else 0).getbbox()
     gris = gris.crop(caja)
     mascara = gris.point(alfa)
@@ -57,24 +61,26 @@ def convertir(origen, recorte=None, quitar_azul=False):
 
 
 def leer_opciones(argumentos):
-    recorte, quitar_azul, rutas = None, False, []
+    recorte, quitar_azul, rutas, borrar = None, False, [], []
     pendientes = list(argumentos)
     while pendientes:
         arg = pendientes.pop(0)
         if arg == "--recorte" and pendientes:
             recorte = tuple(int(v) for v in pendientes.pop(0).split(","))
+        elif arg == "--borrar" and pendientes:
+            borrar.append(tuple(int(v) for v in pendientes.pop(0).split(",")))
         elif arg == "--quitar-azul":
             quitar_azul = True
         else:
             rutas.append(arg)
-    return rutas, recorte, quitar_azul
+    return rutas, recorte, quitar_azul, borrar
 
 
 def main():
-    rutas, recorte, quitar_azul = leer_opciones(sys.argv[1:])
+    rutas, recorte, quitar_azul, borrar = leer_opciones(sys.argv[1:])
     if len(rutas) != 2:
         sys.exit(__doc__)
-    imagen = convertir(rutas[0], recorte, quitar_azul)
+    imagen = convertir(rutas[0], recorte, quitar_azul, borrar)
     datos = io.BytesIO()
     imagen.save(datos, "PNG", optimize=True)
     ancho, alto = imagen.size

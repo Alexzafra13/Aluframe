@@ -145,6 +145,7 @@ async fn se_presupuesta_como_una_ventana_y_sale_su_dibujo() {
     assert!(html.contains("Kit mosquitera"));
     assert!(html.contains(r#"src="/perfiles/mosquitera/cajon.svg""#));
     assert!(html.contains(r#"src="/perfiles/mosquitera/guia-lateral.svg""#));
+    assert!(html.contains(r#"src="/perfiles/herrajes/kit-mosquitera.svg""#));
     // Ni vidrio ni parteluces: las opciones se vuelven a pintar (vacías) y se marca sin cristal.
     assert!(html.contains(r#"<div id="opciones" class="rejilla-campos" hx-swap-oob="true">"#));
     assert!(!html.contains("opcion.parteluces"));
