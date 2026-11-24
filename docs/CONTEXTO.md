@@ -47,6 +47,18 @@ Todo se maneja en cm (un decimal de cm = 1 mm). Redondeo provisional: a 0,1 cm h
 - Igual que la de 2 hojas salvo la hoja de rodamiento: `(ancho − 3) / 4` (primero se resta y luego se divide). El doble de hojas: 4 de cierre, 4 centrales y 8 de rodamiento. Además, 1 cierre 4 hojas (21344) con el alto de la hoja (`alto − 5,3`). 2 kits iguales y 4 cierres embutidos (dos en los laterales y dos en el centro).
 - Supuestos por confirmar: 8 ruedas y 25 tornillos (9 en el marco y 16 en las hojas). Cristal pendiente del descuento.
 
+**Aluprom 21, parteluces (propietario, 2026-11-24; ADR-0030)**
+- Uno por hoja: 21564 con cristal normal, 21565 con Climalit. Se escribe la medida de la chapa (o del cristal) de abajo; lo habitual es 50 cm porque se aprovecha la plancha.
+- Chapa del color de la ventana: con cristal normal, 1 por hoja lacada por las dos caras; con Climalit, 2 por hoja, de preferencia lacadas por una cara (o por dos si se aprovecha un recorte). Planchas de 200 × 125 y 300 × 125 cm (por confirmar), en los mismos RAL que el aluminio.
+- Pendiente: medida de corte del parteluces, su altura real, ancho de la chapa, alto del cristal de arriba y cómo se cobra la chapa.
+
+**Mosquitera enrollable (propietario, 2026-11-24; ADR-0031, en borrador)**
+- Cajón de 45 hasta 140 cm de alto; por encima, de 50. Cajón = `ancho − 2`. Guía (2) = `alto − 4` con cajón de 45 y `alto − 5` con cajón de 50.
+- El terminal no se corta y la malla no se cuenta: vienen dentro del cajón al cortarlo. Un kit de plástico aparte por mosquitera. Dos tiradores, siempre negros. Mismos colores que las ventanas.
+- Se vende suelta; con las persianas podrá ir dentro de la ventana. Pendiente: referencias, proveedor, longitud de barra, cortes a 90° y límites.
+
+**Herrajes (propietario, 2026-11-24; ADR-0029):** cierre de embutir que se usa hoy, Alualpha 267 i (2 por corredera de 2 hojas, 4 por la de 4); kit de plásticos Al21 de Aluval (9426065); tornillo 4,8 × 25 de cabeza redonda y estrella. El modelo concreto lo dice el artículo del catálogo; la serie usa referencias genéricas.
+
 **Sopena V-94, ventana europea abatible de 2 hojas (borrador)**
 - Marco: `ancho` y `alto` sin descuento. Hoja: alto `alto − 4,1` y ancho `(ancho − 4,85) / 2`, 4 piezas de cada. Inversor: `alto − 10,3`. Cortes a 45°.
 - Accesorios: 4 escuadras para el marco y 4 por hoja, 1 cremona, 1 kit de 2 hojas, bisagras (2 por hoja hasta 140 cm de alto incluido, 3 por encima). Barras de 640 cm. Pendientes: pletinas de falleba, tipos de escuadra, cantidad de inversores y cristal.

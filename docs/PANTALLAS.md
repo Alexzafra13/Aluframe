@@ -99,7 +99,7 @@ Un formulario corto, en este orden:
 ## 6. Presupuesto
 - **Cabecera:** número (`P-2026-0001`), estado, cliente y **dirección de montaje** (selector con "+ Añadir otra"), validez y condiciones.
 - **Barra de pasos:** Presupuesto, Trabajo, Orden de taller, Factura; el paso actual resaltado.
-- **Líneas:** cada una es una tarjeta con miniatura del dibujo, descripción ("Corredera 2 hojas · 150 × 120 cm · blanco"), cantidad, precio y una etiqueta **Completa** o **Incompleta** con el motivo en palabras ("falta el cristal", "falta el precio del marco"). Botones **+ Añadir ventana** y **+ Línea libre**.
+- **Líneas:** cada una es una tarjeta con miniatura del dibujo, título corto con el tipo y las medidas ("Ventana corredera 2 hojas · 150 × 120 cm") y **«Ver detalles»** desplegable con la serie, el color y las opciones (desde la 0.20.1; igual en la ficha del trabajo), cantidad, precio y una etiqueta **Completa** o **Incompleta** con el motivo en palabras ("Parteluces: falta la medida de corte"). Botones **+ Ventana o mosquitera** y **+ Otro concepto**.
 - **Pie fijo:** perfiles, cristal, accesorios, mano de obra, descuento, base, IVA y **total**.
 - **Acciones:** *Guardar*, *Imprimir*, *Marcar como enviado*, *Nueva versión*, *Rechazar* y el botón principal **Aceptar y crear trabajo**. Este último está desactivado con su motivo mientras haya líneas incompletas o límites sin revisar. Al pulsarlo se pide confirmación: "Se creará el trabajo T-2026-0001 con estos datos congelados. Cambios posteriores en las series o en las tarifas no lo alteran."
 - **Versiones:** una nueva versión copia las líneas; la anterior queda visible y solo lectura.
@@ -108,7 +108,9 @@ Un formulario corto, en este orden:
 Sigue `design/01-presupuesto.png`.
 - **Izquierda:** el dibujo con pestañas **Cotas**, **Piezas** y **Cristal**. El dibujo se genera con los datos de la serie (`docs/FORMATO_SERIES.md`, apartado 9) y cambia al instante con la medida.
 - **Derecha, arriba:** *Serie* y luego *Tipología* (dos selectores en cascada), **Ancho**, **Alto**, **Vidrio**, **Color** y las **opciones de la tipología** (por ejemplo, "Hoja de la cremona: izquierda o derecha").
-- **Derecha, abajo:** la lista de piezas numerada (como en la hoja de corte) con cantidad, longitud y ángulo.
+- **Cabecera del dibujo (0.19.0, ADR-0029):** el tipo ("Ventana corredera 4 hojas") y debajo la serie con el logotipo de su fabricante. El desplegable dice "Aluprom 21 (Aluval) · Ventana corredera 2 hojas".
+- **Opciones dependientes (0.20.0, ADR-0030):** una opción con `solo_si` aparece y desaparece en el navegador (`recursos/js/opciones.js`) sin recargar: "Parteluces: Sí" muestra "Abajo" y "Medida de abajo (cm)". Al cambiar de serie, el servidor vuelve a pintar las opciones (0.21.3). Una tipología sin cristal (mosquitera) oculta "Vidrio", la capa "Cristal" y su importe.
+- **Derecha, abajo, por apartados:** **Perfiles a cortar** numerados (como en la hoja de corte), con la silueta del perfil, cantidad, longitud y ángulo; una pieza sin medida sale con "pendiente". **Chapas**, con su dibujo técnico a escala y cotas. **Herrajes** (cierres, kits, ruedas, tornillos), con su dibujo y, debajo, el modelo del artículo del catálogo. La hoja de taller y "Mi día" siguen los mismos apartados.
 - **Pie:** perfiles, cristal, accesorios, mano de obra y total, más una etiqueta que explica lo que falta ("Falta el cristal").
 - **Validaciones visibles:** medida fuera de límites ("Este perfil no admite más de X cm: revísalo"), pieza más larga que la barra, longitud negativa. Los avisos no borran lo escrito.
 - **Cálculo en vivo:** el servidor recalcula al escribir (objetivo: menos de 100 ms). Con `CONFIRMAR` el cálculo sigue, pero la línea sale incompleta.

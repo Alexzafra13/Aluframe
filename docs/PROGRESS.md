@@ -16,6 +16,11 @@ Estado (2026-11-24): **H0–H7 terminados**; publicada la **v0.21.4** (dibujo de
 
 **Optimizador (hecho en la 0.17.0, ADR-0026):** mejor aprovechamiento con búsqueda acotada por pasos, medidas habituales e historial. Falta la fase que depende de datos: cuando cada serie tenga sus medidas mínimas (`limites`, hoy `CONFIRMAR`), el mínimo útil de cada perfil será su pieza más corta posible y lo que quede por debajo saldrá desmarcado como desecho en «Terminar orden». Valorar también `cargo-mutants` de vez en cuando sobre `dominio::precio` y `dominio::corte`.
 
+## Siguiente tarea (2026-11-24)
+1. **Lo que pida el propietario al probar la versión publicada:** arreglos y retoques directamente; cada uno con su prueba, versión nueva y publicación en `main`.
+2. **Datos que vaya pasando** (apartado «Datos que faltan del taller» y `OPEN_QUESTIONS.md`): se rellenan en `data/series/*.yaml` o `data/acabados.yaml` sin tocar código. Si un fixture real cambia, solo con datos del propietario. Cuando una serie tenga todos sus datos, pasa de `borrador` a `validada`.
+3. **Tareas grandes ya habladas, cada una con plan y aprobación antes de empezar:** chapa en catálogo y stock (fase 2, ADR-0030) y aprovechar sus recortes (fase 3); persianas, con la mosquitera dentro de la ventana (ADR-0031); importar tarifas desde Excel y PDF.
+
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo (sobre todo «Siguiente tarea», «Reglas» y «Antes de publicar»), `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para tocar la interfaz, `docs/design.md` y `docs/PANTALLAS.md`; para datos, `docs/DATOS.md`; los porqués, en `docs/adr/` y `docs/CAMBIOS.md`.
 2. Trabaja en una rama; al terminar algo que el propietario quiera probar, sube `version` en `Cargo.toml` y llévalo a `main` (ya ha dado permiso para publicar así): GitHub Actions prueba en Linux y Windows, compila y publica el `.tar.gz` de Linux y el instalador de Windows.
@@ -77,6 +82,9 @@ El propietario los pasará todos cuando los tenga (2026-11-23). Mientras, el pro
 - **Precio:** una tarifa real de Aluval (y luego Sopena), margen (sobre coste o venta), mano de obra y cómo se cobra el perfil (barra entera o metros). Sin margen elegido, los presupuestos salen «Provisional».
 - **Facturas:** cómo volver a facturar un trabajo cuya factura se anuló con una rectificativa (con el gestor).
 - **Aluprom 21:** cristal de la 2 hojas puesto (ancho del propietario; **alto provisional**, comprobar con un cristal real); falta el cristal de la 4 hojas y si el Climalit cambia descuentos. Kit de plásticos, cierres embutidos, ruedas, tornillos y cristal usan referencias genéricas del taller (`KIT-CORREDERA`, `CIERRE-EMBUTIDO`, `RUEDA-CORREDERA`, `TORNILLO-4,8X25`, `CRISTAL`) que se dan de alta con precio en Catálogo > Artículos; la descripción del artículo dice el modelo que se compra (cierre de embutir Alualpha 267 i; tornillo 4,8 × 25 de cabeza redonda y estrella) y sale bajo el herraje (ADR-0029).
+- **Parteluces (Aluprom 21, ADR-0030):** medida de corte y ángulo del parteluces, su altura real en la ventana, ancho de la chapa, alto del cristal de arriba, y confirmar que el cristal partido tiene el mismo ancho que sin parteluces.
+- **Chapa:** cómo se cobra (sin decidir, una ventana con chapa no tiene precio final) y formatos de plancha (200 × 125 y 300 × 125 cm, por confirmar); para las fases 2 y 3.
+- **Mosquitera enrollable (ADR-0031, en borrador):** referencias, proveedor y longitud de barra de cajón 45, cajón 50 y guía; si los cortes son a 90°; altos y anchos máximos.
 - **Sopena V-94:** en borrador hasta tener su catálogo.
 - **Colores:** confirmar RAL y superficies de `data/acabados.yaml` y el nombre «Embero».
 - **Gestor:** IVA y menciones legales de la factura; Verifactu (fuera del MVP).
