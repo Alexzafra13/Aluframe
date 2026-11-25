@@ -243,3 +243,12 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Arreglo: los botones de acceso rápido de «Mi día» compartían la clase `acceso` con la pantalla de entrada; ahora son `acceso-rapido`.
   - Incluye el logotipo de la 0.23.1.
   - **El programa se llama Aluframe, como su logotipo** (ADR-0034): títulos, mensajes, instalador, accesos directos y la versión publicada. Las carpetas de datos y de copias, la extensión `.alumframe` y el ejecutable conservan su nombre, para no perder nada al actualizar.
+
+## 2026-11-25
+- **Compilación, pruebas y publicación más rápidas** (ADR-0035, sin versión nueva: el propietario no ve nada distinto salvo un editor algo más ágil).
+  - Las 45 pruebas de integración van en un solo ejecutable (`crates/servidor/tests/integracion/`): recompilar tras cambiar una línea y el tamaño de `target` bajan mucho (cifras en `docs/METRICAS.md`).
+  - Perfil `dev` con `debug = "line-tables-only"` y perfil nuevo `e2e` para la E2E local (recompila en ~4 s en vez de ~2 min).
+  - La aplicación de escritorio comprueba la ventana cada 10 s o cada cuarto del silencio: igual en el uso real; las pruebas de escritorio bajan de 10 s a 2,6 s.
+  - CI y publicación en un solo workflow: en paralelo, con caché, y solo se publica si pasa todo, con los mismos ejecutables probados. Los commits de solo documentación no lanzan CI.
+  - Las series guardadas se recuerdan ya leídas: cada recálculo del editor se ahorra ~5 ms por serie.
+  - `just metricas` y `docs/METRICAS.md` para seguir estas cifras versión a versión; `just limpiar`.

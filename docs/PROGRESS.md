@@ -4,6 +4,8 @@ Estado (2026-11-24): **H0–H7 terminados**; publicada la **v0.24.0** (pantalla 
 
 **Fase actual (2026-11-23): versión mínima.** El propietario instala la versión publicada, la prueba (también con la demostración, ADR-0028) y apunta todo lo que vea mal; con su lista se arregla y se pule hasta tener una versión mínima para el taller. Los arreglos que pida se hacen directamente; una tarea nueva grande, con plan y aprobación. **Los datos que faltan (apartado «Datos que faltan del taller») los pasará cuando los tenga: no se inventan, se esperan.**
 
+**Compilación y publicación (2026-11-25, ADR-0035, sin versión nueva):** pruebas de integración en un solo ejecutable, perfil `e2e` para la E2E local, publicación como último paso de CI (solo si pasa todo) y series leídas en memoria. Cambiar una línea y recompilar baja de ~25 s a ~6 s y `target` de 9,5 a 2,1 GB; cifras y seguimiento en `docs/METRICAS.md`. La primera publicación con el workflow nuevo está por estrenar: comprobar que sale bien.
+
 **Chapa (planteado con el propietario, 2026-11-24, ADR-0030):** fase 1 hecha (0.20.0). **Fase 2:** la chapa como material en catálogo y stock, con color (los RAL del aluminio), lacada por 1 o 2 caras y planchas de 200 × 125 y 300 × 125 cm (por confirmar); migración nueva. **Fase 3:** aprovechar recortes de chapa (optimizador 2D). Proponer plan de cada fase y esperar aprobación.
 
 **Mosquiteras (ADR-0031):** serie en borrador hasta tener los datos de `OPEN_QUESTIONS.md`. **Persianas (ADR-0032):** hecha la persiana en la ventana (0.22.0) en las correderas de Aluprom 21 y la persiana suelta en pared con guías de L (0.23.0, ADR-0033); esperan los datos de la lista de abajo. Después: la mosquitera dentro de la ventana con persiana (el propietario dará su descuento); plan y aprobación.
@@ -23,7 +25,7 @@ Estado (2026-11-24): **H0–H7 terminados**; publicada la **v0.24.0** (pantalla 
 
 ## Cómo retomar en una sesión nueva
 1. Lee `CLAUDE.md`, este archivo (sobre todo «Siguiente tarea», «Reglas» y «Antes de publicar»), `docs/CONTEXTO.md` y `docs/OPEN_QUESTIONS.md`. Para tocar la interfaz, `docs/design.md` y `docs/PANTALLAS.md`; para datos, `docs/DATOS.md`; los porqués, en `docs/adr/` y `docs/CAMBIOS.md`.
-2. Trabaja en una rama; al terminar algo que el propietario quiera probar, sube `version` en `Cargo.toml` y llévalo a `main` (ya ha dado permiso para publicar así): GitHub Actions prueba en Linux y Windows, compila y publica el `.tar.gz` de Linux y el instalador de Windows.
+2. Trabaja en una rama; al terminar algo que el propietario quiera probar, sube `version` en `Cargo.toml` y llévalo a `main` (ya ha dado permiso para publicar así): GitHub Actions prueba en Linux y Windows y, si todo pasa, publica el `.tar.gz` de Linux y el instalador de Windows (ADR-0035).
 3. Para una tarea nueva grande, propón el plan y **espera la aprobación**. Los arreglos y retoques que pida el propietario se hacen directamente.
 4. Al responder al propietario: en español llano, sin jerga; dale el comando de actualización del servidor con la versión nueva y dile si hay que borrar datos (desde 0.11.0, nunca).
 
@@ -35,15 +37,18 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 find crates -name '*.rs' -exec wc -l {} + | awk '$1>300 && $2!="total"'   # debe salir vacío
 cargo test --workspace --locked
 cargo build -p servidor --offline        # tras subir la versión: actualiza Cargo.lock
-cargo build --release --locked -p servidor
-cd e2e && npm ci && ALUMFRAME_BIN=../target/release/alumframe npx playwright test --trace off
+cargo build --profile e2e --locked -p servidor     # no --release: recompila en ~4 s, no en ~2 min
+cd e2e && npm ci && ALUMFRAME_BIN=../target/e2e/alumframe npx playwright test --trace off
 ```
+- Mientras trabajas, la E2E solo de lo que tocas (`npx playwright test pruebas/h3-presupuestos.spec.js`); la entera (~2,5 min) antes de llevar a `main`. CI la pasa siempre con el ejecutable de `release`.
+- **Métricas** (ADR-0035): al publicar una versión, `scripts/metricas.sh` y añade su fila a `docs/METRICAS.md`; comenta al propietario si algo empeora.
+- Una prueba de integración nueva es un módulo en `crates/servidor/tests/integracion/main.rs`, no un archivo suelto en `tests/` (cada archivo suelto es otro ejecutable de ~100 MB que enlazar).
 - La comprobación de tamaño (300 líneas) la pasa CI aunque clippy no la vea: ya rompió una publicación.
-- Pasa clippy **después** de `cargo fmt`: el formateador alarga funciones y una prueba de 38 líneas pasó a 42, y CI falló (0.19.0). El flujo de publicar no pasa clippy, así que la versión sale igualmente y solo CI queda en rojo.
+- Pasa clippy **después** de `cargo fmt`: el formateador alarga funciones y una prueba de 38 líneas pasó a 42, y CI falló (0.19.0). Desde ADR-0035 la publicación es el último paso de CI: si algo falla, no se publica.
 - CI también prueba en **Windows**: cuidado con lo que dependa de finales de línea (los `.sql` van con LF por `.gitattributes`; una huella de un archivo de texto puede cambiar con CRLF) o de rutas con `/`.
 - Si cambias la versión, primero `cargo build --offline` (actualiza `Cargo.lock`) y después la compilación `--locked`, o fallará.
 - Revisa con capturas de Playwright lo visual que cambies (PC a 1366 × 768 y 1366 × 620, e iPhone 13); espera ~1 s a que terminen las animaciones antes de capturar.
-- El disco de la nube es pequeño: si se llena, borra `target/debug` o carpetas de capturas del scratchpad.
+- El disco de la nube es pequeño: si se llena, `cargo clean` (o borra `target/release`, que ya no hace falta en local) o carpetas de capturas del scratchpad.
 
 ## Reglas que conviene no olvidar
 - **Migraciones desde la 0.11.0** (ADR-0021): cada cambio de la base es un archivo nuevo en `crates/servidor/src/bd/migraciones/` que conserva los datos; **las publicadas no se editan**. Una migración destructiva exige preguntar al propietario.

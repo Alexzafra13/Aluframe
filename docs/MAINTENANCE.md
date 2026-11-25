@@ -10,15 +10,17 @@ Objetivo: que cualquier persona, o una sesión nueva de Claude sin contexto, pue
 - Si `just dev` dice que la base es «de otra versión de desarrollo», el esquema ha cambiado: borra `datos-dev/` (ADR-0011).
 
 ## 2. Pruebas
-- `just test`: unitarias e integración (SQLite en memoria).
-- `just e2e`: compila en release y ejecuta Playwright contra el ejecutable, con una carpeta de datos temporal y el puerto 9191.
+- `just test`: unitarias e integración (SQLite en memoria). Las de integración van en un solo ejecutable, `crates/servidor/tests/integracion/`: una prueba nueva es un módulo más en su `main.rs`, no un archivo suelto en `tests/` (ADR-0035).
+- `just e2e`: compila con el perfil `e2e` (optimizado y sin el LTO lento: recompila en segundos) y ejecuta Playwright contra el ejecutable, con una carpeta de datos temporal y el puerto 9191. CI la pasa con el ejecutable de `release`, el que se publica.
+- `just metricas` (o `just metricas --limpia`, que borra `target` y mide desde cero): tiempos de compilación y pruebas, líneas y tamaños, como fila para `docs/METRICAS.md`. Se apunta una en cada versión.
+- `just limpiar`: borra `target`, que crece con cada versión de Rust y de las dependencias.
 - `just cobertura`: cobertura del dominio (necesita `cargo install cargo-llvm-cov` y `rustup component add llvm-tools-preview`).
 
 ## 3. Publicar una versión
 1. Sube `version` en `Cargo.toml` (`[workspace.package]`) y anota el cambio en `docs/CAMBIOS.md`.
 2. `just check` y `just e2e` en verde.
-3. Lleva el cambio a `main`. El workflow `publicar.yml` ve que esa versión aún no tiene etiqueta, pasa las pruebas, compila y crea la versión `vX.Y.Z` con `alumframe-vX.Y.Z-linux-x86_64.tar.gz` y `alumframe-vX.Y.Z-windows-x86_64.zip`. Un push a `main` sin cambiar la versión no publica nada.
-4. También se puede lanzar a mano en Actions > «Publicar versión» > *Run workflow*.
+3. Lleva el cambio a `main`. El workflow `ci.yml` («CI y publicación») compila y prueba en paralelo en Linux (ejecutable musl y E2E sobre él) y en Windows (pruebas e instalador); si **todo** pasa y esa versión aún no tiene etiqueta, el trabajo «Publicar la versión» crea `vX.Y.Z` con `alumframe-vX.Y.Z-linux-x86_64.tar.gz` y `Aluframe-vX.Y.Z-windows-instalar.exe`, los mismos ejecutables que se han probado (ADR-0035). Un push a `main` sin cambiar la versión no publica nada; uno que solo cambia `docs/`, `design/` o archivos `.md` ni siquiera lanza CI.
+4. También se puede lanzar a mano en Actions > «CI y publicación» > *Run workflow* sobre `main`.
 
 ## 4. Instalar y actualizar en el taller
 **Servidor Linux:** descarga y descomprime el `.tar.gz`, entra en la carpeta y ejecuta `sudo ./instalar.sh`:

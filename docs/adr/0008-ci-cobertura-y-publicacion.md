@@ -1,6 +1,6 @@
 # ADR-0008: integración continua, cobertura y publicación
 
-**Estado:** aceptado (2026-11-21, H0).
+**Estado:** aceptado (2026-11-21, H0). *La publicación y la organización de CI las sustituye ADR-0035 (2026-11-25).*
 
 ## Decisión
 - **CI en GitHub Actions** (el repositorio ya está en GitHub): `just check` y `cargo deny check` en Linux, E2E con Playwright contra el ejecutable de release y compilación más pruebas en Windows.
