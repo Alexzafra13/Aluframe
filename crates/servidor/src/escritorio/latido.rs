@@ -40,6 +40,16 @@ pub fn la_ventana_sigue_abierta() -> bool {
     tiempo_sin_latidos() < silencio_para_cerrar()
 }
 
+/// Cada cuánto se mira si la ventana sigue latiendo.
+pub fn intervalo_de_comprobacion() -> Duration {
+    intervalo_para(silencio_para_cerrar())
+}
+
+/// 10 s con el silencio normal; con uno corto (las pruebas) se mira antes, para no esperar de más.
+fn intervalo_para(silencio: Duration) -> Duration {
+    Duration::from_secs(10).min(silencio / 4)
+}
+
 #[cfg(test)]
 mod pruebas {
     use super::*;
@@ -49,5 +59,17 @@ mod pruebas {
         anotar_latido();
         assert!(tiempo_sin_latidos() < Duration::from_secs(2));
         assert!(la_ventana_sigue_abierta());
+    }
+
+    #[test]
+    fn se_comprueba_cada_diez_segundos_salvo_con_un_silencio_corto() {
+        assert_eq!(
+            intervalo_para(SILENCIO_PARA_CERRAR),
+            Duration::from_secs(10)
+        );
+        assert_eq!(
+            intervalo_para(Duration::from_secs(2)),
+            Duration::from_millis(500)
+        );
     }
 }

@@ -9,7 +9,7 @@ use anyhow::Context;
 use servidor::arranque::{ErrorArranque, escuchar, preparar_estado, servir_hasta};
 use servidor::autenticacion::generar_token;
 use servidor::config::{Configuracion, Modo};
-use servidor::escritorio::latido::la_ventana_sigue_abierta;
+use servidor::escritorio::latido::{intervalo_de_comprobacion, la_ventana_sigue_abierta};
 use servidor::escritorio::preferencias::{ARCHIVO_DE_PREFERENCIAS, Preferencias};
 use servidor::escritorio::recuperacion::Recuperacion;
 use servidor::escritorio::ventana::{abrir_ventana, mostrar_error};
@@ -126,7 +126,7 @@ async fn esperar_a_que_se_cierre(ventana: Option<std::process::Child>) -> anyhow
     tokio::task::spawn_blocking(move || ventana.wait()).await??;
     anotar("el proceso de la ventana ha terminado; se sigue mientras la página dé señales");
     while la_ventana_sigue_abierta() {
-        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+        tokio::time::sleep(intervalo_de_comprobacion()).await;
     }
     anotar("la ventana ya no da señales: Aluframe se cierra");
     Ok(true)
