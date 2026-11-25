@@ -252,3 +252,5 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - CI y publicación en un solo workflow: en paralelo, con caché, y solo se publica si pasa todo, con los mismos ejecutables probados. Los commits de solo documentación no lanzan CI.
   - Las series guardadas se recuerdan ya leídas: cada recálculo del editor se ahorra ~5 ms por serie.
   - `just metricas` y `docs/METRICAS.md` para seguir estas cifras versión a versión; `just limpiar`.
+  - Windows en CI en dos trabajos a la vez: pruebas, e instalador.
+- **Documentación para retomar más corta:** `docs/PROGRESS.md` pasa de ~290 a ~95 líneas (estado, siguiente tarea, cómo trabajar y comprobar, reglas, datos que faltan). El historial por hito que tenía ya está en este registro y en los ADR.
