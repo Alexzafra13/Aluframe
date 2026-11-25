@@ -61,13 +61,21 @@ jobs:
           path: target/x86_64-unknown-linux-musl/release/alumframe
           retention-days: 7
 
-  windows:
-    name: Windows (pruebas e instalador)
+  # Pruebas e instalador de Windows por separado, a la vez: cada uno con su caché.
+  windows-pruebas:
+    name: Windows (pruebas)
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --workspace --locked
+
+  windows:
+    name: Windows (instalador)
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
       - run: cargo build --release --locked -p servidor
       - name: Crear el instalador (Inno Setup)
         shell: pwsh
@@ -85,7 +93,7 @@ jobs:
 
   publicar:
     name: Publicar la versión
-    needs: [comprobar, linux, windows]
+    needs: [comprobar, linux, windows-pruebas, windows]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     permissions:
