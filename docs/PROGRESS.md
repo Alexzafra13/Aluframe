@@ -46,6 +46,7 @@ cd e2e && npm ci && ALUMFRAME_BIN=../target/e2e/alumframe npx playwright test --
 - **Pruebas de integración:** una nueva es un módulo en `crates/servidor/tests/integracion/main.rs`, no un archivo suelto en `tests/`.
 - **Al publicar,** `scripts/metricas.sh` y su fila en `docs/METRICAS.md`. Si algo empeora, díselo al propietario.
 - **Disco lleno:** `cargo clean` o borra capturas del scratchpad.
+- **Rendimiento:** hoy todo responde en menos de 10 ms (`docs/METRICAS.md`). Si el propietario nota lentitud, mira en su servidor `journalctl -u alumframe | grep "petición lenta"`.
 
 ## Reglas que conviene no olvidar
 - **Migraciones** (ADR-0021): cada cambio de la base es un archivo nuevo en `crates/servidor/src/bd/migraciones/`; las publicadas no se editan. Una destructiva exige preguntar.

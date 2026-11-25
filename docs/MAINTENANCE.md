@@ -14,6 +14,8 @@ Objetivo: que cualquier persona, o una sesión nueva de Claude sin contexto, pue
 - `just e2e`: compila con el perfil `e2e` (optimizado y sin el LTO lento: recompila en segundos) y ejecuta Playwright contra el ejecutable, con una carpeta de datos temporal y el puerto 9191. CI la pasa con el ejecutable de `release`, el que se publica.
 - `just metricas` (o `just metricas --limpia`, que borra `target` y mide desde cero): tiempos de compilación y pruebas, líneas y tamaños, como fila para `docs/METRICAS.md`. Se apunta una en cada versión.
 - `just limpiar`: borra `target`, que crece con cada versión de Rust y de las dependencias.
+- Cobertura del servidor (a mano): `cargo llvm-cov --package servidor --summary-only`; anótala en `docs/METRICAS.md`.
+- Cada lunes, `.github/workflows/seguridad.yml` mira si alguna dependencia tiene un fallo de seguridad conocido; si falla, GitHub avisa por correo. GitHub pausa las tareas programadas tras 60 días sin cambios en el repositorio: se reactiva en Actions.
 - `just cobertura`: cobertura del dominio (necesita `cargo install cargo-llvm-cov` y `rustup component add llvm-tools-preview`).
 
 ## 3. Publicar una versión

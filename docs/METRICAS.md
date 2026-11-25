@@ -18,6 +18,20 @@ Las cifras son de la máquina de la nube de Claude (4 núcleos), así que sirven
 - E2E completa (36 pruebas, una tras otra): 2,6 min.
 - Leer una serie guardada (Aluprom 21, YAML y prueba de sus combinaciones): **4,8 ms** en `release`; ahora solo la primera vez por proceso.
 
+## Cobertura de las pruebas de Rust (`cargo llvm-cov`)
+El dominio se exige en CI (≥ 90 %). El servidor se mide a mano, sin contar las E2E, que son las que recorren las rutas web.
+
+| Fecha | Servidor (líneas) | Casos de uso (`aplicacion`) | Facturas | Stock | Trabajos | Copias | Consultas (`bd`) | Rutas web (`http`) |
+|---|---|---|---|---|---|---|---|---|
+| 2026-11-25 | 81,8 % | 91,6 % | 93,8 % | 91,0 % | 86,5 % | 84,4 % | 86,0 % | 67,4 % |
+
+## Rendimiento (versión optimizada, datos de la demostración)
+| Fecha | Pantallas (80, mediana) | La más lenta | Recalcular en el editor |
+|---|---|---|---|
+| 2026-11-25 | 2,4 ms | 6 ms (Inicio) | 4,5 ms (peor 7 ms) |
+
+En el servidor real, las peticiones de 200 ms o más quedan en el registro: `journalctl -u alumframe | grep "petición lenta"`.
+
 ## GitHub Actions
 
 | Fecha | Versión | Desde el push a `main` hasta publicada | Notas |

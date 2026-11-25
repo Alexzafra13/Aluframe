@@ -255,3 +255,11 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Windows en CI en dos trabajos a la vez: pruebas, e instalador.
 - **Documentación para retomar más corta:** `docs/PROGRESS.md` pasa de ~290 a ~95 líneas (estado, siguiente tarea, cómo trabajar y comprobar, reglas, datos que faltan). El historial por hito que tenía ya está en este registro y en los ADR.
 - **`CLAUDE.md` (con permiso del propietario):** se empieza por `docs/PROGRESS.md` y `docs/OPEN_QUESTIONS.md`, y el resto se lee según la tarea. La condición de no empezar H0 se sustituye por su estado, comprobado: ADR-0001 y ADR-0002 aceptados, diseño aprobado en `CONTEXTO.md`, H0–H7 hechos y v0.24.0 publicada. El plan con aprobación queda para las tareas grandes; los arreglos que pide el propietario, directamente (como ya decía `PROGRESS.md` desde el 2026-11-23). El resultado de la revisión de ADR-0001 tras H1 («se mantiene Rust»), que solo constaba en el `PROGRESS.md` antiguo, pasa al propio ADR.
+- **Revisión técnica (sin versión nueva):** medido con la demostración, las pantallas responden en 2–6 ms y el recálculo del editor en ~4,5 ms; el análisis estricto de clippy solo da avisos de estilo. Arreglos pequeños:
+  - El registro del servidor sale sin códigos de color fuera de una terminal (en `journalctl` se veían como `[2m…`).
+  - Las peticiones que tardan 200 ms o más quedan en el registro como «petición lenta», con la ruta como patrón (nunca con datos del cliente).
+  - `PRAGMA optimize` al abrir la base y tras la copia diaria, como recomienda SQLite para conexiones que duran meses.
+  - La copia automática y «Exportar datos» salen de un lector: con WAL no paran a quien está guardando (prueba nueva). Leer y escribir el archivo de una copia va en su propio hilo.
+  - Las consultas de albaranes pasan a `bd/consultas/albaranes.rs`, como todas las demás.
+  - Revisión semanal de avisos de seguridad de las dependencias (`.github/workflows/seguridad.yml`), aunque no haya cambios.
+  - Cobertura del servidor medida por primera vez (en `docs/METRICAS.md`).
