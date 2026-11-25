@@ -35,6 +35,10 @@
       detalle.shouldSwap = true;
       detalle.isError = false;
     }
+    // Un cambio de pantalla sustituye siempre la página entera. Un enlace dentro de un trozo
+    // con su propio destino (el editor apunta al dibujo) heredaría ese destino y metería la
+    // página dentro del dibujo, con dos menús.
+    detalle.target = document.body;
     // La transición animada, solo al cambiar de pantalla: la campana o el editor, que se
     // refrescan solos, cortarían la animación a medias.
     detalle.swapOverride = "innerHTML transition:true";

@@ -56,6 +56,12 @@ test("crea un presupuesto de 3 ventanas y otro concepto y lo imprime", async ({ 
   await page.getByRole("button", { name: "Nuevo presupuesto" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Construcciones Peña");
   await page.getByRole("link", { name: "Volver sin guardar" }).click();
+  // El enlace está dentro del formulario del editor, que recalcula en el dibujo: la pantalla
+  // nueva sustituye la página, no se mete dentro del dibujo (ADR-0036).
+  await expect(page).toHaveURL(/\/presupuestos\/\d+$/);
+  await expect(page.getByRole("link", { name: "+ Ventana" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Construcciones Peña" })).toHaveCount(1);
+  await expect(page.locator("nav.menu")).toHaveCount(1);
   await ventana(page, "150", "120");
   await ventana(page, "90", "110");
   await ventana(page, "200", "140");
