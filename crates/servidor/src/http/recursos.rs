@@ -14,7 +14,7 @@ pub async fn servir_recurso(Path(ruta): Path<String>, RawQuery(consulta): RawQue
     };
     let cabeceras = [
         (CONTENT_TYPE, tipo_de_contenido(&ruta)),
-        (CACHE_CONTROL, duracion_en_cache(consulta.as_deref())),
+        (CACHE_CONTROL, duracion_en_cache(&ruta, consulta.as_deref())),
     ];
     (cabeceras, archivo.data.into_owned()).into_response()
 }
@@ -44,9 +44,12 @@ pub async fn servir_silueta(Path(ruta): Path<String>) -> Response {
 }
 
 /// Con `?v=<versión>` la dirección cambia en cada versión: el navegador lo guarda un año sin
-/// volver a preguntar (la tablet carga antes). Sin ella (las letras, pedidas desde el CSS), una hora.
-fn duracion_en_cache(consulta: Option<&str>) -> &'static str {
-    if consulta.is_some_and(|c| c.split('&').any(|par| par.starts_with("v="))) {
+/// volver a preguntar (la tablet carga antes). Las letras se piden desde el CSS sin versión, pero
+/// no cambian nunca: también un año (para cambiar una, cambia el nombre de su archivo).
+/// El resto, una hora.
+fn duracion_en_cache(ruta: &str, consulta: Option<&str>) -> &'static str {
+    let con_version = consulta.is_some_and(|c| c.split('&').any(|par| par.starts_with("v=")));
+    if con_version || ruta.starts_with("fuentes/") {
         "public, max-age=31536000, immutable"
     } else {
         "public, max-age=3600"
@@ -70,10 +73,23 @@ mod pruebas {
 
     #[test]
     fn solo_lo_que_lleva_la_version_se_guarda_un_ano() {
-        assert!(duracion_en_cache(Some("v=0.13.1")).contains("immutable"));
-        assert!(duracion_en_cache(Some("x=1&v=0.13.1")).contains("immutable"));
-        assert_eq!(duracion_en_cache(None), "public, max-age=3600");
-        assert_eq!(duracion_en_cache(Some("vista=1")), "public, max-age=3600");
+        assert!(duracion_en_cache("estilos.css", Some("v=0.13.1")).contains("immutable"));
+        assert!(duracion_en_cache("estilos.css", Some("x=1&v=0.13.1")).contains("immutable"));
+        assert_eq!(
+            duracion_en_cache("estilos.css", None),
+            "public, max-age=3600"
+        );
+        assert_eq!(
+            duracion_en_cache("estilos.css", Some("vista=1")),
+            "public, max-age=3600"
+        );
+    }
+
+    #[test]
+    fn las_letras_se_guardan_un_ano_aunque_el_css_las_pida_sin_version() {
+        let ruta = "fuentes/IBMPlexSans-Regular-Latin1.woff2";
+        assert!(Recursos::get(ruta).is_some());
+        assert!(duracion_en_cache(ruta, None).contains("immutable"));
     }
 
     /// El logotipo del programa y sus iconos son PNG (`recursos/marca/`).
