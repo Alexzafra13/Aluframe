@@ -1,8 +1,8 @@
 {# Pantalla de inicio del operario en la tablet (ADR-0024, parte 3): lo que puede hacer, en grande. #}
 <nav class="accesos-operario" aria-label="Qué hacer">
-  <a class="acceso acceso-principal" href="/apuntes/nuevo"><svg class="icono" aria-hidden="true"><use href="#i-nuevo"/></svg>Nuevo apunte</a>
-  <a class="acceso" href="/apuntes"><svg class="icono" aria-hidden="true"><use href="#i-apuntes"/></svg><span>Apuntes{% if apuntes_pendientes > 0 %}<span class="contador">{{ apuntes_pendientes }}</span>{% endif %}</span></a>
-  <a class="acceso" href="/clientes"><svg class="icono" aria-hidden="true"><use href="#i-clientes"/></svg>Clientes</a>
-  {% if usuario.ve_presupuestos && !usuario.es_propietario %}<a class="acceso" href="/presupuestos"><svg class="icono" aria-hidden="true"><use href="#i-presupuestos"/></svg>Presupuestos</a>{% endif %}
-  {% if usuario.ve_facturas && !usuario.es_propietario %}<a class="acceso" href="/facturas"><svg class="icono" aria-hidden="true"><use href="#i-facturas"/></svg>Facturas</a>{% endif %}
+  <a class="acceso-rapido acceso-principal" href="/apuntes/nuevo"><svg class="icono" aria-hidden="true"><use href="#i-nuevo"/></svg>Nuevo apunte</a>
+  <a class="acceso-rapido" href="/apuntes"><svg class="icono" aria-hidden="true"><use href="#i-apuntes"/></svg><span>Apuntes{% if apuntes_pendientes > 0 %}<span class="contador">{{ apuntes_pendientes }}</span>{% endif %}</span></a>
+  <a class="acceso-rapido" href="/clientes"><svg class="icono" aria-hidden="true"><use href="#i-clientes"/></svg>Clientes</a>
+  {% if usuario.ve_presupuestos && !usuario.es_propietario %}<a class="acceso-rapido" href="/presupuestos"><svg class="icono" aria-hidden="true"><use href="#i-presupuestos"/></svg>Presupuestos</a>{% endif %}
+  {% if usuario.ve_facturas && !usuario.es_propietario %}<a class="acceso-rapido" href="/facturas"><svg class="icono" aria-hidden="true"><use href="#i-facturas"/></svg>Facturas</a>{% endif %}
 </nav>

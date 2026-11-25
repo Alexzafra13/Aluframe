@@ -13,7 +13,7 @@ Referencia visual: `design/` (aprobado). Implementación: `crates/servidor/recur
 | `--linea` | `#D5D1C6` | Bordes y separadores |
 | `--acero` / `--acero-tinte` | `#1F4E79` / `#E3EDF6` | Acento principal: botones, enlaces, confirmaciones |
 | `--aviso` / `--aviso-fondo` | `#8A3207` / `#F8E6DA` | Avisos y errores ("Falta el cristal") |
-| `--indicador` | `#E8702A` | Barra de la entrada activa del menú y foco visible |
+| `--indicador` | `#E8702A` | Foco visible, pestañas de página, contador de avisos y franja de la demostración. **Ya no marca la entrada activa del menú** (0.24.0, el propietario lo pidió) |
 | `--menu-fondo` / `--menu-activo` | `#15191D` / `#252A30` | Menú lateral |
 
 Solo azul acero y naranja como acentos.
@@ -22,6 +22,13 @@ Solo azul acero y naranja como acentos.
 - Archivos en `crates/servidor/recursos/marca/`, sacados del PNG del propietario (fondo transparente): `logo.png` (completo, la «A» de perfil y «ALUFRAME»), `simbolo.png` (solo la «A»), `icono-32.png` (pestaña del navegador) e `icono-180.png` (pantalla de inicio del móvil, sobre el fondo del menú). El icono de Windows, `despliegue/windows/alumframe.ico`, también es la «A».
 - Logo completo en el menú lateral (170 px) y en las pantallas de entrada (200 px). Símbolo en la barra del móvil y en la del operario. Se lee bien sobre el papel y sobre el fondo oscuro del menú.
 - Sustituye al cuadrado gris con el nombre escrito.
+
+## Ambiente (0.24.0, propietario)
+- **Fondo geométrico** `recursos/marca/fondo.svg`: polígonos coloreados en azul acero («Colorizable SVG Geometric Background», © 2026 Taylor Ehat, licencia MIT en `recursos/marca/LICENCIA-fondo.txt`). SVG de unos 9 KB, va dentro del ejecutable.
+- Solo en las partes oscuras: pantallas de entrada (primer arranque, elegir persona, contraseña, PIN y conexión de Windows), menú lateral y barra de «Mi día». La zona de trabajo sigue sobre papel: ahí se lee y se escribe durante horas, y las hojas se imprimen limpias.
+- **Zona de trabajo como hoja:** en el ordenador, con 10 px de margen sobre el fondo y las esquinas de 22 px, en lugar del corte recto con el menú. Una franja fija con el fondo tapa lo que sube por encima de la hoja al desplazar la página.
+- **Entrada:** el logo, «¿Quién eres?» y cada persona en un círculo con su nombre y si es propietario u operario, como al encender un iPhone. La contraseña y el primer arranque, en una tarjeta clara; el PIN, directamente sobre el fondo con el teclado redondo.
+- Todo en `recursos/ambiente.css`, que se carga la última.
 
 ## Tipografía (incluida en el ejecutable)
 - **IBM Plex Sans** 400, 500 y 600: texto.
@@ -53,7 +60,7 @@ Objetivo: que la interfaz se sienta fluida y responda al tacto, sin adornos ni e
 | Elemento | Comportamiento |
 |---|---|
 | Cambio de pantalla | Transiciones de vista nativas del navegador (`@view-transition`): el contenido entra con un fundido y 6 px de subida (260 ms); el menú y la barra superior no se mueven. Navegadores sin soporte cambian de página sin animación |
-| Indicador del menú | La barra naranja se desliza de la entrada anterior a la nueva (`view-transition-name: indicador-menu`, 380 ms) |
+| Indicador del menú | Una píldora de cristal detrás de la entrada activa que se desliza a la nueva con un muelle y un leve estiramiento, como la barra de Instagram (`view-transition-name: indicador-menu`, 520 ms, `ambiente.css`). En el móvil, una burbuja acero claro tras la pestaña activa, con la misma transición |
 | Botones y tarjetas táctiles | Se hunden al 96 % al pulsar y vuelven con un pequeño rebote (curva `--curva-muelle`) |
 | Barra superior | Fija y translúcida, con desenfoque (`backdrop-filter`) |
 | Avisos y confirmaciones | Aparecen bajando 6 px con un fundido |

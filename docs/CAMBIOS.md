@@ -236,3 +236,9 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - El botón del presupuesto pasa a «+ Ventana, mosquitera o persiana».
   - Formato de series: `montaje: pared` en el bloque `persiana`, dibujo `persiana` y series sin piezas (sin longitud de barra).
 - **0.23.1 (propietario): logotipo del programa.** El cuadrado gris con «AlumFrame» escrito pasa a ser el logotipo del propietario: completo en el menú lateral y al entrar, y la «A» sola en la barra del móvil, en la del operario, en la pestaña del navegador, en la pantalla de inicio del móvil y en el icono de Windows. El servidor sirve PNG (`recursos/marca/`).
+- **0.24.0 (propietario): pantalla de entrada nueva y ambiente del programa.**
+  - Entrada: fondo geométrico en azul acero (SVG del propietario, licencia MIT), logo grande y las personas en círculos con su papel. Contraseña y primer arranque en una tarjeta clara; el PIN del operario sobre el fondo con teclas redondas.
+  - El mismo fondo en el menú lateral y en la barra de «Mi día». La zona de trabajo es ahora una hoja con las esquinas redondeadas, sin corte recto con el menú.
+  - Sin la barra naranja junto a la entrada activa: una píldora de cristal que se desliza con un pequeño rebote al cambiar de pantalla, como la barra de Instagram. En el móvil, una burbuja tras la pestaña activa.
+  - Arreglo: los botones de acceso rápido de «Mi día» compartían la clase `acceso` con la pantalla de entrada; ahora son `acceso-rapido`.
+  - Incluye el logotipo de la 0.23.1.

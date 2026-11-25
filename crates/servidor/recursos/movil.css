@@ -74,7 +74,9 @@ code, .mono { overflow-wrap: anywhere; }
   .pestana-ios:active .icono { transform: scale(.84); transition-duration: 80ms; }
   .pestana-ios.activa { color: var(--acero); }
   .pestana-ios.activa .icono { stroke-width: 2; }
-  .pestana-ios .indicador-menu { left: 50%; top: -5px; bottom: auto; width: 22px; height: 3px; margin-left: -11px; border-radius: 0 0 3px 3px; }
+  /* La pestaña activa lleva una burbuja que se desliza entre pestañas, como la de Instagram. */
+  .pestana-ios > .icono, .pestana-ios > span:not(.indicador-menu) { position: relative; z-index: 1; }
+  .pestana-ios .indicador-menu { inset: 2px 4px; border-radius: 16px; background: var(--acero-tinte); }
   body.con-pie-fijo .barra-pestanas { display: none; }
   /* El pie del total ocupa el sitio de la barra de pestañas, de borde a borde. */
   body.con-pie-fijo .contenido { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }

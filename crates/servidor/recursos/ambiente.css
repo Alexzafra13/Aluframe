@@ -1,0 +1,71 @@
+/* Ambiente del programa (0.24.0, propietario): el fondo geométrico en azul acero (marca/fondo.svg,
+   MIT, Taylor Ehat) en las partes oscuras —entrada, menú lateral y barra del operario— y la zona
+   de trabajo como una hoja clara con las esquinas redondeadas, sin corte recto con el menú. Las
+   pantallas de trabajo siguen sobre papel: ahí se lee y se escribe durante horas. */
+
+:root {
+  --fondo-oscuro: linear-gradient(180deg, rgb(21 25 29 / .55), rgb(21 25 29 / .85)), url("marca/fondo.svg") center / cover no-repeat fixed, var(--menu-fondo);
+  --fondo-acceso: radial-gradient(60% 50% at 50% 32%, rgb(21 25 29 / .35) 0%, rgb(21 25 29 / .82) 100%), url("marca/fondo.svg") center / cover no-repeat fixed, var(--menu-fondo);
+  --pastilla: linear-gradient(180deg, rgb(255 255 255 / .15), rgb(255 255 255 / .07));
+  /* Muelle con un pequeño rebote, como la selección de la barra de Instagram. */
+  --curva-pastilla: linear(0, .32 8%, .72 18%, .97 30%, 1.06 40%, 1.04 52%, 1 66%, .995 80%, 1);
+}
+
+/* Menú lateral y zona de trabajo (ordenador y tablet en horizontal). */
+@media (min-width: 901px) {
+  body.con-menu { background: var(--fondo-oscuro); }
+  .menu, .menu-pie { background: transparent; }
+  .area { margin: 10px 10px 10px 0; min-height: calc(100vh - 20px); border-radius: 22px; background: var(--papel); box-shadow: 0 0 0 1px rgb(255 255 255 / .06), 0 10px 40px rgb(0 0 0 / .35); }
+  .barra-superior { top: 10px; border-radius: 22px 22px 0 0; }
+  /* La página se desplaza entera: esta franja tapa lo que sube por encima de la hoja. */
+  body.con-menu::before { content: ""; position: fixed; z-index: 6; top: 0; right: 0; left: var(--ancho-menu); height: 10px; background: var(--fondo-oscuro); transition: left 360ms var(--curva-suave, ease); }
+}
+
+/* La entrada activa: una píldora de cristal que se desliza al cambiar de pantalla. */
+.menu-entrada > .icono, .menu-entrada > .menu-texto { position: relative; z-index: 1; }
+.menu-entrada.activa { background: transparent; }
+.menu .indicador-menu { inset: 0; width: auto; border-radius: 12px; background: var(--pastilla); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .12), 0 4px 14px rgb(0 0 0 / .25); }
+::view-transition-group(indicador-menu) { animation-duration: 520ms; animation-timing-function: var(--curva-pastilla); }
+::view-transition-image-pair(indicador-menu) { animation: estirar-pastilla 520ms var(--curva-suave); }
+@keyframes estirar-pastilla { 35% { transform: scale(1.04, .86); } }
+
+/* Pantallas de entrada: el fondo entero, el logo y las personas en círculos, como al encender un
+   iPhone. La contraseña y el primer arranque siguen en una tarjeta clara, que se lee mejor. */
+body.pantalla-acceso { background: var(--fondo-acceso); color: #fff; min-height: 100vh; }
+.pantalla-acceso .acceso { max-width: 720px; padding-top: 7vh; text-align: center; }
+.pantalla-acceso .marca-acceso { justify-content: center; margin-bottom: 2rem; }
+.pantalla-acceso .marca-acceso .logo-programa { width: 280px; }
+.pantalla-acceso .tarjeta { max-width: 440px; margin: 0 auto; text-align: left; color: var(--tinta); }
+.pantalla-acceso .pregunta-acceso { font: 600 1.4rem var(--condensada); letter-spacing: .03em; color: var(--menu-texto); margin: 0 0 1.75rem; }
+.pantalla-acceso .lista-usuarios { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem 2.25rem; }
+.pantalla-acceso .tarjeta-usuario { flex-direction: column; gap: .55rem; min-height: 0; padding: .25rem; border: 0; background: none; color: #fff; font-size: 1.1rem; font-weight: 600; text-align: center; }
+.pantalla-acceso .tarjeta-usuario::after { content: none; }
+.pantalla-acceso .tarjeta-usuario .avatar { width: 92px; height: 92px; font: 600 2.1rem var(--sans); color: #fff; background: rgb(255 255 255 / .1); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .18); transition: background-color var(--normal) ease, box-shadow var(--normal) ease, transform var(--rapido) var(--curva-muelle); }
+.pantalla-acceso .tarjeta-usuario:hover .avatar, .pantalla-acceso .tarjeta-usuario:focus-visible .avatar { background: var(--acero); box-shadow: inset 0 0 0 1px #5b8fc4, 0 0 0 6px rgb(31 78 121 / .35); }
+.pantalla-acceso .rol-usuario { margin-top: -.45rem; color: var(--menu-grupo); font-size: .9rem; font-weight: 400; }
+.pantalla-acceso .probar-demostracion { margin-top: 4rem; color: var(--menu-grupo); }
+.pantalla-acceso .probar-demostracion .texto-apagado { color: var(--menu-grupo); }
+.pantalla-acceso .probar-demostracion .boton { background: transparent; color: #fff; border-color: rgb(255 255 255 / .3); border-radius: 999px; }
+.pantalla-acceso .enlace-secundario { color: #8bb8e6; }
+.pantalla-acceso .tarjeta .enlace-secundario { color: var(--acero); }
+
+/* PIN del operario: sin tarjeta, directamente sobre el fondo, con el teclado redondo. */
+.pantalla-acceso .formulario-pin { background: none; border: 0; box-shadow: none; color: #fff; text-align: center; max-width: none; }
+.pantalla-acceso .formulario-pin .avatar.grande { width: 88px; height: 88px; color: #fff; background: rgb(255 255 255 / .12); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .18); }
+.pantalla-acceso .formulario-pin .usuario-elegido { color: #fff; }
+.pantalla-acceso .formulario-pin label { color: var(--menu-texto); }
+.pantalla-acceso .formulario-pin .puntos-pin span { border-color: var(--menu-texto); }
+.pantalla-acceso .formulario-pin .puntos-pin span.lleno { background: var(--menu-texto); }
+.pantalla-acceso .con-teclado .teclado button { color: #fff; background: rgb(255 255 255 / .1); }
+.pantalla-acceso .con-teclado .teclado button:active { background: rgb(255 255 255 / .24); }
+.pantalla-acceso .con-teclado .teclado [data-borrar] { background: transparent; }
+.pantalla-acceso .formulario-pin .enlace-secundario { color: #8bb8e6; }
+
+/* Barra del operario («Mi día»): el mismo fondo que el menú. */
+.barra-operario { background: var(--fondo-oscuro); }
+
+@media (max-width: 900px) {
+  .pantalla-acceso .acceso { padding-top: 4vh; }
+  .pantalla-acceso .marca-acceso .logo-programa { width: 220px; }
+  .pantalla-acceso .tarjeta-usuario .avatar { width: 76px; height: 76px; font-size: 1.8rem; }
+}

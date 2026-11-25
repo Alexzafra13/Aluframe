@@ -14,7 +14,7 @@
   {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
   {% match elegido %}
   {% when Some(u) %}
-  <form class="tarjeta formulario-acceso" method="post" action="/entrar">
+  <form class="tarjeta formulario-acceso{% if u.es_operario %} formulario-pin{% endif %}" method="post" action="/entrar">
     <input type="hidden" name="usuario_id" value="{{ u.id }}">
     {% if u.es_operario %}<span class="avatar grande" aria-hidden="true">{{ u.inicial }}</span>{% endif %}
     <p class="usuario-elegido">{{ u.nombre }}</p>
@@ -37,13 +37,13 @@
     <a class="enlace-secundario" href="/entrar">Cambiar de usuario</a>
   </form>
   {% when None %}
-  <p class="texto-apagado">¿Quién eres?</p>
+  <p class="pregunta-acceso">¿Quién eres?</p>
   <ul class="lista-usuarios">
     {% for u in usuarios %}
     {% if en_demostracion %}
-    <li><form method="post" action="/demostracion/entrar-como"><input type="hidden" name="usuario_id" value="{{ u.id }}"><button class="tarjeta-usuario" type="submit"><span class="avatar" aria-hidden="true">{{ u.inicial }}</span>{{ u.nombre }}</button></form></li>
+    <li><form method="post" action="/demostracion/entrar-como"><input type="hidden" name="usuario_id" value="{{ u.id }}"><button class="tarjeta-usuario" type="submit"><span class="avatar" aria-hidden="true">{{ u.inicial }}</span><span>{{ u.nombre }}</span><span class="rol-usuario">{{ u.rol }}</span></button></form></li>
     {% else %}
-    <li><a class="tarjeta-usuario" href="/entrar?usuario={{ u.id }}"><span class="avatar" aria-hidden="true">{{ u.inicial }}</span>{{ u.nombre }}</a></li>
+    <li><a class="tarjeta-usuario" href="/entrar?usuario={{ u.id }}"><span class="avatar" aria-hidden="true">{{ u.inicial }}</span><span>{{ u.nombre }}</span><span class="rol-usuario">{{ u.rol }}</span></a></li>
     {% endif %}
     {% endfor %}
   </ul>

@@ -108,7 +108,6 @@ html.menu-plegado .menu-entrada { padding: 0 .9rem; }
 .menu-entrada { display: flex; align-items: center; min-height: 48px; padding: 0 1rem; border-radius: 10px; color: var(--menu-texto); text-decoration: none; font-size: 1.05rem; position: relative; }
 .menu-entrada:hover { background: var(--menu-activo); }
 .menu-entrada.activa { background: var(--menu-activo); color: #fff; font-weight: 600; }
-.menu-entrada.activa::before { content: ""; position: absolute; left: -1rem; top: 10px; bottom: 10px; width: 4px; border-radius: 0 3px 3px 0; background: var(--indicador); }
 /* El pie (plegar, ajustes, salir) siempre a la vista; si no cabe todo, se desplaza la lista. */
 .menu-pie { margin-top: auto; position: sticky; bottom: -1.5rem; margin-bottom: -1.5rem; padding: .5rem 0 1.5rem; background: var(--menu-fondo); }
 /* Cabecera: marca y botón de plegar (solo icono, como en Linear o Vercel). Plegado, el botón ocupa
@@ -196,9 +195,7 @@ body.con-menu .usuario-actual { display: none; }
 @view-transition { navigation: auto; }
 .menu { view-transition-name: menu; }
 .barra-superior { view-transition-name: barra-superior; }
-.indicador-menu { position: absolute; left: -1rem; top: 10px; bottom: 10px; width: 4px; border-radius: 0 3px 3px 0; background: var(--indicador); view-transition-name: indicador-menu; }
-.menu-entrada.activa::before { content: none; }
-::view-transition-group(indicador-menu) { animation-duration: 380ms; animation-timing-function: var(--curva-suave); }
+.indicador-menu { position: absolute; view-transition-name: indicador-menu; }
 ::view-transition-old(root) { animation: 120ms ease-out both desvanecer; }
 ::view-transition-new(root) { animation: var(--normal) var(--curva-suave) both aparecer; }
 @keyframes desvanecer { to { opacity: 0; } }
