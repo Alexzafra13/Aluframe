@@ -244,7 +244,7 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Incluye el logotipo de la 0.23.1.
   - **El programa se llama Aluframe, como su logotipo** (ADR-0034): títulos, mensajes, instalador, accesos directos y la versión publicada. Las carpetas de datos y de copias, la extensión `.alumframe` y el ejecutable conservan su nombre, para no perder nada al actualizar.
 
-## 2026-11-25
+## 2026-11-25 (0.24.1)
 - **Compilación, pruebas y publicación más rápidas** (ADR-0035, sin versión nueva: el propietario no ve nada distinto salvo un editor algo más ágil).
   - Las 45 pruebas de integración van en un solo ejecutable (`crates/servidor/tests/integracion/`): recompilar tras cambiar una línea y el tamaño de `target` bajan mucho (cifras en `docs/METRICAS.md`).
   - Perfil `dev` con `debug = "line-tables-only"` y perfil nuevo `e2e` para la E2E local (recompila en ~4 s en vez de ~2 min).

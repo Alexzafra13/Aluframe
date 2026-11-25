@@ -3,9 +3,9 @@
 Resumen para retomar sin contexto. El detalle de cada versión está en `docs/CAMBIOS.md`; los porqués, en `docs/adr/`.
 
 ## Estado (2026-11-25)
-- **H0–H7 terminados.** Publicada la **v0.24.0** (nombre visible «Aluframe», ADR-0034). Los datos se conservan al actualizar (migraciones, ADR-0021) y hay copias automáticas (ADR-0022).
+- **H0–H7 terminados.** Publicada la **v0.24.1** (navegación sin recarga y envío único, ADR-0036; «atrás» tras salir no enseña la pantalla del dueño; registros limpios; compilación y CI más rápidos, ADR-0035). Antes, la v0.24.0 (nombre visible «Aluframe», ADR-0034). Los datos se conservan al actualizar (migraciones, ADR-0021) y hay copias automáticas (ADR-0022).
 - **Fase: versión mínima.** El propietario usa la versión publicada (también la demostración, ADR-0028), apunta lo que ve mal y se arregla. **Los datos que faltan los pasará él: no se inventan, se esperan.**
-- **Compilación y CI** (ADR-0035, sin versión nueva): todo va más rápido; las cifras están en `docs/METRICAS.md`. **La primera publicación con el workflow nuevo está por estrenar:** comprueba que salen el `.tar.gz` y el instalador.
+- **Compilación y CI** (ADR-0035, sin versión nueva): todo va más rápido; las cifras están en `docs/METRICAS.md`. La 0.24.1 es la primera publicada con el workflow nuevo.
 
 ## Siguiente tarea
 1. **Lo que pida el propietario:** arreglos directamente, cada uno con su prueba, versión nueva y publicación.
