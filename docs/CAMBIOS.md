@@ -263,3 +263,5 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Las consultas de albaranes pasan a `bd/consultas/albaranes.rs`, como todas las demás.
   - Revisión semanal de avisos de seguridad de las dependencias (`.github/workflows/seguridad.yml`), aunque no haya cambios.
   - Cobertura del servidor medida por primera vez (en `docs/METRICAS.md`).
+- **Letras guardadas un año en el navegador:** las fuentes se piden desde el CSS sin versión y solo se guardaban una hora (unos 170 KB que volvían a bajar). No cambian nunca: para cambiar una, se cambia el nombre de su archivo.
+- **Arreglo de privacidad en la tablet compartida:** tras «Salir», el botón «atrás» del navegador enseñaba la última pantalla del dueño (con precios) sin pedir entrar; comprobado con Playwright. Ahora las pantallas van con `Cache-Control: no-store` y «atrás» lleva a la entrada. Prueba nueva en `acceso.rs`.
