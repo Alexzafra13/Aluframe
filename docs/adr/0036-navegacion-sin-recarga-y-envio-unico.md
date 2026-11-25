@@ -11,6 +11,8 @@
    - Una página cuyo `<body>` no lleva `hx-boost="true"` (hojas de imprimir con su CSS, conexión del escritorio) se abre con carga completa. Enlaces de imprimir, descargas y los formularios que suben archivos llevan además `hx-boost="false"`.
    - Las respuestas de error (422 de validación) también se pintan.
    - La clase de `<body>` se copia de la respuesta (entrada, menú, «Mi día»).
+   - El destino es siempre `<body>`: un enlace dentro de un trozo con `hx-target` propio (el formulario del editor apunta al dibujo) lo heredaría y metería la página dentro de ese trozo.
+   - Manda la última pantalla pedida: la respuesta de una navegación anterior que llegue tarde no se pinta (no se corta, para que el servidor termine lo que empezó).
    - La transición animada solo al cambiar de pantalla, no en los trozos que se refrescan solos.
    - Sin copias de páginas en el navegador para «atrás» (`historyCacheSize: 0`): volverían a enseñar pantallas del dueño tras salir; «atrás» pide la página otra vez.
    - `defaultSettleDelay: 0`: sin el hueco de 20 ms en que la pantalla nueva ya está pero sus elementos HTMX aún no responden.

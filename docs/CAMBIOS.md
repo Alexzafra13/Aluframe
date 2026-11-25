@@ -270,3 +270,4 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Un formulario no se envía dos veces: el botón no admite otro toque hasta la respuesta y, como respaldo, el servidor atiende una sola vez cada envío (`_envio`) y devuelve la misma redirección al repetido. Pruebas de integración y E2E (doble clic real).
   - Barra fina de «cargando» si una petición tarda más de 200 ms.
   - E2E más rápidas (2,5 min) y con `pulsarYEsperar` para esperar a la pantalla nueva.
+  - Arreglos tras la primera ejecución en CI: manda la última pantalla pedida (una respuesta atrasada ya no tapa la nueva), y un cambio de pantalla sustituye siempre la página entera. «Volver sin guardar», dentro del formulario del editor, heredaba su destino (el dibujo) y metía el presupuesto entero dentro del dibujo; aquí no se veía por la rapidez, en CI sí. La E2E lo comprueba (un solo menú y un solo encabezado).
