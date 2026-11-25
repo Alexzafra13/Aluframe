@@ -29,6 +29,8 @@ ERP local para un taller pequeño. Un solo desarrollador, que trabaja con Claude
 ## Punto de revisión (tras H1)
 El hito H1 (motor de cálculo y optimizador, probado contra `fixtures/real/`) es la prueba de viabilidad. Si el desarrollo se atasca o resulta inmanejable, se reabre este ADR y se valora la opción A o D; el motor ya probado y los casos en JSON sirven como contrato independiente del lenguaje.
 
+**Resultado (2026-11-21, al terminar H1):** el motor salió sin atascos; se mantiene Rust.
+
 ## Pendiente de ADR posteriores
 - ADR-0002: criterios de selección y tecnologías concretas (ya redactado).
 - ADR-0003: generación automática de PDF en el servidor (spike con Typst u otras).

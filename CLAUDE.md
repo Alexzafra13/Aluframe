@@ -1,11 +1,11 @@
 # AlumFrame: instrucciones para Claude Code
 
 ERP local para un taller de carpintería de aluminio y cerrajería (España).
-Antes de empezar cualquier hito, lee `SPEC.md`, `docs/CONTEXTO.md`, `docs/OPEN_QUESTIONS.md`, `docs/PROGRESS.md`, `docs/BACKEND.md`, `docs/DATOS.md`, `docs/FORMATO_SERIES.md`, `docs/PANTALLAS.md` y `docs/adr/`.
+Para retomar, lee primero `docs/PROGRESS.md` (estado, siguiente tarea, cómo trabajar y comprobar) y `docs/OPEN_QUESTIONS.md`. El resto, según la tarea: `SPEC.md`, `docs/CONTEXTO.md`, `docs/BACKEND.md`, `docs/DATOS.md`, `docs/FORMATO_SERIES.md`, `docs/PANTALLAS.md` y `docs/adr/`.
 
 ## Condiciones para empezar
-- No empieces H0 hasta que ADR-0001 y ADR-0002 figuren como **aceptados** y el diseño de `design/` tenga el visto bueno del propietario (consta en `docs/CONTEXTO.md`).
-- Trabaja en modo plan: propón el plan del hito y espera la aprobación antes de escribir código.
+- H0–H7 están hechos: ADR-0001 y ADR-0002 aceptados y diseño de `design/` aprobado (consta en `docs/CONTEXTO.md`). Ahora se pule la versión mínima con lo que pide el propietario.
+- Para una tarea nueva grande, trabaja en modo plan: propón el plan y espera la aprobación antes de escribir código. Los arreglos y retoques que pida el propietario se hacen directamente.
 - Estas instrucciones no se han probado con una construcción real. Si algo es inviable o contradictorio, dilo, propón una alternativa y anótalo en un ADR; no lo resuelvas en silencio.
 - No ejecutes `/init`: este `CLAUDE.md` ya existe.
 - Toda la documentación está en **versión 1** hasta que el propietario declare la definitiva. No cambies números de versión; anota cada cambio relevante en `docs/CAMBIOS.md`.
