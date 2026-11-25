@@ -1,14 +1,14 @@
 use dominio::acceso::Accion;
 use dominio::corte::{PlanDeCorte, ValoracionDeSobrantes, planificar_cortes};
-use dominio::series::{Dato, ResultadoVentana, Serie, calcular_ventana, importar_serie};
+use dominio::series::{Dato, ResultadoVentana, Serie, calcular_ventana};
 use dominio::unidades::Decimal;
 
+use super::series_leidas::leer_serie_guardada;
 use super::taller::AjustesDeTaller;
 use super::{Actor, autorizar};
 use crate::bd::consultas::series::{self, VersionGuardada};
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
-use crate::series::leer_yaml;
 
 #[derive(Debug, Clone)]
 pub struct SerieGuardada {
@@ -70,17 +70,7 @@ pub(crate) fn reconstruir(version: VersionGuardada) -> Result<SerieGuardada, Err
             version.codigo, version.numero
         ))
     };
-    let valor = leer_yaml(&version.origen_yaml).map_err(fallo)?;
-    let (serie, _) = importar_serie(&valor).map_err(|informe| {
-        fallo(
-            informe
-                .errores
-                .iter()
-                .map(ToString::to_string)
-                .collect::<Vec<_>>()
-                .join("; "),
-        )
-    })?;
+    let serie = leer_serie_guardada(&version.origen_yaml).map_err(fallo)?;
     Ok(SerieGuardada {
         serie,
         numero_version: version.numero,

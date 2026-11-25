@@ -33,6 +33,7 @@ pub mod restablecer_contrasena;
 pub mod resumen_de_linea;
 pub mod series;
 pub mod series_incluidas;
+mod series_leidas;
 pub mod sesion;
 pub mod stock;
 pub mod taller;
