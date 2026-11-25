@@ -7,9 +7,21 @@
     return etiqueta ? etiqueta[0] : "";
   }
 
+  // Como en el navegador, manda la última pantalla pedida: si se pulsa otra cosa antes de que
+  // llegue la respuesta de un envío, esa respuesta no tapa la pantalla nueva. La petición
+  // anterior no se corta: el servidor termina lo que empezó (un alta, un cobro).
+  var ultimaNavegacion = null;
+  document.addEventListener("htmx:beforeRequest", function (evento) {
+    if (evento.detail.boosted) ultimaNavegacion = evento.detail.xhr;
+  });
+
   document.addEventListener("htmx:beforeSwap", function (evento) {
     var detalle = evento.detail;
     if (!detalle.boosted) return;
+    if (detalle.xhr !== ultimaNavegacion) {
+      detalle.shouldSwap = false;
+      return;
+    }
     var cuerpo = cuerpoDe(detalle.xhr.responseText);
     // Una página que no se deja mostrar así (hojas de imprimir, con su propio CSS; conexión
     // del escritorio) se abre con una carga completa.
