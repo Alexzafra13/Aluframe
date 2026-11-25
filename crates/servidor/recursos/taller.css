@@ -88,3 +88,22 @@
 /* Chapa del parteluces en «Mi día»: el dibujo técnico junto a la medida (ADR-0030). */
 .taller-chapa { display: flex; align-items: center; gap: .75rem; }
 .taller-chapa .dibujo-chapa { width: 120px; height: auto; flex: none; }
+
+/* Material a pedir de cada ventana (ADR-0035): una tarjeta por cosa, con su estado a la vista. */
+.material-a-pedir { margin: 1rem 0 .5rem; }
+.lista-material { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .6rem; }
+.material { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem 1rem; padding: .75rem 1rem; border: 1px solid var(--linea); border-left: 4px solid var(--aviso); border-radius: 12px; background: var(--superficie); }
+.material-pedido { border-left-color: var(--acero); }
+.material-recibido { border-left-color: var(--linea); }
+.material-datos { flex: 1 1 240px; min-width: 0; }
+.material-datos p { margin: 0 0 .25rem; }
+.material-datos p:last-child { margin-bottom: 0; }
+.material-nombre { font-weight: 600; }
+.material-medida { margin-left: .35rem; color: var(--apagado); }
+.etiqueta-material { background: var(--aviso-fondo); color: var(--aviso); }
+.material-pedido .etiqueta-material { background: var(--acero-tinte); color: var(--acero); }
+.material-recibido .etiqueta-material { background: rgb(21 25 29 / .06); color: var(--apagado); }
+.material-nota { color: var(--tinta); font-style: italic; }
+.material-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0; }
+.material-acciones input { width: auto; min-width: 180px; flex: 1 1 180px; margin: 0; }
+.material-acciones .boton { margin: 0; }

@@ -84,11 +84,13 @@ pub fn crear_trabajo(
     let nombres = pasos_configurados(con)?;
     let mut orden = 0;
     for linea in ficha.lineas.iter().filter(|l| l.tipo == "ventana") {
-        let congelado = a_json(&congelar_linea(con, linea)?)?;
+        let congelada = congelar_linea(con, linea)?;
+        let congelado = a_json(&congelada)?;
         for _ in 0..unidades(linea.cantidad_mil) {
             orden += 1;
             let datos = (linea.descripcion.as_str(), congelado.as_str());
             let ventana = ventanas_trabajo::insertar(con, id, (orden, linea.orden), datos)?;
+            super::materiales::crear_materiales(con, ventana, &congelada)?;
             for (posicion, nombre) in (1..).zip(&nombres) {
                 pasos::insertar(con, ventana, posicion, nombre)?;
             }

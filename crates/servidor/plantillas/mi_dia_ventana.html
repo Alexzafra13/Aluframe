@@ -40,6 +40,7 @@
       </ol>
     </section>
   </div>
+  {% if !ventana.materiales.is_empty() %}<section class="tarjeta">{% let v = ventana %}{% let volver_material = "mi-dia" %}{% include "material_a_pedir.html" %}</section>{% endif %}
   <section class="tarjeta">{% let v = ventana %}{% let volver = "mi-dia" %}{% include "repetir_pieza.html" %}</section>
   <section class="tarjeta" aria-labelledby="titulo-falta">
     <h2 id="titulo-falta">¿Falta algo?</h2>

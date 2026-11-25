@@ -13,6 +13,7 @@ pub mod facturas;
 pub mod importaciones;
 pub mod lineas_factura;
 pub mod lineas_presupuesto;
+pub mod materiales;
 pub mod pasos;
 pub mod permisos;
 pub mod presupuestos;

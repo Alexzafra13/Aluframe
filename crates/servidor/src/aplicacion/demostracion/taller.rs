@@ -2,7 +2,7 @@
 //! y cobros, dos facturas sueltas (una anulada con su rectificativa) y apuntes.
 
 use dominio::apuntes::DatosDeApunte;
-use dominio::taller::AccionDePaso;
+use dominio::taller::{AccionDePaso, EstadoDeMaterial};
 use dominio::unidades::{Porcentaje, PrecioUnitario};
 
 use super::ventas::cliente;
@@ -18,6 +18,7 @@ use crate::aplicacion::facturas::editar::{
 use crate::aplicacion::facturas::emitir::emitir_factura;
 use crate::aplicacion::stock::terminar::{RetalConfirmado, preparar_terminar, terminar_orden};
 use crate::aplicacion::trabajos::acciones::{asignar_trabajo, cambiar_paso};
+use crate::aplicacion::trabajos::materiales::marcar_material;
 use crate::bd::consultas::demostracion;
 use crate::errores::ErrorApp;
 use crate::estado::EstadoApp;
@@ -40,10 +41,19 @@ pub(super) async fn crear(
         ));
     };
     marcar_pasos(estado, operario, *a_medias, Some(3)).await?;
+    let nota = Some("Cristalería Demo, llega el jueves".to_owned());
+    material(
+        estado,
+        operario,
+        *a_medias,
+        (EstadoDeMaterial::Pedido, nota),
+    )
+    .await?;
     let senal = ("100", "bizum");
     cobrar(estado, dueno, DestinoDelCobro::Trabajo(*a_medias), senal).await?;
     for trabajo in [*entregado, *por_cobrar] {
         marcar_pasos(estado, operario, trabajo, None).await?;
+        material(estado, dueno, trabajo, (EstadoDeMaterial::Recibido, None)).await?;
         terminar(estado, dueno, trabajo).await?;
     }
     entregar_y_cobrar(estado, dueno, *entregado).await?;
@@ -95,6 +105,23 @@ async fn asignar(
         (Some(operario), Some(prevista)),
     )
     .await
+}
+
+/// Deja todo el material del trabajo pedido o recibido (ADR-0035).
+async fn material(
+    estado: &EstadoApp,
+    quien: &Actor,
+    trabajo: i64,
+    (nuevo, nota): (EstadoDeMaterial, Option<String>),
+) -> Result<(), ErrorApp> {
+    let materiales = estado
+        .bd
+        .leer(move |con| demostracion::materiales_del_trabajo(con, trabajo))
+        .await?;
+    for material in materiales {
+        marcar_material(estado, quien, material, (nuevo, nota.clone())).await?;
+    }
+    Ok(())
 }
 
 /// Termina los pasos del trabajo (todos, o los `hechos` primeros y empieza el siguiente).

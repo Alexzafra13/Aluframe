@@ -116,6 +116,7 @@ referencias:
 - `referencia: CONFIRMAR` o una referencia que no aparece en la tarifa **no es un error**: la línea sale incompleta con el aviso "falta el precio de MARCO_LATERAL".
 - Una misma serie puede usar referencias de más de un proveedor: se añade `proveedor` dentro de la entrada (`{ referencia: "...", proveedor: OTRO }`).
 - El **color** no cambia la referencia: el acabado aplica su recargo sobre el precio del blanco (`docs/DATOS.md`, apartado 3.3).
+- `se_pide` (opcional, `true` o `false`, ADR-0035): el artículo no se corta ni sale del stock, se encarga a medida para cada trabajo (la persiana). Sale en «Para pedir» del presupuesto (no en los herrajes) y, al aceptar, en el material a pedir del trabajo. El cristal se pide siempre.
 - `silueta` (opcional, ADR-0017): el dibujo de la sección del perfil, `fabricante/archivo` en minúsculas (`aluval/21210` es `data/perfiles/aluval/21210.svg`). Sale junto al número de la pieza para reconocerla. **No interviene en el precio**: se puede poner aunque la `referencia` siga en `CONFIRMAR`. También sirve para los herrajes, con los dibujos genéricos de `data/perfiles/herrajes/` (`herrajes/cierre-embutido`, ADR-0029); el modelo concreto lo dice el artículo del catálogo.
 
 ## 6. Vidrio

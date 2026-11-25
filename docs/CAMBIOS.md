@@ -243,3 +243,10 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Arreglo: los botones de acceso rápido de «Mi día» compartían la clase `acceso` con la pantalla de entrada; ahora son `acceso-rapido`.
   - Incluye el logotipo de la 0.23.1.
   - **El programa se llama Aluframe, como su logotipo** (ADR-0034): títulos, mensajes, instalador, accesos directos y la versión publicada. Las carpetas de datos y de copias, la extensión `.alumframe` y el ejecutable conservan su nombre, para no perder nada al actualizar.
+- **0.25.0 (propietario): dibujo limpio en el presupuesto y material a pedir en el trabajo** (ADR-0035, migración 0005).
+  - Presupuesto: la ventana entera con su medida total, sin flechas, números de pieza ni cota del marco, y sin «Cotas · Piezas · Cristal». La hoja de taller, «Mi día» y la ficha del trabajo llevan el dibujo del taller con todo eso.
+  - Debajo del dibujo, «Para pedir»: el cristal con sus medidas y la persiana (que deja de salir en los herrajes). Qué se pide lo marca la serie (`se_pide`).
+  - Trabajo: «Material a pedir» en cada ventana, pendiente → pedido (y recibido si se quiere), con nota y quién y cuándo. Lo marcan el dueño o el operario de la ventana. Sustituye al botón «Marcar cristal recibido»; los trabajos en marcha pasan su cristal a la lista conservando lo recibido.
+  - Al modificar medidas, lo pedido con otra medida vuelve a pendiente y lo dice.
+  - Inicio: «T-…: falta pedir cristal».
+  - La demostración trae un cristal pendiente, uno pedido con nota y los de los trabajos terminados recibidos.

@@ -1,0 +1,34 @@
+{% if !v.materiales.is_empty() %}
+<div class="material-a-pedir" id="material-{{ v.id }}">
+  <h3 class="antetitulo">Material a pedir</h3>
+  <ul class="lista-material" role="list">
+    {% for m in v.materiales %}
+    <li class="material material-{{ m.estado }}">
+      <div class="material-datos">
+        <p class="material-nombre">{{ m.nombre }} <span class="mono">×{{ m.cantidad }}</span> <span class="mono material-medida">{{ m.medida }}</span></p>
+        {% if let Some(modelo) = m.modelo %}<p class="texto-apagado pequeno">{{ modelo }}</p>{% endif %}
+        <p class="pequeno"><span class="etiqueta etiqueta-material">{{ m.etiqueta }}</span>{% if !m.quien.is_empty() %} <span class="texto-apagado">{{ m.quien }}</span>{% endif %}</p>
+        {% if let Some(nota) = m.nota %}<p class="pequeno material-nota">{{ nota }}</p>{% endif %}
+      </div>
+      <form method="post" action="/materiales/{{ m.id }}" class="material-acciones">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <input type="hidden" name="version" value="{{ m.version }}">
+        <input type="hidden" name="volver" value="{{ volver_material }}">
+        {% if m.estado == "pendiente" %}
+        <label class="oculto" for="nota-material-{{ m.id }}">Nota (opcional)</label>
+        <input id="nota-material-{{ m.id }}" name="nota" maxlength="200" placeholder="Nota (opcional)">
+        <button class="boton primario" name="estado" value="pedido">Marcar pedido</button>
+        {% else if m.estado == "pedido" %}
+        <input type="hidden" name="nota" value="{{ m.nota.clone().unwrap_or_default() }}">
+        <button class="boton" name="estado" value="recibido">Recibido</button>
+        <button class="boton" name="estado" value="pendiente">Deshacer</button>
+        {% else %}
+        <input type="hidden" name="nota" value="{{ m.nota.clone().unwrap_or_default() }}">
+        <button class="boton" name="estado" value="pedido">Deshacer</button>
+        {% endif %}
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}

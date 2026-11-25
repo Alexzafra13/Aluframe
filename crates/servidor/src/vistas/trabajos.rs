@@ -3,7 +3,7 @@
 use askama::Template;
 use dominio::taller::{ColumnaDelTablero, EstadoDeTrabajo};
 
-use super::{GrupoMenu, Opcion, UsuarioEnPantalla, euros, fecha_corta};
+use super::{GrupoMenu, Opcion, PasoEnPantalla, UsuarioEnPantalla, euros, fecha_corta};
 use crate::aplicacion::trabajos::consultar::{FichaDeTrabajo, VentanaDeTrabajo};
 
 /// «Ventana corredera 2 hojas» y «120 × 150 cm» de la descripción de una ventana.
@@ -85,7 +85,7 @@ pub struct PaginaInicio {
     pub aviso_de_copias: Option<String>,
 }
 
-/// Las tres columnas del tablero y los avisos «falta algo» de los operarios.
+/// Las tres columnas del tablero y los avisos del taller.
 pub fn tablero(
     fichas: &[FichaDeTrabajo],
 ) -> (
@@ -105,21 +105,7 @@ pub fn tablero(
             Some(ColumnaDelTablero::ParaEntregar) => 2,
             None => continue,
         };
-        for v in ficha
-            .ventanas
-            .iter()
-            .filter(|v| v.fila.falta_algo.is_some())
-        {
-            avisos.push(AvisoDelTaller {
-                texto: format!(
-                    "{} · ventana {}: {}",
-                    ficha.trabajo.codigo(),
-                    v.fila.orden,
-                    v.fila.falta_algo.as_deref().unwrap_or_default()
-                ),
-                enlace: format!("/trabajos/{}", ficha.trabajo.id),
-            });
-        }
+        avisos.extend(super::material::avisos_del_trabajo(ficha));
         if let Some((_, tarjetas)) = columnas.get_mut(indice) {
             tarjetas.push(TarjetaTrabajo::from(ficha));
         }
@@ -137,14 +123,6 @@ pub struct PaginaTrabajos {
     pub cerrados: bool,
 }
 
-pub struct PasoEnPantalla {
-    pub id: i64,
-    pub version: i64,
-    pub nombre: String,
-    pub estado: String,
-    pub quien: String,
-}
-
 pub struct VentanaEnPantalla {
     pub id: i64,
     pub orden: i64,
@@ -158,25 +136,14 @@ pub struct VentanaEnPantalla {
     /// El id del operario como texto, para marcarlo en el desplegable; vacío sin asignar.
     pub asignado: String,
     pub falta_algo: Option<String>,
-    pub cristal_recibido: bool,
+    /// Cristal y lo que se encarga a medida, con su estado (ADR-0035).
+    pub materiales: Vec<super::MaterialEnPantalla>,
     pub revision: i64,
     pub medida_cambiada: bool,
     /// (número, nombre) de cada pieza del dibujo, para «Repetir pieza».
     pub piezas: Vec<(u32, String)>,
     /// «2 × pieza 4 (Hoja lateral): rayón · Luis».
     pub repetidas: Vec<String>,
-}
-
-impl From<&crate::bd::consultas::pasos::FilaPaso> for PasoEnPantalla {
-    fn from(p: &crate::bd::consultas::pasos::FilaPaso) -> Self {
-        PasoEnPantalla {
-            id: p.id,
-            version: p.version,
-            nombre: p.nombre.clone(),
-            estado: p.estado.clone(),
-            quien: p.usuario_nombre.clone().unwrap_or_default(),
-        }
-    }
 }
 
 fn describir_repetida(r: &crate::bd::consultas::repetidas::FilaRepetida) -> String {
@@ -201,7 +168,11 @@ impl From<&VentanaDeTrabajo> for VentanaEnPantalla {
             hechos: v.hechos(),
             asignado: v.fila.asignado_a.map(|a| a.to_string()).unwrap_or_default(),
             falta_algo: v.fila.falta_algo.clone(),
-            cristal_recibido: v.fila.cristal_recibido,
+            materiales: v
+                .materiales
+                .iter()
+                .map(super::MaterialEnPantalla::from)
+                .collect(),
             revision: v.fila.revision,
             medida_cambiada: v.fila.medida_cambiada,
             piezas: v

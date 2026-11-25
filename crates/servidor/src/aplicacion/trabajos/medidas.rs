@@ -151,8 +151,9 @@ fn guardar_revision(
     let fila = ventanas_trabajo::buscar(tx, id)?.ok_or(ErrorApp::NoEncontrado)?;
     comprobar_abierta(tx, fila.trabajo_id)?;
     let anterior = VentanaCongelada::leer(&fila.congelado_json);
-    let nueva = a_json(&recalcular(tx, &anterior, medidas)?)?;
-    let descripcion = VentanaCongelada::leer(&nueva).descripcion;
+    let recalculada = recalcular(tx, &anterior, medidas)?;
+    let nueva = a_json(&recalculada)?;
+    let descripcion = recalculada.descripcion.clone();
     let datos = (descripcion.as_str(), nueva.as_str(), cuando);
     let revision = ventanas_trabajo::revisar(tx, (id, version), datos)?;
     let apunte = Revision {
@@ -166,6 +167,7 @@ fn guardar_revision(
         cuando,
     };
     ventanas_trabajo::anotar_revision(tx, &apunte)?;
+    super::materiales::rehacer_materiales(tx, id, &recalculada)?;
     if medidas.reiniciar_pasos {
         pasos::reiniciar_de_ventana(tx, id)?;
     }

@@ -36,6 +36,7 @@
         <ol class="pasos-ventana" role="list">
           {% for p in v.pasos %}<li class="paso-ventana paso-{{ p.estado }}"><span>{{ p.nombre }}</span>{% if !p.quien.is_empty() %}<span class="texto-apagado pequeno">{{ p.quien }}</span>{% endif %}</li>{% endfor %}
         </ol>
+        {% if abierto %}{% let volver_material = "trabajo" %}{% include "material_a_pedir.html" %}{% endif %}
         {% if abierto && !orden_terminada %}
         {% let volver = "trabajo" %}{% include "repetir_pieza.html" %}
         <div class="acciones">
@@ -44,11 +45,6 @@
             <label for="operario-{{ v.id }}">Operario de esta ventana</label>
             <select id="operario-{{ v.id }}" name="operario"><option value="">El del trabajo</option>{% for o in operarios %}<option value="{{ o.valor }}"{% if v.asignado == o.valor %} selected{% endif %}>{{ o.texto }}</option>{% endfor %}</select>
             <button class="boton" type="submit">Asignar</button>
-          </form>
-          <form method="post" action="/trabajos/{{ id }}/ventanas/{{ v.id }}/cristal">
-            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
-            <input type="hidden" name="recibido" value="{% if v.cristal_recibido %}no{% else %}si{% endif %}">
-            <button class="boton" type="submit">{% if v.cristal_recibido %}✓ Cristal recibido{% else %}Marcar cristal recibido{% endif %}</button>
           </form>
           {% if v.falta_algo.is_some() %}<form method="post" action="/trabajos/{{ id }}/ventanas/{{ v.id }}/falta"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton" type="submit">Quitar el aviso</button></form>{% endif %}
           <a class="boton" href="/trabajos/{{ id }}/ventanas/{{ v.id }}/medidas">Modificar medidas</a>

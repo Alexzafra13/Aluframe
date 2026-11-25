@@ -11,7 +11,7 @@ use crate::aplicacion::Actor;
 use crate::aplicacion::facturas::cobros::MEDIOS;
 use crate::aplicacion::facturas::documentos_de_trabajo;
 use crate::aplicacion::trabajos::acciones::{
-    anotar_falta, asignar_trabajo, asignar_ventana, cerrar_trabajo, marcar_cristal,
+    anotar_falta, asignar_trabajo, asignar_ventana, cerrar_trabajo,
 };
 use crate::aplicacion::trabajos::consultar::{cargar_trabajo, listar_trabajos};
 use crate::aplicacion::trabajos::orden::cargar_orden;
@@ -58,7 +58,6 @@ fn texto_de_confirmacion(clave: &str) -> Option<String> {
     let texto = match clave {
         "guardado" => "Trabajo guardado.",
         "asignada" => "Ventana asignada.",
-        "cristal" => "Cristal anotado.",
         "aviso" => "Aviso quitado.",
         "entregado" => "Trabajo entregado.",
         "anulado" => "Trabajo anulado.",
@@ -187,17 +186,6 @@ pub async fn asignar_la_ventana(
     let operario = Campos::de(pares).entero("operario");
     let resultado = asignar_ventana(&estado, &actor, ventana, operario).await;
     tras(&estado, &actor, id, (resultado, "asignada")).await
-}
-
-pub async fn anotar_cristal(
-    State(estado): State<EstadoApp>,
-    ActorActual(actor): ActorActual,
-    Path((id, ventana)): Path<(i64, i64)>,
-    Form(pares): Form<Vec<(String, String)>>,
-) -> Result<Response, ErrorApp> {
-    let recibido = Campos::de(pares).texto("recibido") == "si";
-    let resultado = marcar_cristal(&estado, &actor, ventana, recibido).await;
-    tras(&estado, &actor, id, (resultado, "cristal")).await
 }
 
 pub async fn quitar_falta(

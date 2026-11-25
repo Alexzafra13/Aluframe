@@ -6,6 +6,7 @@ use rusqlite::Connection;
 
 use super::congelado::VentanaCongelada;
 use crate::aplicacion::{Actor, autorizar};
+use crate::bd::consultas::materiales::{self, FilaMaterial};
 use crate::bd::consultas::pasos::{self, FilaPaso};
 use crate::bd::consultas::repetidas::{self, FilaRepetida};
 use crate::bd::consultas::trabajos::{self, FilaTrabajo};
@@ -19,6 +20,8 @@ pub struct VentanaDeTrabajo {
     pub pasos: Vec<FilaPaso>,
     /// Piezas que se han vuelto a cortar (corte mal, rayón…): entran en el plan y en el stock.
     pub repetidas: Vec<FilaRepetida>,
+    /// Cristal y lo que se encarga a medida, con su estado (ADR-0035).
+    pub materiales: Vec<FilaMaterial>,
 }
 
 impl VentanaDeTrabajo {
@@ -65,6 +68,7 @@ pub fn ventana_completa(con: &Connection, fila: FilaVentana) -> Result<VentanaDe
         congelado: VentanaCongelada::leer(&fila.congelado_json),
         pasos: pasos::de_ventana(con, fila.id)?,
         repetidas: repetidas::de_ventana(con, fila.id)?,
+        materiales: materiales::de_ventana(con, fila.id)?,
         fila,
     })
 }

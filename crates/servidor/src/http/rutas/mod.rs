@@ -18,6 +18,7 @@ pub mod facturas;
 pub mod facturas_acciones;
 pub mod importar_clientes;
 pub mod inicio;
+pub mod materiales;
 pub mod medidas_trabajo;
 pub mod mi_dia;
 pub mod precios;

@@ -44,3 +44,13 @@ pub fn pasos_del_trabajo(con: &Connection, trabajo: i64) -> Result<Vec<(i64, i64
     let filas = consulta.query_map([trabajo], |f| Ok((f.get(0)?, f.get(1)?)))?;
     Ok(filas.collect::<Result<_, _>>()?)
 }
+
+/// El material a pedir de un trabajo (id, versión), para dejarlo pedido o recibido.
+pub fn materiales_del_trabajo(con: &Connection, trabajo: i64) -> Result<Vec<(i64, i64)>, ErrorApp> {
+    let mut consulta = con.prepare(
+        "SELECT m.id, m.version FROM material_a_pedir m \
+         JOIN ventana_trabajo v ON v.id = m.ventana_id WHERE v.trabajo_id = ?1 ORDER BY m.id",
+    )?;
+    let filas = consulta.query_map([trabajo], |f| Ok((f.get(0)?, f.get(1)?)))?;
+    Ok(filas.collect::<Result<_, _>>()?)
+}

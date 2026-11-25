@@ -30,6 +30,10 @@ pub const MIGRACIONES: &[Migracion] = &[
         numero: 4,
         sql: include_str!("migraciones/0004_validez_de_presupuestos.sql"),
     },
+    Migracion {
+        numero: 5,
+        sql: include_str!("migraciones/0005_material_a_pedir.sql"),
+    },
 ];
 
 /// Huella del esquema único de las versiones 0.8.0 a 0.10.0, que es la migración 0001: sus
@@ -158,3 +162,7 @@ fn leer_huella_guardada(conexion: &Connection) -> Result<Option<String>, rusqlit
 #[cfg(test)]
 #[path = "esquema_pruebas.rs"]
 mod pruebas;
+
+#[cfg(test)]
+#[path = "migracion_0005_pruebas.rs"]
+mod pruebas_0005;

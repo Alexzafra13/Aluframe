@@ -2,11 +2,13 @@
 //! plan de corte de todo el trabajo. Sin entrada/salida: el servidor guarda y muestra.
 
 mod habituales;
+mod material;
 mod pasos;
 mod plan;
 mod tablero;
 
 pub use habituales::{PiezaCortada, peso_por_antiguedad, valorar_lo_habitual};
+pub use material::{EstadoDeMaterial, MedidaDeMaterial, estado_tras_cambiar_la_medida};
 pub use pasos::{AccionDePaso, EstadoDePaso, PASOS_POR_DEFECTO, aplicar_accion, leer_pasos};
 pub use plan::{
     BarrasDePerfil, ClaveDePerfil, PiezaDeTrabajo, RetalesPorPerfil, ValoracionesPorPerfil,

@@ -1,4 +1,4 @@
-//! Lo que cambia un trabajo: asignar, marcar pasos, avisar de que falta algo, cristal recibido,
+//! Lo que cambia un trabajo: asignar, marcar pasos, avisar de que falta algo,
 //! entregar y anular. Cada cambio queda en la auditoría con quién y cuándo.
 
 use dominio::acceso::Accion;
@@ -18,7 +18,7 @@ use crate::estado::EstadoApp;
 use crate::fecha::formatear_utc;
 
 /// Ejecuta `operacion` en una transacción y anota el cambio sobre la entidad que devuelve.
-async fn cambiar<T: Send + 'static>(
+pub(super) async fn cambiar<T: Send + 'static>(
     estado: &EstadoApp,
     actor: &Actor,
     (permiso, accion, entidad): (Accion, &'static str, &'static str),
@@ -157,24 +157,6 @@ pub async fn anotar_falta(
     cambiar(estado, actor, permiso, move |tx, _| {
         ventana_para(tx, &quien, ventana)?;
         ventanas_trabajo::anotar_falta(tx, ventana, nota.as_deref())?;
-        Ok(((), ventana))
-    })
-    .await
-}
-
-pub async fn marcar_cristal(
-    estado: &EstadoApp,
-    actor: &Actor,
-    ventana: i64,
-    recibido: bool,
-) -> Result<(), ErrorApp> {
-    let permiso = (
-        Accion::GestionarTrabajos,
-        "cristal_recibido",
-        "ventana_trabajo",
-    );
-    cambiar(estado, actor, permiso, move |tx, _| {
-        ventanas_trabajo::marcar_cristal(tx, ventana, recibido)?;
         Ok(((), ventana))
     })
     .await

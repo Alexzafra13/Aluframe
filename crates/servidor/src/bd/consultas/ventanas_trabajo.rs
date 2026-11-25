@@ -114,14 +114,6 @@ pub fn asignar(con: &Connection, id: i64, usuario: Option<i64>) -> Result<(), Er
     Ok(())
 }
 
-pub fn marcar_cristal(con: &Connection, id: i64, recibido: bool) -> Result<(), ErrorApp> {
-    con.execute(
-        "UPDATE ventana_trabajo SET cristal_recibido = ?2, version = version + 1 WHERE id = ?1",
-        params![id, recibido],
-    )?;
-    Ok(())
-}
-
 pub fn anotar_falta(con: &Connection, id: i64, nota: Option<&str>) -> Result<(), ErrorApp> {
     con.execute(
         "UPDATE ventana_trabajo SET falta_algo = ?2, version = version + 1 WHERE id = ?1",
