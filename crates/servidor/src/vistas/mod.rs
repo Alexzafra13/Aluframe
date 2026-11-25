@@ -51,6 +51,12 @@ use crate::errores::ErrorApp;
 /// pedirlos otra vez en lugar de usar los guardados (que duran una hora).
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+/// Marca de cada formulario pintado: si llega dos veces, se atiende una (ADR-0036). Sin fuente
+/// aleatoria va vacía y el formulario se atiende como siempre.
+pub fn nuevo_envio() -> String {
+    crate::autenticacion::generar_token().unwrap_or_default()
+}
+
 pub fn renderizar(plantilla: &impl Template) -> Result<Html<String>, ErrorApp> {
     Ok(Html(plantilla.render()?))
 }

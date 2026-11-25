@@ -23,3 +23,6 @@
 .franja-reiniciar summary::-webkit-details-marker { display: none; }
 .franja-reiniciar[open] form { margin-top: .5rem; }
 .probar-demostracion { margin-top: 2rem; text-align: center; }
+
+/* Mientras se envía (envio-unico.js): el botón no admite otro toque y se nota que trabaja. */
+form[aria-busy="true"] :is(button, input[type="submit"]) { opacity: .65; cursor: progress; }

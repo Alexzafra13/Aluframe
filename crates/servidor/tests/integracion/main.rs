@@ -18,6 +18,7 @@ mod datos_pantallas;
 mod demostracion;
 mod demostracion_aislamiento;
 mod dorados;
+mod envio_unico;
 #[cfg(unix)]
 mod escritorio;
 mod escritorio_pantallas;

@@ -1,4 +1,4 @@
-use axum::body::{Body, to_bytes};
+use axum::body::to_bytes;
 use axum::extract::{Request, State};
 use axum::http::header::{CACHE_CONTROL, CONTENT_TYPE, HOST, ORIGIN};
 use axum::http::{HeaderMap, HeaderValue, Method, StatusCode};
@@ -81,9 +81,7 @@ pub async fn proteger_csrf(peticion: Request, siguiente: Next) -> Response {
     if !valido {
         return rechazar();
     }
-    siguiente
-        .run(Request::from_parts(partes, Body::from(bytes)))
-        .await
+    super::envio_unico::atender(partes, bytes, siguiente).await
 }
 
 pub async fn anadir_cabeceras_de_seguridad(peticion: Request, siguiente: Next) -> Response {
