@@ -33,8 +33,10 @@ deny:
 antiguedad:
     python3 -I scripts/comprobar_antiguedad.py
 
-e2e: build
-    cd e2e && npm ci --no-audit --no-fund && ALUMFRAME_BIN={{justfile_directory()}}/target/release/alumframe npx playwright test --trace off
+# E2E con el perfil `e2e` (optimizado, sin el LTO lento); CI la pasa con el de `release` (ADR-0035)
+e2e:
+    cargo build --profile e2e --locked -p servidor
+    cd e2e && npm ci --no-audit --no-fund && ALUMFRAME_BIN={{justfile_directory()}}/target/e2e/alumframe npx playwright test --trace off
 
 build:
     cargo build --release --locked -p servidor
@@ -47,6 +49,14 @@ db-migrate:
 
 cobertura:
     cargo llvm-cov --package dominio --fail-under-lines 90
+
+# Tiempos de compilación y pruebas, líneas y tamaños, como fila de docs/METRICAS.md (--limpia: desde cero)
+metricas *opciones:
+    scripts/metricas.sh {{opciones}}
+
+# Borra lo compilado (target crece con cada versión de las dependencias y de Rust)
+limpiar:
+    cargo clean
 
 instalar-hooks:
     git config core.hooksPath .githooks

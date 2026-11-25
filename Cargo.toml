@@ -41,6 +41,19 @@ opt-level = 3
 [profile.release.package.libsqlite3-sys]
 opt-level = 3
 
+# Solo las líneas para los mensajes de error: los ejecutables de prueba pesan y tardan menos en
+# enlazarse (ADR-0035). Para depurar paso a paso, `debug = true` en local.
+[profile.dev]
+debug = "line-tables-only"
+
+# Para las pruebas E2E en local: el mismo código optimizado, sin el LTO lento del publicado.
+# CI pasa la E2E con el ejecutable de `release`, el que se publica (ADR-0035).
+[profile.e2e]
+inherits = "release"
+lto = false
+codegen-units = 16
+incremental = true
+
 [profile.dev.package.argon2]
 opt-level = 3
 
