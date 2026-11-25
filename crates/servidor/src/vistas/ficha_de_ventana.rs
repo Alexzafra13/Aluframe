@@ -43,10 +43,12 @@ pub struct HerrajeEnPantalla {
     pub silueta: Option<String>,
 }
 
+/// Lo que se pide no va con los herrajes: va en «Para pedir».
 pub fn herrajes_en_pantalla(c: &CalculoDeVentana) -> Vec<HerrajeEnPantalla> {
     c.resultado
         .accesorios_sumados()
         .into_iter()
+        .filter(|(codigo, _)| !dominio::series::se_pide(&c.serie, codigo))
         .map(|(codigo, cantidad)| HerrajeEnPantalla {
             nombre: nombre_legible(&codigo),
             modelo: c.articulos.get(&codigo).cloned(),
@@ -95,6 +97,29 @@ pub fn chapas_en_pantalla(c: &CalculoDeVentana) -> Vec<ChapaEnPantalla> {
                 chapa.alto.map(Longitud::decimas_de_mm),
             ),
             dibujo: dibujar_chapa(chapa.ancho, chapa.alto),
+        })
+        .collect()
+}
+
+/// Cristal o artículo que se encarga a medida (la persiana), con su medida.
+pub struct APedirEnPantalla {
+    pub nombre: String,
+    pub modelo: Option<String>,
+    pub cantidad: u32,
+    pub medida: String,
+}
+
+pub fn a_pedir_en_pantalla(c: &CalculoDeVentana) -> Vec<APedirEnPantalla> {
+    crate::aplicacion::resumen_de_linea::a_pedir(c)
+        .into_iter()
+        .map(|m| APedirEnPantalla {
+            nombre: match &m.nombre {
+                Some(parte) => format!("{} {}", nombre_legible(&m.codigo), parte.to_lowercase()),
+                None => nombre_legible(&m.codigo),
+            },
+            modelo: m.modelo,
+            cantidad: m.cantidad,
+            medida: texto_de_medida(m.ancho_dmm, m.alto_dmm),
         })
         .collect()
 }

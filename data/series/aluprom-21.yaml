@@ -53,7 +53,7 @@ referencias:
   TORNILLO_4_8x25:  { referencia: "TORNILLO-4,8X25", silueta: herrajes/tornillo }   # 4,8 × 25, cabeza redonda de estrella (propietario)
   # Persiana en la ventana (propietario, 2026-11-24; ADR-0032): se pide, no se corta. Cómo se pide
   # (medida que se da al proveedor) y cómo se cobra: por confirmar.
-  PERSIANA:         { referencia: CONFIRMAR }
+  PERSIANA:         { referencia: CONFIRMAR, se_pide: true }   # se encarga a medida para cada trabajo
   # El cristal se cobra por m² con el artículo de referencia «CRISTAL»; en cada ventana se puede elegir otro.
   CRISTAL:          { referencia: "CRISTAL" }
 

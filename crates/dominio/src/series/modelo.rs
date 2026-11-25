@@ -24,6 +24,8 @@ pub struct Referencia {
     /// Dibujo de la sección del perfil (`fabricante/archivo`, de `data/perfiles/`): solo para
     /// reconocer la pieza; no interviene en el precio (ADR-0017).
     pub silueta: Option<String>,
+    /// Se encarga a medida para cada trabajo, no se corta ni sale del stock (la persiana).
+    pub se_pide: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

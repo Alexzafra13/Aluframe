@@ -7,17 +7,9 @@ body.con-menu .aviso-efimero { left: calc(var(--ancho-menu) + (100vw - var(--anc
 @keyframes efimero { 0% { opacity: 0; transform: translate(-50%, -16px); } 8%, 86% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -16px); } }
 
 /* Control segmentado: enlaces (filtros) y radios (capas del dibujo). */
-.segmentado, .segmentado-control { display: inline-flex; position: relative; padding: 3px; gap: 2px; border-radius: 11px; background: rgb(21 25 29 / .07); margin-bottom: 1.25rem; }
+.segmentado { display: inline-flex; position: relative; padding: 3px; gap: 2px; border-radius: 11px; background: rgb(21 25 29 / .07); margin-bottom: 1.25rem; }
 .segmento { display: inline-flex; align-items: center; min-height: 38px; padding: 0 1rem; border-radius: 8px; color: var(--tinta); text-decoration: none; font-weight: 500; transition: background-color var(--normal) ease, box-shadow var(--normal) ease; }
 .segmento.activo { background: var(--superficie); box-shadow: 0 1px 3px rgb(21 25 29 / .12); }
-.segmentado-control { margin: 0; display: inline-grid; grid-template-columns: repeat(3, 1fr); }
-.segmentado-control input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.segmentado-control label { position: relative; z-index: 1; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 1.1rem; border-radius: 8px; cursor: pointer; font-weight: 500; color: var(--apagado); transition: color var(--normal) ease; }
-.segmentado-control input:checked + label { color: var(--tinta); }
-.segmentado-control input:focus-visible + label { outline: 3px solid var(--indicador); outline-offset: 1px; }
-.segmentado-control .pildora { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3); border-radius: 8px; background: var(--superficie); box-shadow: 0 1px 3px rgb(21 25 29 / .14); transition: transform 380ms var(--curva-muelle); }
-.segmentado-control:has(#capa-piezas:checked) .pildora { transform: translateX(100%); }
-.segmentado-control:has(#capa-cristal:checked) .pildora { transform: translateX(200%); }
 
 /* Hojas: <dialog> que sube desde abajo (tablet) o entra por la derecha (ordenador). */
 dialog.hoja { border: 0; padding: 0; margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(460px, 100vw); background: var(--superficie); color: var(--tinta); box-shadow: -10px 0 40px rgb(21 25 29 / .18); }
@@ -127,7 +119,7 @@ body.con-pie-fijo .contenido { padding-bottom: 130px; }
 .cabecera-dibujo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; flex-wrap: wrap; }
 .cabecera-dibujo .antetitulo { margin: 0; }
 /* Sin cristal (una mosquitera, ADR-0031): fuera el vidrio, la capa «Cristal» y su importe. */
-body:has([data-sin-vidrio]) :is(#campo-vidrio, #capa-cristal, label[for="capa-cristal"], .pie-cristal) { display: none; }
+body:has([data-sin-vidrio]) :is(#campo-vidrio, .pie-cristal) { display: none; }
 /* Qué ventana es: tipo, y debajo la serie con el logotipo de su fabricante (ADR-0029). */
 .ficha-tipo { margin: .15rem 0 0; font: 600 1.25rem var(--condensada); color: var(--tinta); }
 .ficha-serie { display: flex; align-items: center; gap: .5rem; margin: .2rem 0 0; }
@@ -151,7 +143,6 @@ body:has([data-sin-vidrio]) :is(#campo-vidrio, #capa-cristal, label[for="capa-cr
 span.silueta { background: transparent; }
 /* El número enlaza la pieza con el dibujo de la ventana; discreto para no confundirlo con la cantidad. */
 .pieza-silueta { display: grid; justify-items: center; gap: 2px; }
-.numero-discreto { font: 500 .72rem var(--mono); color: var(--apagado); line-height: 1; }
 .cantidad-pieza { font-weight: 600; color: var(--tinta); }
 .lista-piezas .medida { text-align: right; font-size: 1.05rem; }
 /* Pieza que la ventana lleva pero aún sin medida de corte (ADR-0030). */
@@ -185,12 +176,6 @@ span.silueta { background: transparent; }
 .dibujo-ventana .texto-cota { fill: var(--apagado); font-family: var(--mono); }
 .dibujo-ventana .pieza circle { fill: var(--acero); stroke: #fff; stroke-width: 2; }
 .dibujo-ventana .pieza text { fill: #fff; font-family: var(--condensada); font-weight: 600; }
-.dibujo-ventana .capa-cotas, .dibujo-ventana .capa-piezas { transition: opacity var(--normal) ease; }
-.capa-texto-cristal { text-align: center; margin-top: .5rem; color: var(--apagado); opacity: 0; transition: opacity var(--normal) ease; }
-.editor:has(#capa-piezas:checked) .capa-cotas { opacity: 0; }
-.editor:has(#capa-cristal:checked) .capa-cotas, .editor:has(#capa-cristal:checked) .capa-piezas { opacity: 0; }
-.editor:has(#capa-cristal:checked) .cristal { fill: #B9D2EA; }
-.editor:has(#capa-cristal:checked) .capa-texto-cristal { opacity: 1; }
 
 /* Ajustes largos: botón de guardar siempre a mano. */
 .pila { display: grid; gap: 0; }

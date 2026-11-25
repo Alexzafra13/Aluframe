@@ -15,7 +15,7 @@ longitud_barra: CONFIRMAR                      # no se corta nada: no hace falta
 # La persiana se pide entera (lamas, cajón y guías). Cómo se pide (qué medida se da al proveedor)
 # y cómo se cobra: por confirmar.
 referencias:
-  PERSIANA: { referencia: CONFIRMAR }
+  PERSIANA: { referencia: CONFIRMAR, se_pide: true }   # se encarga a medida para cada trabajo
 
 tipologias:
   persiana_pared:

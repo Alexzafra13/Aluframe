@@ -196,7 +196,7 @@ impl From<&VentanaDeTrabajo> for VentanaEnPantalla {
             titulo: titulo_y_medidas(&v.fila.descripcion).0,
             descripcion,
             detalles,
-            dibujo: v.congelado.resumen.dibujo.clone(),
+            dibujo: v.congelado.resumen.dibujo_de_taller().to_owned(),
             pasos: v.pasos.iter().map(PasoEnPantalla::from).collect(),
             hechos: v.hechos(),
             asignado: v.fila.asignado_a.map(|a| a.to_string()).unwrap_or_default(),

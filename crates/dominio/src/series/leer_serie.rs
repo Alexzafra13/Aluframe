@@ -196,12 +196,17 @@ fn leer_referencias(lector: &mut Lector, campos: &Campos) -> Option<BTreeMap<Str
         let Some(campos) = lector.mapa(valor, &ruta) else {
             continue;
         };
-        lector.solo_campos(campos, &["referencia", "proveedor", "silueta"], &ruta);
+        lector.solo_campos(
+            campos,
+            &["referencia", "proveedor", "silueta", "se_pide"],
+            &ruta,
+        );
         let referencia = lector
             .obligatorio(campos, "referencia", &ruta)
             .and_then(|v| lector.dato_texto(v, &ruta_hija(&ruta, "referencia")));
         let proveedor = opcional(campos, "proveedor").and_then(|v| lector.texto(v, &ruta));
         let silueta = opcional(campos, "silueta").and_then(|v| leer_silueta(lector, v, &ruta));
+        let se_pide = leer_se_pide(lector, opcional(campos, "se_pide"), &ruta);
         if let Some(referencia) = referencia {
             referencias.insert(
                 codigo.clone(),
@@ -209,11 +214,29 @@ fn leer_referencias(lector: &mut Lector, campos: &Campos) -> Option<BTreeMap<Str
                     referencia,
                     proveedor,
                     silueta,
+                    se_pide,
                 },
             );
         }
     }
     Some(referencias)
+}
+
+/// `se_pide: true`: el artículo no se corta ni sale del stock, se encarga a medida para cada
+/// trabajo (la persiana). El cristal se pide siempre.
+fn leer_se_pide(lector: &mut Lector, valor: Option<&Valor>, ruta: &str) -> bool {
+    match valor {
+        None => false,
+        Some(Valor::Booleano(si)) => *si,
+        Some(otro) => {
+            let descripcion = otro.describir();
+            lector.informe.error(
+                &ruta_hija(ruta, "se_pide"),
+                format!("debe ser true o false, no {descripcion}"),
+            );
+            false
+        }
+    }
 }
 
 /// `fabricante/archivo` en minúsculas: nombra un archivo de `data/perfiles/` sin salir de ella.

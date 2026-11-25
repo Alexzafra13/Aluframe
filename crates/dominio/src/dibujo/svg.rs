@@ -31,8 +31,10 @@ pub fn escribir(plano: &Plano, datos: &DatosDeDibujo) -> String {
         cuerpo_de_ventana(&mut s, plano, datos);
     }
     super::cotas::escribir(&mut s, plano, datos);
-    super::parteluces::cota(&mut s, plano, datos);
-    numeros_de_pieza(&mut s, plano, datos);
+    if datos.para_taller {
+        super::parteluces::cota(&mut s, plano, datos);
+        numeros_de_pieza(&mut s, plano, datos);
+    }
     s.push_str("</svg>");
     s
 }
@@ -118,6 +120,18 @@ fn flecha(s: &mut String, hoja: Rect, hacia_la_derecha: bool) {
     );
 }
 
+/// Las flechas de apertura solo en el dibujo del taller; el del presupuesto va limpio.
+fn flecha_si_es_de_taller(
+    s: &mut String,
+    datos: &DatosDeDibujo,
+    hoja: Rect,
+    hacia_la_derecha: bool,
+) {
+    if datos.para_taller {
+        flecha(s, hoja, hacia_la_derecha);
+    }
+}
+
 /// En 2 hojas se abren la indicada o `ambas` (por defecto la derecha): flecha hacia el centro y
 /// cierre en su lateral, contra el marco, como en el catálogo de Aluval. En 4 se abren las cuatro
 /// (propietario, 2026-11-23): las de los lados hacia el centro y las centrales hacia fuera, con un
@@ -131,7 +145,7 @@ fn flechas_de_corredera(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
             (tercera, true),
             (cuarta, false),
         ] {
-            flecha(s, *hoja, hacia_la_derecha);
+            flecha_si_es_de_taller(s, datos, *hoja, hacia_la_derecha);
         }
         cierre_en_el_lado(s, plano, *primera, false);
         cierres_del_centro(s, plano, segunda.centro_y());
@@ -140,11 +154,11 @@ fn flechas_de_corredera(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     }
     let movil = datos.dibujo.hoja_movil.as_deref().unwrap_or("derecha");
     if let Some(izquierda) = hojas.first().filter(|_| movil != "derecha") {
-        flecha(s, *izquierda, true);
+        flecha_si_es_de_taller(s, datos, *izquierda, true);
         cierre_en_el_lado(s, plano, *izquierda, false);
     }
     if let Some(derecha) = hojas.last().filter(|_| movil != "izquierda") {
-        flecha(s, *derecha, false);
+        flecha_si_es_de_taller(s, datos, *derecha, false);
         cierre_en_el_lado(s, plano, *derecha, true);
     }
 }

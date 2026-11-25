@@ -1,6 +1,6 @@
-//! Cotas del dibujo: el ancho abajo y el alto a la izquierda. Con persiana en la ventana
-//! (ADR-0032), fuera va la medida del conjunto y dentro la del marco, que es lo que se corta. En
-//! pared (ADR-0033), dentro el hueco y fuera el total cuando se sabe.
+//! Cotas del dibujo: el ancho abajo y el alto a la izquierda, la medida total. En el dibujo del
+//! taller, con persiana en la ventana (ADR-0032) se acota además el marco, que es lo que se corta;
+//! en pared (ADR-0033), el hueco y, cuando se sabe, el total con guías y cajón.
 
 use std::fmt::Write;
 
@@ -26,9 +26,11 @@ fn de_ventana(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     let c = plano.contorno;
     let m = plano.margen;
     let letra = plano.tamano_de_letra();
-    let fila_del_conjunto = match &datos.persiana {
-        Some(_) => c.abajo() + m * 2 / 3,
-        None => c.abajo() + m / 3,
+    let con_marco = datos.para_taller && datos.persiana.is_some();
+    let fila_del_conjunto = if con_marco {
+        c.abajo() + m * 2 / 3
+    } else {
+        c.abajo() + m / 3
     };
     let ancho = datos.ancho.formatear_cm();
     horizontal(s, (c.x, c.derecha(), fila_del_conjunto), &ancho, letra);
@@ -38,7 +40,7 @@ fn de_ventana(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
         &datos.alto.formatear_cm(),
         letra,
     );
-    if let Some(p) = &datos.persiana {
+    if let Some(p) = datos.persiana.as_ref().filter(|_| con_marco) {
         let marco = plano.marco;
         let texto = format!("marco {}", p.ancho_ventana.formatear_cm());
         horizontal(
@@ -78,7 +80,9 @@ fn de_persiana_en_pared(
         &texto(datos.alto),
         letra,
     );
-    let Some(guia) = p.guia else { return };
+    let Some(guia) = p.guia.filter(|_| datos.para_taller) else {
+        return;
+    };
     if let Some(total) = datos.ancho.sumar(guia).and_then(|a| a.sumar(guia)) {
         let fila = c.abajo() + m * 2 / 3;
         horizontal(s, (c.x, c.derecha(), fila), &total.formatear_cm(), letra);

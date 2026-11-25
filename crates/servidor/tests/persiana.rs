@@ -116,6 +116,8 @@ fn dibujo_en(pares: &[(&str, &str)], color: ColorDeDibujo) -> String {
         .collect();
     let medida = Longitud::desde_decimas_de_mm(12_000);
     let mut datos = DatosDeDibujo::desde_calculo(tipologia, &r, &opciones, (medida, medida));
+    // El del taller: lleva la cota del marco; el del presupuesto solo la medida total.
+    datos.para_taller = true;
     datos.color = color;
     dibujar_ventana(&datos)
 }
@@ -181,4 +183,40 @@ fn la_cinta_es_gris_en_blanco_y_negra_en_color() {
     let antracita = dibujo_en(&[("persiana", "si")], gris);
     assert_eq!(color(&blanca), "#8B939B");
     assert_eq!(color(&antracita), "#15191D");
+}
+
+/// Lo que se encarga a medida: el cristal siempre y lo que la serie marca `se_pide` (la persiana).
+#[test]
+fn se_piden_el_cristal_y_la_persiana() {
+    use dominio::series::{ClaseDePedido, material_a_pedir};
+    let serie = serie();
+    let sin_persiana = material_a_pedir(&serie, &calcular("corredera_2_hojas", &[]));
+    let cristal = &sin_persiana[0];
+    assert_eq!(
+        (cristal.clase, cristal.cantidad),
+        (ClaseDePedido::Cristal, 2)
+    );
+    assert_eq!(cristal.ancho, cm(5_020), "120 / 2 - 9,8");
+    assert_eq!(
+        sin_persiana.len(),
+        1,
+        "los herrajes no se piden: van por stock"
+    );
+    let con_persiana = material_a_pedir(
+        &serie,
+        &calcular("corredera_2_hojas", &[("persiana", "si")]),
+    );
+    let persiana = con_persiana
+        .iter()
+        .find(|m| m.codigo == "PERSIANA")
+        .unwrap();
+    assert_eq!(
+        (persiana.clase, persiana.cantidad),
+        (ClaseDePedido::Articulo, 1)
+    );
+    assert_eq!(
+        persiana.ancho,
+        cm(12_000),
+        "la medida escrita, como referencia"
+    );
 }

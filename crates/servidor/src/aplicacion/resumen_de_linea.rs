@@ -37,11 +37,31 @@ pub struct ChapaResumida {
     pub alto_dmm: Option<i64>,
 }
 
+/// Lo que se encarga a medida para esta ventana (cristal, persiana): al aceptar pasa al trabajo
+/// como material a pedir. Los resúmenes anteriores a la 0.25.0 no lo tienen.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct APedirResumido {
+    /// `cristal` o `articulo`.
+    pub clase: String,
+    pub codigo: String,
+    pub nombre: Option<String>,
+    /// La descripción del artículo del catálogo, si lo hay.
+    pub modelo: Option<String>,
+    pub cantidad: u32,
+    pub ancho_dmm: Option<i64>,
+    pub alto_dmm: Option<i64>,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ResumenDeVentana {
     pub serie: String,
     pub tipologia: String,
+    /// El dibujo del presupuesto: la ventana entera con su medida total.
     pub dibujo: String,
+    /// El del taller, con números de pieza, flechas y cotas del marco (0.24.1). Los resúmenes
+    /// anteriores no lo tienen: entonces el taller usa `dibujo`, que ya llevaba todo eso.
+    #[serde(default)]
+    pub dibujo_taller: String,
     pub piezas: Vec<PiezaResumida>,
     /// Piezas sin medida aún (el parteluces mientras falte su corte). No existían antes de la 0.20.1.
     #[serde(default)]
@@ -51,6 +71,8 @@ pub struct ResumenDeVentana {
     #[serde(default)]
     pub chapas: Vec<ChapaResumida>,
     pub accesorios: Vec<(String, String)>,
+    #[serde(default)]
+    pub a_pedir: Vec<APedirResumido>,
     pub barras: BTreeMap<String, u32>,
     pub perfiles_cent: i64,
     pub perfiles_por_barras_cent: Option<i64>,
@@ -59,6 +81,16 @@ pub struct ResumenDeVentana {
     pub accesorios_cent: i64,
     pub venta_unitaria_cent: i64,
     pub fuera_de_limites: Vec<String>,
+}
+
+impl ResumenDeVentana {
+    pub fn dibujo_de_taller(&self) -> &str {
+        if self.dibujo_taller.is_empty() {
+            &self.dibujo
+        } else {
+            &self.dibujo_taller
+        }
+    }
 }
 
 impl From<&CalculoDeVentana> for ResumenDeVentana {
@@ -73,6 +105,7 @@ impl From<&CalculoDeVentana> for ResumenDeVentana {
                 .map(|t| t.nombre.clone())
                 .unwrap_or_default(),
             dibujo: c.dibujo.clone(),
+            dibujo_taller: c.dibujo_taller.clone(),
             piezas: r.piezas.iter().map(pieza).collect(),
             piezas_pendientes: r
                 .piezas_pendientes
@@ -92,6 +125,7 @@ impl From<&CalculoDeVentana> for ResumenDeVentana {
                 .into_iter()
                 .map(|(a, n)| (a, n.to_string().replace('.', ",")))
                 .collect(),
+            a_pedir: a_pedir(c),
             barras: c.barras.clone(),
             perfiles_cent: m.perfiles.centimos(),
             perfiles_por_barras_cent: m.perfiles_por_barras.map(|d| d.centimos()),
@@ -139,6 +173,24 @@ impl ResumenDeVentana {
         json.and_then(|j| serde_json::from_str(j).ok())
             .unwrap_or_default()
     }
+}
+
+pub fn a_pedir(c: &CalculoDeVentana) -> Vec<APedirResumido> {
+    dominio::series::material_a_pedir(&c.serie, &c.resultado)
+        .into_iter()
+        .map(|m| APedirResumido {
+            clase: match m.clase {
+                dominio::series::ClaseDePedido::Cristal => "cristal".into(),
+                dominio::series::ClaseDePedido::Articulo => "articulo".into(),
+            },
+            modelo: c.articulos.get(&m.codigo).cloned(),
+            codigo: m.codigo,
+            nombre: m.nombre,
+            cantidad: m.cantidad,
+            ancho_dmm: m.ancho.map(|l| l.decimas_de_mm()),
+            alto_dmm: m.alto.map(|l| l.decimas_de_mm()),
+        })
+        .collect()
 }
 
 #[cfg(test)]

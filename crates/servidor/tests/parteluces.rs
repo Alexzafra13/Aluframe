@@ -55,7 +55,7 @@ async fn las_opciones_del_parteluces_se_ocultan_hasta_elegirlo() {
 }
 
 #[tokio::test]
-async fn con_parteluces_sale_la_chapa_con_su_dibujo_y_la_cota_en_la_ventana() {
+async fn con_parteluces_sale_la_chapa_con_su_dibujo() {
     let (html, _) = editor_con(&[("opcion.parteluces", "si"), ("opcion.medida_abajo", "45")]).await;
     assert!(html.contains("Chapa de abajo"));
     assert!(
@@ -68,10 +68,9 @@ async fn con_parteluces_sale_la_chapa_con_su_dibujo_y_la_cota_en_la_ventana() {
         2,
         "uno por hoja"
     );
-    assert!(
-        html.contains(">chapa 45<"),
-        "la cota dice la medida de la chapa"
-    );
+    // El dibujo del presupuesto solo lleva la medida total; la cota de la chapa va en el del
+    // taller (propietario, 2026-11-25). Su medida sigue en la lista de chapas.
+    assert!(!html.contains(">chapa 45<"));
     assert!(html.contains("Chapa: falta decidir cómo se cobra"));
     // El parteluces sale en los perfiles a cortar con su dibujo aunque falte su medida.
     assert!(html.contains(r#"src="/perfiles/aluval/21564.svg""#));
@@ -87,7 +86,8 @@ async fn con_cristal_abajo_no_hay_chapa_y_el_cristal_de_abajo_mide_lo_escrito() 
     ];
     let (html, _) = editor_con(&opciones).await;
     assert!(!html.contains("Chapa de abajo"));
-    assert!(html.contains("Abajo: 2 × 65,2 × 60 cm"), "{html}");
+    assert!(html.contains("Cristal abajo"), "{html}");
+    assert!(html.contains("65,2 × 60"));
 }
 
 #[tokio::test]
@@ -98,5 +98,5 @@ async fn sin_parteluces_la_corredera_queda_como_estaba() {
         !html.contains("Medida de abajo: escribe"),
         "la medida oculta no cuenta"
     );
-    assert!(html.contains("2 × 65,2 × 106,9 cm"));
+    assert!(html.contains("Para pedir") && html.contains("65,2 × 106,9"));
 }

@@ -8,7 +8,7 @@ fn cm(valor: i64) -> Longitud {
     Longitud::desde_decimas_de_mm(valor * 100)
 }
 
-fn datos(tipo: TipoDibujo, hojas: u8) -> DatosDeDibujo {
+pub(super) fn datos(tipo: TipoDibujo, hojas: u8) -> DatosDeDibujo {
     DatosDeDibujo {
         dibujo: Dibujo {
             tipo,
@@ -33,6 +33,7 @@ fn datos(tipo: TipoDibujo, hojas: u8) -> DatosDeDibujo {
         parteluces: None,
         cajon_de_50: false,
         persiana: None,
+        para_taller: true,
     }
 }
 

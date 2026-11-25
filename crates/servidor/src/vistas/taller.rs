@@ -91,7 +91,7 @@ impl HojaDeVentana {
             serie: nombre_legible(&r.serie),
             acabado: c.acabado.clone(),
             medidas: format!("{} × {}", mm(c.ancho_dmm), mm(c.alto_dmm)),
-            dibujo: r.dibujo.clone(),
+            dibujo: r.dibujo_de_taller().to_owned(),
             piezas: piezas_en_hoja(r),
             cristal: r
                 .vidrios
@@ -149,7 +149,7 @@ impl TarjetaVentana {
                 mm(v.congelado.ancho_dmm),
                 mm(v.congelado.alto_dmm)
             ),
-            dibujo: v.congelado.resumen.dibujo.clone(),
+            dibujo: v.congelado.resumen.dibujo_de_taller().to_owned(),
             hechos: v.hechos(),
             total: v.pasos.len(),
             falta_algo: v.fila.falta_algo.clone(),

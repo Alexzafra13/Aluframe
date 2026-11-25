@@ -2,11 +2,10 @@ use std::collections::BTreeMap;
 
 use askama::Template;
 use dominio::series::{Dato, OpcionDeLinea, Serie};
-use dominio::unidades::Longitud;
 
 use super::{
-    ChapaEnPantalla, FichaDeSerie, GrupoMenu, HerrajeEnPantalla, Opcion, UsuarioEnPantalla,
-    chapas_en_pantalla, herrajes_en_pantalla,
+    APedirEnPantalla, ChapaEnPantalla, FichaDeSerie, GrupoMenu, HerrajeEnPantalla, Opcion,
+    UsuarioEnPantalla, a_pedir_en_pantalla, chapas_en_pantalla, herrajes_en_pantalla,
 };
 use crate::aplicacion::calculo_de_ventana::CalculoDeVentana;
 use crate::series::siluetas::url_de_silueta;
@@ -97,12 +96,13 @@ pub struct PiezaEnPantalla {
 pub struct VistaCalculo {
     pub dibujo: String,
     pub piezas: Vec<PiezaEnPantalla>,
-    pub vidrios: Vec<String>,
     pub ficha: Option<FichaDeSerie>,
     /// La tipología no lleva cristal (una mosquitera): se ocultan el vidrio y sus capas.
     pub sin_vidrio: bool,
     /// Lo que no se corta: cierres, kits, ruedas, tornillos…
     pub herrajes: Vec<HerrajeEnPantalla>,
+    /// Cristal y lo que se encarga a medida (la persiana).
+    pub para_pedir: Vec<APedirEnPantalla>,
     pub chapas: Vec<ChapaEnPantalla>,
     pub faltan: Vec<String>,
     pub fuera_de_limites: Vec<String>,
@@ -115,10 +115,6 @@ pub struct VistaCalculo {
     pub completa: bool,
     /// Lo marcó quien presupuesta: la medida se sale de la serie pero es la que es.
     pub limites_revisados: bool,
-}
-
-fn cm(dmm: i64) -> String {
-    Longitud::desde_decimas_de_mm(dmm).formatear_cm()
 }
 
 fn pieza_en_pantalla(serie: &Serie, p: &dominio::series::PiezaCalculada) -> PiezaEnPantalla {
@@ -152,24 +148,6 @@ fn piezas_en_pantalla(c: &CalculoDeVentana) -> Vec<PiezaEnPantalla> {
     piezas
 }
 
-fn vidrios(c: &CalculoDeVentana) -> Vec<String> {
-    let piezas = c.resultado.vidrio.iter().flatten();
-    piezas
-        .map(|v| {
-            format!(
-                "{}{} × {} × {} cm",
-                v.nombre
-                    .as_ref()
-                    .map(|n| format!("{n}: "))
-                    .unwrap_or_default(),
-                v.cantidad,
-                cm(v.ancho.decimas_de_mm()),
-                cm(v.alto.decimas_de_mm())
-            )
-        })
-        .collect()
-}
-
 impl From<&CalculoDeVentana> for VistaCalculo {
     fn from(c: &CalculoDeVentana) -> Self {
         let m = &c.materiales;
@@ -184,13 +162,13 @@ impl From<&CalculoDeVentana> for VistaCalculo {
         VistaCalculo {
             dibujo: c.dibujo.clone(),
             piezas: piezas_en_pantalla(c),
-            vidrios: vidrios(c),
             ficha: Some(FichaDeSerie::desde(c)),
             sin_vidrio: c
                 .serie
                 .tipologia(&c.resultado.tipologia)
                 .is_some_and(|t| matches!(&t.vidrio, Dato::Valor(v) if v.tipo.is_empty())),
             herrajes: herrajes_en_pantalla(c),
+            para_pedir: a_pedir_en_pantalla(c),
             chapas: chapas_en_pantalla(c),
             faltan: c.precio.faltan.clone(),
             fuera_de_limites: c.resultado.fuera_de_limites.clone(),

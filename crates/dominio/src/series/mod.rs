@@ -1,3 +1,4 @@
+mod a_pedir;
 mod calculo;
 mod calculo_persiana;
 mod calculo_rellenos;
@@ -17,6 +18,7 @@ mod valor;
 mod pruebas;
 
 pub use crate::informe::{Informe, Problema};
+pub use a_pedir::{ClaseDePedido, MaterialAPedir, material_a_pedir, se_pide};
 pub use calculo::{ErrorCalculo, calcular_ventana, calcular_ventana_con_opciones};
 pub use modelo::*;
 pub use resultado::{

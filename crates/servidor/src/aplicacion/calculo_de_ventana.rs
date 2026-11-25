@@ -36,7 +36,9 @@ pub struct EntradaDeVentana {
 pub struct CalculoDeVentana {
     pub serie: Serie,
     pub resultado: ResultadoVentana,
+    /// Limpio, para el presupuesto; `dibujo_taller` lleva números, flechas y cotas del marco.
     pub dibujo: String,
+    pub dibujo_taller: String,
     pub materiales: CosteDeMateriales,
     pub precio: PrecioDeLinea,
     pub tarifas: BTreeSet<i64>,
@@ -58,12 +60,7 @@ pub fn calcular(
             .map_err(|e| ErrorApp::Validacion(e.to_string()))?;
     let (perfiles, faltan) = perfiles_usados(&serie, &resultado, taller);
     let enlace = enlazar(con, &serie, &resultado, entrada.vidrio_articulo_id)?;
-    let acabado = entrada
-        .acabado_id
-        .map(|id| acabados::buscar(con, id))
-        .transpose()?
-        .flatten();
-    let recargo = Porcentaje::desde_puntos_basicos(acabado.as_ref().map_or(0, |a| a.recargo_bp));
+    let (recargo, color) = acabado_de(con, entrada)?;
     let avisos = faltan
         .into_iter()
         .chain(enlace.avisos.iter().cloned())
@@ -75,10 +72,15 @@ pub fn calcular(
         ajustes,
     );
     let vidrio = descripcion_de_articulo(con, entrada.vidrio_articulo_id)?;
-    let color = acabado.map(|a| (color_de_dibujo(&a), a.nombre));
+    let dibujos = |para_taller| {
+        let medidas = (entrada, serie.unidad);
+        dibujar(&tipologia, &resultado, medidas, (&color, para_taller))
+    };
+    let (dibujo, dibujo_taller) = (dibujos(false), dibujos(true));
     Ok(CalculoDeVentana {
         descripcion: describir(&serie, &tipologia, entrada, (color.as_ref(), vidrio)),
-        dibujo: dibujar(&tipologia, &resultado, (entrada, serie.unidad), color),
+        dibujo,
+        dibujo_taller,
         barras: perfiles
             .iter()
             .map(|(p, u)| (p.clone(), u.barras))
@@ -90,6 +92,20 @@ pub fn calcular(
         materiales,
         precio,
     })
+}
+
+/// El recargo del acabado elegido y su color para el dibujo (con su nombre).
+fn acabado_de(
+    con: &Connection,
+    entrada: &EntradaDeVentana,
+) -> Result<(Porcentaje, Option<(ColorDeDibujo, String)>), ErrorApp> {
+    let acabado = entrada
+        .acabado_id
+        .map(|id| acabados::buscar(con, id))
+        .transpose()?
+        .flatten();
+    let recargo = Porcentaje::desde_puntos_basicos(acabado.as_ref().map_or(0, |a| a.recargo_bp));
+    Ok((recargo, acabado.map(|a| (color_de_dibujo(&a), a.nombre))))
 }
 
 fn descripcion_de_articulo(con: &Connection, id: Option<i64>) -> Result<Option<String>, ErrorApp> {
@@ -174,12 +190,13 @@ fn dibujar(
     tipologia: &dominio::series::Tipologia,
     resultado: &ResultadoVentana,
     (entrada, unidad): (&EntradaDeVentana, Unidad),
-    color: Option<(ColorDeDibujo, String)>,
+    (color, para_taller): (&Option<(ColorDeDibujo, String)>, bool),
 ) -> String {
     let (ancho, alto) = (medida(entrada.ancho, unidad), medida(entrada.alto, unidad));
     let mut datos =
         DatosDeDibujo::desde_calculo(tipologia, resultado, &entrada.opciones, (ancho, alto));
-    datos.color = color.map(|(c, _)| c).unwrap_or_default();
+    datos.color = color.as_ref().map(|(c, _)| c.clone()).unwrap_or_default();
+    datos.para_taller = para_taller;
     dibujar_ventana(&datos)
 }
 
