@@ -250,3 +250,4 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Al modificar medidas, lo pedido con otra medida vuelve a pendiente y lo dice.
   - Inicio: «T-…: falta pedir cristal».
   - La demostración trae un cristal pendiente, uno pedido con nota y los de los trabajos terminados recibidos.
+  - Sin flechas de apertura en ningún dibujo, tampoco en la hoja de taller (propietario); los cierres sí.

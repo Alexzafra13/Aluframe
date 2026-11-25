@@ -168,7 +168,6 @@ span.silueta { background: transparent; }
 .dibujo-ventana .hoja:not([fill]) { fill: #E7E9EC; stroke: #8B939B; }
 .dibujo-ventana .cristal { fill: #D9E6F2; stroke: #8B939B; stroke-width: 1; transition: fill var(--normal) ease; }
 .dibujo-ventana .reflejo { fill: #fff; opacity: .45; }
-.dibujo-ventana .flecha { fill: none; stroke: var(--acero); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .dibujo-ventana .manilla, .dibujo-ventana .bisagra { stroke: #8B939B; stroke-width: 1; }
 .dibujo-ventana > .manilla, .dibujo-ventana > .bisagra { fill: var(--tinta); }
 .dibujo-ventana .apertura { fill: none; stroke: var(--acero); stroke-width: 1.2; stroke-dasharray: 6 5; }

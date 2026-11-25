@@ -47,7 +47,11 @@ fn dibuja_una_corredera_con_sus_piezas_numeradas_y_cotas() {
     assert!(svg.starts_with("<svg") && svg.ends_with("</svg>"));
     assert_eq!(contar(&svg, r#"class="hoja""#), 2);
     assert_eq!(contar(&svg, r#"class="cristal""#), 2);
-    assert_eq!(contar(&svg, r#"class="flecha""#), 1);
+    assert_eq!(
+        contar(&svg, r#"class="flecha""#),
+        0,
+        "sin flechas (propietario)"
+    );
     assert_eq!(contar(&svg, r#"class="manilla""#), 1);
     for numero in 1..=5 {
         assert!(
@@ -73,13 +77,12 @@ fn posiciones_de_manillas(svg: &str) -> Vec<i64> {
 }
 
 /// Como el catálogo de Aluval (propietario, 2026-11-22): el cierre va en el lateral de cada hoja
-/// que se abre, nunca en el centro, y las flechas miran hacia el centro.
+/// que se abre, nunca en el centro.
 #[test]
 fn la_corredera_de_dos_hojas_lleva_el_cierre_en_los_laterales() {
     let mut ambas = datos(TipoDibujo::Corredera, 2);
     ambas.dibujo.hoja_movil = Some("ambas".into());
     let svg = dibujar_ventana(&ambas);
-    assert_eq!(contar(&svg, r#"class="flecha""#), 2);
     let x = posiciones_de_manillas(&svg);
     assert_eq!(x.len(), 2);
     assert!(
@@ -98,7 +101,6 @@ fn la_corredera_de_dos_hojas_lleva_el_cierre_en_los_laterales() {
 fn la_corredera_de_cuatro_hojas_lleva_cierres_en_los_laterales_y_dos_en_el_centro() {
     let svg = dibujar_ventana(&datos(TipoDibujo::Corredera, 4));
     assert_eq!(contar(&svg, r#"class="hoja""#), 4);
-    assert_eq!(contar(&svg, r#"class="flecha""#), 4);
     let x = posiciones_de_manillas(&svg);
     assert_eq!(x.len(), 4, "{x:?}");
     let centro = 7_500;

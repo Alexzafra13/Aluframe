@@ -1,5 +1,5 @@
 //! El dibujo del presupuesto (propietario, 2026-11-25): la ventana entera con su medida total,
-//! sin números de pieza, sin flechas y sin la cota del marco. Eso queda para el taller.
+//! sin números de pieza y sin la cota del marco, que quedan para el taller.
 
 use super::pruebas::datos;
 use super::*;

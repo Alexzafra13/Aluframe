@@ -51,7 +51,7 @@ fn cuerpo_de_ventana(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     super::parteluces::dibujar(s, plano, datos);
     s.push_str(&grupo_de_herrajes(&datos.color));
     match plano.tipo {
-        TipoDibujo::Corredera => flechas_de_corredera(s, plano, datos),
+        TipoDibujo::Corredera => cierres_de_corredera(s, plano, datos),
         TipoDibujo::Abatible => herrajes_de_abatible(s, plano, datos),
         TipoDibujo::Fija | TipoDibujo::Mosquitera | TipoDibujo::Persiana => {}
     }
@@ -93,60 +93,13 @@ fn dibujar_hoja(
     );
 }
 
-fn flecha(s: &mut String, hoja: Rect, hacia_la_derecha: bool) {
-    let y = hoja.y + hoja.alto / 2;
-    let largo = hoja.ancho * 35 / 100;
-    let punta = (largo / 6).max(1);
-    let (desde, hasta, signo) = if hacia_la_derecha {
-        (
-            hoja.x + hoja.ancho * 33 / 100,
-            hoja.x + hoja.ancho * 33 / 100 + largo,
-            -1,
-        )
-    } else {
-        (
-            hoja.x + hoja.ancho * 67 / 100,
-            hoja.x + hoja.ancho * 67 / 100 - largo,
-            1,
-        )
-    };
-    let _ = write!(
-        s,
-        r#"<path class="flecha" d="M{desde} {y} H{hasta} M{} {} L{hasta} {y} L{} {}"/>"#,
-        hasta + signo * punta,
-        y - punta,
-        hasta + signo * punta,
-        y + punta
-    );
-}
-
-/// Las flechas de apertura solo en el dibujo del taller; el del presupuesto va limpio.
-fn flecha_si_es_de_taller(
-    s: &mut String,
-    datos: &DatosDeDibujo,
-    hoja: Rect,
-    hacia_la_derecha: bool,
-) {
-    if datos.para_taller {
-        flecha(s, hoja, hacia_la_derecha);
-    }
-}
-
-/// En 2 hojas se abren la indicada o `ambas` (por defecto la derecha): flecha hacia el centro y
-/// cierre en su lateral, contra el marco, como en el catálogo de Aluval. En 4 se abren las cuatro
-/// (propietario, 2026-11-23): las de los lados hacia el centro y las centrales hacia fuera, con un
-/// cierre en cada lateral y dos en el centro, uno en cada hoja central.
-fn flechas_de_corredera(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
+/// En 2 hojas se abren la indicada o `ambas` (por defecto la derecha), con el cierre en su
+/// lateral, contra el marco, como en el catálogo de Aluval. En 4 se abren las cuatro
+/// (propietario, 2026-11-23): un cierre en cada lateral y dos en el centro, uno en cada hoja
+/// central. Sin flechas de apertura, en ningún dibujo (propietario, 2026-11-25).
+fn cierres_de_corredera(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     let hojas = &plano.hojas;
-    if let [primera, segunda, tercera, cuarta] = hojas.as_slice() {
-        for (hoja, hacia_la_derecha) in [
-            (primera, true),
-            (segunda, false),
-            (tercera, true),
-            (cuarta, false),
-        ] {
-            flecha_si_es_de_taller(s, datos, *hoja, hacia_la_derecha);
-        }
+    if let [primera, segunda, _, cuarta] = hojas.as_slice() {
         cierre_en_el_lado(s, plano, *primera, false);
         cierres_del_centro(s, plano, segunda.centro_y());
         cierre_en_el_lado(s, plano, *cuarta, true);
@@ -154,11 +107,9 @@ fn flechas_de_corredera(s: &mut String, plano: &Plano, datos: &DatosDeDibujo) {
     }
     let movil = datos.dibujo.hoja_movil.as_deref().unwrap_or("derecha");
     if let Some(izquierda) = hojas.first().filter(|_| movil != "derecha") {
-        flecha_si_es_de_taller(s, datos, *izquierda, true);
         cierre_en_el_lado(s, plano, *izquierda, false);
     }
     if let Some(derecha) = hojas.last().filter(|_| movil != "izquierda") {
-        flecha_si_es_de_taller(s, datos, *derecha, false);
         cierre_en_el_lado(s, plano, *derecha, true);
     }
 }

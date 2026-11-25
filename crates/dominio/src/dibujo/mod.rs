@@ -49,8 +49,8 @@ pub struct DatosDeDibujo {
     pub cajon_de_50: bool,
     /// Persiana en la ventana (ADR-0032): `ancho` y `alto` son entonces los del conjunto.
     pub persiana: Option<PersianaEnDibujo>,
-    /// Para el taller (hoja de taller, «Mi día»): con los números de pieza, las flechas de
-    /// apertura y las cotas del marco. Si no, el dibujo limpio del presupuesto: la ventana entera
+    /// Para el taller (hoja de taller, «Mi día»): con los números de pieza y las cotas del
+    /// marco. Si no, el dibujo limpio del presupuesto: la ventana entera
     /// con su medida total (propietario, 2026-11-25).
     pub para_taller: bool,
 }
