@@ -43,12 +43,12 @@ const HUELLA_DE_LA_0001_EN_WINDOWS: &str =
 #[derive(Debug, Error)]
 pub enum ErrorEsquema {
     #[error(
-        "La base de datos es de una versión más nueva de AlumFrame (esquema {base}; este programa \
+        "La base de datos es de una versión más nueva de Aluframe (esquema {base}; este programa \
          llega al {programa}). Instala la versión más reciente."
     )]
     MasNueva { base: u32, programa: u32 },
     #[error(
-        "La base de datos es de una versión de desarrollo antigua de AlumFrame y no se puede \
+        "La base de datos es de una versión de desarrollo antigua de Aluframe y no se puede \
          actualizar. Si no tiene datos reales, borra la carpeta de datos y vuelve a arrancar."
     )]
     Desconocida,

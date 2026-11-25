@@ -18,12 +18,12 @@ impl Recuperacion {
         let (explicacion, puede_empezar_de_cero) = match error {
             ErrorEsquema::Desconocida => (
                 "La base de datos de este equipo es de una versión de desarrollo antigua de \
-                 AlumFrame y no se puede actualizar."
+                 Aluframe y no se puede actualizar."
                     .to_owned(),
                 true,
             ),
             ErrorEsquema::MasNueva { .. } => (
-                "La base de datos de este equipo es de una versión más nueva de AlumFrame. \
+                "La base de datos de este equipo es de una versión más nueva de Aluframe. \
                  Instala la versión más reciente: así se abre con todos sus datos."
                     .to_owned(),
                 false,

@@ -45,9 +45,7 @@ fn insertar_propietario(
     ahora: OffsetDateTime,
 ) -> Result<String, ErrorApp> {
     if usuarios::contar_usuarios(tx)? > 0 {
-        return Err(ErrorApp::Validacion(
-            "AlumFrame ya está configurado.".into(),
-        ));
+        return Err(ErrorApp::Validacion("Aluframe ya está configurado.".into()));
     }
     let nuevo = NuevoUsuario {
         nombre,

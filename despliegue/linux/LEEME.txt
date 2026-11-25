@@ -1,4 +1,4 @@
-AlumFrame para el servidor del taller (Linux)
+Aluframe para el servidor del taller (Linux)
 
 Instalar o actualizar:
   1. Copia esta carpeta al servidor y entra en ella.
@@ -19,7 +19,7 @@ Disco de copias en el servidor (sin escritorio, los discos no se montan solos):
   4. sudo mount -a
   5. sudo mkdir /mnt/copias/AlumFrame-copias
      sudo chown alumframe:alumframe /mnt/copias/AlumFrame-copias   (solo en ext4)
-  6. sudo systemctl restart alumframe; en AlumFrame, Ajustes > Copias > Copiar ahora.
+  6. sudo systemctl restart alumframe; en Aluframe, Ajustes > Copias > Copiar ahora.
 Restaurar una copia: Ajustes > Copias > Restaurar… (enseña antes lo que contiene).
 Al actualizar a una versión que cambia la base de datos, antes se guarda una copia
 «antes-de-actualizar-…» en /var/lib/alumframe/copias.

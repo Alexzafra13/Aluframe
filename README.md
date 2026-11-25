@@ -6,7 +6,7 @@ Estado: **H0 a H3 terminados** (v0.6.1): clientes, catálogo y tarifas, presupue
 
 ## Cómo funciona
 - **Servidor del taller (Linux):** un único ejecutable `alumframe` y su base de datos SQLite `alumframe.db`, como servicio systemd en el **puerto 9090**.
-- **Aplicación de Windows** (instalador `AlumFrame-vX.Y.Z-windows-instalar.exe`): ventana propia sin consola que trabaja **en este equipo** (sin servidor) o **contra el servidor del taller**; se elige al abrirla (ADR-0015). Los datos pasan de un sitio a otro con Ajustes → Datos (ADR-0016).
+- **Aplicación de Windows** (instalador `Aluframe-vX.Y.Z-windows-instalar.exe`): ventana propia sin consola que trabaja **en este equipo** (sin servidor) o **contra el servidor del taller**; se elige al abrirla (ADR-0015). Los datos pasan de un sitio a otro con Ajustes → Datos (ADR-0016).
 - **Tablet y móvil:** con el navegador en `http://IP-DEL-SERVIDOR:9090` (fuera del taller, con Tailscale).
 
 ## Desarrollo

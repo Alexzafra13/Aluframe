@@ -50,7 +50,7 @@ pub fn crear_router_de_recuperacion(
 fn pagina(cuerpo: &str) -> Html<String> {
     Html(format!(
         "<!doctype html><html lang=es><meta charset=utf-8>\
-         <meta name=viewport content=\"width=device-width,initial-scale=1\"><title>AlumFrame</title>\
+         <meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Aluframe</title>\
          <body style=\"font-family:sans-serif;margin:2rem;max-width:40rem;background:#ECE9E0;\
          color:#15191D;line-height:1.5\">{cuerpo}\
          <script src=\"/recursos/js/latido.js\" defer></script></body></html>"
@@ -70,7 +70,7 @@ fn boton(accion: &str, texto: &str, token: &str) -> String {
 async fn mostrar(State(e): State<Arc<Estado>>) -> Html<String> {
     let r = &e.recuperacion;
     let mut cuerpo = format!(
-        "<h1>AlumFrame no ha podido arrancar</h1><p>{}</p>\
+        "<h1>Aluframe no ha podido arrancar</h1><p>{}</p>\
          <p>Carpeta de datos:<br><code>{}</code></p>{}",
         escapar_html(&r.explicacion),
         escapar_html(&r.carpeta.display().to_string()),
@@ -103,12 +103,12 @@ async fn empezar_de_cero(State(e): State<Arc<Estado>>, Form(p): Form<Pulsado>) -
     match apartar_base(&r.carpeta, &e.marca) {
         Ok(destino) => pagina(&format!(
             "<h1>Listo</h1><p>La base antigua está guardada en<br><code>{}</code></p>\
-             <p>Cierra esta ventana y vuelve a abrir AlumFrame: empezará con una base nueva.</p>",
+             <p>Cierra esta ventana y vuelve a abrir Aluframe: empezará con una base nueva.</p>",
             escapar_html(&destino.display().to_string())
         ))
         .into_response(),
         Err(error) => pagina(&format!(
-            "<h1>No se pudo apartar la base</h1><p>{}</p><p>Cierra AlumFrame y vuelve a \
+            "<h1>No se pudo apartar la base</h1><p>{}</p><p>Cierra Aluframe y vuelve a \
              intentarlo; si se repite, mueve el archivo alumframe.db a mano desde la carpeta.</p>",
             escapar_html(&error.to_string())
         ))

@@ -53,7 +53,7 @@ async fn con_una_base_antigua_dice_la_carpeta_y_la_aparta_sin_borrarla() {
         .oneshot(pulsar("/empezar-de-cero", TOKEN))
         .await
         .unwrap();
-    assert!(texto(listo).await.contains("vuelve a abrir AlumFrame"));
+    assert!(texto(listo).await.contains("vuelve a abrir Aluframe"));
     assert!(!carpeta.join("alumframe.db").exists());
     assert!(
         carpeta.join("apartadas/alumframe-marca.db").exists(),

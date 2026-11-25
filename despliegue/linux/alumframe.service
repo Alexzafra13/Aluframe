@@ -1,5 +1,5 @@
 [Unit]
-Description=AlumFrame (gestión del taller)
+Description=Aluframe (gestión del taller)
 After=network-online.target
 Wants=network-online.target
 

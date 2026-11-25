@@ -242,3 +242,4 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Sin la barra naranja junto a la entrada activa: una píldora de cristal que se desliza con un pequeño rebote al cambiar de pantalla, como la barra de Instagram. En el móvil, una burbuja tras la pestaña activa.
   - Arreglo: los botones de acceso rápido de «Mi día» compartían la clase `acceso` con la pantalla de entrada; ahora son `acceso-rapido`.
   - Incluye el logotipo de la 0.23.1.
+  - **El programa se llama Aluframe, como su logotipo** (ADR-0034): títulos, mensajes, instalador, accesos directos y la versión publicada. Las carpetas de datos y de copias, la extensión `.alumframe` y el ejecutable conservan su nombre, para no perder nada al actualizar.

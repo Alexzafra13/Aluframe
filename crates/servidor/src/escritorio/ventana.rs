@@ -79,9 +79,9 @@ fn abrir_con_el_sistema(url: &str) -> std::io::Result<()> {
 /// Sin consola, un fallo al arrancar se enseña en una ventana con el motivo.
 pub fn mostrar_error(mensaje: &str, perfil: &Path) {
     let html = format!(
-        "<!doctype html><meta charset=utf-8><title>AlumFrame</title>\
+        "<!doctype html><meta charset=utf-8><title>Aluframe</title>\
          <body style=\"font-family:sans-serif;margin:2rem;background:#ECE9E0;color:#15191D\">\
-         <h1>AlumFrame no ha podido arrancar</h1><p>{}</p>\
+         <h1>Aluframe no ha podido arrancar</h1><p>{}</p>\
          <p>Si se repite, avisa a quien mantiene el programa.</p>",
         escapar_html(mensaje)
     );

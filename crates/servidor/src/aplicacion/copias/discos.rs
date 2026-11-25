@@ -6,8 +6,8 @@ use std::path::{Path, PathBuf};
 
 pub const CARPETA_DE_COPIAS: &str = "AlumFrame-copias";
 const LEEME: &str = "LEEME.txt";
-const TEXTO_LEEME: &str = "Copias de seguridad automáticas de AlumFrame.\r\n\
-Se guardan las 7 últimas diarias y 4 semanales. Para recuperar una, abre AlumFrame,\r\n\
+const TEXTO_LEEME: &str = "Copias de seguridad automáticas de Aluframe.\r\n\
+Se guardan las 7 últimas diarias y 4 semanales. Para recuperar una, abre Aluframe,\r\n\
 Ajustes > Copias, con este disco conectado.\r\n";
 
 #[derive(Debug, Clone, Default)]

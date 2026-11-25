@@ -72,7 +72,7 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           target_commitish: ${{ github.sha }}
-          name: AlumFrame ${{ env.VERSION }}
+          name: Aluframe ${{ env.VERSION }}
           files: alumframe-*.tar.gz
 
   windows:
@@ -94,9 +94,9 @@ jobs:
           $numero = $env:VERSION.TrimStart("v")
           & $iscc "/DVersion=$numero" "/DBinarios=$pwd\target\release" despliegue\windows\alumframe.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Move-Item "despliegue\windows\AlumFrame-$numero-instalar.exe" "AlumFrame-$env:VERSION-windows-instalar.exe"
+          Move-Item "despliegue\windows\Aluframe-$numero-instalar.exe" "Aluframe-$env:VERSION-windows-instalar.exe"
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
           target_commitish: ${{ github.sha }}
-          files: AlumFrame-*-windows-instalar.exe
+          files: Aluframe-*-windows-instalar.exe

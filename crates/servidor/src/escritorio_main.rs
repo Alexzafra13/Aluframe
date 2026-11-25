@@ -128,7 +128,7 @@ async fn esperar_a_que_se_cierre(ventana: Option<std::process::Child>) -> anyhow
     while la_ventana_sigue_abierta() {
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
     }
-    anotar("la ventana ya no da señales: AlumFrame se cierra");
+    anotar("la ventana ya no da señales: Aluframe se cierra");
     Ok(true)
 }
 

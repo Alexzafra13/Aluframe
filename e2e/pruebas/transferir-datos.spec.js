@@ -19,7 +19,7 @@ test("exporta los datos y los vuelve a importar tras revisar la copia", async ({
     buffer: Buffer.from("hola"),
   });
   await page.getByRole("button", { name: "Revisar la copia" }).click();
-  await expect(page.getByRole("alert")).toContainText("no es una copia de AlumFrame");
+  await expect(page.getByRole("alert")).toContainText("no es una copia de Aluframe");
 
   await page.getByLabel("Copia (.alumframe)").setInputFiles(ruta);
   await page.getByRole("button", { name: "Revisar la copia" }).click();

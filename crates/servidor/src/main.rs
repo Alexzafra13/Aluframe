@@ -46,7 +46,7 @@ async fn servir() -> anyhow::Result<()> {
     servir_http(&config, estado)
         .await
         .with_context(|| format!("no se pudo servir en el puerto {}", config.puerto))?;
-    tracing::info!("AlumFrame detenido");
+    tracing::info!("Aluframe detenido");
     Ok(())
 }
 

@@ -63,8 +63,7 @@ pub fn comprobar_copia(ruta: &Path) -> Result<ResumenDeDatos, ErrorApp> {
     // Una copia de una versión anterior se actualiza al restaurarla; una más nueva, no.
     match version_de_la_base(&con).map_err(|_| no_es_copia())? {
         Some(version) if version > version_del_programa() => Err(ErrorApp::Validacion(
-            "La copia es de una versión más nueva de AlumFrame: actualiza el programa antes."
-                .into(),
+            "La copia es de una versión más nueva de Aluframe: actualiza el programa antes.".into(),
         )),
         Some(version) if version >= 1 => {
             if super::consultas::configuracion::es_de_demostracion(&con).unwrap_or(false) {
@@ -77,7 +76,7 @@ pub fn comprobar_copia(ruta: &Path) -> Result<ResumenDeDatos, ErrorApp> {
             resumir(&con)
         }
         None if tiene_tabla_de_esquema(&con) => Err(ErrorApp::Validacion(
-            "La copia es de otra versión de desarrollo de AlumFrame, anterior a las \
+            "La copia es de otra versión de desarrollo de Aluframe, anterior a las \
              actualizaciones automáticas: no se puede importar."
                 .into(),
         )),
@@ -114,6 +113,6 @@ fn tiene_tabla_de_esquema(con: &Connection) -> bool {
 
 fn no_es_copia() -> ErrorApp {
     ErrorApp::Validacion(
-        "El archivo no es una copia de AlumFrame (se exporta en Ajustes → Datos).".into(),
+        "El archivo no es una copia de Aluframe (se exporta en Ajustes → Datos).".into(),
     )
 }

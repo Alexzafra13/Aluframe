@@ -211,7 +211,7 @@ pub async fn escuchar(config: &Configuracion) -> std::io::Result<tokio::net::Tcp
     let direccion = SocketAddr::new(config.direccion_de_escucha(), config.puerto);
     let escucha = tokio::net::TcpListener::bind(direccion).await?;
     let datos = config.carpeta_datos.display().to_string();
-    tracing::info!(%datos, "AlumFrame escuchando en {direccion}");
+    tracing::info!(%datos, "Aluframe escuchando en {direccion}");
     Ok(escucha)
 }
 
