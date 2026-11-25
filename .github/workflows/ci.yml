@@ -1,11 +1,22 @@
-name: CI
+name: CI y publicación
 
+# Se compila una sola vez: los ejecutables que pasan las pruebas son los que se publican, y solo
+# se publica si pasa todo (ADR-0035).
 on:
   push:
+    paths-ignore: ["docs/**", "design/**", "**/*.md"]
   pull_request:
+    paths-ignore: ["docs/**", "design/**", "**/*.md"]
+  # Publicar a mano la versión de `Cargo.toml` si no llegó a publicarse.
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+# En una rama, un push nuevo cancela la ejecución anterior; en `main` no, que puede estar publicando.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
   CARGO_TERM_COLOR: always
@@ -26,35 +37,93 @@ jobs:
       - run: cargo deny check
       - run: just cobertura
 
-  e2e:
-    name: E2E con Playwright
+  linux:
+    name: Servidor Linux (estático, musl) y E2E
     runs-on: ubuntu-24.04
-    needs: comprobar
     steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: cargo build --release --locked -p servidor
+      - run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - run: rustup target add x86_64-unknown-linux-musl
+      - run: cargo build --release --locked -p servidor --target x86_64-unknown-linux-musl
+      # La E2E prueba el mismo ejecutable que se publica.
       - working-directory: e2e
         run: |
           npm ci --no-audit --no-fund
           npx playwright install --with-deps chromium
-          ALUMFRAME_BIN=../target/release/alumframe npx playwright test --trace off
+          ALUMFRAME_BIN=../target/x86_64-unknown-linux-musl/release/alumframe npx playwright test --trace off
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: target/x86_64-unknown-linux-musl/release/alumframe
+          retention-days: 7
 
   windows:
-    name: Compilar y probar en Windows
+    name: Windows (pruebas e instalador)
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --workspace --locked
       - run: cargo build --release --locked -p servidor
-      - name: Comprobar que el instalador se genera
+      - name: Crear el instalador (Inno Setup)
         shell: pwsh
         run: |
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
           if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress }
-          & $iscc "/DBinarios=$pwd\target\release" despliegue\windows\alumframe.iss
+          $numero = (Select-String -Path Cargo.toml -Pattern '^version = "(.*)"' | Select-Object -First 1).Matches.Groups[1].Value
+          & $iscc "/DVersion=$numero" "/DBinarios=$pwd\target\release" despliegue\windows\alumframe.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: despliegue/windows/Aluframe-*-instalar.exe
+          retention-days: 7
+
+  publicar:
+    name: Publicar la versión
+    needs: [comprobar, linux, windows]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: decidir
+        run: |
+          version="v$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n 1)"
+          [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Versión no válida: $version"; exit 1; }
+          if git rev-parse -q --verify "refs/tags/$version" >/dev/null; then
+            echo "La versión $version ya está publicada; no hay nada que hacer."
+            echo "publicar=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publicar=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - if: steps.decidir.outputs.publicar == 'true'
+        uses: actions/download-artifact@v4
+      - name: Empaquetar
+        if: steps.decidir.outputs.publicar == 'true'
+        env:
+          VERSION: ${{ steps.decidir.outputs.version }}
+        run: |
+          carpeta=alumframe-${VERSION}-linux-x86_64
+          mkdir -p "$carpeta"
+          install -m 755 linux/alumframe "$carpeta/alumframe"
+          cp -r despliegue/linux/. "$carpeta/"
+          tar czf "$carpeta.tar.gz" "$carpeta"
+          mv windows/Aluframe-*-instalar.exe "Aluframe-${VERSION}-windows-instalar.exe"
+      - if: steps.decidir.outputs.publicar == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.decidir.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: Aluframe ${{ steps.decidir.outputs.version }}
+          files: |
+            alumframe-*.tar.gz
+            Aluframe-*-windows-instalar.exe
