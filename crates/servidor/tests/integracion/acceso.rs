@@ -234,3 +234,24 @@ async fn el_operario_no_puede_mantener_la_sesion_abierta() {
         .unwrap();
     assert!(cookie.contains("Max-Age"), "{cookie}");
 }
+
+/// La tablet la comparten dueño y operarios: tras salir, «atrás» no debe enseñar la pantalla
+/// del dueño guardada en el navegador. Los estilos y las letras sí se guardan.
+#[tokio::test]
+async fn las_pantallas_no_se_guardan_en_el_navegador_y_los_recursos_si() {
+    use axum::http::header::CACHE_CONTROL;
+    let contexto = Contexto::nuevo().await;
+    let (token, _) = contexto.con_propietario().await;
+    let pantalla = contexto.pedir(get("/presupuestos", Some(&token))).await;
+    assert_eq!(pantalla.status(), StatusCode::OK);
+    assert_eq!(pantalla.headers()[CACHE_CONTROL], "no-store");
+    let estilos = contexto
+        .pedir(get("/recursos/estilos.css?v=1", Some(&token)))
+        .await;
+    assert!(
+        estilos.headers()[CACHE_CONTROL]
+            .to_str()
+            .unwrap()
+            .contains("immutable")
+    );
+}

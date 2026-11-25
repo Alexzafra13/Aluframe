@@ -1,6 +1,6 @@
 use axum::body::{Body, to_bytes};
 use axum::extract::{Request, State};
-use axum::http::header::{CONTENT_TYPE, HOST, ORIGIN};
+use axum::http::header::{CACHE_CONTROL, CONTENT_TYPE, HOST, ORIGIN};
 use axum::http::{HeaderMap, HeaderValue, Method, StatusCode};
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Redirect, Response};
@@ -100,7 +100,20 @@ pub async fn anadir_cabeceras_de_seguridad(peticion: Request, siguiente: Next) -
     ] {
         cabeceras.insert(nombre, HeaderValue::from_static(valor));
     }
+    // Las pantallas llevan datos de clientes y precios, y la tablet la comparten dueño y
+    // operarios: que el navegador no las guarde, o «atrás» tras salir las enseñaría sin entrar.
+    // Lo demás (estilos, letras, logos) ya trae su propia duración.
+    if es_html(cabeceras) && !cabeceras.contains_key(CACHE_CONTROL) {
+        cabeceras.insert(CACHE_CONTROL, HeaderValue::from_static("no-store"));
+    }
     respuesta
+}
+
+fn es_html(cabeceras: &HeaderMap) -> bool {
+    cabeceras
+        .get(CONTENT_TYPE)
+        .and_then(|tipo| tipo.to_str().ok())
+        .is_some_and(|tipo| tipo.starts_with("text/html"))
 }
 
 fn es_metodo_seguro(metodo: &Method) -> bool {
