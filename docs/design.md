@@ -18,6 +18,11 @@ Referencia visual: `design/` (aprobado). Implementación: `crates/servidor/recur
 
 Solo azul acero y naranja como acentos.
 
+## Logotipo del programa (0.23.1, del propietario)
+- Archivos en `crates/servidor/recursos/marca/`, sacados del PNG del propietario (fondo transparente): `logo.png` (completo, la «A» de perfil y «ALUFRAME»), `simbolo.png` (solo la «A»), `icono-32.png` (pestaña del navegador) e `icono-180.png` (pantalla de inicio del móvil, sobre el fondo del menú). El icono de Windows, `despliegue/windows/alumframe.ico`, también es la «A».
+- Logo completo en el menú lateral (170 px) y en las pantallas de entrada (200 px). Símbolo en la barra del móvil y en la del operario. Se lee bien sobre el papel y sobre el fondo oscuro del menú.
+- Sustituye al cuadrado gris con el nombre escrito.
+
 ## Tipografía (incluida en el ejecutable)
 - **IBM Plex Sans** 400, 500 y 600: texto.
 - **IBM Plex Sans Condensed** 500 y 600: títulos, antetítulos y etiquetas.

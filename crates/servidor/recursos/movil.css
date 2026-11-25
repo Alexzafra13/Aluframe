@@ -54,7 +54,7 @@ code, .mono { overflow-wrap: anywhere; }
   .menu { display: none; }
   .barra-superior { gap: .75rem; padding: calc(.6rem + env(safe-area-inset-top)) 1rem .6rem; border-bottom-color: rgb(21 25 29 / .1); }
   .marca-movil { display: inline-flex; flex: none; }
-  .marca-movil .marca-logo { width: 30px; height: 30px; border-radius: 8px; }
+  .marca-movil .marca-simbolo { width: 52px; }
   .buscador-global { max-width: none; }
   .usuario-nombre { display: none; }
   body.con-menu .usuario-actual { display: inline-flex; }

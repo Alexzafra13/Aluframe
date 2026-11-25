@@ -1,5 +1,5 @@
 <header class="barra-operario">
-  <a class="marca" href="/mi-dia"><span class="marca-logo" aria-hidden="true"></span>Mi día</a>
+  <a class="marca" href="/mi-dia"><img class="marca-simbolo" src="/recursos/marca/simbolo.png?v={{ crate::vistas::VERSION }}" alt="" width="46" height="24">Mi día</a>
   <span class="usuario-actual">{{ usuario.nombre }}</span>
   {% if usuario.es_propietario %}<a class="boton" href="/">Volver al inicio</a>{% endif %}
   <form method="post" action="/salir">

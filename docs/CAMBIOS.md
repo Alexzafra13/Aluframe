@@ -235,3 +235,4 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Pendiente del propietario: el ala de la guía de L (80 o 100 mm), los cajones, la medida de pedido y cómo se cobra. Mientras, sale incompleta y sin precio final.
   - El botón del presupuesto pasa a «+ Ventana, mosquitera o persiana».
   - Formato de series: `montaje: pared` en el bloque `persiana`, dibujo `persiana` y series sin piezas (sin longitud de barra).
+- **0.23.1 (propietario): logotipo del programa.** El cuadrado gris con «AlumFrame» escrito pasa a ser el logotipo del propietario: completo en el menú lateral y al entrar, y la «A» sola en la barra del móvil, en la del operario, en la pestaña del navegador, en la pantalla de inicio del móvil y en el icono de Windows. El servidor sirve PNG (`recursos/marca/`).

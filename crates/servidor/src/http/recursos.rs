@@ -58,6 +58,7 @@ fn tipo_de_contenido(ruta: &str) -> &'static str {
         Some("css") => "text/css; charset=utf-8",
         Some("js") => "text/javascript; charset=utf-8",
         Some("svg") => "image/svg+xml",
+        Some("png") => "image/png",
         Some("woff2") => "font/woff2",
         _ => "application/octet-stream",
     }
@@ -73,5 +74,13 @@ mod pruebas {
         assert!(duracion_en_cache(Some("x=1&v=0.13.1")).contains("immutable"));
         assert_eq!(duracion_en_cache(None), "public, max-age=3600");
         assert_eq!(duracion_en_cache(Some("vista=1")), "public, max-age=3600");
+    }
+
+    /// El logotipo del programa y sus iconos son PNG (`recursos/marca/`).
+    #[test]
+    fn el_logotipo_se_sirve_como_png() {
+        assert_eq!(tipo_de_contenido("marca/logo.png"), "image/png");
+        assert!(Recursos::get("marca/logo.png").is_some());
+        assert!(Recursos::get("marca/simbolo.png").is_some());
     }
 }

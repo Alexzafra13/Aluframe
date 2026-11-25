@@ -5,7 +5,7 @@
 {% let en_mas = seccion == "stock" || seccion == "catalogo" || seccion == "facturas" || seccion == "ajustes" %}
 <nav class="menu" aria-label="Menú principal">
   <div class="menu-cabecera">
-    <a class="marca" href="/"><span class="marca-logo" aria-hidden="true"></span><span class="menu-texto">AlumFrame</span></a>
+    <a class="marca" href="/"><img class="logo-programa" src="/recursos/marca/logo.png?v={{ crate::vistas::VERSION }}" alt="AlumFrame" width="200" height="80"></a>
     <button class="boton-plegar" type="button" data-plegar-menu aria-expanded="true" aria-label="Plegar menú" title="Plegar menú"><svg class="icono" aria-hidden="true"><use href="#i-plegar"/></svg></button>
   </div>
   {% for grupo in menu %}
@@ -30,7 +30,7 @@
 </nav>
 <div class="area">
   <header class="barra-superior">
-    <a class="marca-movil" href="/" aria-label="AlumFrame, inicio"><span class="marca-logo" aria-hidden="true"></span></a>
+    <a class="marca-movil" href="/" aria-label="AlumFrame, inicio"><img class="marca-simbolo" src="/recursos/marca/simbolo.png?v={{ crate::vistas::VERSION }}" alt="" width="46" height="24"></a>
     <form class="buscador-global" method="get" action="/clientes" role="search">
       <label class="oculto" for="buscar-global">Buscar cliente</label>
       <svg class="icono icono-buscar" aria-hidden="true"><use href="#i-buscar"/></svg>
