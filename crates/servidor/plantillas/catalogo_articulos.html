@@ -37,11 +37,11 @@
   {% if editable %}
   <p class="texto-apagado pequeno">Cambia los precios en la tabla y pulsa «Guardar precios», o marca artículos y súbelos o bájalos un porcentaje. Cada cambio crea una versión nueva de la tarifa que se puede deshacer.</p>
   <form id="precios" method="post" action="/catalogo/articulos/precios">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <input type="hidden" name="proveedor" value="{{ proveedor_elegido }}">
   </form>
   <form id="ajuste" class="formulario-en-linea ajuste-precios" method="post" action="/catalogo/articulos/ajuste">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <input type="hidden" name="proveedor" value="{{ proveedor_elegido }}">
     <label>Porcentaje a aplicar a los marcados (−5 baja, 5 sube) <input name="porcentaje" inputmode="decimal" required></label>
     <button class="boton" type="submit">Aplicar a los marcados</button>

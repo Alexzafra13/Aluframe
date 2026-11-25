@@ -1,6 +1,6 @@
 <dialog class="hoja" id="hoja-libre" aria-labelledby="hoja-libre-titulo">
   <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/lineas/libre" class="hoja-contenido">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <header class="hoja-cabecera"><h2 id="hoja-libre-titulo">Otro concepto</h2><button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button></header>
     <p class="texto-apagado pequeno">Para lo que no se calcula con una serie: escribe qué es y su precio.</p>
     <label for="libre-descripcion">Descripción</label>
@@ -16,7 +16,7 @@
 </dialog>
 <dialog class="hoja" id="hoja-version" aria-labelledby="hoja-version-titulo">
   <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/version" class="hoja-contenido">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <header class="hoja-cabecera"><h2 id="hoja-version-titulo">Nueva versión</h2><button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button></header>
     <p>Se copiarán las líneas en una versión nueva, en borrador. La versión actual se conserva tal cual.</p>
     <label for="motivo">Motivo (opcional)</label>
@@ -26,7 +26,7 @@
 </dialog>
 <dialog class="hoja" id="hoja-rechazar" aria-labelledby="hoja-rechazar-titulo">
   <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/estado/rechazado" class="hoja-contenido">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <header class="hoja-cabecera"><h2 id="hoja-rechazar-titulo">Rechazar presupuesto</h2><button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button></header>
     <p>Quedará como rechazado. Si el cliente cambia de idea, crea una versión nueva.</p>
     <div class="hoja-pie"><button class="boton" type="button" data-cerrar-hoja>Cancelar</button><button class="boton peligro" type="submit">Rechazar</button></div>
@@ -34,7 +34,7 @@
 </dialog>
 <dialog class="hoja" id="hoja-aceptar" aria-labelledby="hoja-aceptar-titulo">
   <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/aceptar" class="hoja-contenido">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <header class="hoja-cabecera"><h2 id="hoja-aceptar-titulo">Aceptar {{ codigo }}</h2><button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button></header>
     <p>Se guardará con estos datos congelados: <strong class="mono">{{ total() }}</strong>. Los cambios posteriores en las series o en las tarifas no lo alteran y ya no se podrá modificar.</p>
     <p class="texto-apagado pequeno">Al aceptarlo nace el trabajo para el taller, con una ventana por unidad y sus pasos.</p>

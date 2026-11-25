@@ -5,20 +5,19 @@
   <div class="logo-actual">
     {% if let Some(direccion) = logo %}<img class="logo-muestra" src="{{ direccion }}" alt="Logotipo actual">{% else %}<p class="logo-muestra logo-vacio">Sin logotipo</p>{% endif %}
   </div>
-  <form method="post" action="/ajustes/presupuestos/logo" data-subir-archivo data-csrf="{{ usuario.token_csrf }}" class="acciones">
+  <form method="post" action="/ajustes/presupuestos/logo" hx-boost="false" data-subir-archivo data-csrf="{{ usuario.token_csrf }}" class="acciones">
     <div class="campo"><label for="archivo-logo">Archivo del logotipo</label><input id="archivo-logo" type="file" accept="image/png,image/jpeg" required></div>
     <button class="boton primario" type="submit">{% if logo.is_some() %}Cambiar logotipo{% else %}Subir logotipo{% endif %}</button>
     <p class="aviso" role="alert" data-aviso hidden></p>
   </form>
   {% if logo.is_some() %}
   <form method="post" action="/ajustes/presupuestos/logo/quitar">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <button class="boton" type="submit">Quitar logotipo</button>
   </form>
   {% endif %}
 </section>
 {% endblock %}
-{% block scripts %}<script src="/recursos/js/subir-copia.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
 {% block contenido %}
 <header class="cabecera-pagina">
   <p class="antetitulo">Ajustes</p>
@@ -29,7 +28,7 @@
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 {% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
 <form method="post" action="/ajustes/presupuestos" class="pila">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <section class="tarjeta">
     <h2>Empresa</h2>
     <p class="texto-apagado pequeno">Sale en la cabecera y el pie del presupuesto impreso (y en las facturas). Lo que dejes en blanco no aparece.</p>
@@ -96,14 +95,14 @@
   <div class="logo-actual">
     {% if let Some(direccion) = logo %}<img class="logo-muestra" src="{{ direccion }}" alt="Logotipo actual">{% else %}<p class="logo-muestra logo-vacio">Sin logotipo</p>{% endif %}
   </div>
-  <form method="post" action="/ajustes/presupuestos/logo" data-subir-archivo data-csrf="{{ usuario.token_csrf }}" class="acciones">
+  <form method="post" action="/ajustes/presupuestos/logo" hx-boost="false" data-subir-archivo data-csrf="{{ usuario.token_csrf }}" class="acciones">
     <div class="campo"><label for="archivo-logo">Archivo del logotipo</label><input id="archivo-logo" type="file" accept="image/png,image/jpeg" required></div>
     <button class="boton primario" type="submit">{% if logo.is_some() %}Cambiar logotipo{% else %}Subir logotipo{% endif %}</button>
     <p class="aviso" role="alert" data-aviso hidden></p>
   </form>
   {% if logo.is_some() %}
   <form method="post" action="/ajustes/presupuestos/logo/quitar">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <button class="boton" type="submit">Quitar logotipo</button>
   </form>
   {% endif %}

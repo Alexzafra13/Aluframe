@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block titulo %}{{ codigo }}{% endblock %}
 {% block clase_body %}hoja-impresa{% endblock %}
-{% block scripts %}<link rel="stylesheet" href="/recursos/hoja-a4.css?v={{ crate::vistas::VERSION }}"><script src="/recursos/js/imprimir.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
+{% block navegacion %}{% endblock %}
+{% block scripts %}<link rel="stylesheet" href="/recursos/hoja-a4.css?v={{ crate::vistas::VERSION }}">{% endblock %}
 {% block cuerpo %}
 <div class="barra-impresion no-imprimir">
   <a class="boton" href="/facturas/{{ id }}">Volver a la factura</a>

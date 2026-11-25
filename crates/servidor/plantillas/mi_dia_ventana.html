@@ -28,7 +28,7 @@
         <li class="paso-operario paso-{{ p.estado }}">
           <span class="paso-nombre">{{ p.nombre }}{% if p.estado == "hecho" %} ✓{% endif %}{% if !p.quien.is_empty() %}<span class="texto-apagado pequeno"> · {{ p.quien }}</span>{% endif %}</span>
           <form method="post" action="/mi-dia/pasos/{{ p.id }}" class="acciones-paso">
-            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
             <input type="hidden" name="version" value="{{ p.version }}">
             <input type="hidden" name="ventana" value="{{ ventana.id }}">
             {% if p.estado == "pendiente" %}<button class="boton" name="accion" value="empezar">Empezar</button><button class="boton primario" name="accion" value="terminar">Terminar</button>{% endif %}
@@ -45,7 +45,7 @@
     <h2 id="titulo-falta">¿Falta algo?</h2>
     {% if let Some(f) = ventana.falta_algo %}<p class="etiqueta etiqueta-aviso">Avisado: {{ f }}</p>{% endif %}
     <form method="post" action="/mi-dia/{{ ventana.id }}/falta" class="formulario-en-linea">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       {% for motivo in ["Falta cristal", "Falta material", "Medida mal"] %}<button class="boton" name="nota" value="{{ motivo }}">{{ motivo }}</button>{% endfor %}
       <label class="oculto" for="otra-nota">Otro motivo</label>
       <input id="otra-nota" name="otra" placeholder="Otro motivo" maxlength="200">

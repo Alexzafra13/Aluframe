@@ -1,6 +1,5 @@
 {% extends "marco.html" %}
 {% block titulo %}Datos{% endblock %}
-{% block scripts %}<script src="/recursos/js/subir-copia.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
 {% block contenido %}
 <header class="cabecera-pagina">
   <p class="antetitulo">Ajustes</p>
@@ -9,7 +8,7 @@
 {% include "pestanas_ajustes.html" %}
 {% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
 <form class="tarjeta" method="post" action="/demostracion/entrar">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <h2>Demostración</h2>
   <p class="texto-apagado">El programa con clientes, presupuestos, trabajos, stock y facturas inventados, para probarlo o aprender a usarlo. Va aparte: no toca estos datos ni entra en las copias. Se sale con el botón de la franja de arriba.</p>
   <button class="boton" type="submit">Probar la demostración</button>
@@ -17,9 +16,9 @@
 <section class="tarjeta">
   <h2>Exportar</h2>
   <p class="texto-apagado">Descarga una copia con todos los datos ({{ resumen.clientes }} clientes, {{ resumen.presupuestos }} presupuestos, {{ resumen.usuarios }} usuarios). Sirve para llevarlos de este equipo al servidor del taller o al revés, o para guardarla aparte.</p>
-  <a class="boton primario" href="/ajustes/datos/exportar" download>Exportar datos</a>
+  <a class="boton primario" href="/ajustes/datos/exportar" download hx-boost="false">Exportar datos</a>
 </section>
-<form class="tarjeta" method="post" action="/ajustes/datos/importar" data-subir-copia data-csrf="{{ usuario.token_csrf }}">
+<form class="tarjeta" method="post" action="/ajustes/datos/importar" hx-boost="false" data-subir-copia data-csrf="{{ usuario.token_csrf }}">
   <h2>Importar</h2>
   <p class="texto-apagado">Elige una copia exportada desde Aluframe (archivo <span class="mono">.alumframe</span>). Antes de cambiar nada verás qué contiene. <strong>Importar sustituye todos los datos de aquí</strong>: no se mezclan.</p>
   <label for="copia">Copia (.alumframe)</label>

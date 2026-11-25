@@ -7,7 +7,7 @@
 </header>
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 <form class="tarjeta formulario-apunte" method="post" action="/apuntes">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   {% if let Some((id, nombre)) = cliente %}
   <input type="hidden" name="cliente" value="{{ id }}">
   <p>Cliente: <a href="/clientes/{{ id }}"><strong>{{ nombre }}</strong></a></p>

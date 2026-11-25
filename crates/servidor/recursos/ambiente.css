@@ -69,3 +69,15 @@ body.pantalla-acceso { background: var(--fondo-acceso); color: #fff; min-height:
   .pantalla-acceso .marca-acceso .logo-programa { width: 220px; }
   .pantalla-acceso .tarjeta-usuario .avatar { width: 76px; height: 76px; font-size: 1.8rem; }
 }
+
+/* Barra de «cargando» (navegacion.js): aparece solo si una petición pasa de 200 ms. */
+html.cargando::before {
+  content: ""; position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 1000;
+  background: linear-gradient(90deg, transparent, var(--acero), transparent);
+  background-size: 40% 100%; background-repeat: no-repeat;
+  animation: cargando 1s linear infinite;
+}
+@keyframes cargando { from { background-position: -40% 0; } to { background-position: 140% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  html.cargando::before { animation: none; background: var(--acero); opacity: .6; }
+}

@@ -16,6 +16,7 @@ test("aceptar un presupuesto crea el trabajo y se asigna a un operario", async (
   await expect(page.locator("#texto")).toHaveValue(/PRUEBA_COMPLETA/);
   await page.getByRole("button", { name: "Revisar" }).click();
   await page.getByRole("button", { name: "Confirmar e importar" }).click();
+  await expect(page).toHaveURL(/importada=/);
   await page.goto("/ajustes/usuarios");
   await page.getByLabel("Nombre").fill(OPERARIO.nombre);
   await page.getByLabel("PIN de 6 cifras").fill(OPERARIO.pin);

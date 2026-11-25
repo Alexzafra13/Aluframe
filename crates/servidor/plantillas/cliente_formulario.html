@@ -10,7 +10,7 @@
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 {% if errores.hay() %}<p class="aviso" role="alert">Revisa los campos marcados; no se ha guardado nada.</p>{% endif %}
 <form class="tarjeta formulario-cliente" method="post" action="{% if let Some(n) = id %}/clientes/{{ n }}/editar{% else %}/clientes/nuevo{% endif %}">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <input type="hidden" name="version" value="{{ version }}">
   <fieldset class="selector-tipo">
     <legend>Tipo de cliente</legend>

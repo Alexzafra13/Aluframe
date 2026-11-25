@@ -22,7 +22,7 @@
   <div class="acciones">
     <a class="boton" href="/ajustes/datos">Cancelar</a>
     <form method="post" action="/ajustes/datos/importar/{{ clave }}">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <button class="boton primario" type="submit">Sustituir los datos por la copia</button>
     </form>
   </div>

@@ -15,9 +15,12 @@
     boton.setAttribute("title", texto);
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
+  function rotularTodos() {
     document.querySelectorAll("[data-plegar-menu]").forEach(rotular);
-  });
+  }
+  document.addEventListener("DOMContentLoaded", rotularTodos);
+  // Con la navegación sin recarga el menú llega nuevo en cada pantalla.
+  document.addEventListener("htmx:afterSettle", rotularTodos);
   document.addEventListener("click", function (evento) {
     var boton = evento.target.closest("[data-plegar-menu]");
     if (!boton) return;

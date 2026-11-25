@@ -231,3 +231,23 @@ async fn nuevo_presupuesto_y_factura_ofrecen_todos_los_clientes() {
         assert!(pagina.contains("Cliente 01"), "{ruta}");
     }
 }
+
+/// La búsqueda mientras se escribe pide solo la lista; la navegación sin recarga (ADR-0036),
+/// también por HTMX, pide la página entera.
+#[tokio::test]
+async fn la_navegacion_sin_recarga_recibe_la_pagina_entera_de_clientes() {
+    use axum::body::Body;
+    use axum::http::{Request, header};
+    let contexto = Contexto::nuevo().await;
+    let (token, _) = contexto.con_propietario().await;
+    let trozo = texto(contexto.pedir(get_htmx("/clientes", &token)).await).await;
+    assert!(!trozo.contains("<html"));
+    let navegacion = Request::get("/clientes")
+        .header(header::COOKIE, format!("alumframe_sesion={token}"))
+        .header("hx-request", "true")
+        .header("hx-boosted", "true")
+        .body(Body::empty())
+        .unwrap();
+    let pagina = texto(contexto.pedir(navegacion).await).await;
+    assert!(pagina.contains("<html"));
+}

@@ -13,7 +13,7 @@
 <p class="vacio tarjeta">Primero da de alta un proveedor en la pestaña Proveedores.</p>
 {% else %}
 <form class="tarjeta" method="post" action="{% if let Some(n) = id %}/catalogo/articulos/{{ n }}{% else %}/catalogo/articulos/nuevo{% endif %}">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <input type="hidden" name="version" value="{{ version }}">
   <div class="rejilla-campos">
     <div class="campo">
@@ -65,7 +65,7 @@
   {% endif %}
 </section>
 <form class="tarjeta" method="post" action="/catalogo/articulos/{{ n }}/{% if archivado %}recuperar{% else %}archivar{% endif %}">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <p class="texto-apagado">{% if archivado %}Este artículo está archivado.{% else %}Archivar lo oculta de la lista; los precios y documentos que lo usan se conservan.{% endif %}</p>
   <button class="boton" type="submit">{% if archivado %}Recuperar{% else %}Archivar{% endif %}</button>
 </form>

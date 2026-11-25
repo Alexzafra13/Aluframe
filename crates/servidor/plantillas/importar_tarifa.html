@@ -1,6 +1,5 @@
 {% extends "marco.html" %}
 {% block titulo %}Importar tarifa{% endblock %}
-{% block scripts %}<script src="/recursos/js/archivo.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
 {% block contenido %}
 <header class="cabecera-pagina">
   <p class="antetitulo">Catálogo · Tarifas</p>
@@ -14,7 +13,7 @@
 <p class="vacio tarjeta">Primero da de alta el proveedor en la pestaña Proveedores.</p>
 {% else %}
 <form class="tarjeta" method="post" action="/catalogo/tarifas/importar/revisar">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <p class="texto-apagado">Paso 1 de 3. Elige el proveedor y el archivo CSV de su tarifa (desde Excel: «Guardar como» → CSV). Nada se guarda hasta que confirmes.</p>
   <p class="pequeno">Columnas: <code>{{ plantilla }}</code>. El precio es el del blanco, por unidad de venta, en euros (admite coma decimal y hasta 4 decimales); la longitud de barra, en cm. <code>tipo</code> es opcional.</p>
   <div class="rejilla-campos">
@@ -86,7 +85,7 @@
     <a class="boton" href="/catalogo/tarifas/importar">Elegir otro archivo</a>
     {% if vista.se_puede_importar %}
     <form method="post" action="/catalogo/tarifas/importar">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <input type="hidden" name="sha256" value="{{ vista.sha256 }}">
       <input type="hidden" name="proveedor" value="{{ valores.proveedor }}">
       <input type="hidden" name="nombre" value="{{ valores.nombre }}">

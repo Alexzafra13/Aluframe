@@ -1,5 +1,5 @@
 {% if cobros.is_empty() %}<p class="vacio">Sin cobros todavía.</p>{% endif %}
 <ul class="lista-simple lista-cobros">{% for c in cobros %}<li{% if c.anulado %} class="anulado"{% endif %}>
   <span><span class="mono">{{ c.importe }}</span> · {{ c.medio }} · {{ c.fecha }}{% if !c.nota.is_empty() %} · {{ c.nota }}{% endif %}{% if c.anulado %} · <strong>anulado</strong>: {{ c.motivo }}{% endif %}</span>
-  {% if !c.anulado %}<details class="anular-cobro"><summary>Anular</summary><form method="post" action="/cobros/{{ c.id }}/anular" class="formulario-en-linea"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input name="motivo" required placeholder="Motivo" maxlength="200" aria-label="Motivo de la anulación"><button class="boton" type="submit">Anular</button></form></details>{% endif %}
+  {% if !c.anulado %}<details class="anular-cobro"><summary>Anular</summary><form method="post" action="/cobros/{{ c.id }}/anular" class="formulario-en-linea"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}"><input name="motivo" required placeholder="Motivo" maxlength="200" aria-label="Motivo de la anulación"><button class="boton" type="submit">Anular</button></form></details>{% endif %}
 </li>{% endfor %}</ul>

@@ -1,6 +1,5 @@
 {% extends "marco.html" %}
 {% block titulo %}Importar serie{% endblock %}
-{% block scripts %}<script src="/recursos/js/archivo.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
 {% block contenido %}
 <header class="cabecera-pagina">
   <p class="antetitulo">Catálogo · Series</p>
@@ -10,7 +9,7 @@
 {% match previsualizacion %}
 {% when None %}
 <form class="tarjeta" method="post" action="/catalogo/series/importar/revisar">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <p class="texto-apagado">Paso 1 de 3. Elige el archivo de la serie o pega su contenido. Nada se guarda hasta que confirmes.</p>
   <label for="archivo">Archivo (.yaml)</label>
   <input id="archivo" type="file" accept=".yaml,.yml,text/yaml" data-volcar-en="texto">
@@ -40,7 +39,7 @@
     <a class="boton" href="/catalogo/series/importar">Elegir otro archivo</a>
     {% if vista.se_puede_importar() %}
     <form method="post" action="/catalogo/series/importar">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <textarea name="texto" hidden>{{ texto }}</textarea>
       <button class="boton primario" type="submit">Confirmar e importar</button>
     </form>

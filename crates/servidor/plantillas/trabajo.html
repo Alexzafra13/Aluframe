@@ -15,7 +15,7 @@
     <div class="cabecera-seccion">
       <h2 id="titulo-ventanas">Ventanas</h2>
       <div class="acciones">
-        <a class="boton primario" href="/trabajos/{{ id }}/orden">Orden de taller</a>
+        <a class="boton primario" href="/trabajos/{{ id }}/orden" hx-boost="false">Orden de taller</a>
         {% if orden_terminada %}<span class="etiqueta etiqueta-estado">Orden terminada · stock descontado</span>{% else if abierto %}<a class="boton" href="/trabajos/{{ id }}/terminar">Terminar orden y descontar stock</a>{% endif %}
       </div>
     </div>
@@ -40,17 +40,17 @@
         {% let volver = "trabajo" %}{% include "repetir_pieza.html" %}
         <div class="acciones">
           <form method="post" action="/trabajos/{{ id }}/ventanas/{{ v.id }}/operario" class="formulario-en-linea">
-            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
             <label for="operario-{{ v.id }}">Operario de esta ventana</label>
             <select id="operario-{{ v.id }}" name="operario"><option value="">El del trabajo</option>{% for o in operarios %}<option value="{{ o.valor }}"{% if v.asignado == o.valor %} selected{% endif %}>{{ o.texto }}</option>{% endfor %}</select>
             <button class="boton" type="submit">Asignar</button>
           </form>
           <form method="post" action="/trabajos/{{ id }}/ventanas/{{ v.id }}/cristal">
-            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
             <input type="hidden" name="recibido" value="{% if v.cristal_recibido %}no{% else %}si{% endif %}">
             <button class="boton" type="submit">{% if v.cristal_recibido %}✓ Cristal recibido{% else %}Marcar cristal recibido{% endif %}</button>
           </form>
-          {% if v.falta_algo.is_some() %}<form method="post" action="/trabajos/{{ id }}/ventanas/{{ v.id }}/falta"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton" type="submit">Quitar el aviso</button></form>{% endif %}
+          {% if v.falta_algo.is_some() %}<form method="post" action="/trabajos/{{ id }}/ventanas/{{ v.id }}/falta"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}"><button class="boton" type="submit">Quitar el aviso</button></form>{% endif %}
           <a class="boton" href="/trabajos/{{ id }}/ventanas/{{ v.id }}/medidas">Modificar medidas</a>
         </div>
         {% endif %}
@@ -69,7 +69,7 @@
       <p><a href="/presupuestos/{{ presupuesto_id }}">Ver el presupuesto</a> · <a href="/clientes/{{ cliente_id }}">Ficha del cliente</a></p>
       {% if abierto %}
       <form method="post" action="/trabajos/{{ id }}/datos">
-        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
         <input type="hidden" name="version" value="{{ version }}">
         <label for="operario">Operario del trabajo</label>
         <select id="operario" name="operario"><option value="">Sin asignar</option>{% for o in operarios %}<option value="{{ o.valor }}"{% if es_operario(o.valor) %} selected{% endif %}>{{ o.texto }}</option>{% endfor %}</select>
@@ -84,11 +84,11 @@
     <section class="tarjeta" aria-labelledby="titulo-cerrar">
       <h2 id="titulo-cerrar">Cerrar el trabajo</h2>
       <form method="post" action="/trabajos/{{ id }}/entregar" class="pila-botones">
-        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
         <button class="boton primario" type="submit">Marcar como entregado</button>
       </form>
       <form method="post" action="/trabajos/{{ id }}/anular" class="pila-botones">
-        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
         <label class="casilla"><input type="checkbox" name="confirmar" value="si" required> Anular el trabajo (no se puede deshacer)</label>
         <button class="boton" type="submit">Anular</button>
       </form>

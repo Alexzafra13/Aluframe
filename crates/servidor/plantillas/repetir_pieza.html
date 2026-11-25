@@ -2,7 +2,7 @@
 <details class="repetir-pieza">
   <summary>Repetir pieza (corte mal, rayón…)</summary>
   <form method="post" action="/mi-dia/{{ v.id }}/repetir" class="formulario-en-linea">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <input type="hidden" name="volver" value="{{ volver }}">
     <label>Pieza <select name="numero">{% for (n, nombre) in v.piezas %}<option value="{{ n }}">{{ n }} · {{ nombre }}</option>{% endfor %}</select></label>
     <label>Cuántas <input name="cantidad" value="1" inputmode="numeric" size="3"></label>

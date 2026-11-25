@@ -36,8 +36,10 @@ pub struct FiltroClientes {
     conservados: Option<usize>,
 }
 
+/// Un trozo de página (la búsqueda mientras se escribe). La navegación sin recarga también
+/// llega por HTMX, pero pide la página entera (`HX-Boosted`, ADR-0036).
 pub fn es_htmx(cabeceras: &HeaderMap) -> bool {
-    cabeceras.contains_key("hx-request")
+    cabeceras.contains_key("hx-request") && !cabeceras.contains_key("hx-boosted")
 }
 
 pub async fn mostrar_clientes(

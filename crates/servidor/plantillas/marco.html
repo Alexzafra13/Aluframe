@@ -22,7 +22,7 @@
       <span class="avatar avatar-menu" aria-hidden="true">{{ usuario.nombre.chars().next().unwrap_or('A') }}</span>
       <span class="menu-usuario-datos menu-texto"><span class="menu-usuario-nombre">{{ usuario.nombre }}</span><span class="menu-usuario-rol">{% if usuario.es_propietario %}Propietario{% else %}Operario{% endif %}</span></span>
       <form method="post" action="/salir">
-        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
         <button class="boton-salir" type="submit" aria-label="Salir" title="Salir"><svg class="icono" aria-hidden="true"><use href="#i-salir"/></svg></button>
       </form>
     </div>
@@ -63,11 +63,9 @@
       {% if usuario.es_propietario %}<li><a class="celda-ios{% if seccion == "ajustes" %} activa{% endif %}" href="/ajustes/usuarios"><svg class="icono" aria-hidden="true"><use href="#i-ajustes"/></svg>Ajustes</a></li>{% endif %}
     </ul>
     <form class="grupo-ios" method="post" action="/salir">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <button class="celda-ios celda-salir" type="submit"><svg class="icono" aria-hidden="true"><use href="#i-salir"/></svg>Salir</button>
     </form>
   </div>
 </dialog>
-<script src="/recursos/js/hojas.js?v={{ crate::vistas::VERSION }}" defer></script>
-<script src="/recursos/js/opciones.js?v={{ crate::vistas::VERSION }}" defer></script>
 {% endblock %}

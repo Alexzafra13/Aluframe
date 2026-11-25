@@ -9,7 +9,7 @@
     <h1>{% if rectificativa %}Rectificativa {% else %}Factura {% endif %}<span class="mono">{{ codigo }}</span> <span class="etiqueta etiqueta-cobro-{{ estado|lower }}">{{ estado }}</span></h1>
     <p><a href="/clientes/{{ cliente_id }}">{{ cliente }}</a>{% if let Some((r, c)) = rectifica %} · rectifica a <a href="/facturas/{{ r }}">{{ c }}</a>: {{ motivo }}{% endif %}{% for (r, c, borrador) in rectificada_por %} · rectificada por <a href="/facturas/{{ r }}">{% if *borrador %}una rectificativa en borrador{% else %}<span class="mono">{{ c }}</span>{% endif %}</a>{% endfor %}</p>
   </div>
-  <a class="boton" href="/facturas/{{ id }}/imprimir">{% if borrador %}Ver la hoja (borrador){% else %}Imprimir o guardar PDF{% endif %}</a>
+  <a class="boton" href="/facturas/{{ id }}/imprimir" hx-boost="false">{% if borrador %}Ver la hoja (borrador){% else %}Imprimir o guardar PDF{% endif %}</a>
 </header>
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 {% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
@@ -21,7 +21,7 @@
       <thead><tr><th scope="col">Descripción</th><th scope="col" class="numero">Cant.</th><th scope="col" class="numero">Precio</th><th scope="col" class="numero">Dto.</th><th scope="col" class="numero">IVA</th><th scope="col" class="numero">Importe</th>{% if edita %}<th></th>{% endif %}</tr></thead>
       <tbody>{% for l in lineas %}<tr>
         <td>{{ l.descripcion }}</td><td class="numero mono">{{ l.cantidad }}</td><td class="numero mono">{{ l.precio }}</td><td class="numero mono">{{ l.descuento }}</td><td class="numero mono">{{ l.iva }}</td><td class="numero mono">{{ l.importe }}</td>
-        {% if edita %}<td><form method="post" action="/facturas/{{ id }}/lineas/{{ l.id }}/quitar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton-icono" type="submit" aria-label="Quitar la línea {{ l.descripcion }}">✕</button></form></td>{% endif %}
+        {% if edita %}<td><form method="post" action="/facturas/{{ id }}/lineas/{{ l.id }}/quitar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}"><button class="boton-icono" type="submit" aria-label="Quitar la línea {{ l.descripcion }}">✕</button></form></td>{% endif %}
       </tr>{% endfor %}</tbody>
     </table></div>
     <dl class="lista-datos totales-factura">
@@ -31,7 +31,7 @@
     </dl>
     {% if edita %}
     <form method="post" action="/facturas/{{ id }}/lineas" class="tarjeta-interior">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <h3>Añadir línea</h3>
       <div class="rejilla-campos">
         <div class="campo campo-ancho"><label for="desc">Descripción</label><input id="desc" name="descripcion" required maxlength="300" placeholder="Mosquitera, portes, ajuste de medidas…"></div>
@@ -47,7 +47,7 @@
   <aside class="columna-datos">
     {% if edita %}
     <form class="tarjeta" method="post" action="/facturas/{{ id }}/datos">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <input type="hidden" name="version" value="{{ version }}">
       <h2>Datos</h2>
       <label for="fecha-op">Fecha de la operación (si no es la de emisión)</label><input id="fecha-op" name="fecha_operacion" type="date" value="{{ fecha_operacion }}">
@@ -57,14 +57,14 @@
       <button class="boton" type="submit">Guardar datos</button>
     </form>
     <form class="tarjeta" method="post" action="/facturas/{{ id }}/emitir">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <h2>Emitir</h2>
       <p class="texto-apagado pequeno">Recibirá su número correlativo y ya no se podrá modificar. Una corrección se hará con una rectificativa.</p>
       {% if falta_nif %}<label class="casilla"><input type="checkbox" name="confirmar" value="si"> El cliente no tiene NIF: emitir igualmente</label>{% endif %}
       <button class="boton primario ancho" type="submit">Emitir factura</button>
     </form>
     <form method="post" action="/facturas/{{ id }}/descartar">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <button class="boton ancho" type="submit">Descartar el borrador</button>
     </form>
     {% else if !borrador %}
@@ -74,7 +74,7 @@
       {% include "lista_cobros.html" %}
       {% if !rectificativa && usuario.es_propietario %}
       <form method="post" action="/facturas/{{ id }}/cobros" class="pila">
-        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
         {% let importe = pendiente_en_campo.clone() %}{% include "campos_cobro.html" %}
         <button class="boton primario" type="submit">Registrar cobro</button>
       </form>
@@ -82,7 +82,7 @@
     </section>
     {% if !rectificativa && usuario.es_propietario %}
     <form class="tarjeta" method="post" action="/facturas/{{ id }}/rectificar">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <h2>Corregir</h2>
       <label for="motivo-r">Motivo de la rectificativa</label>
       <input id="motivo-r" name="motivo" required maxlength="300" placeholder="Precio mal, devolución…">

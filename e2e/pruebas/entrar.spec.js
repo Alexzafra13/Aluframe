@@ -56,6 +56,8 @@ test("el dueño da permisos al operario y este ve solo lo permitido", async ({ p
   await page.getByRole("link", { name: PROPIETARIO.nombre }).click();
   await page.getByLabel("Contraseña").fill(PROPIETARIO.contrasena);
   await page.getByRole("button", { name: "Entrar" }).click();
+  // Sin recarga (ADR-0036) el clic no espera a la respuesta: se espera a haber entrado.
+  await expect(page).not.toHaveURL(/\/entrar/);
   await page.goto("/ajustes/usuarios");
   const fila = page.getByRole("row", { name: new RegExp(OPERARIO.nombre) });
   await fila.getByText("Permisos (0 de 4)").click();

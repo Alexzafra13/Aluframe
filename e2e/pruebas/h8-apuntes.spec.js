@@ -25,6 +25,7 @@ test("el dueño manda una tarea y el operario la ve en Mi día y la marca hecha"
   await page.getByLabel("Nombre").fill(OPERARIO.nombre);
   await page.getByLabel("PIN de 6 cifras").fill(OPERARIO.pin);
   await page.getByRole("button", { name: "Dar de alta" }).click();
+  await expect(page).toHaveURL(/hecho=/);
   await page.goto("/clientes/nuevo");
   await page.getByLabel(/Nombre o razón social/).fill("Rosa Gil");
   await page.getByLabel(/Teléfono móvil/).fill("611222333");

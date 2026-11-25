@@ -11,7 +11,7 @@
 <section class="tarjeta">
   <h2>Nuevo operario</h2>
   <form class="formulario-en-linea" method="post" action="/ajustes/usuarios">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <label>Nombre <input name="nombre" required maxlength="60" autocomplete="off"></label>
     <label>PIN de 6 cifras <input name="pin" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off"></label>
     <button class="boton primario" type="submit">Dar de alta</button>
@@ -31,19 +31,19 @@
           {% if u.es_operario %}
           <div class="acciones">
           <form class="formulario-en-linea" method="post" action="/ajustes/usuarios/{{ u.id }}/pin">
-            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
             <label>Nuevo PIN <input name="pin" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off"></label>
             <button class="boton" type="submit">Cambiar PIN</button>
           </form>
           <form method="post" action="/ajustes/usuarios/{{ u.id }}/{% if u.activo %}desactivar{% else %}activar{% endif %}">
-            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
             <button class="boton" type="submit">{% if u.activo %}Desactivar{% else %}Activar{% endif %}</button>
           </form>
           </div>
           <details class="permisos-operario">
             <summary>Permisos ({{ u.permisos_marcados() }} de {{ u.permisos.len() }})</summary>
             <form method="post" action="/ajustes/usuarios/{{ u.id }}/permisos" class="pila">
-              <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+              <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
               <p class="texto-apagado pequeno">Siempre puede ver sus trabajos, marcar los pasos, tomar apuntes y buscar clientes. Nunca ve costes ni márgenes.</p>
               {% for c in u.permisos %}
               <label class="casilla"><input type="checkbox" name="{{ c.campo }}" value="si"{% if c.marcada %} checked{% endif %}> {{ c.texto }}</label>

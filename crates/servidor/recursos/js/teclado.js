@@ -1,6 +1,8 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const teclado = document.querySelector(".teclado[data-destino]");
+// Teclado del PIN. Se prepara al cargar y tras cada cambio de pantalla sin recarga.
+function prepararTeclado() {
+  const teclado = document.querySelector(".teclado[data-destino]:not([data-listo])");
   if (!teclado) return;
+  teclado.dataset.listo = "si";
   const campo = document.getElementById(teclado.dataset.destino);
   const formulario = campo.form;
   const puntos = formulario.querySelectorAll(".puntos-pin span");
@@ -31,4 +33,6 @@ document.addEventListener("DOMContentLoaded", function () {
     pintar();
   });
   pintar();
-});
+}
+document.addEventListener("DOMContentLoaded", prepararTeclado);
+document.addEventListener("htmx:afterSettle", prepararTeclado);

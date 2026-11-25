@@ -1,6 +1,5 @@
 {% extends "marco.html" %}
 {% block titulo %}Importar clientes{% endblock %}
-{% block scripts %}<script src="/recursos/js/archivo.js?v={{ crate::vistas::VERSION }}" defer></script>{% endblock %}
 {% block contenido %}
 <header class="cabecera-pagina">
   <p class="antetitulo">Clientes</p>
@@ -10,7 +9,7 @@
 {% match previsualizacion %}
 {% when None %}
 <form class="tarjeta" method="post" action="/clientes/importar/revisar">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <p class="texto-apagado">Paso 1 de 3. Elige un archivo CSV (desde Excel: «Guardar como» → CSV) o pega su contenido. Nada se guarda hasta que confirmes.</p>
   <p class="pequeno">Columnas que se reconocen (todas opcionales, en cualquier orden): <code>{{ plantilla }}</code></p>
   <label for="archivo">Archivo (.csv)</label>
@@ -32,7 +31,7 @@
         <td>{% if i.deshecha %}Deshecha{% else %}Confirmada{% endif %}</td>
         <td>{% if !i.deshecha %}
           <form method="post" action="/clientes/importaciones/{{ i.id }}/deshacer">
-            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
             <button class="boton" type="submit">Deshacer</button>
           </form>{% endif %}
         </td>
@@ -70,7 +69,7 @@
     <a class="boton" href="/clientes/importar">Elegir otro archivo</a>
     {% if vista.se_puede_importar() %}
     <form method="post" action="/clientes/importar">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <input type="hidden" name="sha256" value="{{ vista.sha256 }}">
       <textarea name="texto" hidden>{{ texto }}</textarea>
       <button class="boton primario" type="submit">Paso 3: confirmar e importar {{ vista.clientes.len() }} clientes</button>

@@ -8,7 +8,7 @@
 </header>
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 <form method="post" action="/trabajos/{{ id }}/terminar" class="pila">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <section class="tarjeta" aria-labelledby="titulo-salidas">
     <h2 id="titulo-salidas">Sale del stock</h2>
     {% if salidas.is_empty() %}<p class="vacio">Nada que descontar (ningún perfil ni accesorio tiene artículo en el catálogo).</p>{% endif %}

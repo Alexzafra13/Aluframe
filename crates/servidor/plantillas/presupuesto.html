@@ -16,7 +16,7 @@
 <div class="aviso con-accion" role="alert">
   <span>La tarifa ha cambiado desde que se calcularon estas ventanas.</span>
   <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/recalcular">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <button class="boton" type="submit">Recalcular precios</button>
   </form>
 </div>
@@ -57,7 +57,7 @@
         {% endif %}
         {% if editable() %}
         <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/lineas/{{ l.orden }}/quitar" class="quitar-linea">
-          <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+          <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
           <button class="boton-icono" type="submit" aria-label="Quitar la línea {{ l.orden }}">✕</button>
         </form>
         {% endif %}
@@ -68,7 +68,7 @@
   <aside class="columna-datos">
     {% if let Some(t) = ficha.trabajo_id %}{% if usuario.es_propietario %}<a class="boton primario ancho" href="/trabajos/{{ t }}">Ver el trabajo en el taller</a>{% endif %}{% endif %}
     <form class="tarjeta" method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/datos">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <input type="hidden" name="version" value="{{ ficha.presupuesto.version }}">
       <h2>Datos</h2>
       <fieldset{% if !editable() %} disabled{% endif %}>
@@ -90,10 +90,10 @@
     <section class="tarjeta">
       <h2>Acciones</h2>
       <div class="pila-botones">
-        <a class="boton" href="/presupuestos/{{ ficha.presupuesto.id }}/imprimir">Imprimir o guardar PDF</a>
+        <a class="boton" href="/presupuestos/{{ ficha.presupuesto.id }}/imprimir" hx-boost="false">Imprimir o guardar PDF</a>
         {% if usuario.es_propietario %}
         {% if estado() == "borrador" && situacion == "borrador" %}
-        <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/estado/enviado"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton" type="submit">Marcar como enviado</button></form>
+        <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/estado/enviado"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}"><button class="boton" type="submit">Marcar como enviado</button></form>
         {% endif %}
         {% if estado() == "borrador" || estado() == "enviado" || estado() == "rechazado" %}
         <button class="boton" type="button" data-abrir-hoja="hoja-version">Nueva versión</button>
@@ -105,7 +105,7 @@
       </div>
       {% if usuario.es_propietario && (situacion == "caducado" || situacion == "archivado" || situacion == "rechazado") %}
       <form method="post" action="/presupuestos/{{ ficha.presupuesto.id }}/renovar" class="pila">
-        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
         <button class="boton primario ancho" type="submit">Renovar</button>
         <p class="pequeno texto-apagado">Pone los precios de hoy y una validez nueva desde hoy. Si se había enviado, lo enviado queda como versión anterior.</p>
       </form>

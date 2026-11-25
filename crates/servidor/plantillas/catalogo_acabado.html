@@ -9,7 +9,7 @@
 {% let pestana = "Acabados" %}{% include "pestanas_catalogo.html" %}
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 <form class="tarjeta" method="post" action="/catalogo/acabados/{{ id }}">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <input type="hidden" name="version" value="{{ version }}">
   {% include "campos_acabado.html" %}
   <div class="acciones pie-formulario">
@@ -18,7 +18,7 @@
   </div>
 </form>
 <form class="tarjeta" method="post" action="/catalogo/acabados/{{ id }}/{% if archivado %}recuperar{% else %}archivar{% endif %}">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <button class="boton" type="submit">{% if archivado %}Recuperar{% else %}Archivar{% endif %}</button>
 </form>
 {% endblock %}

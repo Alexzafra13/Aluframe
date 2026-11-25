@@ -8,7 +8,7 @@
 </header>
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 <form class="tarjeta" method="post" action="/trabajos/{{ trabajo }}/ventanas/{{ ventana }}/medidas">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <input type="hidden" name="version" value="{{ version }}">
   <div class="rejilla-dos">
     <div class="campo"><label for="ancho">Ancho (cm)</label><input class="campo-medida" id="ancho" name="ancho" value="{{ ancho }}" inputmode="decimal" required autocomplete="off"></div>

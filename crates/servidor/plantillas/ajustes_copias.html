@@ -14,7 +14,7 @@
   {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
   <p class="texto-apagado">Se copia solo cada día a las 14:00 y al cerrar el programa; si el equipo estuvo apagado, al encenderlo. Se guardan las 7 últimas diarias y 4 semanales en el disco y en este equipo.</p>
   <form method="post" action="/ajustes/copias/ahora">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <button class="boton primario" type="submit">Copiar ahora</button>
   </form>
 </section>
@@ -23,7 +23,7 @@
   <p class="texto-apagado">Vale cualquier pendrive o disco con una carpeta <span class="mono">AlumFrame-copias</span> en su raíz: se reconoce por la carpeta, aunque cambie la letra. Conviene tener dos y alternarlos, y guardar uno fuera del taller.</p>
   {% for raiz in sin_preparar %}
   <form method="post" action="/ajustes/copias/preparar" class="fila-accion">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <input type="hidden" name="raiz" value="{{ raiz }}">
     <span class="mono">{{ raiz }}</span>
     <button class="boton" type="submit">Usar este disco para las copias</button>
@@ -41,7 +41,7 @@
     <tbody>
     {% for c in lugar.copias %}
       <tr><td class="mono">{{ c.cuando }}</td><td class="numero mono">{{ c.tamano }}</td>
-        <td><form method="post" action="/ajustes/copias/restaurar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="disco" value="{{ lugar.disco }}"><input type="hidden" name="nombre" value="{{ c.nombre }}"><button class="boton" type="submit" aria-label="Revisar la copia del {{ c.cuando }} para restaurarla">Restaurar…</button></form></td></tr>
+        <td><form method="post" action="/ajustes/copias/restaurar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}"><input type="hidden" name="disco" value="{{ lugar.disco }}"><input type="hidden" name="nombre" value="{{ c.nombre }}"><button class="boton" type="submit" aria-label="Revisar la copia del {{ c.cuando }} para restaurarla">Restaurar…</button></form></td></tr>
     {% endfor %}
     </tbody>
   </table>

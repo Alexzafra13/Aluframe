@@ -1,6 +1,6 @@
 const path = require("node:path");
 const { test, expect } = require("@playwright/test");
-const { entrarComoPropietario } = require("./comun");
+const { entrarComoPropietario, pulsarYEsperar } = require("./comun");
 
 test.describe.configure({ mode: "serial" });
 
@@ -9,8 +9,9 @@ const TARIFA_DEMO = path.join(__dirname, "..", "..", "fixtures", "demo", "tarifa
 const CON_ERRORES = "referencia;descripcion;unidad;precio_tarifa;longitud_barra\nX-1;Perfil;barra;0;640\nX-2;Tornillo;saco;3;\n";
 
 async function irA(page, pestana) {
-  await page.getByRole("link", { name: "Catálogo" }).click();
-  await page.getByRole("navigation", { name: "Secciones del catálogo" }).getByRole("link", { name: pestana }).click();
+  await pulsarYEsperar(page, page.getByRole("link", { name: "Catálogo" }));
+  const secciones = page.getByRole("navigation", { name: "Secciones del catálogo" });
+  await pulsarYEsperar(page, secciones.getByRole("link", { name: pestana }));
 }
 
 test("da de alta un proveedor", async ({ page }) => {

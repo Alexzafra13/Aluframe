@@ -10,7 +10,7 @@
     {% if usuario.puede_editar_clientes %}<a class="boton" href="/clientes/{{ cliente.id }}/editar">Editar datos</a>{% endif %}
     <a class="boton" href="/apuntes/nuevo?cliente={{ cliente.id }}">Nuevo apunte</a>
     {% if usuario.es_propietario %}<form method="post" action="/presupuestos">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <input type="hidden" name="cliente" value="{{ cliente.id }}">
       <button class="boton primario" type="submit">Nuevo presupuesto</button>
     </form>{% endif %}
@@ -46,7 +46,7 @@
         {% if usuario.puede_editar_clientes %}<div class="acciones">
           <a class="boton" href="/clientes/{{ cliente.id }}/direcciones/{{ d.id }}/editar">Editar</a>
           <form method="post" action="/clientes/{{ cliente.id }}/direcciones/{{ d.id }}/quitar">
-            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
             <button class="boton" type="submit">Quitar</button>
           </form>
         </div>{% endif %}
@@ -57,7 +57,7 @@
     {% if usuario.puede_editar_clientes %}<details>
       <summary>+ Añadir dirección de montaje</summary>
       <form method="post" action="/clientes/{{ cliente.id }}/direcciones">
-        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
         {% let bloque = nueva_direccion %}{% include "direccion_bloque.html" %}
         <button class="boton primario" type="submit">Añadir</button>
       </form>
@@ -85,16 +85,16 @@
   <h2>Datos personales</h2>
   <p class="texto-apagado">Exportar descarga todo lo guardado de este cliente. Archivar lo oculta de la lista sin borrarlo.</p>
   <div class="acciones">
-    <a class="boton" href="/clientes/{{ cliente.id }}/exportar" download>Exportar datos</a>
+    <a class="boton" href="/clientes/{{ cliente.id }}/exportar" download hx-boost="false">Exportar datos</a>
     <form method="post" action="/clientes/{{ cliente.id }}/{% if cliente.archivado %}recuperar{% else %}archivar{% endif %}">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <button class="boton" type="submit">{% if cliente.archivado %}Recuperar{% else %}Archivar{% endif %}</button>
     </form>
   </div>
   <details class="zona-peligro">
     <summary>Borrar definitivamente</summary>
     <form method="post" action="/clientes/{{ cliente.id }}/borrar">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <p>Se borrarán el cliente y sus direcciones de montaje. <strong>No se puede deshacer.</strong> Úsalo cuando el cliente pida que se eliminen sus datos.</p>
       <label class="casilla"><input type="checkbox" name="confirmar" value="si" required> Entiendo que no se puede deshacer</label>
       <button class="boton peligro" type="submit">Borrar cliente</button>

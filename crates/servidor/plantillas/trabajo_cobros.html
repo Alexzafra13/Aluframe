@@ -6,7 +6,7 @@
   <details class="registrar-senal"{% if d.senales.is_empty() %} open{% endif %}>
     <summary>Registrar una señal a cuenta</summary>
     <form method="post" action="/trabajos/{{ id }}/senal" class="pila">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       {% let importe = String::new() %}{% let medios = d.medios.clone() %}{% let hoy = d.hoy.clone() %}{% include "campos_cobro.html" %}
       <button class="boton" type="submit">Registrar señal</button>
     </form>
@@ -14,9 +14,9 @@
   {% endif %}
   {% for (f, codigo, estado) in d.facturas %}<p><a class="mono" href="/facturas/{{ f }}">{{ codigo }}</a> <span class="etiqueta etiqueta-cobro-{{ estado|lower }}">{{ estado }}</span></p>{% endfor %}
   {% if d.facturas.is_empty() %}
-  <form method="post" action="/trabajos/{{ id }}/factura"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton primario ancho" type="submit">Crear la factura</button></form>
+  <form method="post" action="/trabajos/{{ id }}/factura"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}"><button class="boton primario ancho" type="submit">Crear la factura</button></form>
   {% endif %}
   <p class="antetitulo">Albaranes</p>
-  {% for (a, codigo) in d.albaranes %}<p><a class="mono" href="/albaranes/{{ a }}/imprimir">{{ codigo }}</a></p>{% endfor %}
-  <form method="post" action="/trabajos/{{ id }}/albaran"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton ancho" type="submit">Crear albarán de entrega</button></form>
+  {% for (a, codigo) in d.albaranes %}<p><a class="mono" href="/albaranes/{{ a }}/imprimir" hx-boost="false">{{ codigo }}</a></p>{% endfor %}
+  <form method="post" action="/trabajos/{{ id }}/albaran" hx-boost="false"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}"><button class="boton ancho" type="submit">Crear albarán de entrega</button></form>
 </section>

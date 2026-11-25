@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const { entrarComoPropietario } = require("./comun");
+const { entrarComoPropietario, pulsarYEsperar } = require("./comun");
 
 test.describe.configure({ mode: "serial" });
 
@@ -148,7 +148,7 @@ test("comprueba el NIF al escribirlo y guarda varias direcciones", async ({ page
 
 test("busca sin tildes mientras se escribe", async ({ page }) => {
   await entrarComoPropietario(page);
-  await page.getByRole("link", { name: "Clientes" }).click();
+  await pulsarYEsperar(page, page.getByRole("link", { name: "Clientes" }));
   await page.getByLabel(/Buscar por nombre/).fill("pena");
   await expect(page.locator("#lista-clientes")).toContainText("Construcciones Peña");
   await expect(page.locator("#lista-clientes")).not.toContainText("Jose Pérez");
@@ -166,4 +166,16 @@ test("importa clientes de un CSV guardado por Excel en Windows-1252", async ({ p
   await expect(page.getByRole("status")).toContainText("Importados 1 clientes.");
   await page.getByRole("button", { name: "Deshacer esta importación" }).click();
   await expect(page.getByRole("status")).toContainText("Importación deshecha: 1 clientes quitados.");
+});
+
+// Doble toque en la tablet (ADR-0036): el formulario se envía una vez y hay un solo cliente.
+test("un doble clic en Guardar da de alta un solo cliente", async ({ page }) => {
+  await entrarComoPropietario(page);
+  await page.goto("/clientes/nuevo");
+  await page.getByLabel(/Nombre o razón social/).fill("Doble Toque");
+  await page.getByLabel(/Teléfono móvil/).fill("611222333");
+  await page.getByRole("button", { name: "Guardar", exact: true }).dblclick();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Doble Toque");
+  await page.goto("/clientes?q=Doble");
+  await expect(page.getByRole("link", { name: /Doble Toque/ })).toHaveCount(1);
 });

@@ -14,6 +14,7 @@ test("prepara la serie y la tarifa ficticias y las reglas de precio", async ({ p
   await expect(page.locator("#texto")).toHaveValue(/DEMO_FICTICIA/);
   await page.getByRole("button", { name: "Revisar" }).click();
   await page.getByRole("button", { name: "Confirmar e importar" }).click();
+  await expect(page).toHaveURL(/importada=/);
   await page.goto("/catalogo/tarifas/importar");
   await page.getByLabel("Proveedor").selectOption({ label: "Proveedor demo" });
   await page.locator("#archivo").setInputFiles(path.join(DEMO, "tarifa-demo.csv"));
@@ -22,7 +23,10 @@ test("prepara la serie y la tarifa ficticias y las reglas de precio", async ({ p
   await expect(page.getByText("Paso 2 de 3")).toBeVisible();
   // h2-tarifas ya pudo dejarla vigente: entonces la vista previa dice que no hay cambios.
   const confirmar = page.getByRole("button", { name: "Paso 3: confirmar e importar" });
-  if (await confirmar.count()) await confirmar.click();
+  if (await confirmar.count()) {
+    await confirmar.click();
+    await expect(page).toHaveURL(/importada=/);
+  }
   await page.goto("/ajustes/presupuestos");
   await page.getByLabel("Sobre el coste (coste × 1,30)").check();
   await page.getByLabel("Margen (%)").fill("30");

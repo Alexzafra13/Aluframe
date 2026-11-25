@@ -5,18 +5,18 @@
     <details class="franja-reiniciar">
       <summary class="boton">Empezar de nuevo</summary>
       <form method="post" action="/demostracion/empezar-de-nuevo">
-        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+        <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
         <p class="pequeno">Se borra lo que hayas hecho en la demostración y vuelve como al principio.</p>
         <button class="boton" type="submit">Sí, empezar de nuevo</button>
       </form>
     </details>
     {% endif %}
     <form method="post" action="/salir">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <button class="boton" type="submit">Cambiar de usuario</button>
     </form>
     <form method="post" action="/demostracion/salir">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <button class="boton primario" type="submit">Salir de la demostración</button>
     </form>
   </div>

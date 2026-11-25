@@ -33,7 +33,7 @@
 {% if usuario.es_propietario %}
 <dialog class="hoja" id="hoja-nuevo" aria-labelledby="hoja-nuevo-titulo">
   <form method="post" action="/presupuestos" class="hoja-contenido">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <header class="hoja-cabecera">
       <h2 id="hoja-nuevo-titulo">Nuevo presupuesto</h2>
       <button class="boton-cerrar" type="button" data-cerrar-hoja aria-label="Cerrar">✕</button>

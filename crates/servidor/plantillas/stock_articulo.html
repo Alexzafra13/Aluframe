@@ -23,7 +23,7 @@
       {% if filas.is_empty() %}<p class="vacio">Nada.</p>{% endif %}
     </section>
     <form class="tarjeta" method="post" action="/stock/{{ id }}/minimo">
-      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+      <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
       <h2>Mínimo</h2>
       <p class="texto-apagado pequeno">Por debajo, sale «Bajo mínimo» en el stock y en el Inicio, y entra en la lista de la compra.</p>
       <label for="minimo">Mínimo ({{ unidad }})</label>

@@ -9,7 +9,7 @@
 {% if let Some(texto) = aviso %}<p class="aviso" role="alert">{{ texto }}</p>{% endif %}
 {% if let Some(texto) = confirmacion %}<p class="aviso-efimero" role="status">{{ texto }}</p>{% endif %}
 <form class="tarjeta" method="post" action="/ajustes/taller">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <h2>Corte de barras</h2>
   <p class="texto-apagado">Se usan para repartir las piezas en las barras.{% if provisional %} Son valores provisionales hasta que los guardes.{% endif %}</p>
   <div class="formulario-en-linea">
@@ -20,7 +20,7 @@
   <button class="boton primario" type="submit">Guardar</button>
 </form>
 <form class="tarjeta" method="post" action="/ajustes/taller/metodo">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <h2 id="titulo-metodo">Cómo se reparten las piezas</h2>
   <p class="texto-apagado" id="explica-metodo">Vale para el precio de cada ventana, «Probar una ventana» y la orden de taller.</p>
   <fieldset class="opciones-verticales" aria-labelledby="titulo-metodo" aria-describedby="explica-metodo">
@@ -35,11 +35,11 @@
   {% if habituales.is_empty() %}<p class="vacio">Ninguna: el reparto aprende solo de lo que se acepta.</p>{% endif %}
   <ul class="lista-simple lista-con-quitar">{% for m in habituales %}<li>
     <span>{{ m.texto }}{% if let Some(a) = m.aviso %} <span class="etiqueta etiqueta-aviso">No se usa: {{ a }}</span>{% endif %}</span>
-    <form method="post" action="/ajustes/taller/habituales/{{ m.indice }}/quitar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><button class="boton-icono" type="submit" aria-label="Quitar {{ m.texto }}">✕</button></form>
+    <form method="post" action="/ajustes/taller/habituales/{{ m.indice }}/quitar"><input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}"><button class="boton-icono" type="submit" aria-label="Quitar {{ m.texto }}">✕</button></form>
   </li>{% endfor %}</ul>
   {% if !tipologias.is_empty() %}
   <form method="post" action="/ajustes/taller/habituales">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     <label for="habitual-tipologia">Serie y tipología</label>
     <select id="habitual-tipologia" name="tipologia" required>{% for (valor, texto) in tipologias %}<option value="{{ valor }}">{{ texto }}</option>{% endfor %}</select>
     <div class="formulario-en-linea">
@@ -51,7 +51,7 @@
   {% endif %}
 </section>
 <form class="tarjeta" method="post" action="/ajustes/taller/pasos">
-  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+  <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
   <h2>Pasos de cada ventana</h2>
   <p class="texto-apagado">Un paso por renglón, en orden. El operario los marca en «Mi día». Valen para los trabajos que se acepten desde ahora; los que ya existen conservan los suyos.</p>
   <label for="pasos">Pasos</label>

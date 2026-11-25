@@ -30,7 +30,7 @@
         <td class="numero" data-etiqueta="Precios:">{{ t.precios }}</td>
         <td>{% if t.vigente %}
           <form method="post" action="/catalogo/tarifas/{{ t.id }}/deshacer">
-            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+            <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
             <button class="boton" type="submit">Deshacer</button>
           </form>{% endif %}
         </td>

@@ -12,7 +12,7 @@
 <details class="tarjeta"{% if errores.hay() || aviso.is_some() || proveedores.is_empty() %} open{% endif %}>
   <summary>+ Nuevo proveedor</summary>
   <form method="post" action="/catalogo/proveedores">
-    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}">
+    <input type="hidden" name="_csrf" value="{{ usuario.token_csrf }}"><input type="hidden" name="_envio" value="{{ crate::vistas::nuevo_envio() }}">
     {% include "campos_proveedor.html" %}
     <button class="boton primario" type="submit">Guardar proveedor</button>
   </form>

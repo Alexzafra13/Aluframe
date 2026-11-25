@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block titulo %}{% endblock %} · Aluframe</title>
-  <meta name="htmx-config" content='{"includeIndicatorStyles":false}'>
+  <meta name="htmx-config" content='{"includeIndicatorStyles":false,"historyCacheSize":0,"refreshOnHistoryMiss":true,"defaultSettleDelay":0}'>
   <link rel="icon" href="/recursos/marca/icono-32.png?v={{ crate::vistas::VERSION }}" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="/recursos/marca/icono-180.png?v={{ crate::vistas::VERSION }}">
   <link rel="stylesheet" href="/recursos/estilos.css?v={{ crate::vistas::VERSION }}">
@@ -18,9 +18,17 @@
   <script src="/recursos/js/htmx-2.0.11.min.js?v={{ crate::vistas::VERSION }}" defer></script>
   <script src="/recursos/js/latido.js?v={{ crate::vistas::VERSION }}" defer></script>
   <script src="/recursos/js/poblacion.js?v={{ crate::vistas::VERSION }}" defer></script>
+  <script src="/recursos/js/envio-unico.js?v={{ crate::vistas::VERSION }}" defer></script>
+  <script src="/recursos/js/navegacion.js?v={{ crate::vistas::VERSION }}" defer></script>
+  <script src="/recursos/js/hojas.js?v={{ crate::vistas::VERSION }}" defer></script>
+  <script src="/recursos/js/opciones.js?v={{ crate::vistas::VERSION }}" defer></script>
+  <script src="/recursos/js/teclado.js?v={{ crate::vistas::VERSION }}" defer></script>
+  <script src="/recursos/js/archivo.js?v={{ crate::vistas::VERSION }}" defer></script>
+  <script src="/recursos/js/subir-copia.js?v={{ crate::vistas::VERSION }}" defer></script>
+  <script src="/recursos/js/imprimir.js?v={{ crate::vistas::VERSION }}" defer></script>
   {% block scripts %}{% endblock %}
 </head>
-<body class="{% block clase_body %}{% endblock %}">
+<body class="{% block clase_body %}{% endblock %}"{% block navegacion %} hx-boost="true"{% endblock %}>
 {% block cuerpo %}{% endblock %}
 </body>
 </html>
