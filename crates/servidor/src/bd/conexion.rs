@@ -21,6 +21,9 @@ impl BaseDeDatos {
         let escritor = Connection::open(ruta)?;
         configurar(&escritor)?;
         escritor.pragma_update(None, "journal_mode", "WAL")?;
+        // Lo que SQLite recomienda para conexiones que duran meses: al abrir y a diario
+        // (`optimizar`), para que siga eligiendo bien los índices según crecen los datos.
+        escritor.execute_batch("PRAGMA optimize=0x10002")?;
         let mut lectores = Vec::with_capacity(LECTORES);
         for _ in 0..LECTORES {
             let lector = Connection::open_with_flags(ruta, OpenFlags::SQLITE_OPEN_READ_ONLY)?;
@@ -85,6 +88,12 @@ impl BaseDeDatos {
         let lector = self.lectores.get(indice).ok_or_else(envenenado)?;
         let conexion = lector.lock().map_err(|_| envenenado())?;
         consulta(&conexion)
+    }
+
+    /// Mantenimiento diario de SQLite (ver `abrir`); no cambia ningún dato.
+    pub async fn optimizar(&self) -> Result<(), ErrorApp> {
+        self.con_escritor_entero(|con| Ok(con.execute_batch("PRAGMA optimize")?))
+            .await
     }
 
     /// La conexión de escritura sin transacción: para copiar o restaurar la base entera.

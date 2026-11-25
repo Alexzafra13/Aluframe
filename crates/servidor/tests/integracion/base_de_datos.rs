@@ -29,6 +29,7 @@ async fn la_base_en_archivo_usa_wal_y_los_lectores_ven_lo_escrito() {
         .await
         .unwrap();
     assert_eq!(modo, "wal");
+    bd.optimizar().await.unwrap();
     let estado = EstadoApp::nuevo(bd, Arc::new(RelojDelSistema))
         .await
         .unwrap();
@@ -62,4 +63,34 @@ async fn restablecer_la_contrasena_permite_entrar_con_la_nueva() {
     };
     let resultado = entrar(&contexto.estado, con_nueva).await.unwrap();
     assert!(matches!(resultado, ResultadoDeEntrada::Correcta { .. }));
+}
+
+/// La copia sale de un lector (ADR-0035): con WAL, ve la última foto confirmada y no espera a
+/// quien está guardando, ni lo hace esperar.
+#[tokio::test]
+async fn la_copia_desde_un_lector_no_espera_a_quien_guarda_ni_coge_lo_no_confirmado() {
+    let carpeta = carpeta_temporal("copia-lector");
+    let ruta = carpeta.join("alumframe.db");
+    let mut conexion = rusqlite::Connection::open(&ruta).unwrap();
+    preparar_esquema(&mut conexion, "2026-11-21T08:00:00Z").unwrap();
+    drop(conexion);
+    let bd = BaseDeDatos::abrir(&ruta).unwrap();
+    let mut guardando = rusqlite::Connection::open(&ruta).unwrap();
+    let transaccion = guardando
+        .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
+        .unwrap();
+    transaccion
+        .execute(
+            "INSERT INTO cliente (busqueda, creado_en) VALUES ('sin confirmar', '2026-11-21')",
+            [],
+        )
+        .unwrap();
+    let destino = carpeta.join("copia.db");
+    let copia = destino.clone();
+    bd.leer(move |con| servidor::bd::copia::exportar(con, &copia))
+        .await
+        .unwrap();
+    transaccion.commit().unwrap();
+    let resumen = servidor::bd::copia::comprobar_copia(&destino).unwrap();
+    assert_eq!(resumen.clientes, 0);
 }

@@ -32,13 +32,16 @@ pub async fn exportar_datos(estado: &EstadoApp, actor: &Actor) -> Result<CopiaEx
     exigir_datos_reales(estado)?;
     let carpeta = preparar_carpeta(estado)?;
     let ruta = carpeta.join(format!("exportacion-{}{EXTENSION}", generar_token()?));
-    let destino = ruta.clone();
-    estado
+    // Desde un lector y en su hilo: ni para a quien guarda ni al resto de peticiones.
+    let bytes = estado
         .bd
-        .con_escritor_entero(move |con| copia::exportar(con, &destino))
-        .await?;
-    let bytes = std::fs::read(&ruta).map_err(error_de_archivo);
-    let _ = std::fs::remove_file(&ruta);
+        .leer(move |con| {
+            copia::exportar(con, &ruta)?;
+            let bytes = std::fs::read(&ruta).map_err(error_de_archivo);
+            let _ = std::fs::remove_file(&ruta);
+            bytes
+        })
+        .await;
     let ahora = formatear_utc(estado.ahora());
     anotar(estado, Some(actor.id), "exportar_datos").await?;
     Ok(CopiaExportada {
@@ -62,7 +65,8 @@ pub async fn recibir_importacion(
     borrar_importaciones_pendientes(&carpeta);
     let clave = generar_token()?;
     let ruta = ruta_de_importacion(&carpeta, &clave);
-    std::fs::write(&ruta, bytes).map_err(error_de_archivo)?;
+    let destino = ruta.clone();
+    en_hilo_aparte(move || std::fs::write(&destino, bytes).map_err(error_de_archivo)).await?;
     if let Err(error) = comprobar(&ruta).await {
         let _ = std::fs::remove_file(&ruta);
         return Err(error);
@@ -116,7 +120,14 @@ pub async fn confirmar_importacion(
 
 async fn comprobar(ruta: &Path) -> Result<ResumenDeDatos, ErrorApp> {
     let ruta = ruta.to_path_buf();
-    tokio::task::spawn_blocking(move || copia::comprobar_copia(&ruta))
+    en_hilo_aparte(move || copia::comprobar_copia(&ruta)).await
+}
+
+/// Una copia puede pesar cientos de MB: leerla o escribirla no debe parar las demás peticiones.
+async fn en_hilo_aparte<T: Send + 'static>(
+    tarea: impl FnOnce() -> Result<T, ErrorApp> + Send + 'static,
+) -> Result<T, ErrorApp> {
+    tokio::task::spawn_blocking(tarea)
         .await
         .map_err(|error| ErrorApp::Interno(format!("tarea interrumpida: {error}")))?
 }

@@ -26,6 +26,10 @@ pub async fn vigilar_copias(estado: EstadoApp) {
         );
         if toca && estado.hay_usuarios() {
             copiar_y_anotar(&estado, "programada").await;
+            // Una vez al día, como la copia, mientras el programa sigue en marcha.
+            if let Err(error) = estado.bd.optimizar().await {
+                anotar_aviso(&format!("mantenimiento de la base: {error}"));
+            }
         }
     }
 }

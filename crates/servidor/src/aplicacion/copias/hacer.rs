@@ -30,9 +30,10 @@ pub async fn hacer_copia(estado: &EstadoApp) -> Result<RegistroDeCopias, ErrorAp
     let temporal = local.join(format!("{nombre}.tmp"));
     let _ = std::fs::remove_file(&temporal);
     let destino = temporal.clone();
+    // Desde un lector: con WAL ve lo último confirmado y no para a quien está guardando.
     let hecha = estado
         .bd
-        .con_escritor_entero(move |con| copia::exportar(con, &destino))
+        .leer(move |con| copia::exportar(con, &destino))
         .await;
     let destinos = estado.discos_de_copia().destinos();
     let resultado = match hecha {
