@@ -1,0 +1,22 @@
+name: Revisión de seguridad semanal
+
+# Aunque pasen meses sin cambios, se mira cada semana si alguna dependencia tiene un fallo de
+# seguridad conocido. Si lo hay, falla y GitHub avisa por correo (ADR-0035).
+on:
+  schedule:
+    - cron: "37 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  avisos:
+    name: Avisos de seguridad de las dependencias
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
+      - run: cargo deny check advisories
