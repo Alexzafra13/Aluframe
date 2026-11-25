@@ -59,7 +59,9 @@ Objetivo: que la interfaz se sienta fluida y responda al tacto, sin adornos ni e
 
 | Elemento | Comportamiento |
 |---|---|
-| Cambio de pantalla | Transiciones de vista nativas del navegador (`@view-transition`): el contenido entra con un fundido y 6 px de subida (260 ms); el menú y la barra superior no se mueven. Navegadores sin soporte cambian de página sin animación |
+| Cambio de pantalla | **Sin recarga** (`hx-boost`, ADR-0036): solo se sustituye el cuerpo de la página y el contenido entra con la transición de vista del navegador (fundido y 6 px de subida, 260 ms); el menú y la barra superior no se mueven. Navegadores sin soporte cambian sin animación. Las hojas de imprimir y las descargas abren con carga completa |
+| Cargando | Si una petición pasa de 200 ms (Tailscale, datos móviles), una barra fina acero recorre el borde superior; en el taller no llega a verse |
+| Enviar un formulario | El botón se atenúa y no admite un segundo toque hasta que llega la respuesta (`envio-unico.js`) |
 | Indicador del menú | Una píldora de cristal detrás de la entrada activa que se desliza a la nueva con un muelle y un leve estiramiento, como la barra de Instagram (`view-transition-name: indicador-menu`, 520 ms, `ambiente.css`). En el móvil, una burbuja acero claro tras la pestaña activa, con la misma transición |
 | Botones y tarjetas táctiles | Se hunden al 96 % al pulsar y vuelven con un pequeño rebote (curva `--curva-muelle`) |
 | Barra superior | Fija y translúcida, con desenfoque (`backdrop-filter`) |

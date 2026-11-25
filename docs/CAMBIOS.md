@@ -265,3 +265,8 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Cobertura del servidor medida por primera vez (en `docs/METRICAS.md`).
 - **Letras guardadas un año en el navegador:** las fuentes se piden desde el CSS sin versión y solo se guardaban una hora (unos 170 KB que volvían a bajar). No cambian nunca: para cambiar una, se cambia el nombre de su archivo.
 - **Arreglo de privacidad en la tablet compartida:** tras «Salir», el botón «atrás» del navegador enseñaba la última pantalla del dueño (con precios) sin pedir entrar; comprobado con Playwright. Ahora las pantallas van con `Cache-Control: no-store` y «atrás» lleva a la entrada. Prueba nueva en `acceso.rs`.
+- **Navegación sin recarga y doble toque** (ADR-0036, sin versión nueva):
+  - Al cambiar de pantalla solo se sustituye el contenido (`hx-boost`), con su transición; estilos, scripts y letras no se vuelven a cargar. Las hojas de imprimir y las descargas abren con carga completa. «Atrás» vuelve a pedir la página (sin copias guardadas en el navegador).
+  - Un formulario no se envía dos veces: el botón no admite otro toque hasta la respuesta y, como respaldo, el servidor atiende una sola vez cada envío (`_envio`) y devuelve la misma redirección al repetido. Pruebas de integración y E2E (doble clic real).
+  - Barra fina de «cargando» si una petición tarda más de 200 ms.
+  - E2E más rápidas (2,5 min) y con `pulsarYEsperar` para esperar a la pantalla nueva.

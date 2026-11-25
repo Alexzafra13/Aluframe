@@ -40,6 +40,7 @@ cargo build -p servidor --offline                  # si subiste la versión: act
 cargo build --profile e2e --locked -p servidor     # no --release: ~4 s en vez de ~2 min
 cd e2e && npm ci && ALUMFRAME_BIN=../target/e2e/alumframe npx playwright test --trace off
 ```
+- **E2E con navegación sin recarga** (ADR-0036): un clic que cambia de pantalla no espera a la nueva. Tras enviar, espera su resultado (URL o aviso) antes de `page.goto`; para navegar, `pulsarYEsperar` (`e2e/pruebas/comun.js`).
 - **E2E:** mientras trabajas, solo el archivo que tocas (`npx playwright test pruebas/h3-presupuestos.spec.js`); la entera (~2,5 min) antes de `main`.
 - **Capturas** de lo visual que cambies: PC a 1366 × 768 y 1366 × 620, e iPhone 13. Espera ~1 s a que terminen las animaciones.
 - **Windows:** cuidado con los finales de línea (los `.sql` van con LF) y con las rutas.
@@ -56,6 +57,7 @@ cd e2e && npm ci && ALUMFRAME_BIN=../target/e2e/alumframe npx playwright test --
 - **Tamaños:** archivos de 300 líneas como máximo y funciones de 40.
 - **Interfaz:**
   - estilo iOS adaptado al móvil (`docs/design.md`);
+  - navegación sin recarga (ADR-0036): una pantalla con CSS o scripts propios va sin ella (`{% block navegacion %}{% endblock %}`); los formularios de acción llevan `_csrf` y `_envio`;
   - la CSP no deja estilos en línea, así que los colores del dibujo van en atributos SVG;
   - estilos y scripts llevan `?v=` con la versión.
 - **Datos de prueba:** ficticios, en `fixtures/demo/` (E2E con `ALUMFRAME_DATOS_DEMO=si`).
