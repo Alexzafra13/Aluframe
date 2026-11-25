@@ -3,6 +3,7 @@ mod errores;
 mod extractores;
 mod formulario;
 mod middleware;
+mod peticiones_lentas;
 mod recuperacion;
 mod recursos;
 mod router;

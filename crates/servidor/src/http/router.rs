@@ -49,6 +49,7 @@ fn enrutador_de(estado: EstadoApp) -> Router {
         .layer(from_fn_with_state(estado.clone(), cargar_sesion))
         .layer(from_fn_with_state(estado.clone(), exigir_configuracion))
         .layer(from_fn(anadir_cabeceras_de_seguridad))
+        .layer(from_fn(super::peticiones_lentas::anotar_si_tarda))
         .with_state(estado)
 }
 

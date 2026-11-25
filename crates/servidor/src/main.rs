@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use std::io::BufRead;
+use std::io::{BufRead, IsTerminal};
 
 use anyhow::{Context, bail};
 use servidor::aplicacion::restablecer_contrasena::restablecer_contrasena;
@@ -15,7 +15,12 @@ restablecer-contrasena <nombre>
 version        muestra la versión";
 
 fn main() -> anyhow::Result<()> {
-    tracing_subscriber::fmt().with_target(false).init();
+    // Sin colores fuera de una terminal: en el registro del servicio (journalctl) salen como
+    // códigos raros.
+    tracing_subscriber::fmt()
+        .with_target(false)
+        .with_ansi(std::io::stdout().is_terminal())
+        .init();
     let argumentos: Vec<String> = std::env::args().skip(1).collect();
     let tiempo_de_ejecucion = tokio::runtime::Runtime::new()?;
     match argumentos
