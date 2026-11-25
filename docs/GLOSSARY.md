@@ -27,6 +27,12 @@ El código usa el vocabulario del taller, en español y sin tildes ni eñes.
 | condición de una parte de la serie | `solo_si` |
 | mosquitera enrollable: cajón, guía lateral, terminal, kit | `mosquitera`, `cajon`, `guia`, `terminal`, `kit` |
 | pieza pendiente (sin medida de corte todavía) | `pieza_pendiente` |
+| persiana en la ventana / suelta en pared (guías de L) | `persiana`, `montaje: ventana` / `montaje: pared` |
+| cajón, guía, cinta, recogedor, lama (de la persiana) | `cajon`, `guia`, `cinta`, `recogedor`, `lama` |
+| medida del conjunto / del marco / del hueco | `ancho` y `alto` escritos; `ancho_ventana` (marco con persiana); hueco en pared |
+| material a pedir (lo que se encarga a medida: cristal, persiana) | `material_a_pedir`, `MaterialAPedir`; en la serie, `se_pide: true` |
+| estado del material: pendiente de pedir, pedido, recibido | `EstadoDeMaterial::{Pendiente, Pedido, Recibido}` |
+| dibujo del presupuesto / dibujo del taller | `dibujo` / `dibujo_taller` (`para_taller`) |
 
 ## Ejemplos de funciones
 `evaluar_formula`, `expandir_ventana`, `optimizar_cortes`, `calcular_cuota_iva`, `aceptar_presupuesto`, `emitir_factura`, `registrar_salida_de_stock`, `asignar_numero_de_documento`, `crear_copia_de_seguridad`, `restaurar_copia`. Preguntas de sí o no: `es_incompleta`, `tiene_stock_suficiente`, `puede_emitirse`.

@@ -106,11 +106,11 @@ Un formulario corto, en este orden:
 
 ## 7. Editor de línea de ventana
 Sigue `design/01-presupuesto.png`.
-- **Izquierda:** el dibujo con pestañas **Cotas**, **Piezas** y **Cristal**. El dibujo se genera con los datos de la serie (`docs/FORMATO_SERIES.md`, apartado 9) y cambia al instante con la medida.
+- **Izquierda:** el dibujo **limpio** (0.25.0, ADR-0035): la ventana entera con su medida total, sin números de pieza, flechas ni cota del marco, y sin pestañas. Se genera con los datos de la serie (`docs/FORMATO_SERIES.md`, apartado 9) y cambia al instante con la medida. Los números y las cotas del marco van en el dibujo del taller.
 - **Derecha, arriba:** *Serie* y luego *Tipología* (dos selectores en cascada), **Ancho**, **Alto**, **Vidrio**, **Color** y las **opciones de la tipología** (por ejemplo, "Hoja de la cremona: izquierda o derecha").
 - **Cabecera del dibujo (0.19.0, ADR-0029):** el tipo ("Ventana corredera 4 hojas") y debajo la serie con el logotipo de su fabricante. El desplegable dice "Aluprom 21 (Aluval) · Ventana corredera 2 hojas".
 - **Opciones dependientes (0.20.0, ADR-0030):** una opción con `solo_si` aparece y desaparece en el navegador (`recursos/js/opciones.js`) sin recargar: "Parteluces: Sí" muestra "Abajo" y "Medida de abajo (cm)". Al cambiar de serie, el servidor vuelve a pintar las opciones (0.21.3). Una tipología sin cristal (mosquitera) oculta "Vidrio", la capa "Cristal" y su importe.
-- **Derecha, abajo, por apartados:** **Perfiles a cortar** numerados (como en la hoja de corte), con la silueta del perfil, cantidad, longitud y ángulo; una pieza sin medida sale con "pendiente". **Chapas**, con su dibujo técnico a escala y cotas. **Herrajes** (cierres, kits, ruedas, tornillos), con su dibujo y, debajo, el modelo del artículo del catálogo. La hoja de taller y "Mi día" siguen los mismos apartados.
+- **Derecha, abajo, por apartados:** **Perfiles a cortar** con la silueta del perfil, cantidad, longitud y ángulo; una pieza sin medida sale con "pendiente". **Para pedir** (0.25.0): el cristal con sus medidas y lo que la serie marca `se_pide` (la persiana). **Chapas**, con su dibujo técnico a escala y cotas. **Herrajes** (cierres, kits, ruedas, tornillos), con su dibujo y, debajo, el modelo del artículo del catálogo. La hoja de taller y "Mi día" siguen los mismos apartados.
 - **Pie:** perfiles, cristal, accesorios, mano de obra y total, más una etiqueta que explica lo que falta ("Falta el cristal").
 - **Validaciones visibles:** medida fuera de límites ("Este perfil no admite más de X cm: revísalo"), pieza más larga que la barra, longitud negativa. Los avisos no borran lo escrito.
 - **Cálculo en vivo:** el servidor recalcula al escribir (objetivo: menos de 100 ms). Con `CONFIRMAR` el cálculo sigue, pero la línea sale incompleta.
@@ -121,7 +121,8 @@ Sigue `design/01-presupuesto.png`.
 - **Resumen:** las ventanas con su miniatura, el **operario** (selector, para todo el trabajo o por ventana), la **fecha prevista**, una barra de progreso y las notas de aviso.
 - **Orden de taller:** vista en pantalla de las hojas (una por ventana) y botón **Imprimir**.
 - **Material:** lo que necesita el trabajo, lo que hay en stock y el plan de corte por barra; indica si falta algo.
-- **Entrega:** casilla **cristal recibido** por ventana, albarán y factura.
+- **Material a pedir** (0.25.0, ADR-0035): en cada ventana, el cristal y lo que se encarga a medida, con su medida y su estado (**Pendiente de pedir**, **Pedido**, **Recibido**). **Marcar pedido** con una nota opcional; luego **Recibido** (opcional) o **Deshacer**. Queda quién y cuándo. Sustituye a la casilla «cristal recibido». El Inicio avisa: «T-…: falta pedir cristal».
+- **Entrega:** albarán y factura.
 - **Acciones:** *Asignar*, *Imprimir orden*, **Terminar orden y descontar stock** (confirmación: "Se descontarán X barras, 1 kit… Esto no se puede deshacer, se corrige con un ajuste"), *Crear albarán* y *Crear factura*.
 - **Cambiar las medidas lo hace quien lleva el trabajo (el propietario), nunca el operario.** En cada ventana hay un botón **Modificar medidas**, que abre un formulario con ancho, alto y las opciones de la tipología:
   - Recalcula con la **misma versión de la serie y de la tarifa** con la que se aceptó, y muestra lo que cambia: piezas antes y después, plan de corte y diferencia de precio.
@@ -166,7 +167,7 @@ El operario entra con su nombre y su **PIN en un teclado numérico grande**. Est
 
 | Pantalla | Ruta | Hito | Qué hace |
 |---|---|---|---|
-| Entrar | `/entrar` | H0 | Tarjetas con los nombres de los operarios y teclado de PIN |
+| Entrar | `/entrar` | H0 | Sobre el fondo geométrico: el logo y cada persona en un círculo con su papel; el PIN con teclas redondas (0.24.0) |
 | Mi día | `/mi-dia` | H4 | Tarjetas de las ventanas que tiene asignadas |
 | Ventana | `/mi-dia/{ventana}` | H4 | El dibujo grande, la lista de pasos y la hoja de corte |
 
@@ -175,6 +176,7 @@ El operario entra con su nombre y su **PIN en un teclado numérico grande**. Est
 **Ventana:**
 - **Arriba:** el dibujo con las piezas numeradas y las opciones elegidas (por ejemplo, "Cremona en la hoja derecha").
 - **Pasos:** lista de pasos (propuesta: cortar, montar marco, montar hojas, acristalar, accesorios y cierre, revisar). Cada paso tiene un botón claro: **Empezar** (pasa a *en curso*) y **Terminar** (pasa a *hecho*). Se puede pulsar **Terminar** sin haber pulsado **Empezar**. **Pausar** y **Deshacer** devuelven el paso a su estado anterior.
+- **Material a pedir:** la misma lista que en el trabajo; el operario puede marcar lo que ha pedido.
 - **Falta algo:** abre una nota con motivos rápidos ("falta cristal", "falta material", "medida mal", "otro" con texto). El aviso llega al Inicio del propietario y la ventana queda marcada.
 - **Hoja de corte** (pestañas): Piezas (medida, cantidad y ángulo), Cristal, Accesorios y Barras (plan de corte).
 - Cada cambio guarda quién y cuándo. Si dos personas tocan el mismo paso, la segunda ve un aviso y recarga.

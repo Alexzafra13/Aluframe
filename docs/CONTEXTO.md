@@ -62,6 +62,10 @@ Todo se maneja en cm (un decimal de cm = 1 mm). Redondeo provisional: a 0,1 cm h
 - **Suelta en pared** con guías de L (perfil plano, canal de 53 mm y ala de 80 o 100, por confirmar): se escribe el hueco; va al presupuesto con su dibujo, sola o con la ventana.
 - Pendiente: alturas de los cajones, medida que se da al proveedor y cómo se cobran.
 
+**Material a pedir (propietario, 2026-11-25; ADR-0035).** El cristal y la persiana se encargan a medida para cada trabajo. En el trabajo se marcan pendiente → pedido; «recibido» existe pero no hace falta. Lo marca el dueño o el operario que lo pidió. Qué se pide lo dice la serie (`se_pide`), para poder añadir más cosas sin tocar código. Propuesto y pendiente de respuesta: **cristal suelto** como producto (ancho × alto, tipo de vidrio, por m²) y **pasos por producto** (una persiana o un cristal suelto no llevan los pasos de una ventana).
+
+**Imagen del programa (2026-11-25; ADR-0034).** Se llama **Aluframe**, como su logotipo (completo en el menú y al entrar; la «A» como símbolo e icono). Fondo geométrico en azul acero en la entrada, el menú y la barra del operario; la zona de trabajo, clara. Sin flechas en los dibujos. El propietario prefiere ver capturas o bocetos antes de decidir lo visual.
+
 **Herrajes (propietario, 2026-11-24; ADR-0029):** cierre de embutir que se usa hoy, Alualpha 267 i (2 por corredera de 2 hojas, 4 por la de 4); kit de plásticos Al21 de Aluval (9426065); tornillo 4,8 × 25 de cabeza redonda y estrella. El modelo concreto lo dice el artículo del catálogo; la serie usa referencias genéricas.
 
 **Sopena V-94, ventana europea abatible de 2 hojas (borrador)**

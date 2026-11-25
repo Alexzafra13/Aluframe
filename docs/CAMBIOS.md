@@ -251,3 +251,4 @@ La documentación se mantiene en versión 1 hasta que el propietario declare la 
   - Inicio: «T-…: falta pedir cristal».
   - La demostración trae un cristal pendiente, uno pedido con nota y los de los trabajos terminados recibidos.
   - Sin flechas de apertura en ningún dibujo, tampoco en la hoja de taller (propietario); los cierres sí.
+- **Puesta al día para una sesión nueva (2026-11-25):** `PROGRESS.md` con el estado, lo pendiente de respuesta del propietario (publicar la 0.25.0, cristal suelto, pasos por producto, hoja para pedir) y las lecciones de la sesión; glosario, contexto y pantallas al día.
