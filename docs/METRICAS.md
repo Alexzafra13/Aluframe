@@ -23,3 +23,4 @@ Las cifras son de la máquina de la nube de Claude (4 núcleos), así que sirven
 | Fecha | Versión | Desde el push a `main` hasta publicada | Notas |
 |---|---|---|---|
 | 2026-11-25 | 0.24.0 | 12 min | Antes de ADR-0035: Linux 3,5 min y después Windows sin caché 8,5 min; CI repetía las pruebas a la vez (7 min). |
+| 2026-11-25 | 0.24.0 | 4 min 40 s (CI entero; la publicación no se ha estrenado aún) | Con ADR-0035 y Windows en dos trabajos. Ahora el camino más largo es Linux con la E2E (~4,5 min). |
